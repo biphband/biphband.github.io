@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Vocabulary Review</title>
+        <link rel="icon" href="/icons/BGicon.png">
+        <link href="style.css" rel="stylesheet" type="text/css">
+    </head>
+
+    <body onload="getRandomWord()">
+        <h1 class="Title">BIPH Middle School Music</h1>
+        <h1 class="Subtitle">Vocabulary Review</h1>
+ 
+
+            <div class="dropdown">
+              <select name="vocab" onChange="getVocab()">
+                <option value="Cumulative" selected>Cumulative</option>
+                <option value="Unit1">Unit 1</option>
+              </select>
+            </div>
+
+
+        <div>
+            <h3 class="english"></h3>
+        </div>
+
+        <div>
+            <h3 class="pinyin"></h3>
+        </div>
+
+        <div> <h3 class="term-container">A</h3></div>
+        <div>
+          <h3 class="term"></h3>
+        </div>
+
+        <div class="button-container">
+  
+          
+            <div class="definitionButton">
+              <button class="pinyinbutton"></button>
+              <button class="definitionButton">Click anywhere to Reveal the Definition</button>
+            </div>
+          
+            <div class="nextButton">
+              <button class="nextButton">Click anywhere to Go to the next word</button>
+            </div>
+          </div>
+
+<div class="BGLogo">
+    <img src="https://i.postimg.cc/FKjG7zKB/BG-5percent.png" alt="Background logo">
+</div>
+
+<div class="autoProgressContainer">
+    <button class="autoProgressButton">Auto-progress</button>
+    <input type="range" min="1000" max="3000" value="1500" class="slider" id="progressSpeed" style="display: none;">
+</div>
+
+
+<script src="app.js"></script>
+
+
+</body>
+</html>
