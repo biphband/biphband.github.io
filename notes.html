@@ -175,6 +175,8 @@
             direction: ltr;
         }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
 <body>
     <h1>Notes on the Staff</h1>
@@ -429,6 +431,7 @@
             updateNote(noteSelect.value);
         });
 
+        // Modify the existing note selection logic
         noteSelect.addEventListener('change', (event) => {
             updateNote(event.target.value);
         });
@@ -439,6 +442,7 @@
                 .map(option => option.value);
         }
 
+        // Modify the moveNote function
         function moveNote(direction) {
             const visibleNotes = getVisibleNotes();
             const currentIndex = visibleNotes.indexOf(noteSelect.value);
@@ -448,6 +452,8 @@
                 const newNote = visibleNotes[newIndex];
                 noteSelect.value = newNote;
                 updateNote(newNote);
+                // Update the note in Firebase
+                database.ref('currentNote').set(newNote);
             }
         }
 
