@@ -484,7 +484,6 @@
             if (passwordInput.value === '12345') {
                 toggleConductorMode(true);
                 hidePasswordModal();
-                alert('Conductor mode enabled');
                 noteSelect.style.display = 'block'; // Show the concert pitch dropdown
                 gearIcon.style.display = 'block'; // Show the gear icon for filter menu
             } else {
@@ -754,7 +753,7 @@
         updateFiltersByScale();
         applyFilter();
 
-        const socket = io('https://responsible-robust-donkey.glitch.me/');
+        const socket = io();
 
         socket.on('updateNote', (note) => {
             noteSelect.value = note;
