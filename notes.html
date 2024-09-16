@@ -40,11 +40,13 @@
         }
         #note {
             position: absolute;
-            left: 140px;
-            width: 60px;
-            height: 60px;
-            top: 45px;
+            left: 133px; 
+            width: 75px;
+            height: 206px;
+            transform: translateY(-73px); /* Use transform to move up */
+            z-index: -1;
         }
+
         #noteDisplay {
             font-size: 26px;
             margin: 10px 0;
@@ -170,13 +172,13 @@
         #instrumentSelect {
             text-align-last: center;
             padding-right: 29px; 
+            direction: rtl;
         }
         #instrumentSelect option {
             direction: ltr;
         }
     </style>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
     <h1>Notes on the Staff</h1>
@@ -305,7 +307,17 @@
         <div class="line" style="top: 75%;"></div>
         <div class="line" style="top: 100%;"></div>
         <div id="trebleClef">&#119070;</div>
-        <img id="note" src="images/wholenote.png" alt="Whole Note">
+        <svg id="note" viewBox="0 0 100 60">
+            <svg width="100" height="60" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <clipPath id="cutout">
+                        <ellipse cx="50" cy="30" rx="25" ry="14" transform="rotate(45, 50, 30)"/>
+                    </clipPath>
+                </defs>
+                <ellipse cx="50" cy="30" rx="40" ry="25" fill="black"/>
+                <ellipse cx="50" cy="30" rx="40" ry="25" fill="white" clip-path="url(#cutout)"/>
+            </svg>
+        </svg>
         <div id="ledgerLineC4" class="ledger-line"></div>
         <div id="ledgerLineA3" class="ledger-line"></div>
         <div id="ledgerLineA5" class="ledger-line"></div>
@@ -452,8 +464,6 @@
                 const newNote = visibleNotes[newIndex];
                 noteSelect.value = newNote;
                 updateNote(newNote);
-                // Update the note in Firebase
-                database.ref('currentNote').set(newNote);
             }
         }
 
@@ -622,6 +632,36 @@
         // Set C major as the default scale and apply the filter
         updateFiltersByScale();
         applyFilter();
+
+        const socket = io('https://responsible-robust-donkey.glitch.me/');
+
+        socket.on('updateNote', (note) => {
+            noteSelect.value = note;
+            updateNote(note);
+        });
+
+        // Modify the existing note selection logic
+        noteSelect.addEventListener('change', (event) => {
+            const selectedNote = event.target.value;
+            updateNote(selectedNote);
+            // Emit the note change to the server
+            socket.emit('changeNote', selectedNote);
+        });
+
+        // Modify the moveNote function
+        function moveNote(direction) {
+            const visibleNotes = getVisibleNotes();
+            const currentIndex = visibleNotes.indexOf(noteSelect.value);
+            const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+            
+            if (newIndex >= 0 && newIndex < visibleNotes.length) {
+                const newNote = visibleNotes[newIndex];
+                noteSelect.value = newNote;
+                updateNote(newNote);
+                // Emit the note change to the server
+                socket.emit('changeNote', newNote);
+            }
+        }
     </script>
 </body>
 </html>
