@@ -172,10 +172,56 @@
         #instrumentSelect {
             text-align-last: center;
             padding-right: 29px; 
-            direction: rtl;
+            direction: ltr; /* never RTL */
         }
         #instrumentSelect option {
             direction: ltr;
+        }
+        #passwordModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @keyframes slideUp {
+            from {transform: translateY(100%);}
+            to {transform: translateY(0);}
+        }
+
+        #noteSelect, #gearIcon {
+            display: none; /* Hide by default */
         }
     </style>
     <script src="/socket.io/socket.io.js"></script>
@@ -186,11 +232,20 @@
         <label for="instrumentSelect">Select your instrument:</label>
         <br>
         <select id="instrumentSelect">
-            <option value="concert">Concert Pitch (Flute, Oboe, Violin, etc.)</option>
+            <option value="conductor">Conductor</option>
+            <option value="concert">Flute, Oboe, Violin (C)</option>
             <option value="clarinet_trumpet">Clarinet/Trumpet (Bb)</option>
             <option value="alto_sax">Alto Saxophone (Eb)</option>
             <option value="french_horn">French Horn (F)</option>
         </select>
+    </div>
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Enter the conductor password:</h2>
+            <input type="password" id="passwordInput">
+            <button id="submitPassword">Submit</button>
+        </div>
     </div>
     <div id="gearIcon">⚙️</div>
     <div id="filterMenu">
@@ -344,6 +399,10 @@
         const ledgerLineC6 = document.getElementById('ledgerLineC6');
         const selectedScaleDisplay = document.getElementById('selectedScale');
         const instrumentSelect = document.getElementById('instrumentSelect');
+        const modal = document.getElementById('passwordModal');
+        const closeBtn = document.getElementsByClassName('close')[0];
+        const passwordInput = document.getElementById('passwordInput');
+        const submitPasswordButton = document.getElementById('submitPassword');
 
         const notePositions = {
             'C6': -71, 'C#6': -71, 'Cb6': -71,
@@ -373,6 +432,7 @@
         };
 
         let currentTransposition = 0;
+        let isConductorMode = false;
 
         function transposeNote(note, semitones) {
             const [noteName, octave] = [note.slice(0, -1), parseInt(note.slice(-1))];
@@ -382,8 +442,67 @@
             return ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'][newIndex] + newOctave;
         }
 
+        function toggleConductorMode(enabled) {
+            isConductorMode = enabled;
+            noteSelect.style.display = enabled ? 'block' : 'none';
+            gearIcon.style.display = enabled ? 'block' : 'none';
+        }
+
+        function showPasswordModal() {
+            modal.style.display = 'block';
+            isPasswordPromptActive = true;
+            passwordInput.focus();
+        }
+
+        function hidePasswordModal() {
+            modal.style.display = 'none';
+            passwordInput.value = '';
+            instrumentSelect.value = 'concert';
+            isPasswordPromptActive = false;
+        }
+
+        instrumentSelect.addEventListener('change', (event) => {
+            if (event.target.value === 'conductor') {
+                showPasswordModal();
+                toggleConductorMode(false);
+            } else {
+                currentTransposition = transpositions[event.target.value];
+                updateNote(noteSelect.value);
+                toggleConductorMode(false);
+            }
+        });
+
+        closeBtn.addEventListener('click', hidePasswordModal);
+
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                hidePasswordModal();
+            }
+        });
+
+        function submitPassword() {
+            if (passwordInput.value === '12345') {
+                toggleConductorMode(true);
+                hidePasswordModal();
+                alert('Conductor mode enabled');
+                noteSelect.style.display = 'block'; // Show the concert pitch dropdown
+                gearIcon.style.display = 'block'; // Show the gear icon for filter menu
+            } else {
+                alert('Incorrect password');
+                hidePasswordModal();
+            }
+        }
+
+        submitPasswordButton.addEventListener('click', submitPassword);
+
+        passwordInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                submitPassword();
+            }
+        });
+
         function updateNote(selectedNote) {
-            if (selectedNote) {
+            if (selectedNote && (isConductorMode || instrumentSelect.value !== 'conductor')) {
                 const transposedNote = transposeNote(selectedNote, currentTransposition);
                 noteElement.style.display = 'block';
                 noteElement.style.top = `${notePositions[transposedNote] - 30}px`;
@@ -438,14 +557,11 @@
             }
         }
 
-        instrumentSelect.addEventListener('change', (event) => {
-            currentTransposition = transpositions[event.target.value];
-            updateNote(noteSelect.value);
-        });
-
         // Modify the existing note selection logic
         noteSelect.addEventListener('change', (event) => {
-            updateNote(event.target.value);
+            if (isConductorMode) {
+                updateNote(event.target.value);
+            }
         });
 
         function getVisibleNotes() {
@@ -456,14 +572,16 @@
 
         // Modify the moveNote function
         function moveNote(direction) {
-            const visibleNotes = getVisibleNotes();
-            const currentIndex = visibleNotes.indexOf(noteSelect.value);
-            const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-            
-            if (newIndex >= 0 && newIndex < visibleNotes.length) {
-                const newNote = visibleNotes[newIndex];
-                noteSelect.value = newNote;
-                updateNote(newNote);
+            if (isConductorMode) {
+                const visibleNotes = getVisibleNotes();
+                const currentIndex = visibleNotes.indexOf(noteSelect.value);
+                const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+                
+                if (newIndex >= 0 && newIndex < visibleNotes.length) {
+                    const newNote = visibleNotes[newIndex];
+                    noteSelect.value = newNote;
+                    updateNote(newNote);
+                }
             }
         }
 
@@ -476,35 +594,37 @@
         let isShiftPressed = false;
 
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowUp') {
-                event.preventDefault();
-                isArrowUpPressed = true;
-                moveNote('up');
-            } else if (event.key === 'ArrowDown') {
-                event.preventDefault();
-                isArrowDownPressed = true;
-                moveNote('down');
-            } else if (event.key === 'Shift') {
-                isShiftPressed = true;
-            } else {
-                const noteLetter = event.key.toUpperCase();
-                if ('ABCDEFG'.includes(noteLetter)) {
-                    const visibleNotes = getVisibleNotes();
-                    const octave = isShiftPressed ? '5' : '4';
-                    let noteToSelect = '';
+            if (isConductorMode && !isPasswordPromptActive) {
+                if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    isArrowUpPressed = true;
+                    moveNote('up');
+                } else if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    isArrowDownPressed = true;
+                    moveNote('down');
+                } else if (event.key === 'Shift') {
+                    isShiftPressed = true;
+                } else {
+                    const noteLetter = event.key.toUpperCase();
+                    if ('ABCDEFG'.includes(noteLetter)) {
+                        const visibleNotes = getVisibleNotes();
+                        const octave = isShiftPressed ? '5' : '4';
+                        let noteToSelect = '';
 
-                    // Find the first visible note that matches the pressed key
-                    for (const variant of [noteLetter, noteLetter + '#', noteLetter + 'b']) {
-                        const possibleNote = variant + octave;
-                        if (visibleNotes.includes(possibleNote)) {
-                            noteToSelect = possibleNote;
-                            break;
+                        // Find the first visible note that matches the pressed key
+                        for (const variant of [noteLetter, noteLetter + '#', noteLetter + 'b']) {
+                            const possibleNote = variant + octave;
+                            if (visibleNotes.includes(possibleNote)) {
+                                noteToSelect = possibleNote;
+                                break;
+                            }
                         }
-                    }
 
-                    if (noteToSelect) {
-                        noteSelect.value = noteToSelect;
-                        updateNote(noteToSelect);
+                        if (noteToSelect) {
+                            noteSelect.value = noteToSelect;
+                            updateNote(noteToSelect);
+                        }
                     }
                 }
             }
@@ -524,6 +644,7 @@
         noteSelect.value = 'C4';
         instrumentSelect.value = 'concert';
         updateNote('C4');
+        toggleConductorMode(false); // Ensure conductor mode is off by default
 
         // Filter menu functionality
         gearIcon.addEventListener('click', () => {
@@ -642,24 +763,28 @@
 
         // Modify the existing note selection logic
         noteSelect.addEventListener('change', (event) => {
-            const selectedNote = event.target.value;
-            updateNote(selectedNote);
-            // Emit the note change to the server
-            socket.emit('changeNote', selectedNote);
+            if (isConductorMode) {
+                const selectedNote = event.target.value;
+                updateNote(selectedNote);
+                // Emit the note change to the server
+                socket.emit('changeNote', selectedNote);
+            }
         });
 
         // Modify the moveNote function
         function moveNote(direction) {
-            const visibleNotes = getVisibleNotes();
-            const currentIndex = visibleNotes.indexOf(noteSelect.value);
-            const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-            
-            if (newIndex >= 0 && newIndex < visibleNotes.length) {
-                const newNote = visibleNotes[newIndex];
-                noteSelect.value = newNote;
-                updateNote(newNote);
-                // Emit the note change to the server
-                socket.emit('changeNote', newNote);
+            if (isConductorMode) {
+                const visibleNotes = getVisibleNotes();
+                const currentIndex = visibleNotes.indexOf(noteSelect.value);
+                const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+                
+                if (newIndex >= 0 && newIndex < visibleNotes.length) {
+                    const newNote = visibleNotes[newIndex];
+                    noteSelect.value = newNote;
+                    updateNote(newNote);
+                    // Emit the note change to the server
+                    socket.emit('changeNote', newNote);
+                }
             }
         }
     </script>
