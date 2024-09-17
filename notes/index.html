@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes on the Staff</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            min-height: 100vh; /* Ensure body takes up at least the full viewport height */
+            overflow-x: hidden; /* Allow vertical scrolling if needed */
+            overflow-y: auto;
+        }
+        body::before {
+            content: '';
+            position: fixed; /* Change to fixed positioning */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 0, 0.2), rgba(0, 0, 255, 0.2));
+            animation: colorShift 10s infinite alternate;
+            z-index: -1;
+        }
+        @keyframes colorShift {
+            0% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 0.8;
+            }
+        }
+        select {
+            font-size: 16px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+        #staff {
+            width: 300px;
+            height: 150px;
+            position: relative;
+            margin-top: 90px;
+        }
+        .line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background-color: black;
+        }
+        #trebleClef {
+            position: absolute;
+            font-size: 265px;
+            left: 0px;
+            top: -4px;
+            height: 190px;
+            display: flex;
+            align-items: center;
+        }
+        #note {
+            position: absolute;
+            left: 133px; 
+            width: 75px;
+            height: 206px;
+            transform: translateY(-73px); /* Use transform to move up */
+            z-index: -1;
+        }
+
+        #noteDisplay {
+            font-size: 26px;
+            margin: 10px 0;
+        }
+        #noteControlContainer {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        #stepperButtons {
+            display: none; /* Hide the stepper buttons */
+        }
+        #gearIcon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+        #gearIcon:hover {
+            transform: rotate(20deg);
+        }
+        #gearIcon.active {
+            animation: spin 0.5s ease;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #filterMenu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            max-width: 300px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        #filterMenu.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        #filterMenu h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        #filterMenu label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        #filterMenu button {
+            margin-top: 15px;
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #filterMenu button:hover {
+            background-color: #45a049;
+        }
+        .subsection {
+            margin-bottom: 20px;
+        }
+        #scaleSelect {
+            width: 100%;
+            padding: 8px;
+            margin-top: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .ledger-line {
+            position: absolute;
+            width: 80px;
+            height: 2px;
+            background-color: black;
+            left: 130px;
+            display: none;
+        }
+        #bottomLedgerLine1 {
+            top: 185px;
+        }
+        #bottomLedgerLine2 {
+            top: 220px;
+        }
+        #topLedgerLine1 {
+            top: -35px;
+        }
+        #topLedgerLine2 {
+            top: -71px;
+        }
+        #selectedScale {
+            font-size: 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        #instrumentSelection {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #instrumentSelect {
+            text-align-last: center;
+            padding-right: 29px; 
+            direction: ltr; /* never RTL */
+        }
+        #instrumentSelect option {
+            direction: ltr;
+        }
+        #passwordModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @keyframes slideUp {
+            from {transform: translateY(100%);}
+            to {transform: translateY(0);}
+        }
+
+        #noteSelect, #gearIcon {
+            display: none; /* Hide by default */
+        }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <h1>Notes on the Staff</h1>
+    <div id="instrumentSelection">
+        <label for="instrumentSelect">Select your instrument:</label>
+        <br>
+        <select id="instrumentSelect">
+            <option value="conductor">Conductor</option>
+            <option value="concert">Flute, Oboe, Violin (C)</option>
+            <option value="clarinet_trumpet">Clarinet/Trumpet (Bb)</option>
+            <option value="alto_sax">Alto Saxophone (Eb)</option>
+            <option value="french_horn">French Horn (F)</option>
+            <option value="bassoon">Bassoon (C)</option>
+            <option value="euphonium">Euphonium (C)</option>
+            <option value="trombone">Trombone (C)</option>
+            <option value="cello">Cello (C)</option>
+            <option value="contrabass">Contrabass (C)</option>
+            <option value="tuba">Tuba (C)</option>
+        </select>
+    </div>
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Enter the conductor password:</h2>
+            <input type="password" id="passwordInput">
+            <button id="submitPassword">Submit</button>
+        </div>
+    </div>
+    <div id="gearIcon">⚙️</div>
+    <div id="filterMenu">
+        <div class="subsection">
+            <h3>Scale Select</h3>
+            <select id="scaleSelect">
+                <option value="C" selected>C Major</option>
+                <option value="custom">Custom</option>
+                <option value="G">G Major</option>
+                <option value="D">D Major</option>
+                <option value="A">A Major</option>
+                <option value="E">E Major</option>
+                <option value="B">B Major</option>
+                <option value="F#">F# Major</option>
+                <option value="C#">C# Major</option>
+                <option value="F">F Major</option>
+                <option value="Bb">Bb Major</option>
+                <option value="Eb">Eb Major</option>
+                <option value="Ab">Ab Major</option>
+                <option value="Db">Db Major</option>
+                <option value="Gb">Gb Major</option>
+                <option value="Cb">Cb Major</option>
+            </select>
+        </div>
+        <div class="subsection">
+            <h3>Filter Notes</h3>
+            <label><input type="checkbox" class="noteFilter" value="C" checked> C</label>
+            <label><input type="checkbox" class="noteFilter" value="C#"> C#</label>
+            <label><input type="checkbox" class="noteFilter" value="Db"> Db</label>
+            <label><input type="checkbox" class="noteFilter" value="D" checked> D</label>
+            <label><input type="checkbox" class="noteFilter" value="D#"> D#</label>
+            <label><input type="checkbox" class="noteFilter" value="Eb"> Eb</label>
+            <label><input type="checkbox" class="noteFilter" value="E" checked> E</label>
+            <label><input type="checkbox" class="noteFilter" value="Fb"> Fb</label>
+            <label><input type="checkbox" class="noteFilter" value="F" checked> F</label>
+            <label><input type="checkbox" class="noteFilter" value="E#"> E#</label>
+            <label><input type="checkbox" class="noteFilter" value="F#"> F#</label>
+            <label><input type="checkbox" class="noteFilter" value="Gb"> Gb</label>
+            <label><input type="checkbox" class="noteFilter" value="G" checked> G</label>
+            <label><input type="checkbox" class="noteFilter" value="G#"> G#</label>
+            <label><input type="checkbox" class="noteFilter" value="Ab"> Ab</label>
+            <label><input type="checkbox" class="noteFilter" value="A" checked> A</label>
+            <label><input type="checkbox" class="noteFilter" value="A#"> A#</label>
+            <label><input type="checkbox" class="noteFilter" value="Bb"> Bb</label>
+            <label><input type="checkbox" class="noteFilter" value="B" checked> B</label>
+            <label><input type="checkbox" class="noteFilter" value="Cb"> Cb</label>
+        </div>
+        <button id="applyFilter">Apply</button>
+    </div>
+    <label for="noteSelect">Concert pitch:</label>
+    <select id="noteSelect">
+        <option value="C#6">C#6</option>
+        <option value="C6">C6</option>
+        <option value="Cb6">Cb6</option>
+        <option value="B#5">B#5</option>
+        <option value="B5">B5</option>
+        <option value="Bb5">Bb5</option>
+        <option value="A#5">A#5</option>
+        <option value="A5">A5</option>
+        <option value="Ab5">Ab5</option>
+        <option value="G#5">G#5</option>
+        <option value="G5">G5</option>
+        <option value="Gb5">Gb5</option>
+        <option value="F#5">F#5</option>
+        <option value="F5">F5</option>
+        <option value="Fb5">Fb5</option>
+        <option value="E#5">E#5</option>
+        <option value="E5">E5</option>
+        <option value="Eb5">Eb5</option>
+        <option value="D#5">D#5</option>
+        <option value="D5">D5</option>
+        <option value="Db5">Db5</option>
+        <option value="C#5">C#5</option>
+        <option value="C5">C5</option>
+        <option value="Cb5">Cb5</option>
+        <option value="B#4">B#4</option>
+        <option value="B4">B4</option>
+        <option value="Bb4">Bb4</option>
+        <option value="A#4">A#4</option>
+        <option value="A4">A4</option>
+        <option value="Ab4">Ab4</option>
+        <option value="G#4">G#4</option>
+        <option value="G4">G4</option>
+        <option value="Gb4">Gb4</option>
+        <option value="F#4">F#4</option>
+        <option value="F4">F4</option>
+        <option value="Fb4">Fb4</option>
+        <option value="E4">E#4</option>
+        <option value="E4">E4</option>
+        <option value="Eb4">Eb4</option>
+        <option value="D#4">D#4</option>
+        <option value="D4">D4</option>
+        <option value="Db4">Db4</option>
+        <option value="C#4">C#4</option>
+        <option value="C4">C4</option>
+        <option value="B3">B#3</option>
+        <option value="B3">B3</option>
+        <option value="Bb3">Bb3</option>
+        <option value="A#3">A#3</option>
+        <option value="A3">A3</option>
+    </select>
+    <div id="selectedScale">Selected Scale: C Major</div>
+    <div id="noteControlContainer">
+        <div id="noteDisplay">Current Note: C4</div>
+        <div id="stepperButtons">
+            <button id="nextNote">&#9650;</button>
+            <button id="prevNote">&#9660;</button>
+        </div>
+    </div>
+    <div id="staff">
+        <div class="line" style="top: 0;"></div>
+        <div class="line" style="top: 25%;"></div>
+        <div class="line" style="top: 50%;"></div>
+        <div class="line" style="top: 75%;"></div>
+        <div class="line" style="top: 100%;"></div>
+        <div id="trebleClef">&#119070;</div>
+        <svg id="note" viewbox="0 0 100 60">
+            <svg width="100" height="60" viewbox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <clippath id="cutout">
+                        <ellipse cx="50" cy="30" rx="25" ry="14" transform="rotate(45, 50, 30)"/>
+                    </clippath>
+                </defs>
+                <ellipse cx="50" cy="30" rx="40" ry="25" fill="black"/>
+                <ellipse cx="50" cy="30" rx="40" ry="25" fill="white" clip-path="url(#cutout)"/>
+            </svg>
+        </svg>
+        <div id="bottomLedgerLine1" class="ledger-line"></div>
+        <div id="bottomLedgerLine2" class="ledger-line"></div>
+        <div id="topLedgerLine1" class="ledger-line"></div>
+        <div id="topLedgerLine2" class="ledger-line"></div>
+    </div>
+    <script>
+        const noteSelect = document.getElementById('noteSelect');
+        const noteElement = document.getElementById('note');
+        const noteDisplay = document.getElementById('noteDisplay');
+        const prevButton = document.getElementById('prevNote');
+        const nextButton = document.getElementById('nextNote');
+        const gearIcon = document.getElementById('gearIcon');
+        const filterMenu = document.getElementById('filterMenu');
+        const applyFilterButton = document.getElementById('applyFilter');
+        const scaleSelect = document.getElementById('scaleSelect');
+        const noteFilters = document.querySelectorAll('.noteFilter');
+        const bottomLedgerLine1 = document.getElementById('bottomLedgerLine1');
+        const bottomLedgerLine2 = document.getElementById('bottomLedgerLine2');
+        const topLedgerLine1 = document.getElementById('topLedgerLine1');
+        const topLedgerLine2 = document.getElementById('topLedgerLine2');
+        const selectedScaleDisplay = document.getElementById('selectedScale');
+        const instrumentSelect = document.getElementById('instrumentSelect');
+        const modal = document.getElementById('passwordModal');
+        const closeBtn = document.getElementsByClassName('close')[0];
+        const passwordInput = document.getElementById('passwordInput');
+        const submitPasswordButton = document.getElementById('submitPassword');
+
+        const notePositions = {
+            'C6': -71, 'C#6': -71, 'Cb6': -71,
+            'B5': -53, 'B#5': -53, 'Bb5': -53,
+            'A5': -35, 'A#5': -35, 'Ab5': -35,
+            'G5': -17, 'G#5': -17, 'Gb5': -17,
+            'F5': 1, 'F#5': 1, 'Fb5': 1,
+            'E5': 21, 'E#5': 21, 'Eb5': 21,
+            'D5': 39, 'D#5': 39, 'Db5': 39,
+            'C5': 57, 'C#5': 57, 'Cb5': 57,
+            'B4': 78, 'B#4': 78, 'Bb4': 78,
+            'A4': 95, 'A#4': 95, 'Ab4': 95,
+            'G4': 114, 'G#4': 114, 'Gb4': 114,
+            'F4': 132, 'F#4': 132, 'Fb4': 132,
+            'E4': 152, 'E#4': 152, 'Eb4': 152,
+            'D4': 169, 'D#4': 169, 'Db4': 169,
+            'C4': 187, 'C#4': 187, 'Cb4': 187,
+            'B3': 204, 'B#3': 204, 'Bb3': 204,
+            'A3': 220, 'A#3': 220, 'Ab3': 220
+        };
+
+        const bassNotePositions = {
+            'E4': -71, 'E#4': -71, 'Eb4': -71,
+            'D4': -53, 'D#4': -53, 'Db4': -53,
+            'C4': -35, 'C#4': -35, 'Cb4': -35,
+            'B3': -17, 'B#3': -17, 'Bb3': -17,
+            'A3': 1, 'A#3': 1, 'Ab3': 1,
+            'G3': 21, 'G#3': 21, 'Gb3': 21,
+            'F3': 39, 'F#3': 39, 'Fb3': 39,
+            'E3': 57, 'E#3': 57, 'Eb3': 57,
+            'D3': 78, 'D#3': 78, 'Db3': 78,
+            'C3': 95, 'C#3': 95, 'Cb3': 95,
+            'B2': 114, 'B#2': 114, 'Bb2': 114,
+            'A2': 132, 'A#2': 132, 'Ab2': 132,
+            'G2': 152, 'G#2': 152, 'Gb2': 152,
+            'F2': 169, 'F#2': 169, 'Fb2': 169,
+            'E2': 187, 'E#2': 187, 'Eb2': 187,
+            'D2': 204, 'D#2': 204, 'Db2': 204,
+            'C2': 220, 'C#2': 220, 'Cb2': 220
+        };
+
+        const transpositions = {
+            'concert': 0,
+            'clarinet_trumpet': 2,
+            'alto_sax': 9,
+            'french_horn': 7,
+            'bassoon': -12,
+            'euphonium': -12,
+            'trombone': -12,
+            'cello': -12,
+            'contrabass': -12,
+            'tuba': -24
+        };
+
+        const bassClefInstruments = ['bassoon', 'euphonium', 'trombone', 'contrabass', 'tuba', 'cello'];
+
+        let currentTransposition = 0;
+        let isConductorMode = false;
+
+        function transposeNote(note, semitones) {
+            const [noteName, octave] = [note.slice(0, -1), parseInt(note.slice(-1))];
+            const noteIndex = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'].indexOf(noteName);
+            let newIndex = (noteIndex + semitones + 120) % 12; // Add 120 instead of 12 to handle larger transpositions
+            let newOctave = octave + Math.floor((noteIndex + semitones) / 12);
+            return ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'][newIndex] + newOctave;
+        }
+
+        function toggleConductorMode(enabled) {
+            isConductorMode = enabled;
+            noteSelect.style.display = enabled ? 'block' : 'none';
+            gearIcon.style.display = enabled ? 'block' : 'none';
+        }
+
+        function showPasswordModal() {
+            modal.style.display = 'block';
+            isPasswordPromptActive = true;
+            passwordInput.focus();
+        }
+
+        function hidePasswordModal() {
+            modal.style.display = 'none';
+            passwordInput.value = '';
+            instrumentSelect.value = 'concert';
+            isPasswordPromptActive = false;
+        }
+
+        instrumentSelect.addEventListener('change', (event) => {
+            if (event.target.value === 'conductor') {
+                showPasswordModal();
+                toggleConductorMode(false);
+            } else {
+                currentTransposition = transpositions[event.target.value];
+                updateNote(noteSelect.value);
+                toggleConductorMode(false);
+                updateClef(event.target.value);
+            }
+        });
+
+        closeBtn.addEventListener('click', hidePasswordModal);
+
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                hidePasswordModal();
+            }
+        });
+
+        function submitPassword() {
+            if (passwordInput.value === '12345') {
+                toggleConductorMode(true);
+                hidePasswordModal();
+                noteSelect.style.display = 'block'; // Show the concert pitch dropdown
+                gearIcon.style.display = 'block'; // Show the gear icon for filter menu
+            } else {
+                alert('Incorrect password');
+                hidePasswordModal();
+            }
+        }
+
+        submitPasswordButton.addEventListener('click', submitPassword);
+
+        passwordInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                submitPassword();
+            }
+        });
+
+        function wrapNote(note, isBassClef) {
+            const [noteName, octave] = [note.slice(0, -1), parseInt(note.slice(-1))];
+            if (isBassClef) {
+                if (octave < 2) return noteName + '2';
+                if (octave > 4) return noteName + '4';
+            } else {
+                if (octave < 3) return noteName + '3';
+                if (octave > 5) return noteName + '5';
+            }
+            return note;
+        }
+
+        function updateNote(selectedNote) {
+            if (selectedNote && (isConductorMode || instrumentSelect.value !== 'conductor')) {
+                let transposedNote = transposeNote(selectedNote, currentTransposition);
+                const isBassClef = bassClefInstruments.includes(instrumentSelect.value);
+                
+                // Apply wrapping to transposed note
+                transposedNote = wrapNote(transposedNote, isBassClef);
+                
+                noteElement.style.display = 'block';
+                
+                const positions = isBassClef ? bassNotePositions : notePositions;
+                
+                const notePosition = positions[transposedNote] - 30;
+                noteElement.style.top = `${notePosition}px`;
+                if (currentTransposition === 0) {
+                    noteDisplay.innerHTML = `<div style="text-align: center;">Current Note: ${selectedNote}</div>`;
+                } else {
+                    const concertPitch = selectedNote.replace(/\d+$/, '');
+                    noteDisplay.innerHTML = `
+                        <div style="text-align: center;">
+                            Current Note: ${transposedNote}<br>
+                            <span style="font-size: 0.8em;">(Concert ${concertPitch})</span>
+                        </div>
+                    `;
+                }
+                // Remove any existing accidental symbols
+                const existingSymbols = document.querySelectorAll('.accidental');
+                existingSymbols.forEach(symbol => symbol.remove());
+                
+                if (transposedNote.includes('b')) {
+                    // Add flat symbol before the note
+                    const flatSymbol = document.createElement('span');
+                    flatSymbol.textContent = '♭';
+                    flatSymbol.style.position = 'absolute';
+                    flatSymbol.style.left = '100px';
+                    flatSymbol.style.top = `${notePosition - 45}px`;
+                    flatSymbol.style.fontSize = '50px';
+                    flatSymbol.className = 'accidental';
+                    noteElement.parentNode.appendChild(flatSymbol);
+                } else if (transposedNote.includes('#')) {
+                    // Add sharp symbol before the note
+                    const sharpSymbol = document.createElement('span');
+                    sharpSymbol.textContent = '♯';
+                    sharpSymbol.style.position = 'absolute';
+                    sharpSymbol.style.left = '110px';
+                    sharpSymbol.style.top = `${notePosition + 0}px`;
+                    sharpSymbol.style.fontSize = '50px';
+                    sharpSymbol.className = 'accidental';
+                    noteElement.parentNode.appendChild(sharpSymbol);
+                }
+
+                // Update ledger lines
+                topLedgerLine1.style.display = (notePosition <= -55) ? 'block' : 'none';
+                topLedgerLine2.style.display = (notePosition <= -85) ? 'block' : 'none';
+                bottomLedgerLine1.style.display = (notePosition >= 145) ? 'block' : 'none';
+                bottomLedgerLine2.style.display = (notePosition >= 185) ? 'block' : 'none';
+            } else {
+                noteElement.style.display = 'none';
+                noteDisplay.textContent = 'Current Note: None';
+                bottomLedgerLine1.style.display = 'none';
+                bottomLedgerLine2.style.display = 'none';
+                topLedgerLine1.style.display = 'none';
+                topLedgerLine2.style.display = 'none';
+            }
+        }
+
+        // Modify the existing note selection logic
+        noteSelect.addEventListener('change', (event) => {
+            if (isConductorMode) {
+                updateNote(event.target.value);
+            }
+        });
+
+        function getVisibleNotes() {
+            return Array.from(noteSelect.options)
+                .filter(option => option.style.display !== 'none')
+                .map(option => option.value);
+        }
+
+        function moveNote(direction) {
+            if (isConductorMode) {
+                const visibleNotes = getVisibleNotes();
+                let currentIndex = visibleNotes.indexOf(noteSelect.value);
+                let newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+                
+                const isBassClef = bassClefInstruments.includes(instrumentSelect.value);
+                
+                if (isBassClef) {
+                    // Bass clef wrapping
+                    if (newIndex < 0 && visibleNotes[currentIndex] === 'E4') {
+                        newIndex = visibleNotes.findIndex(note => note === 'F3');
+                    } else if (newIndex >= visibleNotes.length && visibleNotes[currentIndex] === 'C2') {
+                        newIndex = visibleNotes.findIndex(note => note === 'B3');
+                    }
+                } else {
+                    // Treble clef wrapping
+                    if (newIndex < 0 && visibleNotes[currentIndex] === 'C6') {
+                        newIndex = visibleNotes.findIndex(note => note === 'D5');
+                    } else if (newIndex >= visibleNotes.length && visibleNotes[currentIndex] === 'A3') {
+                        newIndex = visibleNotes.findIndex(note => note === 'G4');
+                    } else if (direction === 'down' && visibleNotes[currentIndex] === 'E4') {
+                        newIndex = visibleNotes.findIndex(note => note === 'D4');
+                    } else if (direction === 'down' && visibleNotes[currentIndex] === 'B3') {
+                        newIndex = visibleNotes.findIndex(note => note === 'A3');
+                    }
+                }
+                
+                if (newIndex >= 0 && newIndex < visibleNotes.length) {
+                    const newNote = visibleNotes[newIndex];
+                    noteSelect.value = newNote;
+                    updateNote(newNote);
+                    // Emit the note change to the server
+                    socket.emit('changeNote', newNote);
+                }
+            }
+        }
+
+        prevButton.addEventListener('click', () => moveNote('down'));
+        nextButton.addEventListener('click', () => moveNote('up'));
+
+        // Add keyboard event listener for arrow keys and note selection
+        let isArrowDownPressed = false;
+        let isArrowUpPressed = false;
+        let isShiftPressed = false;
+
+        document.addEventListener('keydown', (event) => {
+            if (isConductorMode && !isPasswordPromptActive) {
+                if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    isArrowUpPressed = true;
+                    moveNote('up');
+                } else if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    isArrowDownPressed = true;
+                    moveNote('down');
+                } else if (event.key === 'Shift') {
+                    isShiftPressed = true;
+                } else {
+                    const noteLetter = event.key.toUpperCase();
+                    if ('ABCDEFG'.includes(noteLetter)) {
+                        const visibleNotes = getVisibleNotes();
+                        const octave = isShiftPressed ? '5' : '4';
+                        let noteToSelect = '';
+
+                        // Find the first visible note that matches the pressed key
+                        for (const variant of [noteLetter, noteLetter + '#', noteLetter + 'b']) {
+                            const possibleNote = variant + octave;
+                            if (visibleNotes.includes(possibleNote)) {
+                                noteToSelect = possibleNote;
+                                break;
+                            }
+                        }
+
+                        if (noteToSelect) {
+                            noteSelect.value = noteToSelect;
+                            updateNote(noteToSelect);
+                            // Emit the note change to the server
+                            socket.emit('changeNote', noteToSelect);
+                        }
+                    }
+                }
+            }
+        });
+
+        document.addEventListener('keyup', (event) => {
+            if (event.key === 'ArrowUp') {
+                isArrowUpPressed = false;
+            } else if (event.key === 'ArrowDown') {
+                isArrowDownPressed = false;
+            } else if (event.key === 'Shift') {
+                isShiftPressed = false;
+            }
+        });
+
+        // Set default to middle C (C4) and concert pitch instrument
+        noteSelect.value = 'C4';
+        instrumentSelect.value = 'concert';
+        updateNote('C4');
+        toggleConductorMode(false); // Ensure conductor mode is off by default
+
+        // Filter menu functionality
+        gearIcon.addEventListener('click', () => {
+            filterMenu.classList.toggle('active');
+            gearIcon.classList.toggle('active');
+        });
+
+        applyFilterButton.addEventListener('click', () => {
+            applyFilter();
+            filterMenu.classList.remove('active');
+            gearIcon.classList.remove('active');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!filterMenu.contains(event.target) && event.target !== gearIcon) {
+                filterMenu.classList.remove('active');
+                gearIcon.classList.remove('active');
+            }
+        });
+
+        scaleSelect.addEventListener('change', updateFiltersByScale);
+
+        function updateFiltersByScale() {
+            const selectedScale = scaleSelect.value;
+            const scaleNotes = {
+                'C': ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
+                'G': ['G', 'A', 'B', 'C', 'D', 'E', 'F#'],
+                'D': ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'],
+                'A': ['A', 'B', 'C#', 'D', 'E', 'F#', 'G#'],
+                'E': ['E', 'F#', 'G#', 'A', 'B', 'C#', 'D#'],
+                'B': ['B', 'C#', 'D#', 'E', 'F#', 'G#', 'A#'],
+                'F#': ['F#', 'G#', 'A#', 'B', 'C#', 'D#', 'E#'],
+                'C#': ['C#', 'D#', 'E#', 'F#', 'G#', 'A#', 'B#'],
+                'F': ['F', 'G', 'A', 'Bb', 'C', 'D', 'E'],
+                'Bb': ['Bb', 'C', 'D', 'Eb', 'F', 'G', 'A'],
+                'Eb': ['Eb', 'F', 'G', 'Ab', 'Bb', 'C', 'D'],
+                'Ab': ['Ab', 'Bb', 'C', 'Db', 'Eb', 'F', 'G'],
+                'Db': ['Db', 'Eb', 'F', 'Gb', 'Ab', 'Bb', 'C'],
+                'Gb': ['Gb', 'Ab', 'Bb', 'Cb', 'Db', 'Eb', 'F'],
+                'Cb': ['Cb', 'Db', 'Eb', 'Fb', 'Gb', 'Ab', 'Bb']
+            };
+
+            if (selectedScale !== 'custom') {
+                const scaleNotesSet = new Set(scaleNotes[selectedScale]);
+                noteFilters.forEach(filter => {
+                    filter.checked = scaleNotesSet.has(filter.value);
+                });
+                applyFilter();
+
+                // Set the default note to the root of the scale in the 4th octave
+                const rootNote = selectedScale + '4';
+                if (Array.from(noteSelect.options).some(option => option.value === rootNote)) {
+                    noteSelect.value = rootNote;
+                    updateNote(rootNote);
+                }
+
+                // Update the Selected Scale display
+                selectedScaleDisplay.textContent = `Selected Scale: ${selectedScale} Major`;
+            } else {
+                selectedScaleDisplay.textContent = 'Selected Scale: Custom';
+            }
+        }
+
+        noteFilters.forEach(filter => {
+            filter.addEventListener('change', () => {
+                scaleSelect.value = 'custom';
+                selectedScaleDisplay.textContent = 'Selected Scale: Custom';
+                applyFilter(); // Apply the filter immediately when a checkbox is changed
+            });
+        });
+
+        function applyFilter() {
+            const checkedNotes = Array.from(document.querySelectorAll('.noteFilter:checked')).map(checkbox => checkbox.value);
+            
+            Array.from(noteSelect.options).forEach(option => {
+                const baseNote = option.value.replace(/[0-9]/g, '');
+                const isNoteAllowed = checkedNotes.includes(baseNote);
+                
+                option.style.display = isNoteAllowed ? '' : 'none';
+            });
+            
+            // Ensure all octaves of the selected notes are visible
+            const allOctaves = ['3', '4', '5', '6'];
+            checkedNotes.forEach(note => {
+                allOctaves.forEach(octave => {
+                    const fullNote = note + octave;
+                    const option = Array.from(noteSelect.options).find(opt => opt.value === fullNote);
+                    if (option) {
+                        option.style.display = '';
+                    }
+                });
+            });
+            
+            // After applying the filter, update the current note if it's not visible
+            if (noteSelect.selectedOptions[0].style.display === 'none') {
+                const visibleNotes = getVisibleNotes();
+                if (visibleNotes.length > 0) {
+                    noteSelect.value = visibleNotes[0];
+                    updateNote(visibleNotes[0]);
+                } else {
+                    updateNote(null);
+                }
+            }
+        }
+
+        // Set C major as the default scale and apply the filter
+        updateFiltersByScale();
+        applyFilter();
+
+        const socket = io('https://biph-band.glitch.me/');
+
+        socket.on('updateNote', (note) => {
+            noteSelect.value = note;
+            updateNote(note);
+        });
+
+        // Modify the existing note selection logic
+        noteSelect.addEventListener('change', (event) => {
+            if (isConductorMode) {
+                const selectedNote = event.target.value;
+                updateNote(selectedNote);
+                // Emit the note change to the server
+                socket.emit('changeNote', selectedNote);
+            }
+        });
+
+        function updateClef(instrument) {
+            const trebleClef = document.getElementById('trebleClef');
+            if (bassClefInstruments.includes(instrument)) {
+                trebleClef.innerHTML = '&#119074;'; // Bass clef symbol
+                trebleClef.style.fontSize = '200px';
+                trebleClef.style.top = '-25px';
+            } else {
+                trebleClef.innerHTML = '&#119070;'; // Treble clef symbol
+                trebleClef.style.fontSize = '265px';
+                trebleClef.style.top = '-4px';
+            }
+        }
+
+        // Update the initial clef
+        updateClef(instrumentSelect.value);
+    </script>
+</body>
+</html>

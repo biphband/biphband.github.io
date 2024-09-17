@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Chromatic Tuner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .tuner {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #note {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        #frequency {
+            font-size: 24px;
+            color: #666;
+        }
+        #start-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out, opacity 0.2s ease-out;
+            opacity: 0;
+        }
+
+        .dropdown-content button {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .dropdown-content button:hover {
+            background-color: #f1f1f1;
+        }
+
+        .show {
+            max-height: 300px;
+            opacity: 1;
+            transition: max-height 0.2s ease-in, opacity 0.2s ease-in;
+        }
+    </style>
+</head>
+<body>
+    <div class="tuner">
+        <div id="note">-</div>
+        <div id="frequency">- Hz</div>
+        <div class="dropdown">
+            <button id="select-part">Select your part</button>
+            <div id="instrument-families" class="dropdown-content">
+                <!-- Instrument families will be added here dynamically -->
+            </div>
+        </div>
+        <div id="instruments" class="dropdown-content">
+            <!-- Individual instruments will be added here dynamically -->
+        </div>
+        <button id="start-btn">Start Tuner</button>
+    </div>
+
+    <script>
+        const noteElement = document.getElementById('note');
+        const frequencyElement = document.getElementById('frequency');
+        const startButton = document.getElementById('start-btn');
+
+        const A4 = 440;
+        const SEMITONE = Math.pow(2, 1/12);
+        const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+        let audioContext;
+        let analyser;
+
+        startButton.addEventListener('click', async () => {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 2048;
+
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    const source = audioContext.createMediaStreamSource(stream);
+                    source.connect(analyser);
+                    updatePitch();
+                } catch (error) {
+                    console.error('Error accessing microphone:', error);
+                    noteElement.textContent = 'Error';
+                    frequencyElement.textContent = 'Microphone access denied';
+                }
+            }
+        });
+
+        function updatePitch() {
+            const bufferLength = analyser.fftSize;
+            const buffer = new Float32Array(bufferLength);
+            analyser.getFloatTimeDomainData(buffer);
+
+            const ac = autoCorrelate(buffer, audioContext.sampleRate);
+
+            if (ac !== -1) {
+                const note = frequencyToNote(ac);
+                noteElement.textContent = note;
+                frequencyElement.textContent = `${ac.toFixed(1)} Hz`;
+            } else {
+                noteElement.textContent = '-';
+                frequencyElement.textContent = '- Hz';
+            }
+
+            requestAnimationFrame(updatePitch);
+        }
+
+        function autoCorrelate(buffer, sampleRate) {
+            const SIZE = buffer.length;
+            const MAX_SAMPLES = Math.floor(SIZE/2);
+            let bestOffset = -1;
+            let bestCorrelation = 0;
+            let rms = 0;
+            let foundGoodCorrelation = false;
+
+            for (let i = 0; i < SIZE; i++) {
+                const val = buffer[i];
+                rms += val * val;
+            }
+            rms = Math.sqrt(rms / SIZE);
+
+            if (rms < 0.01) return -1;
+
+            for (let offset = 0; offset < MAX_SAMPLES; offset++) {
+                let correlation = 0;
+
+                for (let i = 0; i < MAX_SAMPLES; i++) {
+                    correlation += Math.abs((buffer[i]) - (buffer[i + offset]));
+                }
+
+                correlation = 1 - (correlation / MAX_SAMPLES);
+
+                if (correlation > bestCorrelation) {
+                    bestCorrelation = correlation;
+                    bestOffset = offset;
+                }
+
+                if (correlation > 0.9) {
+                    foundGoodCorrelation = true;
+                } else if (foundGoodCorrelation) {
+                    break;
+                }
+            }
+
+            if (bestCorrelation > 0.01) {
+                return sampleRate / bestOffset;
+            }
+            return -1;
+        }
+
+        function frequencyToNote(frequency) {
+            const halfStepsBelowA4 = Math.round(12 * Math.log2(frequency / A4));
+            const octave = Math.floor((halfStepsBelowA4 + 57) / 12);
+            const noteIndex = (halfStepsBelowA4 + 57) % 12;
+            return NOTES[noteIndex] + octave;
+        }
+
+        const selectPartButton = document.getElementById('select-part');
+        const instrumentFamiliesMenu = document.getElementById('instrument-families');
+        const instrumentsMenu = document.getElementById('instruments');
+
+        const instrumentFamilies = {
+            'Woodwinds': ['Flute', 'Clarinet', 'Saxophone', 'Oboe', 'Bassoon'],
+            'Brass': ['Trumpet', 'Trombone', 'French Horn', 'Tuba'],
+            'Strings': ['Violin', 'Viola', 'Cello', 'Double Bass'],
+            'Percussion': ['Snare Drum', 'Bass Drum', 'Cymbals', 'Xylophone']
+        };
+
+        function toggleDropdown(dropdown) {
+            if (dropdown.classList.contains('show')) {
+                dropdown.style.maxHeight = dropdown.scrollHeight + "px";
+                setTimeout(() => {
+                    dropdown.style.maxHeight = "0px";
+                }, 10);
+                setTimeout(() => {
+                    dropdown.classList.remove('show');
+                }, 500);
+            } else {
+                dropdown.classList.add('show');
+                dropdown.style.maxHeight = "0px";
+                setTimeout(() => {
+                    dropdown.style.maxHeight = dropdown.scrollHeight + "px";
+                }, 10);
+            }
+        }
+
+        selectPartButton.addEventListener('click', () => {
+            instrumentFamiliesMenu.innerHTML = '';
+            for (const family in instrumentFamilies) {
+                const button = document.createElement('button');
+                button.textContent = family;
+                button.addEventListener('click', () => showInstruments(family));
+                instrumentFamiliesMenu.appendChild(button);
+            }
+            toggleDropdown(instrumentFamiliesMenu);
+        });
+
+        function showInstruments(family) {
+            instrumentsMenu.innerHTML = '';
+            instrumentFamilies[family].forEach(instrument => {
+                const button = document.createElement('button');
+                button.textContent = instrument;
+                button.addEventListener('click', () => selectInstrument(instrument));
+                instrumentsMenu.appendChild(button);
+            });
+            toggleDropdown(instrumentsMenu);
+        }
+
+        function selectInstrument(instrument) {
+            selectPartButton.textContent = instrument;
+            toggleDropdown(instrumentFamiliesMenu);
+            toggleDropdown(instrumentsMenu);
+        }
+
+        // Close the dropdown if the user clicks outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('#select-part') && !event.target.matches('.dropdown-content button')) {
+                if (instrumentFamiliesMenu.classList.contains('show')) {
+                    toggleDropdown(instrumentFamiliesMenu);
+                }
+                if (instrumentsMenu.classList.contains('show')) {
+                    toggleDropdown(instrumentsMenu);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
