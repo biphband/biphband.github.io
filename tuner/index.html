@@ -40,60 +40,12 @@
             border-radius: 5px;
             cursor: pointer;
         }
-
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            position: absolute;
-            background-color: #f9f9f9;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.2s ease-out, opacity 0.2s ease-out;
-            opacity: 0;
-        }
-
-        .dropdown-content button {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            width: 100%;
-            text-align: left;
-            border: none;
-            background: none;
-            cursor: pointer;
-        }
-
-        .dropdown-content button:hover {
-            background-color: #f1f1f1;
-        }
-
-        .show {
-            max-height: 300px;
-            opacity: 1;
-            transition: max-height 0.2s ease-in, opacity 0.2s ease-in;
-        }
     </style>
 </head>
 <body>
     <div class="tuner">
         <div id="note">-</div>
         <div id="frequency">- Hz</div>
-        <div class="dropdown">
-            <button id="select-part">Select your part</button>
-            <div id="instrument-families" class="dropdown-content">
-                <!-- Instrument families will be added here dynamically -->
-            </div>
-        </div>
-        <div id="instruments" class="dropdown-content">
-            <!-- Individual instruments will be added here dynamically -->
-        </div>
         <button id="start-btn">Start Tuner</button>
     </div>
 
@@ -195,75 +147,6 @@
             const octave = Math.floor((halfStepsBelowA4 + 57) / 12);
             const noteIndex = (halfStepsBelowA4 + 57) % 12;
             return NOTES[noteIndex] + octave;
-        }
-
-        const selectPartButton = document.getElementById('select-part');
-        const instrumentFamiliesMenu = document.getElementById('instrument-families');
-        const instrumentsMenu = document.getElementById('instruments');
-
-        const instrumentFamilies = {
-            'Woodwinds': ['Flute', 'Clarinet', 'Saxophone', 'Oboe', 'Bassoon'],
-            'Brass': ['Trumpet', 'Trombone', 'French Horn', 'Tuba'],
-            'Strings': ['Violin', 'Viola', 'Cello', 'Double Bass'],
-            'Percussion': ['Snare Drum', 'Bass Drum', 'Cymbals', 'Xylophone']
-        };
-
-        function toggleDropdown(dropdown) {
-            if (dropdown.classList.contains('show')) {
-                dropdown.style.maxHeight = dropdown.scrollHeight + "px";
-                setTimeout(() => {
-                    dropdown.style.maxHeight = "0px";
-                }, 10);
-                setTimeout(() => {
-                    dropdown.classList.remove('show');
-                }, 500);
-            } else {
-                dropdown.classList.add('show');
-                dropdown.style.maxHeight = "0px";
-                setTimeout(() => {
-                    dropdown.style.maxHeight = dropdown.scrollHeight + "px";
-                }, 10);
-            }
-        }
-
-        selectPartButton.addEventListener('click', () => {
-            instrumentFamiliesMenu.innerHTML = '';
-            for (const family in instrumentFamilies) {
-                const button = document.createElement('button');
-                button.textContent = family;
-                button.addEventListener('click', () => showInstruments(family));
-                instrumentFamiliesMenu.appendChild(button);
-            }
-            toggleDropdown(instrumentFamiliesMenu);
-        });
-
-        function showInstruments(family) {
-            instrumentsMenu.innerHTML = '';
-            instrumentFamilies[family].forEach(instrument => {
-                const button = document.createElement('button');
-                button.textContent = instrument;
-                button.addEventListener('click', () => selectInstrument(instrument));
-                instrumentsMenu.appendChild(button);
-            });
-            toggleDropdown(instrumentsMenu);
-        }
-
-        function selectInstrument(instrument) {
-            selectPartButton.textContent = instrument;
-            toggleDropdown(instrumentFamiliesMenu);
-            toggleDropdown(instrumentsMenu);
-        }
-
-        // Close the dropdown if the user clicks outside of it
-        window.onclick = function(event) {
-            if (!event.target.matches('#select-part') && !event.target.matches('.dropdown-content button')) {
-                if (instrumentFamiliesMenu.classList.contains('show')) {
-                    toggleDropdown(instrumentFamiliesMenu);
-                }
-                if (instrumentsMenu.classList.contains('show')) {
-                    toggleDropdown(instrumentsMenu);
-                }
-            }
         }
     </script>
 </body>
