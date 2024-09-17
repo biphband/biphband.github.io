@@ -32,11 +32,6 @@
             justify-content: center;
             align-items: center;
         }
-        #instrument-select {
-            font-size: 1.2em;
-            padding: 10px;
-            margin: 20px;
-        }
         #viewer {
             background-color: rgba(255, 255, 255, 0.2);
             transform: translateX(100%);
@@ -64,47 +59,96 @@
             cursor: pointer;
             z-index: 1000;
         }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f9f9f9;
+            min-width: 200px;
+            max-width: 80vw;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-height: 0;
+            overflow-y: auto;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            opacity: 0;
+            scrollbar-width: thin;
+            scrollbar-color: #888 #f1f1f1;
+        }
+
+        .dropdown-content::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .dropdown-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .dropdown-content::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+        .dropdown-content button {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .dropdown-content button:hover {
+            background-color: #f1f1f1;
+        }
+
+        .show {
+            max-height: 80vh; /* Increased from 300px to 80% of viewport height */
+            opacity: 1;
+            transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
+        }
+
+        @media (min-height: 600px) {
+            .show {
+                max-height: 500px; /* Fixed height for taller screens */
+            }
+        }
+
+        @media (min-height: 800px) {
+            .show {
+                max-height: 700px; /* Even taller for very large screens */
+            }
+        }
+
+        #select-part {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
     <div id="landing">
         <h1>Select Your Instrument</h1>
-        <select id="instrument-family-select">
-            <option value="">Choose an instrument family</option>
-            <option value="strings">Strings</option>
-            <option value="woodwinds">Woodwinds</option>
-            <option value="brass">Brass</option>
-            <option value="percussion">Percussion</option>
-        </select>
-        <select id="instrument-select">
-            <option value="">Choose an instrument</option>
-        </select>
-        <script>
-            const familySelect = document.getElementById('instrument-family-select');
-            const instrumentSelect = document.getElementById('instrument-select');
-            const instruments = {
-                strings: ['Piano', 'Cello', 'Violin 3', 'Violin 2', 'Violin 1', 'Contrabass'],
-                woodwinds: ['Bassoon', 'Oboe (Opt. Fl. 3)', 'Flute 1, 2', 'Piccolo', 'Bb Clarinet #1', 'Bb Clarinet #2, 3', 'Bass Clarinet', 'Alto Saxophone #1, 2', 'Tenor Saxophone', 'Baritone Saxophone'],
-                brass: ['Bb Trumpet #1', 'Bb Trumpet #2, 3', 'Horn in F #1, 2', 'Horn in F #3, 4', 'Trombone #1', 'Trombone #2, 3', 'Euphonium', 'Tuba'],
-                percussion: ['Percussion 1', 'Aux Percussion', 'Mallets #1', 'Marimba']
-            };
-
-            familySelect.addEventListener('change', (e) => {
-                const family = e.target.value;
-                instrumentSelect.innerHTML = '<option value="">Choose an instrument</option>';
-                if (family) {
-                    instruments[family].forEach(instrument => {
-                        const option = document.createElement('option');
-                        option.value = instrument.toLowerCase().replace(/\s+/g, '_');
-                        option.textContent = instrument;
-                        instrumentSelect.appendChild(option);
-                    });
-                    instrumentSelect.style.display = 'block';
-                } else {
-                    instrumentSelect.style.display = 'none';
-                }
-            });
-        </script>
+        <div class="dropdown">
+            <button id="select-part">Select your part</button>
+            <div id="instrument-families" class="dropdown-content">
+                <!-- Instrument families will be added here dynamically -->
+            </div>
+        </div>
+        <div id="instruments" class="dropdown-content">
+            <!-- Individual instruments will be added here dynamically -->
+        </div>
     </div>
     <div id="viewer">
         <div id="hamburger">☰</div>
@@ -114,7 +158,9 @@
     <script>
         const landing = document.getElementById('landing');
         const viewer = document.getElementById('viewer');
-        const select = document.getElementById('instrument-select');
+        const selectPart = document.getElementById('select-part');
+        const instrumentFamilies = document.getElementById('instrument-families');
+        const instruments = document.getElementById('instruments');
         const pdfContainer = document.getElementById('pdf-container');
         const hamburger = document.getElementById('hamburger');
 
@@ -134,18 +180,69 @@
         let currentInstrument = '';
         let currentPage = 0;
 
-        select.addEventListener('change', (e) => {
-            currentInstrument = e.target.value;
+        const instrumentData = {
+            'Woodwinds': ['Piccolo', 'Flute 1', 'Flute 2', 'Oboe (Opt. Fl. 3)', 'Bb Clarinet 1', 'Bb Clarinet 2', 'Bb Clarinet 3', 'Bass Clarinet', 'Alto Saxophone 1', 'Alto Saxophone 2', 'Tenor Saxophone', 'Baritone Saxophone', 'Bassoon'],
+            'Brass': ['Bb Trumpet 1', 'Bb Trumpet 2', 'Bb Trumpet 3', 'Bb Trumpet, simplified', 'F Horn 1', 'F Horn 2', 'F Horn 3', 'F Horn 4', 'Trombone 1', 'Trombone 2', 'Trombone 3', 'Euphonium', 'Euphonium, simplified', 'Tuba'],
+            'Percussion': ['Percussion 1', 'Aux Percussion', 'Mallets 1', 'Marimba', 'Vibraphone', 'Glockenspiel, Chimes', 'Piano'],
+            'Strings': ['Violin 1', 'Violin 2', 'Violin 3', 'Cello 1', 'Cello 2', 'Contrabass']
+        };
+
+        function populateInstrumentFamilies() {
+            for (let family in instrumentData) {
+                const button = document.createElement('button');
+                button.textContent = family;
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    showInstruments(family);
+                };
+                instrumentFamilies.appendChild(button);
+            }
+        }
+
+        function showInstruments(family) {
+            instruments.innerHTML = '';
+            instrumentData[family].forEach(instrument => {
+                const button = document.createElement('button');
+                button.textContent = instrument;
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    selectInstrument(instrument);
+                };
+                instruments.appendChild(button);
+            });
+            instrumentFamilies.classList.remove('show');
+            instruments.classList.add('show');
+        }
+
+        function selectInstrument(instrument) {
+            selectPart.textContent = instrument;
+            instruments.classList.remove('show');
+            // Handle the selected instrument (you can reuse your existing logic here)
+            console.log('Selected instrument:', instrument);
+            currentInstrument = instrument.toLowerCase().replace(/ /g, '_');
             if (currentInstrument) {
                 currentPage = 0;
                 viewer.classList.add('active');
                 showPDF();
             }
+        }
+
+        selectPart.onclick = (e) => {
+            e.stopPropagation();
+            instrumentFamilies.classList.toggle('show');
+            instruments.classList.remove('show');
+        };
+
+        document.addEventListener('click', () => {
+            instrumentFamilies.classList.remove('show');
+            instruments.classList.remove('show');
         });
+
+        populateInstrumentFamilies();
 
         hamburger.addEventListener('click', () => {
             viewer.classList.remove('active');
-            select.value = '';
+            selectPart.textContent = 'Select your part';
         });
 
         function showPDF() {
