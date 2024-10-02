@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Participation Points</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'American Typewriter', serif;
+            height: 100%;
+            font-size: 18px;
+            overflow: hidden;
+        }
+        #header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 60px 50px 0px;
+            background-color: #f0f0f0;
+        }
+        #title {
+            text-align: center;
+            flex-grow: 1;
+            position: absolute;
+            margin-top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #title h1 {
+            margin: 0;
+            font-size: 48px;
+            font-weight: normal;
+        }
+        #title h2 {
+            margin: 5px 0 0;
+            font-weight: normal; 
+            font-size: 24px;
+        }
+        #date {
+            margin-top: -50px;
+            text-align: right;
+        }
+        #date p {
+            margin: 5px 0; 
+        }
+        #objective {
+            margin-top: -50px;
+            margin-left: -10px;
+            text-align: left;
+        }
+        #objective h3 {
+            margin-left: 10px;
+        }
+        #objectiveList {
+            margin-left: -10px;
+        }
+        .editable:hover {
+            background-color: #dadada;
+            cursor: pointer;
+        }
+        #graph-container {
+            margin-top: -5px;
+            width: 100%;
+            height: calc(85%); 
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            background-color: #f0f0f0;
+            padding: 20px;
+            padding-bottom: 100px; 
+            box-sizing: border-box;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        .bar {
+            width: 40px;
+            background-color: #3498db;
+            transition: height 0.5s ease-in-out;
+            position: relative;
+            margin: 0 10px;
+        }
+        .bar-label {
+            position: absolute;
+            bottom: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            font-size: 12px;
+            white-space: nowrap;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .menu-icon {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #333;
+            opacity: 0.5;
+            z-index: 1000;
+        }
+        .menu {
+            position: fixed;
+            top: 60px;
+            left: -250px;
+            width: 250px;
+            height: calc(100% - 60px);
+            background-color: #fff;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            transition: left 0.3s ease-in-out;
+            z-index: 1001;
+        }
+        .menu.open {
+            left: 0;
+        }
+        .menu ul {
+            list-style-type: none;
+            padding: 20px;
+        }
+        .menu ul li {
+            margin-bottom: 10px;
+        }
+        .menu ul li a {
+            text-decoration: none;
+            color: #333;
+        }
+        #teacher-mode {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            max-width: 1200px;
+            max-height: 90%;
+            background-color: #fff;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        .spreadsheet {
+            display: grid;
+            grid-template-columns: 1fr 1fr repeat(4, 1fr) 1fr;
+            gap: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .spreadsheet div {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .stepper button {
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+            border: none;
+            background-color: #3498db;
+            color: #fff;
+            cursor: pointer;
+        }
+        .attendance-dropdown,
+        .checkbox-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        @keyframes flash-green {
+            0% { background-color: #3498db; }
+            50% { background-color: #2ecc71; }
+            100% { background-color: #3498db; }
+        }
+        @keyframes flash-red {
+            0% { background-color: #3498db; }
+            50% { background-color: #e74c3c; }
+            100% { background-color: #3498db; }
+        }
+        .spreadsheet-header {
+            position: sticky;
+            top: 0;
+            background-color: #fff;
+            z-index: 1;
+            cursor: pointer;
+        }
+        .close-button {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 2;
+        }
+        .copy-button {
+            position: fixed;
+            left: 10px;
+            bottom: 10px;
+            width: 30px;
+            height: 30px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            opacity: 0.1;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+        .copy-button:hover {
+            opacity: 0.5;
+        }
+        .copy-button img {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-icon" onclick="enterTeacherMode()">☰</div>
+    <div id="header">
+        <div id="objective">
+            <h3>Objective:</h3>
+            <ul id="objectiveList">
+                <li class="editable" onclick="editObjective(this)">Instrument fundamentals</li>
+                <li class="editable" onclick="editObjective(this)">Sectionals, new music</li>
+                <li class="editable" onclick="editObjective(this)">Tutoring on the weekends</li>
+            </ul>
+        </div>
+        <div id="title">
+            <h1>MS Band</h1>
+            <h2 id="timeRange">12:40 - 1:30</h2>
+        </div>
+        <div id="date">
+            <p><h3>Date:</h3></p>
+            <p><span id="currentDate"></span></p>
+            <p><span id="currentDay"></span></p>
+        </div>
+    </div>
+    <div id="graph-container">
+        <button class="copy-button" onclick="copyScores()">
+            <img src="../icons/copy.png" alt="Copy">
+        </button>
+    </div>
+    <div id="teacher-mode">
+        <span class="close-button" onclick="exitTeacherMode()">&times;</span>
+        <div class="spreadsheet">
+            <div class="spreadsheet-header"><strong>Student</strong></div>
+            <div class="spreadsheet-header"><strong onclick="cycleAttendance()">Attendance</strong></div>
+            <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('stands')">Stands</strong></div>
+            <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('music')">Music</strong></div>
+            <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('pencils')">Pencils</strong></div>
+            <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('cases')">Cases</strong></div>
+            <div class="spreadsheet-header"><strong>Participation</strong></div>
+        </div>
+    </div>
+
+    <script>
+           const students = [
+        'Anne', 'Kevin', 'Shine', 'Sophie', 'Owen', 'Helen H', 'Haefen', 'Leo', 'Francis', 'Mianmian', 
+        'Steven', 'Helen N', 'Jenny', 'Grace', 'June', 'Rene', 'Steve', 'Bruce', 'Calvin Y', 'Luna', 
+        'Calvin Z', 'Aurora'
+    ].map(name => ({ name, score: 'EX', attendance: 'Absent', stands: false, music: false, pencils: false, cases: false }));
+
+    const teacherModeOrder = [
+        'Shine', 'Jenny', 'June', 'Leo', 'Grace', 'Mianmian', 'Helen H', 'Anne', 'Calvin Y', 'Francis',
+        'Steve', 'Owen', 'Haefen', 'Sophie', 'Steven', 'Calvin Z', 'Helen N', 'Luna', 'Rene', 'Bruce',
+        'Aurora', 'Kevin'
+    ];
+
+    function populateStudents() {
+        const spreadsheet = document.querySelector('.spreadsheet');
+        teacherModeOrder.forEach(name => {
+            const student = students.find(s => s.name === name);
+            spreadsheet.innerHTML += `
+                <div>${student.name}</div>
+                <div class="attendance-dropdown">
+                    <select onchange="syncAttendance('${student.name}', this)">
+                        <option value="Absent" selected>Absent</option>
+                        <option value="Present">Present</option>
+                        <option value="Tardy">Tardy</option>
+                    </select>
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" onchange="syncCheckbox('${student.name}', this, 'stands')"> 
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" onchange="syncCheckbox('${student.name}', this, 'music')"> 
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" onchange="syncCheckbox('${student.name}', this, 'pencils')"> 
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" onchange="syncCheckbox('${student.name}', this, 'cases')"> 
+                </div>
+                <div class="stepper">
+                    <button onclick="updateScore('${student.name}', -10)">-</button>
+                    <span>${student.score}</span>
+                    <button onclick="updateScore('${student.name}', 10)">+</button>
+                </div>
+            `;
+        });
+    }
+
+    function enterTeacherMode() {
+        const teacherMode = document.getElementById('teacher-mode');
+        if (teacherMode.style.display === 'block') {
+            exitTeacherMode();
+        } else {
+            teacherMode.style.display = 'block';
+            populateStudents();
+        }
+    }
+
+    function exitTeacherMode() {
+        document.getElementById('teacher-mode').style.display = 'none';
+        document.querySelector('.spreadsheet').innerHTML = ''; // Clear previous controls
+    }
+
+        function syncAttendance(name, select) {
+            const student = students.find(s => s.name === name);
+            if (student) {
+                student.attendance = select.value;
+                calculateScore(student);
+            }
+        }
+
+        function syncCheckbox(name, checkbox, type) {
+            const student = students.find(s => s.name === name);
+            if (student) {
+                student[type] = checkbox.checked;
+                calculateScore(student);
+            }
+        }
+
+        function calculateScore(student) {
+            if (student.attendance === 'Absent') {
+                student.score = 'EX';
+            } else {
+                let score = 60; // Base score for present
+                if (student.attendance === 'Tardy') score -= 20;
+                if (student.stands) score += 10;
+                if (student.music) score += 10;
+                if (student.pencils) score += 10;
+                if (student.cases) score += 10;
+                student.score = Math.max(0, Math.min(100, score));
+            }
+            updateScoreDisplay(student);
+        }
+
+        function updateScoreDisplay(student) {
+            const bar = document.getElementById(`bar-${student.name}`);
+            if (bar) {
+                if (student.score === 'EX') {
+                    bar.style.height = '0%';
+                    bar.querySelector('.bar-label').innerHTML = `${student.name}<br>EX`;
+                } else {
+                    bar.style.height = `${student.score}%`;
+                    bar.querySelector('.bar-label').innerHTML = `${student.name}<br>${student.score}%`;
+                }
+            }
+            const participationSpan = document.querySelector(`.spreadsheet .stepper:has(button[onclick*="${student.name}"]) span`);
+            if (participationSpan) {
+                participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
+            }
+        }
+
+        function updateScore(name, change) {
+            const student = students.find(s => s.name === name);
+            if (student && student.score !== 'EX') {
+                student.score = Math.max(0, Math.min(100, student.score + change));
+                const bar = document.getElementById(`bar-${name}`);
+                bar.style.height = `${student.score}%`;
+                bar.querySelector('.bar-label').innerHTML = `${name}<br>${student.score}%`;
+                bar.style.animation = 'none';
+                bar.offsetHeight; // Trigger reflow
+                bar.style.animation = change > 0 ? 'flash-green 0.5s' : 'flash-red 0.5s';
+                updateScoreDisplay(student);
+            }
+        }
+
+        function createBars() {
+            const container = document.getElementById('graph-container');
+            students.forEach(student => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = student.score === 'EX' ? '0%' : `${student.score}%`;
+                bar.id = `bar-${student.name}`;
+                
+                const label = document.createElement('div');
+                label.className = 'bar-label';
+                label.innerHTML = `${student.name}<br>${student.score === 'EX' ? 'EX' : student.score + '%'}`;
+                
+                bar.appendChild(label);
+                container.appendChild(bar);
+            });
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('currentDay').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
+        }
+
+        function editObjective(item) {
+            const currentItem = item.textContent;
+            const newItem = prompt('Edit objective:', currentItem);
+            if (newItem !== null) {
+                item.textContent = newItem.trim();
+            }
+        }
+
+        function cycleAttendance() {
+            const attendanceOptions = ['Absent', 'Present', 'Tardy'];
+            const currentIndex = attendanceOptions.indexOf(students[0].attendance);
+            const nextIndex = (currentIndex + 1) % attendanceOptions.length;
+            const nextAttendance = attendanceOptions[nextIndex];
+            
+            students.forEach(student => {
+                student.attendance = nextAttendance;
+                calculateScore(student);
+            });
+
+            document.querySelectorAll('.attendance-dropdown select').forEach(select => {
+                select.value = nextAttendance;
+            });
+        }
+
+        function toggleAllCheckboxes(type) {
+            const checkboxes = document.querySelectorAll(`.spreadsheet .checkbox-container input[type="checkbox"]`);
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            checkboxes.forEach((cb, index) => {
+                if (index % 4 === ['stands', 'music', 'pencils', 'cases'].indexOf(type)) {
+                    cb.checked = !allChecked;
+                    const studentName = teacherModeOrder[Math.floor(index / 4)];
+                    syncCheckbox(studentName, cb, type);
+                }
+            });
+        }
+        
+        function copyScores() {
+    const scores = students.map(student => student.score === 'EX' ? 'EX' : `${student.score}%`).join('\n');
+    navigator.clipboard.writeText(scores).then(() => {
+        showTemporaryMessage('Copied to clipboard');
+    }).catch(err => {
+        console.error('Failed to copy scores: ', err);
+    });
+}
+
+function showTemporaryMessage(message) {
+    const messageElement = document.createElement('div');
+    messageElement.textContent = message;
+    messageElement.style.position = 'fixed';
+    messageElement.style.bottom = '20px';
+    messageElement.style.left = '50%';
+    messageElement.style.transform = 'translateX(-50%)';
+    messageElement.style.backgroundColor = '#4CAF50'; // Green background
+    messageElement.style.color = 'white';
+    messageElement.style.padding = '10px 20px';
+    messageElement.style.borderRadius = '5px';
+    messageElement.style.zIndex = '1000';
+    messageElement.style.opacity = '1'; // Start fully visible
+    messageElement.style.transition = 'opacity 1s ease-in-out'; // Transition for fade-out
+    document.body.appendChild(messageElement);
+
+    // Fade out after 1 second
+    setTimeout(() => {
+        messageElement.style.opacity = '0'; // Start fade-out
+        setTimeout(() => {
+            document.body.removeChild(messageElement);
+        }, 1000); // Wait for fade-out to complete before removing
+    }, 1000); // Show for 1 second
+}
+
+        createBars();
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        document.addEventListener('click', function(event) {
+            const teacherMode = document.getElementById('teacher-mode');
+            if (!teacherMode.contains(event.target) && teacherMode.style.display === 'block' && !event.target.closest('.menu-icon')) {
+                exitTeacherMode();
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                exitTeacherMode();
+            }
+        });
+    </script>
+</body>
+</html>
