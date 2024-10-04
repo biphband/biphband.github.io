@@ -1,259 +1,433 @@
 body, html {
-            margin: 0;
-            padding: 0;
-            font-family: 'American Typewriter', serif;
-            height: 100%;
-            font-size: 18px;
-            overflow: hidden;
-        }
-        #header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 60px 50px 0px;
-            background-color: #f0f0f0;
-        }
-        #title {
-            text-align: center;
-            flex-grow: 1;
-            position: absolute;
-            margin-top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        #title h1 {
-            margin: 0;
-            font-size: 48px;
-            font-weight: normal;
-        }
-        #title h2 {
-            margin: 5px 0 0;
-            font-weight: normal; 
-            font-size: 24px;
-        }
-        #date {
-            margin-top: -50px;
-            text-align: right;
-        }
-        #date p {
-            margin: 5px 0; 
-        }
-        #objective {
-            margin-top: -50px;
-            margin-left: -10px;
-            text-align: left;
-        }
-        #objective h3 {
-            margin-left: 10px;
-        }
-        #objectiveList {
-            margin-left: -10px;
-        }
-        .editable:hover {
-            background-color: #dadada;
-            cursor: pointer;
-        }
-        #graph-container {
-            margin-top: -5px;
-            width: 100%;
-            height: calc(85%); 
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-around;
-            background-color: #f0f0f0;
-            padding: 20px;
-            padding-bottom: 100px; 
-            box-sizing: border-box;
-            overflow-x: auto;
-            overflow-y: hidden;
-        }
-        .bar {
-            width: 40px;
-            background-color: #3498db;
-            transition: height 0.5s ease-in-out, opacity 0.3s ease;
-            position: relative;
-            margin: 0 10px;
-            cursor: pointer;
-        }
-        .bar:hover {
-            opacity: 1 !important;
-        }
+    margin: 0;
+    padding: 0;
+    font-family: 'American Typewriter', serif;
+    height: 100%;
+    font-size: 18px;
+    overflow: hidden;
+}
+#header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 60px 50px 0px;
+    background-color: #f0f0f0;
+}
+#title {
+    text-align: center;
+    flex-grow: 1;
+    position: absolute;
+    margin-top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+#title h1 {
+    margin: 0;
+    font-size: 48px;
+    font-weight: normal;
+}
+#title h2 {
+    margin: 5px 0 0;
+    font-weight: normal; 
+    font-size: 24px;
+}
+#date {
+    margin-top: -35px;
+    text-align: right;
+}
+#date p {
+    margin: 15px 25; 
+    margin-bottom: -15px;
+}
+#objective {
+    margin-top: -50px;
+    margin-left: -0px;
+    text-align: left;
+}
+#objective h3 {
+    margin-left: 10px;
+    margin-bottom: -15px;
+}
+#objectiveList {
+    margin-left: -10px;
+}
+.editable:hover {
+    background-color: #dadada;
+    cursor: pointer;
+}
+#graph-container {
+    margin-top: -5px;
+    width: 100%;
+    height: calc(85%); 
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    background-color: #f0f0f0;
+    padding: 20px;
+    padding-bottom: 100px; 
+    box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+.bar {
+width: 50px;
+background: linear-gradient(to top, #3378a6, #52a6df);
+box-shadow: 2px 0 15px rgba(0,0,0,0.2);
+transition: height 0.5s ease-in-out, opacity 0.8s ease;
+position: relative;
+margin: 0 10px;
+cursor: pointer;
+text-align: center;
+}
 
-        .spreadsheet-row {
-            display: contents;
-        }
+.bar::after {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: transparent;
+pointer-events: none;
+transition: background-color 0.5s;
+}
 
-        .spreadsheet-row.hidden {
-            display: none;
-        }
-        .bar-label {
-            position: absolute;
-            bottom: -45px;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            font-size: 12px;
-            white-space: nowrap;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: opacity 0.3s ease-in-out;
-        }
-        .menu-icon {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            font-size: 30px;
-            cursor: pointer;
-            color: #333;
-            opacity: 0.5;
-            z-index: 1000;
-        }
-        .menu {
-            position: fixed;
-            top: 60px;
-            left: -250px;
-            width: 250px;
-            height: calc(100% - 60px);
-            background-color: #fff;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            transition: left 0.3s ease-in-out;
-            z-index: 1001;
-        }
-        .menu.open {
-            left: 0;
-        }
-        .menu ul {
-            list-style-type: none;
-            padding: 20px;
-        }
-        .menu ul li {
-            margin-bottom: 10px;
-        }
-        .menu ul li a {
-            text-decoration: none;
-            color: #333;
-        }
-        #teacher-mode {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 95%;
-            max-width: 1200px;
-            max-height: 90%;
-            background-color: #fff;
-            padding: 20px;
-            box-sizing: border-box;
-            overflow-y: auto;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            border-radius: 10px;
-        }
-        .close-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-            font-size: 24px;
-        }
-        .spreadsheet {
-            display: grid;
-            grid-template-columns: 1fr 1fr repeat(4, 1fr) 1fr;
-            gap: 10px;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        .spreadsheet-header {
-            font-weight: bold;
-            text-align: center;
-        }
-        .spreadsheet-row {
-            display: contents;
-        }
-        .spreadsheet-row.hidden {
-            display: none;
-        }
-        .stepper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .stepper button {
-            width: 30px;
-            height: 30px;
-            font-size: 20px;
-            border: none;
-            background-color: #3498db;
-            color: #fff;
-            cursor: pointer;
-        }
-        .attendance-dropdown,
-        .checkbox-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        @keyframes flash-green {
-            0% { background-color: #3498db; }
-            50% { background-color: #2ecc71; }
-            100% { background-color: #3498db; }
-        }
-        @keyframes flash-red {
-            0% { background-color: #3498db; }
-            50% { background-color: #e74c3c; }
-            100% { background-color: #3498db; }
-        }
-        .spreadsheet-header {
-            position: sticky;
-            top: 0;
-            background-color: #fff;
-            z-index: 1;
-            cursor: pointer;
-        }
-        .close-button {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 2;
-        }
-        .copy-button {
-            position: fixed;
-            left: 10px;
-            bottom: 10px;
-            width: 25px;
-            height: 20px;
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-            opacity: 0.1;
-            transition: opacity 0.3s ease;
-            z-index: 1000;
-        }
-        .copy-button:hover {
-            opacity: 0.5;
-        }
-        .copy-button img {
-            width: 100%;
-            height: 100%;
-        }
-      .reset-button {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            padding: 5px 10px;
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .floating-menu {
-            display: none;
-            position: absolute;
-            background-color: white;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-        }
+.flash-animation::after {
+animation: flash 0.7s;
+}
+
+@keyframes flash {
+0%, 50% { background-color: transparent; }
+50% { background-color: var(--flash-color); }
+}
+
+@keyframes glow {
+0% {
+    box-shadow: 0 0 10px var(--glow-color);
+}
+100% {
+    box-shadow: 0 0 20px var(--glow-color);
+}
+}
+
+
+.bar:hover {
+    opacity: 1 !important;
+}
+.spreadsheet-row {
+    display: contents;
+}
+.spreadsheet-row.hidden {
+    display: none;
+}
+
+.bar-label {
+position: absolute;
+left: 50%; 
+bottom: -35px;
+transform: translateX(-50%); 
+text-align: center;
+font-size: 12px;
+white-space: nowrap;
+display: flex;
+flex-direction: column;
+align-items: center;
+transition: opacity 1.5s ease-in-out;
+justify-content: space-between; 
+}
+
+.value-label {
+    position: absolute;
+    top: 5px;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 2px 5px;
+    text-align: center;
+    font-size: 12px;
+    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex;
+    height: 100%;
+    padding-bottom: 5px;
+    transition: opacity 1.5s ease-in-out;
+    color: white;  
+}
+
+.main-labels {
+position: absolute; 
+left: 50%; 
+top: -30px; 
+transform: translateX(-50%); 
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: flex-end;
+height: auto; 
+}
+
+.secondary-labels {
+position: absolute; 
+left: 50%; 
+top: 0px; 
+transform: translateX(-50%); 
+display: flex;
+flex-direction: column;
+align-items: center;
+}
+
+.tardy-label {
+    font-size: 1.1em;
+    color: red;
+}
+.house-points {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+.menu-icon {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    font-size: 30px;
+    cursor: pointer;
+    color: #333333;
+    opacity: 0.5;
+    z-index: 1000;
+}
+.menu {
+    position: fixed;
+    top: 60px;
+    left: -250px;
+    width: 250px;
+    height: calc(100% - 60px);
+    background-color: #ffffff;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    transition: left 0.3s ease-in-out;
+    z-index: 1001;
+}
+.menu.open {
+    left: 0;
+}
+.menu ul {
+    list-style-type: none;
+    padding: 20px;
+}
+.menu ul li {
+    margin-bottom: 10px;
+}
+.menu ul li a {
+    text-decoration: none;
+    color: #333333;
+}
+#teacher-mode {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 1200px;
+    max-height: 90vh;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    z-index: 1002;
+}
+@media (min-width: 800px) {
+    #teacher-mode {
+        width: 700px;
+        max-width: 1000px;
+    }
+}
+
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 24px;
+    z-index: 2;
+}
+/*
+.close-button {
+    position: fixed;
+}
+*/
+.spreadsheet {
+    display: grid;
+    grid-template-columns: auto auto auto auto auto auto auto auto;
+    gap: 10px;
+    margin-top: 20px;
+    font-size: 14px;
+}
+.spreadsheet-header {
+    font-weight: bold;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    background-color: #ffffff;
+    z-index: 1;
+    cursor: pointer;
+}
+.student-name {
+    font-size: 1.5em; /* Adjust size as needed */
+}
+
+.stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.stepper button {
+width: 30px;                /* Width of the button */
+height: 30px;               /* Height of the button */
+font-size: 20px;           
+border: 6px solid white;    /* Thicker border */
+background-color: #3498db; 
+color: #ffffff;       
+cursor: pointer;       
+padding: 0;                 /* Remove padding for precise centering */
+border-radius: 10px;  
+opacity: 0.7;         
+transition: opacity 0.3s; 
+display: flex;              /* Use flexbox for centering */
+align-items: center;        /* Center vertically */
+justify-content: center;    /* Center horizontally */
+}
+
+.stepper button:hover {
+opacity: 1;        
+}
+.attendance-dropdown,
+.checkbox-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.copy-button {
+    position: fixed;
+    left: 10px;
+    bottom: 10px;
+    width: 25px;
+    height: 20px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    opacity: 0.1;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+}
+.copy-button:hover {
+    opacity: 0.5;
+}
+.copy-button img {
+    width: 100%;
+    height: 100%;
+}
+.reset-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    border:none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+.reset-button:hover {
+    color:black;
+}
+.floating-menu {
+    text-align: center; 
+    line-height: 2;
+    display: none;
+    position: absolute;
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    transform: translate(-50%, -50%); /* Optional: for perfect centering */
+}
+
+/* New media queries for narrow screens */
+@media (max-width: 1000px) {
+    .bar {
+        margin: 0 2px; /* Reduce space between bars */
+    }
+    
+.bar-label {
+    font-size: 1.5vw; /* Responsive font size with a minimum */
+    color: white;
+    transform: rotate(180deg);
+    writing-mode: vertical-rl;
+    width: 100%; /* Use full width of the bar */
+    height: 30%; /* Limit height to leave space at the top of the bar */
+    bottom: 35px; /* Position from the bottom of the bar */
+    left: 0;
+    padding: -20px 0; /* Reduce padding */
+    line-height: 1.2; /* Adjust line height for better spacing */
+    z-index: 5000;
+    display: flex;
+    align-items: flex-start; /* Align text to the start (bottom when rotated) */
+    justify-content: center; /* Center text horizontally */
+    text-align: right; /* Align text to the right (top when rotated) */
+}
+  
+  
+    .value-label {
+        transform: rotate(180deg);
+        left: 5%;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        height: auto;
+        width: 20px; /* Adjust as needed */
+        bottom: auto;
+        padding: 5px 0;
+    }
+    
+    #graph-container {
+        padding-bottom: 80px; /* Adjust bottom padding */
+    }
+}
+
+#search-box {
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+background-color: white;
+padding: 20px;
+border-radius: 5px;
+box-shadow: 0 0 10px rgba(0,0,0,0.1);
+z-index: 1000;
+}
+
+#search-input {
+width: 85%;
+padding: 10px;
+margin-bottom: 10px;
+}
+
+#search-results {
+max-height: 200px;
+overflow-y: auto;
+}
+
+#search-results div {
+padding: 5px;
+cursor: pointer;
+}
+
+#search-results div.selected {
+background-color: #f0f0f0;
+}

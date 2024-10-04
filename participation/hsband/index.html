@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HS Band</title>
+      <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="menu-icon" onclick="enterTeacherMode()">☰</div>
+    <div id="header">
+        <div id="objective">
+            <h3>Objective:</h3>
+            <ul id="objectiveList">
+                <li class="editable" onclick="editObjective(this)">Putting it all together</li>
+                <li class="editable" onclick="editObjective(this)">ALL Halloween Music</li>
+                <li class="editable" onclick="editObjective(this)">First Major Assessment: Oct 10</li>
+            </ul>
+        </div>
+        <div id="title">
+            <h1>HS Band</h1>
+            <h2 id="timeRange">3:25 - 4:30</h2>
+        </div>
+        <div id="date">
+            <p><h3>Date:</h3></p>
+            <p><span id="currentDate"></span></p>
+            <p><span id="currentDay"></span></p>
+        </div>
+    </div>
+    <div id="graph-container">
+        <button class="copy-button" onclick="copyScores()">Copy Scores</button>
+    </div>
+    <div id="teacher-mode">
+        <span class="close-button" onclick="exitTeacherMode()">&times;</span>
+        <button class="reset-button" onclick="resetAllStudents()">Reset All</button>
+        <div class="spreadsheet">
+            <div class="spreadsheet-header"><strong>Student</strong></div>
+            <div class="spreadsheet-header"><strong onclick="cycleAttendance()">Attendance</strong></div>
+            <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('stands')">Stands</strong></div>
+            <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('music')">Music</strong></div>
+            <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('pencils')">Pencils</strong></div>
+            <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('cases')">Cases</strong></div>
+            <div class="spreadsheet-header"><strong>Participation</strong></div>
+        </div>
+    </div>
+    <div id="floating-menu" class="floating-menu"></div>
+
+    <script>
+        const students = [
+            'Michael', 'Kevin', 'Daniel', 'Tiger', 'Agu', 'Frankie', 'Chris', 'Lucy', 'Henry', 'Jacky', 
+    'Ethan', 'Stephen', 'Johnny', 'Jim'
+        ].map(name => ({ name, score: 'EX', attendance: 'Absent', stands: false, music: false, pencils: false, cases: false, housePoints: 0 }));
+      
+        const teacherModeOrder = [
+            'Chris', 'Lucy', 'Agu', 'Michael', 'Stephen', 'Henry', 'Jim', 'Daniel', 'Ethan', 
+    'Kevin', 'Jacky', 'Tiger', 'Johnny', 'Frankie'
+        ];
+
+         
+function populateStudents() {
+            const spreadsheet = document.querySelector('.spreadsheet');
+            spreadsheet.innerHTML = `
+                <div class="spreadsheet-header"><strong>Student</strong></div>
+                <div class="spreadsheet-header"><strong onclick="cycleAttendance()">Attendance</strong></div>
+                <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('stands')">Stands</strong></div>
+                <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('music')">Music</strong></div>
+                <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('pencils')">Pencils</strong></div>
+                <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('cases')">Cases</strong></div>
+                <div class="spreadsheet-header"><strong>Participation</strong></div>
+                <div class="spreadsheet-header"><strong>House Points</strong></div>
+            `;
+            teacherModeOrder.forEach(name => {
+                const student = students.find(s => s.name === name);
+                const row = document.createElement('div');
+                row.className = 'spreadsheet-row';
+                row.dataset.studentName = student.name;
+                row.innerHTML = `
+                    <div class="student-name">${student.name}</div>
+                    <div class="attendance-dropdown">
+                        <select onchange="syncAttendance('${student.name}', this)">
+                            <option value="Absent" ${student.attendance === 'Absent' ? 'selected' : ''}>Absent</option>
+                            <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
+                            <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
+                        </select>
+                    </div>
+                    <div class="checkbox-container">
+                        <input type="checkbox" ${student.stands ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, 'stands')"> 
+                    </div>
+                    <div class="checkbox-container">
+                        <input type="checkbox" ${student.music ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, 'music')"> 
+                    </div>
+                    <div class="checkbox-container">
+                        <input type="checkbox" ${student.pencils ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, 'pencils')"> 
+                    </div>
+                    <div class="checkbox-container">
+                        <input type="checkbox" ${student.cases ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, 'cases')"> 
+                    </div>
+<div class="stepper">
+    <button onclick="updateScore('${student.name}', -10)">-</button>
+    <span>
+        ${student.score === 'EX' ? student.score : student.score + '%'}
+    </span>
+    <button onclick="updateScore('${student.name}', 10)">+</button>
+</div>
+                    <div class="stepper">
+                        <button onclick="updateHousePoints('${student.name}', -10)">-</button>
+                        <span>${student.housePoints}</span>
+                        <button onclick="updateHousePoints('${student.name}', 10)">+</button>
+                    </div>
+                `;
+                spreadsheet.appendChild(row);
+            });
+        }
+
+        function updateHousePoints(name, change) {
+        const student = students.find(s => s.name === name);
+        if (student) {
+            student.housePoints += change;
+            updateScoreDisplay(student);
+            
+            const housePointsSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper:last-child span`);
+            if (housePointsSpan) {
+                housePointsSpan.textContent = student.housePoints;
+            }
+
+            // Update floating menu if it's open
+            updateFloatingMenu(student);
+        }
+    }
+
+
+        function enterTeacherMode() {
+            const teacherMode = document.getElementById('teacher-mode');
+            if (teacherMode.style.display === 'block') {
+                exitTeacherMode();
+            } else {
+                teacherMode.style.display = 'block';
+                populateStudents();
+            }
+        }
+
+        function exitTeacherMode() {
+            document.getElementById('teacher-mode').style.display = 'none';
+        }
+
+        function syncAttendance(name, select) {
+    const student = students.find(s => s.name === name);
+    if (student) {
+        student.attendance = select.value;
+        calculateScore(student);
+        updateScoreDisplay(student);
+        updateTardyLabel(student);
+    }
+}
+
+function syncCheckbox(name, checkbox, type) {
+    const student = students.find(s => s.name === name);
+    if (student) {
+        student[type] = checkbox.checked;
+        calculateScore(student);
+        updateScoreDisplay(student);
+    }
+}
+
+    function updateScore(name, change) {
+    const student = students.find(s => s.name === name);
+    if (student && student.score !== 'EX') {
+        student.manualAdjustment = (student.manualAdjustment || 0) + change;
+        calculateScore(student);
+        const bar = document.getElementById(`bar-${name}`);
+        bar.style.height = `${student.score}%`;
+        bar.querySelector('.bar-label').innerHTML = `${name}<br>${student.score}%`;
+
+        // Apply animation to the ::after pseudo-element
+        bar.style.setProperty('--flash-color', change > 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)');
+        bar.classList.remove('flash-animation');
+        void bar.offsetWidth; // Trigger reflow
+        bar.classList.add('flash-animation');
+
+        updateScoreDisplay(student);
+    }
+}
+      
+
+        function calculateScore(student) {
+    if (student.attendance === 'Absent') {
+        student.score = 'EX';
+    } else {
+        let baseScore = 60; 
+        if (student.attendance === 'Tardy') baseScore -= 20;
+        if (student.stands) baseScore += 10;
+        if (student.music) baseScore += 10;
+        if (student.pencils) baseScore += 10;
+        if (student.cases) baseScore += 10;
+
+        // Apply manual adjustments
+        let manualAdjustment = student.manualAdjustment || 0; // Default to 0 if not set
+        student.score = Math.max(0, Math.min(100, baseScore + manualAdjustment));
+    }
+}
+
+        function updateScoreDisplay(student) {
+    const bar = document.getElementById(`bar-${student.name}`);
+    if (bar) {
+        // Determine the display based on the student's score
+        if (student.score === 'EX') {
+            bar.style.height = '0%';
+            bar.innerHTML = `
+                <div class="bar-label">
+                    <div class="main-labels">
+                        <span>${student.name}</span>
+                        <span>EX</span>
+                    </div>
+                    <div class="secondary-labels">
+                        ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                        ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : '-'}${Math.abs(student.housePoints)}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        } else {
+            bar.style.height = `${student.score}%`;
+            bar.innerHTML = `
+                <div class="value-label">${student.score}%</div>
+                <div class="bar-label">
+                    <div class="main-labels">
+                        <span>${student.name}</span>
+                        <span>${student.score}%</span>
+                    </div>
+                    <div class="secondary-labels">
+                        ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                        ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : '-'}${Math.abs(student.housePoints)}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    // Update the participation value in the teacher menu
+    updateTeacherMenu(student);
+
+    // Update the floating menu if it's open
+    updateFloatingMenu(student);
+
+    // Update the participation value in the teacher menu
+    const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
+    if (participationSpan) {
+        participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`; // Ensure % symbol is added
+    }
+}
+
+function updateTeacherMenu(student) {
+        const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
+        if (participationSpan) {
+            participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
+        }
+    }
+      
+function updateFloatingMenu(student) {
+    const floatingMenu = document.getElementById('floating-menu');
+    if (floatingMenu.style.display === 'block') {
+        // Update attendance dropdown
+        const attendanceSelect = floatingMenu.querySelector('select');
+        attendanceSelect.value = student.attendance;
+
+        // Update checkboxes
+        const checkboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            const property = checkbox.id.replace('checkbox-', '');
+            checkbox.checked = student[property];
+        });
+
+        // Update participation score
+        const participationSpan = floatingMenu.querySelector('.stepper span');
+        if (participationSpan) {
+            participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
+        }
+
+        // Update house points
+        const housePointsSpan = floatingMenu.querySelector('.stepper:last-child span:nth-child(3)');
+        if (housePointsSpan) {
+            housePointsSpan.textContent = student.housePoints;
+        }
+    }
+}
+      
+
+        function updateTardyLabel(student) {
+            const bar = document.getElementById(`bar-${student.name}`);
+            if (bar) {
+                const secondaryLabels = bar.querySelector('.secondary-labels');
+                if (secondaryLabels) {
+                    const tardyLabel = secondaryLabels.querySelector('.tardy-label');
+                    if (student.attendance === 'Tardy') {
+                        if (!tardyLabel) {
+                            const newTardyLabel = document.createElement('div');
+                            newTardyLabel.className = 'tardy-label';
+                            newTardyLabel.textContent = 'Tardy';
+                            secondaryLabels.appendChild(newTardyLabel);
+                        }
+                    } else {
+                        if (tardyLabel) {
+                            tardyLabel.remove();
+                        }
+                    }
+                }
+            }
+        }
+
+        function createBars() {
+            const container = document.getElementById('graph-container');
+            students.forEach(student => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = student.score === 'EX' ? '0%' : `${student.score}%`;
+                bar.id = `bar-${student.name}`;
+                
+                bar.innerHTML = `
+                    ${student.score !== 'EX' ? `<div class="value-label">${student.score}%</div>` : ''}
+                    <div class="bar-label">
+                        <div class="main-labels">
+                            <span>${student.name}</span>
+                            <span>${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
+                        </div>
+                        <div class="secondary-labels">
+                            ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                            ${student.housePoints !== 0 ? `<div class="house-points">${student.housePoints > 0 ? '+' : '-'}${Math.abs(student.housePoints)}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                bar.addEventListener('mouseover', () => highlightBar(student.name));
+                bar.addEventListener('mouseout', resetBarHighlights);
+                bar.addEventListener('click', (event) => showFloatingMenu(event, student.name));
+                container.appendChild(bar);
+            });
+        }
+
+        function highlightBar(name) {
+            document.querySelectorAll('.bar, .bar-label').forEach(el => {
+                if (el.id === `bar-${name}` || el.parentElement.id === `bar-${name}`) {
+                    el.style.opacity = '1';
+                } else {
+                    el.style.opacity = '0.7';
+                }
+            });
+        }
+
+        function resetBarHighlights() {
+            document.querySelectorAll('.bar, .bar-label').forEach(el => {
+                el.style.opacity = '1';
+            });
+        }
+
+let currentMenuOpen = null;
+let currentStudentIndex = -1;
+let searchBox = null;
+let searchResults = null;
+let selectedIndex = 0;      
+      
+function navigateStudentMenu(direction) {
+    if (currentStudentIndex === -1) {
+        currentStudentIndex = direction > 0 ? 0 : students.length - 1;
+    } else {
+        currentStudentIndex = (currentStudentIndex + direction + students.length) % students.length;
+    }
+    const newStudent = students[currentStudentIndex];
+    showFloatingMenu(null, newStudent.name);
+}
+
+function showFloatingMenu(event, studentName) {
+    const floatingMenu = document.getElementById('floating-menu');
+
+    if (currentMenuOpen) {
+        closeFloatingMenu();
+    }
+
+    const student = students.find(s => s.name === studentName);
+    currentStudentIndex = students.indexOf(student);
+
+    floatingMenu.innerHTML = `
+        <h3>${student.name}</h3>
+        <select onchange="syncAttendance('${student.name}', this)">
+            <option value="Absent" ${student.attendance === 'Absent' ? 'selected' : ''}>Absent</option>
+            <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
+            <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
+        </select>
+        <label><input type="checkbox" id="checkbox-stands" ${student.stands ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, 'stands')"> Stand</label>
+        <label><input type="checkbox" id="checkbox-music" ${student.music ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, 'music')"> Music</label>
+        <label><input type="checkbox" id="checkbox-pencils" ${student.pencils ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, 'pencils')"> Pencil</label>
+        <label><input type="checkbox" id="checkbox-cases" ${student.cases ? 'checked' : ''} onchange="syncCheckbox('${student.name}', this, 'cases')"> Case</label>
+        <div class="stepper">
+            <button onclick="updateScore('${student.name}', -10)">-</button>
+            <span>${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
+            <button onclick="updateScore('${student.name}', 10)">+</button>
+        </div>
+        <div class="stepper">
+            <span>House Points</span>
+            <button onclick="updateHousePoints('${student.name}', -10)">-</button>
+            <span>${student.housePoints}</span>
+            <button onclick="updateHousePoints('${student.name}', 10)">+</button>
+        </div>
+        <button onclick="closeFloatingMenu()">Close</button>
+    `;
+
+    const menuWidth = floatingMenu.offsetWidth;
+    const menuHeight = floatingMenu.offsetHeight;
+    floatingMenu.style.left = `calc(50% - ${menuWidth / 2}px)`;
+    floatingMenu.style.top = `calc(50% - ${menuHeight / 2}px)`;
+
+    floatingMenu.style.display = 'block';
+    currentMenuOpen = floatingMenu;
+
+    // Highlight the corresponding bar
+    highlightBar(student.name);
+}
+
+function closeFloatingMenu() {
+    if (currentMenuOpen) {
+        currentMenuOpen.style.display = 'none';
+        currentMenuOpen = null;
+        currentStudentIndex = -1;
+        resetBarHighlights();
+    }
+}
+      
+function highlightBar(name) {
+    document.querySelectorAll('.bar, .bar-label').forEach(el => {
+        if (el.id === `bar-${name}` || el.parentElement.id === `bar-${name}`) {
+            el.style.opacity = '1';
+            // Highlight and make bold the student name
+            const nameSpan = el.querySelector('.main-labels span:first-child');
+            if (nameSpan) {
+                nameSpan.style.fontWeight = 'bold';
+            }
+        } else {
+            el.style.opacity = '0.7';
+        }
+    });
+}
+
+function resetBarHighlights() {
+    document.querySelectorAll('.bar, .bar-label').forEach(el => {
+        el.style.opacity = '1';
+        // Reset the student name style
+        const nameSpan = el.querySelector('.main-labels span:first-child');
+        if (nameSpan) {
+            nameSpan.style.fontWeight = 'normal';
+            nameSpan.style.textDecoration = 'none';
+        }
+    });
+}      
+      
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('currentDay').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
+        }
+
+        function editObjective(item) {
+            const currentItem = item.textContent;
+            const newItem = prompt('Edit objective:', currentItem);
+            if (newItem !== null) {
+                item.textContent = newItem.trim();
+            }
+        }
+
+        function cycleAttendance() {
+            const attendanceOptions = ['Absent', 'Present', 'Tardy'];
+            const currentIndex = attendanceOptions.indexOf(students[0].attendance);
+            const nextIndex = (currentIndex + 1) % attendanceOptions.length;
+            const nextAttendance = attendanceOptions[nextIndex];
+            
+            students.forEach(student => {
+                student.attendance = nextAttendance;
+                calculateScore(student);
+                updateScoreDisplay(student);
+                updateTardyLabel(student);
+            });
+
+            document.querySelectorAll('.attendance-dropdown select').forEach(select => {
+                select.value = nextAttendance;
+            });
+        }
+
+        function toggleAllCheckboxes(type) {
+            const checkboxes = document.querySelectorAll(`.spreadsheet .checkbox-container input[type="checkbox"]`);
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            checkboxes.forEach((cb, index) => {
+                if (index % 4 === ['stands', 'music', 'pencils', 'cases'].indexOf(type)) {
+                    cb.checked = !allChecked;
+                    const studentName = teacherModeOrder[Math.floor(index / 4)];
+                    syncCheckbox(studentName, cb, type);
+                }
+            });
+        }
+
+        function copyScores() {
+            const scores = students.map(student => 
+                student.score === 'EX' ? 'EX' : `${student.score}%`
+            );
+
+            // Create an HTML table for clipboard
+            const htmlTable = `
+                <table style="border-collapse: collapse; font-family: 'Arial Narrow'; font-size: 22pt;">
+                    <tr>
+                        ${scores.map(score => `<td style="border: 2pt solid black;">${score}</td>`).join('')}
+                    </tr>
+                </table>
+            `;
+
+            // Use the clipboard API to copy the HTML
+            navigator.clipboard.write([
+                new ClipboardItem({
+                    'text/html': new Blob([htmlTable], { type: 'text/html' }),
+                    'text/plain': new Blob([scores.join('\t')], { type: 'text/plain' }) // Fallback for plain text
+                })
+            ]).then(() => {
+                showTemporaryMessage('Copied to clipboard');
+            }).catch(err => {
+                console.error('Failed to copy scores: ', err);
+            });
+        }
+
+        function showTemporaryMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = message;
+            messageElement.style.position = 'fixed';
+            messageElement.style.bottom = '20px';
+            messageElement.style.left = '50%';
+            messageElement.style.transform = 'translateX(-50%)';
+            messageElement.style.backgroundColor = '#4CAF50'; // Green background
+            messageElement.style.color = 'white';
+            messageElement.style.padding = '10px 20px';
+            messageElement.style.borderRadius = '5px';
+            messageElement.style.zIndex = '1000';
+            messageElement.style.opacity = '1'; // Start fully visible
+            messageElement.style.transition = 'opacity 1s ease-in-out'; // Transition for fade-out
+            document.body.appendChild(messageElement);
+
+            // Fade out after 1 second
+            setTimeout(() => {
+                messageElement.style.opacity = '0'; // Start fade-out
+                setTimeout(() => {
+                    document.body.removeChild(messageElement);
+                }, 1000); // Wait for fade-out to complete before removing
+            }, 1000); // Show for 1 second
+        }
+
+        function resetAllStudents() {
+            students.forEach(student => {
+                student.attendance = 'Absent';
+                student.stands = false;
+                student.music = false;
+                student.pencils = false;
+                student.cases = false;
+                student.score = 'EX';
+                student.housePoints = 0;
+                updateScoreDisplay(student);
+            });
+
+            document.querySelectorAll('.attendance-dropdown select').forEach(select => {
+                select.value = 'Absent';
+            });
+
+            document.querySelectorAll('.checkbox-container input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            document.querySelectorAll('.spreadsheet-row .stepper:last-child span').forEach(span => {
+                span.textContent = '0';
+            });
+        }
+
+        createBars();
+        updateDateTime();
+        setInterval(updateDateTime, 1000);  
+
+      
+function createSearchBox() {
+    searchBox = document.createElement('div');
+    searchBox.id = 'search-box';
+    searchBox.innerHTML = `
+        <input type="text" id="search-input" placeholder="Type student name...">
+        <div id="search-results"></div>
+    `;
+    document.body.appendChild(searchBox);
+    searchResults = document.getElementById('search-results');
+    document.getElementById('search-input').focus();
+}
+
+function handleSearchBoxKeys(event) {
+    const input = document.getElementById('search-input');
+    const results = Array.from(searchResults.children);
+
+    switch (event.key) {
+        case 'Escape':
+            closeSearchBox();
+            break;
+        case 'ArrowUp':
+            event.preventDefault(); // Prevent cursor from moving to start of input
+            selectedIndex = Math.max(0, selectedIndex - 1);
+            updateSelectedResult();
+            break;
+        case 'ArrowDown':
+            event.preventDefault(); // Prevent cursor from moving to end of input
+            selectedIndex = Math.min(results.length - 1, selectedIndex + 1);
+            updateSelectedResult();
+            break;
+        case 'Enter':
+            if (results.length > 0) {
+                const selectedStudent = results[selectedIndex].textContent;
+                closeSearchBox();
+                showFloatingMenu(null, selectedStudent);
+            }
+            break;
+        default:
+            // Allow all other key presses for typing
+            setTimeout(() => updateSearchResults(input.value), 0);
+    }
+}
+
+function updateSearchResults(query) {
+    const matchingStudents = students.filter(student => 
+        student.name.toLowerCase().includes(query.toLowerCase())
+    );
+
+    searchResults.innerHTML = '';
+    selectedIndex = 0;
+
+    matchingStudents.forEach((student, index) => {
+        const result = document.createElement('div');
+        result.textContent = student.name;
+        result.className = index === 0 ? 'selected' : '';
+        searchResults.appendChild(result);
+    });
+}
+
+function updateSelectedResult() {
+    Array.from(searchResults.children).forEach((result, index) => {
+        result.className = index === selectedIndex ? 'selected' : '';
+    });
+}
+
+function closeSearchBox() {
+    if (searchBox) {
+        document.body.removeChild(searchBox);
+        searchBox = null;
+        searchResults = null;
+        selectedIndex = 0;
+    }
+}
+
+function handleFloatingMenuHotkeys(event, studentName) {
+    const student = students.find(s => s.name === studentName);
+    if (!student) return;
+
+    switch (event.key) {
+        case 'a':
+            cycleAttendanceForStudent(student);
+            break;
+        case 's':
+            toggleCheckboxForStudent(student, 'stands');
+            break;
+        case 'm':
+            toggleCheckboxForStudent(student, 'music');
+            break;
+        case 'p':
+            toggleCheckboxForStudent(student, 'pencils');
+            break;
+        case 'c':
+            toggleCheckboxForStudent(student, 'cases');
+            break;
+    }
+    updateFloatingMenu(student);
+}
+      
+function cycleAttendanceForStudent(student) {
+    const attendanceOptions = ['Present', 'Tardy', 'Absent'];
+    const currentIndex = attendanceOptions.indexOf(student.attendance);
+    const nextIndex = (currentIndex + 1) % attendanceOptions.length;
+    student.attendance = attendanceOptions[nextIndex];
+    syncAttendance(student.name, { value: student.attendance });
+}
+
+function toggleCheckboxForStudent(student, property) {
+    student[property] = !student[property];
+    syncCheckbox(student.name, { checked: student[property] }, property);
+}
+      
+      
+      
+document.addEventListener('keydown', function(event) {
+    // If search box is open, allow all key presses
+    if (searchBox) {
+        handleSearchBoxKeys(event);
+        return; // Exit early to prevent other hotkey handling
+    }
+
+    // Prevent default behavior for hotkeys to avoid unwanted scrolling or other actions
+    if (['t', 'a', 's', 'm', 'p', 'c', '/', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(event.key)) {
+        event.preventDefault();
+    }
+
+    // Search functionality
+    if (event.key === '/' && !searchBox) {
+        createSearchBox();
+    } else {
+        // Check if a floating menu is open
+        if (currentMenuOpen) {
+            const studentName = document.querySelector('#floating-menu h3').textContent;
+            handleFloatingMenuHotkeys(event, studentName);
+        } else if (document.getElementById('teacher-mode').style.display === 'block') {
+            // Existing teacher mode hotkey logic
+            switch (event.key) {
+                case 't':
+                    exitTeacherMode();
+                    break;
+                case 'a':
+                    cycleAttendance();
+                    break;
+                case 's':
+                    toggleAllCheckboxes('stands');
+                    break;
+                case 'm':
+                    toggleAllCheckboxes('music');
+                    break;
+                case 'p':
+                    toggleAllCheckboxes('pencils');
+                    break;
+                case 'c':
+                    toggleAllCheckboxes('cases');
+                    break;
+            }
+        } else if (event.key === 't') {
+            enterTeacherMode();
+        }
+
+        // Student navigation and scoring
+        if (currentMenuOpen) {
+            switch (event.key) {
+                case 'ArrowUp':
+                    const studentName = document.querySelector('#floating-menu h3').textContent;
+                    updateScore(studentName, 10);
+                    break;
+                case 'ArrowDown':
+                    const studentNameDown = document.querySelector('#floating-menu h3').textContent;
+                    updateScore(studentNameDown, -10);
+                    break;
+                case 'ArrowLeft':
+                    navigateStudentMenu(-1);
+                    break;
+                case 'ArrowRight':
+                    navigateStudentMenu(1);
+                    break;
+            }
+        } else {
+            // Open first or last student's menu when no menu is open
+            if (event.key === 'ArrowRight') {
+                navigateStudentMenu(1);
+            } else if (event.key === 'ArrowLeft') {
+                navigateStudentMenu(-1);
+            }
+        }
+    }
+});
+      
+        document.addEventListener('click', function(event) {
+    const teacherMode = document.getElementById('teacher-mode');
+    const floatingMenu = document.getElementById('floating-menu');
+    if (!teacherMode.contains(event.target) && teacherMode.style.display === 'block' && !event.target.closest('.menu-icon')) {
+        exitTeacherMode();
+    }
+    if (!floatingMenu.contains(event.target) && floatingMenu.style.display === 'block' && !event.target.closest('.bar')) {
+        closeFloatingMenu();
+    }
+});
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        exitTeacherMode();
+        closeFloatingMenu();
+    }
+});
+  
+    </script>
+</body>
+</html>
