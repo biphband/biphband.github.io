@@ -31,7 +31,7 @@
         <button class="copy-button" onclick="copyScores()">Copy Scores</button>
     </div>
     <div id="teacher-mode">
-        <span class="close-button" onclick="exitTeacherMode()">&times;</span>
+        <span class="close-button" onclick="closeTopMenu()">&times;</span>
         <button class="reset-button" onclick="resetAllStudents()">Reset All</button>
         <div class="spreadsheet">
             <div class="spreadsheet-header"><strong>Student</strong></div>
@@ -44,8 +44,52 @@
         </div>
     </div>
     <div id="floating-menu" class="floating-menu"></div>
+  <div id="overlay">
+    <span class="close-button" onclick="closeTopMenu()">&times;</span>
+        <h3>Hotkeys</h3>
+        <div id="hotkeys"></div>
+        <hr>
+        <h3>Within Menus:</h3>
+        <div id="menuHotkeys"></div>
+    </div>
 
     <script>
+let menuStack = [];
+    let currentZIndex = 1000;
+
+    function openMenu(menuId) {
+        const menu = document.getElementById(menuId);
+        if (menu) {
+            currentZIndex++;
+            menu.style.zIndex = currentZIndex;
+            menu.style.display = 'block';
+            menuStack.push(menu);
+        }
+    }
+
+    function closeTopMenu() {
+        if (menuStack.length > 0) {
+            const topMenu = menuStack.pop();
+            topMenu.style.display = 'none';
+        }
+    }
+
+function closeSpecificMenu(menuId) {
+    const menuIndex = menuStack.findIndex(menu => menu.id === menuId);
+    if (menuIndex !== -1) {
+        const menu = menuStack.splice(menuIndex, 1)[0];
+        menu.style.display = 'none';
+    }
+}
+
+
+      
+              function updateObjectives(objectives) {
+            const objectiveList = document.getElementById('objectiveList');
+            objectiveList.innerHTML = objectives.map(obj => `<li class="editable" onclick="editObjective(this)">${obj}</li>`).join('');
+        }
+      
+      
         const students = [
             'Michael', 'Kevin', 'Daniel', 'Tiger', 'Agu', 'Frankie', 'Chris', 'Lucy', 'Henry', 'Jacky', 
     'Ethan', 'Stephen', 'Johnny', 'Jim'
@@ -113,35 +157,32 @@ function populateStudents() {
         }
 
         function updateHousePoints(name, change) {
-        const student = students.find(s => s.name === name);
-        if (student) {
-            student.housePoints += change;
-            updateScoreDisplay(student);
-            
-            const housePointsSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper:last-child span`);
-            if (housePointsSpan) {
-                housePointsSpan.textContent = student.housePoints;
-            }
-
-            // Update floating menu if it's open
-            updateFloatingMenu(student);
+    const student = students.find(s => s.name === name);
+    if (student) {
+        student.housePoints += change;
+        updateScoreDisplay(student);
+        
+        const housePointsSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper:last-child span`);
+        if (housePointsSpan) {
+            housePointsSpan.textContent = student.housePoints;
         }
+
+        // Update floating menu if it's open
+        updateFloatingMenu(student);
+
     }
+}
 
 
-        function enterTeacherMode() {
-            const teacherMode = document.getElementById('teacher-mode');
-            if (teacherMode.style.display === 'block') {
-                exitTeacherMode();
-            } else {
-                teacherMode.style.display = 'block';
-                populateStudents();
-            }
-        }
+function enterTeacherMode() {
+    openMenu('teacher-mode');
+    populateStudents();
+}
 
-        function exitTeacherMode() {
-            document.getElementById('teacher-mode').style.display = 'none';
-        }
+function exitTeacherMode() {
+    closeSpecificMenu('teacher-mode');
+}
+
 
         function syncAttendance(name, select) {
     const student = students.find(s => s.name === name);
@@ -162,27 +203,35 @@ function syncCheckbox(name, checkbox, type) {
     }
 }
 
-    function updateScore(name, change) {
+    
+function updateScore(name, change) {
     const student = students.find(s => s.name === name);
     if (student && student.score !== 'EX') {
-        student.manualAdjustment = (student.manualAdjustment || 0) + change;
-        calculateScore(student);
-        const bar = document.getElementById(`bar-${name}`);
-        bar.style.height = `${student.score}%`;
-        bar.querySelector('.bar-label').innerHTML = `${name}<br>${student.score}%`;
+        // Calculate the new score
+        const newScore = Math.max(0, Math.min(100, student.score + change));
+        
+        // Only update if the score has changed
+        if (newScore !== student.score) {
+            student.manualAdjustment = (student.manualAdjustment || 0) + (newScore - student.score);
+            student.score = newScore;
+            
+            const bar = document.getElementById(`bar-${name}`);
+            bar.style.height = `${student.score}%`;
+            bar.querySelector('.bar-label').innerHTML = `${name}<br>${student.score}%`;
 
-        // Apply animation to the ::after pseudo-element
-        bar.style.setProperty('--flash-color', change > 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)');
-        bar.classList.remove('flash-animation');
-        void bar.offsetWidth; // Trigger reflow
-        bar.classList.add('flash-animation');
+            // Apply animation to the ::after pseudo-element
+            bar.style.setProperty('--flash-color', change > 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)');
+            bar.classList.remove('flash-animation');
+            void bar.offsetWidth; // Trigger reflow
+            bar.classList.add('flash-animation');
 
-        updateScoreDisplay(student);
+            updateScoreDisplay(student);
+        }
     }
 }
       
 
-        function calculateScore(student) {
+function calculateScore(student) {
     if (student.attendance === 'Absent') {
         student.score = 'EX';
     } else {
@@ -197,6 +246,7 @@ function syncCheckbox(name, checkbox, type) {
         let manualAdjustment = student.manualAdjustment || 0; // Default to 0 if not set
         student.score = Math.max(0, Math.min(100, baseScore + manualAdjustment));
     }
+
 }
 
         function updateScoreDisplay(student) {
@@ -370,15 +420,13 @@ function navigateStudentMenu(direction) {
 function showFloatingMenu(event, studentName) {
     const floatingMenu = document.getElementById('floating-menu');
 
-    if (currentMenuOpen) {
-        closeFloatingMenu();
-    }
+        // Update the content of the floating menu
+        const student = students.find(s => s.name === studentName);
+        currentStudentIndex = students.indexOf(student);
 
-    const student = students.find(s => s.name === studentName);
-    currentStudentIndex = students.indexOf(student);
-
-    floatingMenu.innerHTML = `
-        <h3>${student.name}</h3>
+        floatingMenu.innerHTML = `
+            <span class="close-button" onclick="closeTopMenu()">&times;</span>
+            <h3>${student.name}</h3>
         <select onchange="syncAttendance('${student.name}', this)">
             <option value="Absent" ${student.attendance === 'Absent' ? 'selected' : ''}>Absent</option>
             <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
@@ -403,25 +451,19 @@ function showFloatingMenu(event, studentName) {
     `;
 
     const menuWidth = floatingMenu.offsetWidth;
-    const menuHeight = floatingMenu.offsetHeight;
-    floatingMenu.style.left = `calc(50% - ${menuWidth / 2}px)`;
-    floatingMenu.style.top = `calc(50% - ${menuHeight / 2}px)`;
+        const menuHeight = floatingMenu.offsetHeight;
+        floatingMenu.style.left = `50%`;
+        floatingMenu.style.top = `50%`;
 
-    floatingMenu.style.display = 'block';
-    currentMenuOpen = floatingMenu;
-
-    // Highlight the corresponding bar
+ openMenu('floating-menu');
     highlightBar(student.name);
-}
+    }
 
 function closeFloatingMenu() {
-    if (currentMenuOpen) {
-        currentMenuOpen.style.display = 'none';
-        currentMenuOpen = null;
-        currentStudentIndex = -1;
+        closeSpecificMenu('floating-menu');
         resetBarHighlights();
     }
-}
+
       
 function highlightBar(name) {
     document.querySelectorAll('.bar, .bar-label').forEach(el => {
@@ -457,13 +499,14 @@ function resetBarHighlights() {
             document.getElementById('currentDay').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
         }
 
-        function editObjective(item) {
-            const currentItem = item.textContent;
-            const newItem = prompt('Edit objective:', currentItem);
-            if (newItem !== null) {
-                item.textContent = newItem.trim();
-            }
-        }
+function editObjective(item) {
+    const currentItem = item.textContent;
+    const newItem = prompt('Edit objective:', currentItem);
+    if (newItem !== null && newItem.trim() !== '') {
+        item.textContent = newItem.trim();
+        const objectives = Array.from(document.querySelectorAll('#objectiveList li')).map(li => li.textContent);
+    }
+}
 
         function cycleAttendance() {
             const attendanceOptions = ['Absent', 'Present', 'Tardy'];
@@ -578,6 +621,7 @@ function resetBarHighlights() {
 
       
 function createSearchBox() {
+    if (!document.getElementById('search-box')) {
     searchBox = document.createElement('div');
     searchBox.id = 'search-box';
     searchBox.innerHTML = `
@@ -587,6 +631,8 @@ function createSearchBox() {
     document.body.appendChild(searchBox);
     searchResults = document.getElementById('search-results');
     document.getElementById('search-input').focus();
+              openMenu('search-box');
+}
 }
 
 function handleSearchBoxKeys(event) {
@@ -643,14 +689,16 @@ function updateSelectedResult() {
 }
 
 function closeSearchBox() {
+    const searchBox = document.getElementById('search-box');
     if (searchBox) {
         document.body.removeChild(searchBox);
-        searchBox = null;
-        searchResults = null;
-        selectedIndex = 0;
+        // Re-enable hotkeys
+        document.removeEventListener('keydown', handleSearchBoxKeys);
+        document.addEventListener('keydown', handleGlobalHotkeys);
     }
 }
 
+      
 function handleFloatingMenuHotkeys(event, studentName) {
     const student = students.find(s => s.name === studentName);
     if (!student) return;
@@ -688,13 +736,52 @@ function toggleCheckboxForStudent(student, property) {
     syncCheckbox(student.name, { checked: student[property] }, property);
 }
       
+ const hotkeys = [
+            { key: "t", description: "	Toggle teacher mode." },
+            { key: "/", description: "	Search student name." },
+            { key: "→", description: "	Next student." },
+            { key: "←", description: "	Previous student." },
+            { key: "↑", description: "	Increase participation by 10." },
+            { key: "↓", description: "	Decrease participation by 10." },
+        ];
+
+        const menuHotkeys = [
+            { key: "a", description: "	Toggle attendance." },
+            { key: "s", description: "	Toggle Stands checkbox(es)." },
+            { key: "m", description: "	Toggle Music checkbox(es)." },
+            { key: "p", description: "	Toggle Pencils checkbox(es)." },
+            { key: "c", description: "	Toggle Cases checkbox(es)." },
+            { key: "Esc", description: "	Close current window." }
+        ];
+
+        function populateHotkeys(hotkeys, elementId) {
+            const container = document.getElementById(elementId);
+            hotkeys.forEach(hotkey => {
+                const div = document.createElement('div');
+                div.innerHTML = `<strong>${hotkey.key}</strong>\t: ${hotkey.description}`;
+                container.appendChild(div);
+            });
+        }
+
+        populateHotkeys(hotkeys, 'hotkeys');
+        populateHotkeys(menuHotkeys, 'menuHotkeys');
+
+function toggleOverlay() {
+    const overlay = document.getElementById('overlay');
+    if (overlay.style.display === 'block') {
+        closeTopMenu();
+    } else {
+        openMenu('overlay');
+    }
+}
       
-      
-document.addEventListener('keydown', function(event) {
-    // If search box is open, allow all key presses
-    if (searchBox) {
-        handleSearchBoxKeys(event);
-        return; // Exit early to prevent other hotkey handling
+
+function handleGlobalHotkeys(event) {
+    // Handle overlay toggle
+    if (event.key === '?' || (event.shiftKey && event.key === '/')) {
+        toggleOverlay();
+        event.preventDefault();
+        return;
     }
 
     // Prevent default behavior for hotkeys to avoid unwanted scrolling or other actions
@@ -702,86 +789,104 @@ document.addEventListener('keydown', function(event) {
         event.preventDefault();
     }
 
-    // Search functionality
-    if (event.key === '/' && !searchBox) {
-        createSearchBox();
-    } else {
-        // Check if a floating menu is open
-        if (currentMenuOpen) {
-            const studentName = document.querySelector('#floating-menu h3').textContent;
-            handleFloatingMenuHotkeys(event, studentName);
-        } else if (document.getElementById('teacher-mode').style.display === 'block') {
-            // Existing teacher mode hotkey logic
-            switch (event.key) {
-                case 't':
-                    exitTeacherMode();
-                    break;
-                case 'a':
-                    cycleAttendance();
-                    break;
-                case 's':
-                    toggleAllCheckboxes('stands');
-                    break;
-                case 'm':
-                    toggleAllCheckboxes('music');
-                    break;
-                case 'p':
-                    toggleAllCheckboxes('pencils');
-                    break;
-                case 'c':
-                    toggleAllCheckboxes('cases');
-                    break;
-            }
-        } else if (event.key === 't') {
-            enterTeacherMode();
-        }
-
-        // Student navigation and scoring
-        if (currentMenuOpen) {
-            switch (event.key) {
-                case 'ArrowUp':
-                    const studentName = document.querySelector('#floating-menu h3').textContent;
-                    updateScore(studentName, 10);
-                    break;
-                case 'ArrowDown':
-                    const studentNameDown = document.querySelector('#floating-menu h3').textContent;
-                    updateScore(studentNameDown, -10);
-                    break;
-                case 'ArrowLeft':
-                    navigateStudentMenu(-1);
-                    break;
-                case 'ArrowRight':
-                    navigateStudentMenu(1);
-                    break;
-            }
-        } else {
-            // Open first or last student's menu when no menu is open
-            if (event.key === 'ArrowRight') {
-                navigateStudentMenu(1);
-            } else if (event.key === 'ArrowLeft') {
-                navigateStudentMenu(-1);
-            }
-        }
-    }
-});
-      
-        document.addEventListener('click', function(event) {
-    const teacherMode = document.getElementById('teacher-mode');
     const floatingMenu = document.getElementById('floating-menu');
-    if (!teacherMode.contains(event.target) && teacherMode.style.display === 'block' && !event.target.closest('.menu-icon')) {
-        exitTeacherMode();
-    }
-    if (!floatingMenu.contains(event.target) && floatingMenu.style.display === 'block' && !event.target.closest('.bar')) {
-        closeFloatingMenu();
-    }
-});
 
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        exitTeacherMode();
-        closeFloatingMenu();
+    switch (event.key) {
+        case 't':
+            if (document.getElementById('teacher-mode').style.display === 'block') {
+                exitTeacherMode();
+            } else {
+                enterTeacherMode();
+            }
+            break;
+        case '/':
+            if (!document.getElementById('search-box')) {
+                createSearchBox();
+                // Disable global hotkeys when search box is open
+                document.removeEventListener('keydown', handleGlobalHotkeys);
+                document.addEventListener('keydown', handleSearchBoxKeys);
+            }
+            break;
+        case 'ArrowRight':
+            navigateStudentMenu(1);
+            break;
+        case 'ArrowLeft':
+            navigateStudentMenu(-1);
+            break;
+        case 'ArrowUp':
+            if (floatingMenu.style.display === 'block') {
+                const studentName = document.querySelector('#floating-menu h3').textContent;
+                updateScore(studentName, 10);
+            }
+            break;
+        case 'ArrowDown':
+            if (floatingMenu.style.display === 'block') {
+                const studentName = document.querySelector('#floating-menu h3').textContent;
+                updateScore(studentName, -10);
+            }
+            break;
+        case 'a':
+        case 's':
+        case 'm':
+        case 'p':
+        case 'c':
+            if (floatingMenu.style.display === 'block') {
+                const studentName = document.querySelector('#floating-menu h3').textContent;
+                handleFloatingMenuHotkeys(event, studentName);
+            } else if (document.getElementById('teacher-mode').style.display === 'block') {
+                switch (event.key) {
+                    case 'a':
+                        cycleAttendance();
+                        break;
+                    case 's':
+                        toggleAllCheckboxes('stands');
+                        break;
+                    case 'm':
+                        toggleAllCheckboxes('music');
+                        break;
+                    case 'p':
+                        toggleAllCheckboxes('pencils');
+                        break;
+                    case 'c':
+                        toggleAllCheckboxes('cases');
+                        break;
+                }
+            }
+            break;
+        case 'Escape':
+            closeTopMenu();
+            break;
     }
-});
+}     
+      
+      
+document.addEventListener('keydown', handleGlobalHotkeys);
+
+
+      
+      
+document.addEventListener('click', function(event) {
+        const teacherMode = document.getElementById('teacher-mode');
+        const floatingMenu = document.getElementById('floating-menu');
+        
+        if (!teacherMode.contains(event.target) && !event.target.closest('.menu-icon') && !teacherMode.contains(event.target.closest('.menu'))) {
+            closeSpecificMenu('teacher-mode');
+        }
+        
+        if (!floatingMenu.contains(event.target) && !event.target.closest('.bar') && !floatingMenu.contains(event.target.closest('.menu'))) {
+            closeFloatingMenu();
+        }
+    });
+
+    // Ensure clicking on students names or bars opens the floating menu
+    document.addEventListener('click', function(event) {
+        if (event.target.closest('.bar') || event.target.closest('.student-name')) {
+            const studentName = event.target.closest('.bar') ? 
+                event.target.closest('.bar').dataset.studentName : 
+                event.target.textContent;
+            showFloatingMenu(event, studentName);
+        }
+    });
   
     </script>
 </body>
