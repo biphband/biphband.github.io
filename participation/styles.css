@@ -448,3 +448,57 @@ cursor: pointer;
 #search-results div.selected {
 background-color: #f0f0f0;
 }
+
+#houseshield {
+        position: fixed;
+        bottom: -200px;
+        left: 50%;
+        transform: translatex(-50%);
+        width: 100px;
+        height: 120px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        transition: all 0.5s ease-out;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #houseshield.active {
+        bottom: 50%;
+        left: 50%;
+        transform: translate(-50%, 50%);
+    }
+
+    #points {
+        width: 100px;
+        transform: translate(calc(-50% + 48px), calc(50% - 30px));
+        font-size: 36px;
+        font-weight: bold;
+        text-align: center;
+        align-items: center;
+        color: #ffffff;
+        text-shadow: 2px 2px 6px rgba(0, 0, 0, 1);
+        opacity: 0;
+        transition: opacity 0.3s ease-out;
+    }
+
+    #points.active {
+        text-align: center;
+        opacity: 1;
+    }
+
+    #student-name {
+        position: absolute;
+        bottom: -40px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #33333300;
+        opacity: 0;
+        transition: opacity 0.3s ease-out;
+    }
+
+    #student-name.active {
+        opacity: 0;
+    }
