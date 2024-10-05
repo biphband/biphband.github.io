@@ -845,7 +845,7 @@ function activateHouseshield() {
 
     // Check if elements exist before modifying them
     if (houseshield) {
-        houseshield.style.backgroundImage = `url('https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/${houseInfo.house.toLowerCase()}.png')`;
+        houseshield.style.backgroundImage = `url('../houses/${houseInfo.house.toLowerCase()}.png')`;
         houseshield.classList.add('active');
     }
 
@@ -971,11 +971,12 @@ function toggleCheckboxForStudent(student, property) {
         ];
 
         const menuHotkeys = [
-            { key: "a", description: "	Toggle attendance." },
-            { key: "s", description: "	Toggle Stands checkbox(es)." },
-            { key: "m", description: "	Toggle Music checkbox(es)." },
-            { key: "p", description: "	Toggle Pencils checkbox(es)." },
-            { key: "c", description: "	Toggle Cases checkbox(es)." },
+            { key: "a", description: "	Attendance" },
+            { key: "s", description: "	Stands" },
+            { key: "m", description: "	Music" },
+            { key: "p", description: "	Pencils" },
+            { key: "c", description: "	Cases" },
+            { key: "h", description: "	House Points" },
             { key: "Esc", description: "	Close current window." }
         ];
 
