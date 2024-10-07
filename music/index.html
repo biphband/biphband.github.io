@@ -50,7 +50,7 @@
             position: fixed;
             top: 15px;
             left: 220px;
-            color: white;
+            color: black;
             font-size: 20px;
             cursor: pointer;
             z-index: 1000;
@@ -375,16 +375,16 @@
 
         function animatePageTurn(direction) {
             const pageTurn = document.createElement('div');
-            pageTurn.className = `page-turn page-turn-${direction > 0 ? 'right' : 'left'}`;
+            pageTurn.className = `page-turn page-turn-${direction > 0 ? 'left' : 'right'}`;
             pdfContainer.appendChild(pageTurn);
 
             setTimeout(() => {
                 pageTurn.classList.add(direction > 0 ? 'turn-right' : 'turn-left');
-            }, 50);
+            }, 0);
 
             setTimeout(() => {
                 pdfContainer.removeChild(pageTurn);
-            }, 500);
+            }, 50);
         }
 
 
