@@ -273,7 +273,7 @@
             'aux_percussion_1': ['PDFs/Percussion/ Aux Percussion 1.pdf'],
             'aux_percussion_2': ['PDFs/Percussion/ Aux Percussion 2.pdf'],
             'aux_percussion_3': ['PDFs/Percussion/ Aux Percussion 3.pdf'],
-            'chimes_glockenspiel': ['PDFs/Percussion/ Chimes Glockenspiel.pdf'],
+            'chimes,_glockenspiel': ['PDFs/Percussion/ Chimes Glockenspiel.pdf'],
             'marimba': ['PDFs/Percussion/ Marimba.pdf'],
             'percussion_1': ['PDFs/Percussion/ Percussion 1.pdf'],
             'timpani': ['PDFs/Percussion/ Timpani.pdf'],
@@ -427,16 +427,16 @@
         });
 
         function showPDF() {
-            if (currentInstrument && pdfData[currentInstrument]) {
-                pdfContainer.innerHTML = `
-                    <button id="prev-button" class="nav-button">&#9664;</button>
-                    <button id="next-button" class="nav-button">&#9654;</button>
-                    <iframe src="${pdfData[currentInstrument][currentPage]}#page=1&view=FitH"></iframe>
-                `;
-                document.getElementById('prev-button').addEventListener('click', prevPage);
-                document.getElementById('next-button').addEventListener('click', nextPage);
-            }
+        if (currentInstrument && pdfData[currentInstrument]) {
+            pdfContainer.innerHTML = `
+                <button id="prev-button" class="nav-button">&#9664;</button>
+                <button id="next-button" class="nav-button">&#9654;</button>
+                <iframe src="${pdfData[currentInstrument][0]}#page=${currentPage + 1}&view=FitH"></iframe>
+            `;
+            document.getElementById('prev-button').addEventListener('click', prevPage);
+            document.getElementById('next-button').addEventListener('click', nextPage);
         }
+    }
 
         function prevPage() {
             if (currentPage > 0) {
