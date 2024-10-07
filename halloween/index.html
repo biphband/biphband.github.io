@@ -155,7 +155,7 @@
         <div id="hamburger">⇦</div>
         <div id="pdf-container"></div>
     </div>
-    <script src="script.js" defer></script>
+
     <script>
         const landing = document.getElementById('landing');
         const viewer = document.getElementById('viewer');
@@ -165,27 +165,110 @@
         const pdfContainer = document.getElementById('pdf-container');
         const hamburger = document.getElementById('hamburger');
 
-/*  script.js contains the paths to the PDFs in the following format
-        const pdfData = {
-  'violin_3': [
-    '/PDFs/Strings/Violins/Violin 3/1. This is Halloween-Violin_3.pdf',
-    '/PDFs/Strings/Violins/Violin 3/Christmas Eve - Violin 3.pdf',
-    '/PDFs/Strings/Violins/Violin 3/Finale-Violin_3.pdf',
-    '/PDFs/Strings/Violins/Violin 3/Oogie Boogies Song-Violin_3.pdf',
-    "PDFs/Strings/Violins/Violin 3/Sally's Song Violin 3.pdf"
-  ],
-
-        */
-
         let currentInstrument = '';
         let currentPage = 0;
 
         const instrumentData = {
-            'Woodwinds': ['Piccolo', 'Flute 1', 'Flute 2', 'Oboe', 'Clarinet 1', 'Clarinet 2', 'Clarinet 3', 'Bass Clarinet', 'Alto Sax 1', 'Alto Sax 2', 'Tenor Sax', 'Bassoon'],
-            'Brass': ['Trumpet 1', 'Trumpet 2', 'Trumpet 3', 'F Horn 1', 'F Horn 2', 'F Horn 3', 'F Horn 4', 'Trombone 1', 'Trombone 2', 'Trombone 3', 'Baritone', 'Tuba'],
-            'Percussion': ['Percussion 1', 'Aux Percussion', 'Mallets 1', 'Marimba', 'Vibraphone', 'Glockenspiel, Chimes', 'Piano'],
-            'Strings': ['Violin 1', 'Violin 2', 'Violin 3', 'Cello 1', 'Cello 2', 'Contrabass']
-        };
+    'Woodwinds': [
+        'Piccolo',
+        'Flute 1',
+        'Flute 2',
+        'Oboe',
+        'Clarinet 1',
+        'Clarinet 2',
+        'Clarinet 3',
+        'Bass Clarinet',
+        'Alto Sax 1',
+        'Alto Sax 2',
+        'Tenor Sax',
+        'Bassoon'
+    ],
+    'Brass': [
+        'Trumpet 1',
+        'Trumpet 2',
+        'Trumpet 3',
+        'F Horn 1',
+        'F Horn 2',
+        'F Horn 3',
+        'F Horn 4',
+        'Trombone 1',
+        'Trombone 2',
+        'Trombone 3',
+        'Baritone',
+        'Tuba'
+    ],
+    'Percussion': [
+        'Timpani',
+        'Piano',
+        'Chimes, Glockenspiel',
+        'Percussion 1',
+        'Marimba',
+        'Vibraphone',
+        'Aux Percussion 1',
+        'Aux Percussion 2',
+        'Aux Percussion 3'
+    ],
+    'Strings': [
+        'Violin 1',
+        'Violin 2',
+        'Violin 3',
+        'Violin 4',
+        'Cello 1',
+        'Cello 2',
+        'String Bass 1',
+        'String Bass 2'
+    ]
+};
+
+const pdfData = {
+
+'piccolo': ['PDFs/Woodwinds/Flutes/ Piccolo.pdf'],
+'flute_1': ['PDFs/Woodwinds/Flutes/ Flute 1.pdf'],
+'flute_2': ['PDFs/Woodwinds/Flutes/ Flute 2.pdf'],
+'oboe': ['PDFs/Woodwinds/Oboe/ Oboe.pdf'],
+'clarinet_1': ["PDFs/Woodwinds/Clarinets/ Clarinet 1.pdf"],
+'clarinet_2': ["PDFs/Woodwinds/Clarinets/ Clarinet 2.pdf"],
+'clarinet_3': ["PDFs/Woodwinds/Clarinets/ Clarinet 3.pdf"],
+'bass_clarinet': ["PDFs/Woodwinds/Clarinets/ Bass Clarinet.pdf"],
+'alto_sax_1': ['PDFs/Woodwinds/Saxes/ Alto Sax 1.pdf'],
+'alto_sax_2': ['PDFs/Woodwinds/Saxes/ Alto Sax 2.pdf'],
+'tenor_sax': ['PDFs/Woodwinds/Saxes/ Tenor Sax.pdf'],
+'bassoon': ['PDFs/Woodwinds/Bassoons/ Bassoon.pdf'],
+
+
+'trumpet_1': ['PDFs/Brass/Trumpet/ Trumpet 1.pdf'],
+'trumpet_2': ['PDFs/Brass/Trumpet/ Trumpet 2.pdf'],
+'trumpet_3': ['PDFs/Brass/Trumpet/ Trumpet 3.pdf'],
+'f_horn_1': ['PDFs/Brass/F Horn/ F Horn 1.pdf'],
+'f_horn_2': ['PDFs/Brass/F Horn/ F Horn 2.pdf'],
+'f_horn_3': ['PDFs/Brass/F Horn/ F Horn 3.pdf'],
+'f_horn_4': ['PDFs/Brass/F Horn/ F Horn 4.pdf'],
+'trombone_1': ['PDFs/Brass/Trombone/ Trombone 1.pdf'],
+'trombone_2': ['PDFs/Brass/Trombone/ Trombone 2.pdf'],
+'trombone_3': ['PDFs/Brass/Trombone/ Trombone 3.pdf'],
+'baritone': ['PDFs/Brass/Baritone/ Baritone.pdf'],
+'tuba': ['PDFs/Brass/Tuba/ Tuba.pdf'],
+
+'piano': ['PDFs/Percussion/ Piano.pdf'],
+'aux_percussion_1': ['PDFs/Percussion/ Aux Percussion 1.pdf'],
+'aux_percussion_2': ['PDFs/Percussion/ Aux Percussion 2.pdf'],
+'aux_percussion_3': ['PDFs/Percussion/ Aux Percussion 3.pdf'],
+'chimes,_glockenspiel': ['PDFs/Percussion/ Chimes Glockenspiel.pdf'],
+'marimba': ['PDFs/Percussion/ Marimba.pdf'],
+'percussion_1': ['PDFs/Percussion/ Percussion 1.pdf'],
+'timpani': ['PDFs/Percussion/ Timpani.pdf'],
+'vibraphone': ['PDFs/Percussion/ Vibraphone.pdf'],
+
+'violin_1': ['PDFs/Strings/Violins/ Violin 1.pdf'],
+'violin_2': ['PDFs/Strings/Violins/ Violin 2.pdf'],
+'violin_3': ['PDFs/Strings/Violins/ Violin 3.pdf'],
+'violin_4': ['PDFs/Strings/Violins/ Violin 4.pdf'],
+'cello_1': ['PDFs/Strings/Cellos/ Cello 1.pdf'],
+'cello_2': ['PDFs/Strings/Cellos/ Cello 2.pdf'],
+'string_bass_1': ['PDFs/Strings/String Bass/ String Bass 1.pdf'],
+'string_bass_2': ['PDFs/Strings/String Bass/ String Bass 2.pdf'],
+
+      };
 
         function populateInstrumentFamilies() {
             for (let family in instrumentData) {
