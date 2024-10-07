@@ -42,9 +42,10 @@
             overflow: hidden;
         }
         #pdf-viewer {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
         }
         #hamburger {
             position: fixed;
@@ -113,20 +114,6 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-        .nav-button {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            font-size: 18px;
-            z-index: 1000;
-        }
-        #prev-button { left: 10px; }
-        #next-button { right: 10px; }
         #search-container { margin-bottom: 20px; }
         #search-input {
             padding: 10px;
@@ -194,143 +181,12 @@
     <div id="viewer">
         <div id="hamburger">⇦</div>
         <div id="pdf-container">
-            <button id="prev-button" class="nav-button">&#9664;</button>
-            <button id="next-button" class="nav-button">&#9654;</button>
             <canvas id="pdf-viewer"></canvas>
         </div>
     </div>
 
+    <script src="instrumentData.js"></script> 
     <script>
-        const landing = document.getElementById('landing');
-        const viewer = document.getElementById('viewer');
-        const selectPart = document.getElementById('select-part');
-        const instrumentFamilies = document.getElementById('instrument-families');
-        const instruments = document.getElementById('instruments');
-        const pdfContainer = document.getElementById('pdf-container');
-        const hamburger = document.getElementById('hamburger');
-        const searchInput = document.getElementById('search-input');
-        const searchResults = document.getElementById('search-results');
-        const pdfViewer = document.getElementById('pdf-viewer');
-
-        let currentInstrument = '';
-        let currentPage = 1;
-        let selectedIndex = -1;
-        let pdfDoc = null;
-
-        const instrumentData = {
-            'Woodwinds': ['Piccolo', 'Flute 1', 'Flute 2', 'Oboe', 'Clarinet 1', 'Clarinet 2', 'Clarinet 3', 'Bass Clarinet', 'Alto Sax 1', 'Alto Sax 2', 'Tenor Sax', 'Bassoon'],
-            'Brass': ['Trumpet 1', 'Trumpet 2', 'Trumpet 3', 'F Horn 1', 'F Horn 2', 'F Horn 3', 'F Horn 4', 'Trombone 1', 'Trombone 2', 'Trombone 3', 'Baritone', 'Tuba'],
-            'Percussion': ['Timpani', 'Piano', 'Chimes, Glockenspiel', 'Percussion 1', 'Marimba', 'Vibraphone', 'Aux Percussion 1', 'Aux Percussion 2', 'Aux Percussion 3'],
-            'Strings': ['Violin 1', 'Violin 2', 'Violin 3', 'Violin 4', 'Cello 1', 'Cello 2', 'String Bass 1', 'String Bass 2']
-        };
-
-        const pdfData = {
-            'piccolo': ['PDFs/Woodwinds/ Piccolo.pdf'],
-            'flute_1': ['PDFs/Woodwinds/ Flute 1.pdf'],
-            'flute_2': ['PDFs/Woodwinds/ Flute 2.pdf'],
-            'oboe': ['PDFs/Woodwinds/ Oboe.pdf'],
-            'clarinet_1': ['PDFs/Woodwinds/ Clarinet 1.pdf'],
-            'clarinet_2': ['PDFs/Woodwinds/ Clarinet 2.pdf'],
-            'clarinet_3': ['PDFs/Woodwinds/ Clarinet 3.pdf'],
-            'bass_clarinet': ['PDFs/Woodwinds/ Bass Clarinet.pdf'],
-            'alto_sax_1': ['PDFs/Woodwinds/ Alto Sax 1.pdf'],
-            'alto_sax_2': ['PDFs/Woodwinds/ Alto Sax 2.pdf'],
-            'tenor_sax': ['PDFs/Woodwinds/ Tenor Sax.pdf'],
-            'bassoon': ['PDFs/Woodwinds/ Bassoon.pdf'],
-            'trumpet_1': ['PDFs/Brass/ Trumpet 1.pdf'],
-            'trumpet_2': ['PDFs/Brass/ Trumpet 2.pdf'],
-            'trumpet_3': ['PDFs/Brass/ Trumpet 3.pdf'],
-            'f_horn_1': ['PDFs/Brass/ F Horn 1.pdf'],
-            'f_horn_2': ['PDFs/Brass/ F Horn 2.pdf'],
-            'f_horn_3': ['PDFs/Brass/ F Horn 3.pdf'],
-            'f_horn_4': ['PDFs/Brass/ F Horn 4.pdf'],
-            'trombone_1': ['PDFs/Brass/ Trombone 1.pdf'],
-            'trombone_2': ['PDFs/Brass/ Trombone 2.pdf'],
-            'trombone_3': ['PDFs/Brass/ Trombone 3.pdf'],
-            'baritone': ['PDFs/Brass/ Baritone.pdf'],
-            'tuba': ['PDFs/Brass/ Tuba.pdf'],
-            'piano': ['PDFs/Percussion/ Piano.pdf'],
-            'aux_percussion_1': ['PDFs/Percussion/ Aux Percussion 1.pdf'],
-            'aux_percussion_2': ['PDFs/Percussion/ Aux Percussion 2.pdf'],
-            'aux_percussion_3': ['PDFs/Percussion/ Aux Percussion 3.pdf'],
-            'chimes,_glockenspiel': ['PDFs/Percussion/ Chimes Glockenspiel.pdf'],
-            'marimba': ['PDFs/Percussion/ Marimba.pdf'],
-            'percussion_1': ['PDFs/Percussion/ Percussion 1.pdf'],
-            'timpani': ['PDFs/Percussion/ Timpani.pdf'],
-            'vibraphone': ['PDFs/Percussion/ Vibraphone.pdf'],
-            'violin_1': ['PDFs/Strings/ Violin 1.pdf'],
-            'violin_2': ['PDFs/Strings/ Violin 2.pdf'],
-            'violin_3': ['PDFs/Strings/ Violin 3.pdf'],
-            'violin_4': ['PDFs/Strings/ Violin 4.pdf'],
-            'cello_1': ['PDFs/Strings/ Cello 1.pdf'],
-            'cello_2': ['PDFs/Strings/ Cello 2.pdf'],
-            'string_bass_1': ['PDFs/Strings/ String Bass 1.pdf'],
-            'string_bass_2': ['PDFs/Strings/ String Bass 2.pdf'],
-        };
-
-        const studentData = {
-            "Alina Zhao": "Flute 1", "Heather Hornsby": "Flute 2", "Sissi Zhou": "Flute 1", "Chris Peng": "Flute 1",
-            "Lucy Sheng": "Flute 2", "Tison Wu": "Trumpet 1", "Leo Teng": "Piccolo", "Authur Zeng": "Violin 2",
-            "Frankie Liu": "Percussion 1", "Angelina An": "Violin 3", "Steven Wang": "Violin 1", "James Hong": "Piano",
-            "Stephen Yang": "Alto Sax 1", "Melody Li": "Violin 2", "Vivi Xia": "Cello 1", "Tom Ma": "Trumpet 2",
-            "Kevin Chen": "String Bass 1", "Alex Huang": "Violin 1", "Alex Sun": "Violin 2", "Kevin Sun": "Violin 3",
-            "Vivienne Wang": "Cello 2", "Jojo Da": "Trumpet 2", "James Dai": "Trumpet 3", "Terry He": "Violin 2",
-            "Melody He": "Cello 1", "William Xu": "Flute 1", "Tiger Hou": "Aux Percussion 1", "Ethan Wang": "Tuba",
-            "Calvin Yan": "Bass Clarinet", "Agu Huang": "Alto Sax 2", "Mandy Luo": "Cello 1", "Pai Li": "Cello 2",
-            "Sophie Geng": "F Horn 4", "Ben Chen": "Timpani", "Catherine Zhang": "Violin 1", "Leo Li": "Flute 1",
-            "Simon Zhan": "Flute 1", "Yaffa Luo": "Violin 2", "Jerry Chen": "Trombone 2", "Helen Hu": "Clarinet 2",
-            "Daniel He": "Trombone 1", "Stuart Yang": "Bassoon", "Eamon Tan": "Flute 2", "Anne An": "Clarinet 3",
-            "Emily Ke": "Violin 2", "Jacky Wang": "Marimba", "Jim Zheng": "Clarinet 3", "Michael Chen": "Alto Sax 2",
-            "Jennifer Mou": "Cello 2", "Yvonne Duan": "Violin 3", "Henry Shi": "Clarinet 1", "Odelia Xie": "Violin 3",
-            "Alan Wen": "Flute 1", "Ziqi Zhou": "Violin 3", "Celine Shu": "Violin 3", "Kevin Fu": "Cello 2",
-            "Owen He": "Trumpet 3", "Fiona Fang": "Violin 3", "Johnny Yi": "Aux Percussion 2", "Francis Liu": "Alto Sax 2",
-            "Shine Duan": "Violin 1", "Aurora Zhong": "Vibraphone", "June Qin": "Flute 2", "Luna Zhan": "String Bass 2",
-            "Rene Tang": "String Bass 2", "Calvin Zhang": "Tuba", "Heafen Huang": "F Horn 2", "Kevin Cai": "Aux Percussion 3",
-            "Steven Meng": "Baritone", "Helen Nie": "Cello 2", "Jenny Nie": "Violin 2", "Bruce Yan": "Chimes, Glockenspiel",
-            "Mianmian Lyu": "Flute 2", "Grace Ning": "Flute 1", "Daisy Wei": "Cello 2", "Steve Wang": "Alto Sax 2",
-            "Christi Zhu": "F Horn 3"
-        };
-
-        function populateInstrumentFamilies() {
-            for (let family in instrumentData) {
-                const button = document.createElement('button');
-                button.textContent = family;
-                button.onclick = (e) => {
-                    e.stopPropagation();
-                    showInstruments(family);
-                };
-                instrumentFamilies.appendChild(button);
-            }
-        }
-
-        function showInstruments(family) {
-            instruments.innerHTML = '';
-            instrumentData[family].forEach(instrument => {
-                const button = document.createElement('button');
-                button.textContent = instrument;
-                button.onclick = (e) => {
-                    e.stopPropagation();
-                    selectInstrument(instrument);
-                };
-                instruments.appendChild(button);
-            });
-            instrumentFamilies.classList.remove('show');
-            instruments.classList.add('show');
-        }
-
-        function selectInstrument(instrument) {
-            selectPart.textContent = instrument;
-            instruments.classList.remove('show');
-            currentInstrument = instrument.toLowerCase().replace(/ /g, '_').replace(/[()]/g, '');
-            if (currentInstrument && pdfData[currentInstrument]) {
-                currentPage = 1;
-                viewer.classList.add('active');
-                loadPDF();
-            } else {
-                console.log('No PDF data available for:', currentInstrument);
-            }
-        }
-
         async function loadPDF() {
             if (currentInstrument && pdfData[currentInstrument]) {
                 const url = pdfData[currentInstrument][0];
@@ -345,10 +201,8 @@
             const canvas = document.getElementById('pdf-viewer');
             const context = canvas.getContext('2d');
 
-            // Calculate scale to fit
-            const scaleX = pdfContainer.clientWidth / viewport.width;
-            const scaleY = pdfContainer.clientHeight / viewport.height;
-            const scale = Math.min(scaleX, scaleY);
+            // Calculate scale to fit width
+            const scale = pdfContainer.clientWidth / viewport.width;
 
             const scaledViewport = page.getViewport({ scale });
 
@@ -384,9 +238,8 @@
 
             setTimeout(() => {
                 pdfContainer.removeChild(pageTurn);
-            }, 50);
+            }, 250);
         }
-
 
         function updateSearchResults() {
             const query = searchInput.value.toLowerCase();
@@ -475,18 +328,6 @@
             }
         });
 
-        document.getElementById('prev-button').addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            changePage(-1);
-        });
-
-        document.getElementById('next-button').addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            changePage(1);
-        });
-
         let touchStartX;
         pdfContainer.addEventListener('touchstart', (e) => {
             touchStartX = e.changedTouches[0].screenX;
@@ -498,11 +339,18 @@
             changePage(direction);
         });
 
+        pdfContainer.addEventListener('click', (e) => {
+            const clickX = e.clientX;
+            const containerWidth = pdfContainer.clientWidth;
+            if (clickX < containerWidth * 0.2) {
+                changePage(-1);
+            } else if (clickX > containerWidth * 0.8) {
+                changePage(1);
+            }
+        });
+
         searchInput.addEventListener('input', updateSearchResults);
         searchInput.addEventListener('keydown', handleSearchBoxKeys);
-
-        document.getElementById('prev-button').addEventListener('click', () => changePage(-1));
-        document.getElementById('next-button').addEventListener('click', () => changePage(1));
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js';
 
