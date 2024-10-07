@@ -187,6 +187,17 @@
 
     <script src="instrumentData.js"></script> 
     <script>
+        const landing = document.getElementById('landing');
+        const viewer = document.getElementById('viewer');
+        const selectPart = document.getElementById('select-part');
+        const instrumentFamilies = document.getElementById('instrument-families');
+        const instruments = document.getElementById('instruments');
+        const pdfContainer = document.getElementById('pdf-container');
+        const hamburger = document.getElementById('hamburger');
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+        const pdfViewer = document.getElementById('pdf-viewer');
+
         async function loadPDF() {
             if (currentInstrument && pdfData[currentInstrument]) {
                 const url = pdfData[currentInstrument][0];
