@@ -142,24 +142,18 @@
             font-size: 18px;
             font-weight: bold;
         }
-        .page-turn {
+        #page-indicator {
             position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 50%;
-            background-color: #fff;
-            transition: transform 0.5s ease-in-out;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
         }
-        .page-turn-left {
-            left: 0;
-            transform-origin: left;
-        }
-        .page-turn-right {
-            right: 0;
-            transform-origin: right;
-        }
-        .turn-left { transform: perspective(1200px) rotateY(-180deg); }
-        .turn-right { transform: perspective(1200px) rotateY(180deg); }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
 </head>
@@ -183,6 +177,7 @@
         <div id="pdf-container">
             <canvas id="pdf-viewer"></canvas>
         </div>
+        <div id="page-indicator"></div>
     </div>
 
     <script src="instrumentData.js"></script> 
@@ -197,7 +192,12 @@
         const searchInput = document.getElementById('search-input');
         const searchResults = document.getElementById('search-results');
         const pdfViewer = document.getElementById('pdf-viewer');
+        const pageIndicator = document.getElementById('page-indicator');
 
+        let currentInstrument = '';
+        let currentPage = 1;
+        let selectedIndex = -1;
+        let pdfDoc = null;
 
         async function loadPDF() {
             if (currentInstrument && pdfData[currentInstrument]) {
@@ -213,14 +213,12 @@
             const canvas = document.getElementById('pdf-viewer');
             const context = canvas.getContext('2d');
 
-            // Calculate scale to fit width while maintaining high resolution
             const containerWidth = pdfContainer.clientWidth;
             const containerHeight = pdfContainer.clientHeight;
             const widthScale = containerWidth / viewport.width;
             const heightScale = containerHeight / viewport.height;
             const scale = Math.min(widthScale, heightScale);
 
-            // Use a higher scale for better quality, especially on high DPI displays
             const outputScale = window.devicePixelRatio || 1;
             const scaledViewport = page.getViewport({ scale: scale * outputScale });
 
@@ -237,8 +235,8 @@
             };
 
             await page.render(renderContext);
+            updatePageIndicator();
         }
-
 
         function changePage(direction) {
             if (pdfDoc === null) return;
@@ -246,23 +244,12 @@
             const newPage = Math.max(1, Math.min(pdfDoc.numPages, currentPage + direction));
             if (newPage !== currentPage) {
                 currentPage = newPage;
-                animatePageTurn(direction);
                 renderPage(currentPage);
             }
         }
 
-        function animatePageTurn(direction) {
-            const pageTurn = document.createElement('div');
-            pageTurn.className = `page-turn page-turn-${direction > 0 ? 'left' : 'right'}`;
-            pdfContainer.appendChild(pageTurn);
-
-            setTimeout(() => {
-                pageTurn.classList.add(direction > 0 ? 'turn-right' : 'turn-left');
-            }, 0);
-
-            setTimeout(() => {
-                pdfContainer.removeChild(pageTurn);
-            }, 250);
+        function updatePageIndicator() {
+            pageIndicator.textContent = `Page ${currentPage} of ${pdfDoc.numPages}`;
         }
 
         function updateSearchResults() {
@@ -322,32 +309,32 @@
         }
 
         function showInstruments(family) {
-    instruments.innerHTML = '';
-    instrumentData[family].forEach(instrument => {
-        const button = document.createElement('button');
-        button.textContent = instrument;
-        button.onclick = (e) => {
-            e.stopPropagation();
-            selectInstrument(instrument);
-        };
-        instruments.appendChild(button);
-    });
-    instrumentFamilies.classList.remove('show');
-    instruments.classList.add('show');
-}
+            instruments.innerHTML = '';
+            instrumentData[family].forEach(instrument => {
+                const button = document.createElement('button');
+                button.textContent = instrument;
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    selectInstrument(instrument);
+                };
+                instruments.appendChild(button);
+            });
+            instrumentFamilies.classList.remove('show');
+            instruments.classList.add('show');
+        }
 
-function selectInstrument(instrument) {
-    selectPart.textContent = instrument;
-    instruments.classList.remove('show');
-    currentInstrument = instrument.toLowerCase().replace(/ /g, '_').replace(/[()]/g, '');
-    if (currentInstrument && pdfData[currentInstrument]) {
-        currentPage = 1;
-        viewer.classList.add('active');
-        loadPDF();
-    } else {
-        console.log('No PDF data available for:', currentInstrument);
-    }
-}
+        function selectInstrument(instrument) {
+            selectPart.textContent = instrument;
+            instruments.classList.remove('show');
+            currentInstrument = instrument.toLowerCase().replace(/ /g, '_').replace(/[()]/g, '');
+            if (currentInstrument && pdfData[currentInstrument]) {
+                currentPage = 1;
+                viewer.classList.add('active');
+                loadPDF();
+            } else {
+                console.log('No PDF data available for:', currentInstrument);
+            }
+        }
 
         function populateInstrumentFamilies() {
             for (let family in instrumentData) {
@@ -384,25 +371,6 @@ function selectInstrument(instrument) {
             }
         });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight') {
-                changePage(1);
-            } else if (e.key === 'ArrowLeft') {
-                changePage(-1);
-            }
-        });
-
-        let touchStartX;
-        pdfContainer.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-
-        pdfContainer.addEventListener('touchend', (e) => {
-            const touchEndX = e.changedTouches[0].screenX;
-            const direction = touchEndX < touchStartX ? 1 : -1;
-            changePage(direction);
-        });
-
         pdfContainer.addEventListener('click', (e) => {
             const clickX = e.clientX;
             const containerWidth = pdfContainer.clientWidth;
@@ -410,6 +378,14 @@ function selectInstrument(instrument) {
                 changePage(-1);
             } else if (clickX > containerWidth * 0.8) {
                 changePage(1);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                changePage(1);
+            } else if (e.key === 'ArrowLeft') {
+                changePage(-1);
             }
         });
 
