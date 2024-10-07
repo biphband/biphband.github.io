@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Sheet Viewer</title>
-    <link rel="icon" href="/images/jack.png">
+    <link rel="icon" href="images/jack.png">
     <style>
         body, html {
             margin: 0;
@@ -152,7 +152,7 @@
             color: white;
             padding: 5px 10px;
             border-radius: 5px;
-            font-size: 18px;
+            font-size: 12px;
             font-weight: bold;
         }
     </style>
@@ -203,8 +203,13 @@
         async function loadPDF() {
             if (currentInstrument && pdfData[currentInstrument]) {
                 const url = pdfData[currentInstrument][0];
-                pdfDoc = await pdfjsLib.getDocument(url).promise;
-                renderPage(currentPage);
+                try {
+                    pdfDoc = await pdfjsLib.getDocument(url).promise;
+                    currentPage = 1;
+                    renderPage(currentPage);
+                } catch (error) {
+                    console.error('Error loading PDF:', error);
+                }
             }
         }
 
@@ -329,7 +334,6 @@
             instruments.classList.remove('show');
             currentInstrument = instrument.toLowerCase().replace(/ /g, '_').replace(/[()]/g, '');
             if (currentInstrument && pdfData[currentInstrument]) {
-                currentPage = 1;
                 viewer.classList.add('active');
                 loadPDF();
             } else {
@@ -363,12 +367,14 @@
         hamburger.addEventListener('click', () => {
             viewer.classList.remove('active');
             selectPart.textContent = 'Select your part';
+            pdfDoc = null; // Reset pdfDoc when going back to the main screen
         });
 
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
                 viewer.classList.remove('active');
                 selectPart.textContent = 'Select your part';
+                pdfDoc = null; // Reset pdfDoc when going back to the main screen
             }
         });
 
