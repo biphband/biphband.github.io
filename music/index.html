@@ -198,6 +198,7 @@
         const searchResults = document.getElementById('search-results');
         const pdfViewer = document.getElementById('pdf-viewer');
 
+
         async function loadPDF() {
             if (currentInstrument && pdfData[currentInstrument]) {
                 const url = pdfData[currentInstrument][0];
@@ -212,20 +213,32 @@
             const canvas = document.getElementById('pdf-viewer');
             const context = canvas.getContext('2d');
 
-            // Calculate scale to fit width
-            const scale = pdfContainer.clientWidth / viewport.width;
+            // Calculate scale to fit width while maintaining high resolution
+            const containerWidth = pdfContainer.clientWidth;
+            const containerHeight = pdfContainer.clientHeight;
+            const widthScale = containerWidth / viewport.width;
+            const heightScale = containerHeight / viewport.height;
+            const scale = Math.min(widthScale, heightScale);
 
-            const scaledViewport = page.getViewport({ scale });
+            // Use a higher scale for better quality, especially on high DPI displays
+            const outputScale = window.devicePixelRatio || 1;
+            const scaledViewport = page.getViewport({ scale: scale * outputScale });
 
-            canvas.height = scaledViewport.height;
-            canvas.width = scaledViewport.width;
+            canvas.width = Math.floor(scaledViewport.width);
+            canvas.height = Math.floor(scaledViewport.height);
+            canvas.style.width = Math.floor(scaledViewport.width / outputScale) + 'px';
+            canvas.style.height = Math.floor(scaledViewport.height / outputScale) + 'px';
 
             const renderContext = {
                 canvasContext: context,
-                viewport: scaledViewport
+                viewport: scaledViewport,
+                enableWebGL: true,
+                renderInteractiveForms: false
             };
+
             await page.render(renderContext);
         }
+
 
         function changePage(direction) {
             if (pdfDoc === null) return;
@@ -402,6 +415,12 @@ function selectInstrument(instrument) {
 
         searchInput.addEventListener('input', updateSearchResults);
         searchInput.addEventListener('keydown', handleSearchBoxKeys);
+
+        window.addEventListener('resize', () => {
+            if (pdfDoc) {
+                renderPage(currentPage);
+            }
+        });
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js';
 
