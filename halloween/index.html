@@ -46,16 +46,17 @@
             justify-content: center;
             align-items: center;
         }
-        #pdf-container img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+        #pdf-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
         #hamburger {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            font-size: 30px;
+            top: 15px;
+            left: 220px;
+            color: white;
+            font-size: 20px;
             cursor: pointer;
             z-index: 1000;
         }
@@ -110,20 +111,20 @@
         }
 
         .show {
-            max-height: 80vh; /* Increased from 300px to 80% of viewport height */
+            max-height: 80vh;
             opacity: 1;
             transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
         }
 
         @media (min-height: 600px) {
             .show {
-                max-height: 500px; /* Fixed height for taller screens */
+                max-height: 500px;
             }
         }
 
         @media (min-height: 800px) {
             .show {
-                max-height: 700px; /* Even taller for very large screens */
+                max-height: 700px;
             }
         }
 
@@ -151,10 +152,10 @@
         </div>
     </div>
     <div id="viewer">
-        <div id="hamburger">☰</div>
+        <div id="hamburger">⇦</div>
         <div id="pdf-container"></div>
     </div>
-
+    <script src="script.js" defer></script>
     <script>
         const landing = document.getElementById('landing');
         const viewer = document.getElementById('viewer');
@@ -164,25 +165,24 @@
         const pdfContainer = document.getElementById('pdf-container');
         const hamburger = document.getElementById('hamburger');
 
-        // Simulated PDF data (replace with actual PDF data)
+/*  script.js contains the paths to the PDFs in the following format
         const pdfData = {
-            'violin3': [
-                'https://via.placeholder.com/800x1000.png?text=Violin+3+Page+1',
-                'https://via.placeholder.com/800x1000.png?text=Violin+3+Page+2',
-                'https://via.placeholder.com/800x1000.png?text=Violin+3+Page+3'
-            ],
-            'baritone': [
-                'https://via.placeholder.com/800x1000.png?text=Baritone+Page+1',
-                'https://via.placeholder.com/800x1000.png?text=Baritone+Page+2'
-            ]
-        };
+  'violin_3': [
+    '/PDFs/Strings/Violins/Violin 3/1. This is Halloween-Violin_3.pdf',
+    '/PDFs/Strings/Violins/Violin 3/Christmas Eve - Violin 3.pdf',
+    '/PDFs/Strings/Violins/Violin 3/Finale-Violin_3.pdf',
+    '/PDFs/Strings/Violins/Violin 3/Oogie Boogies Song-Violin_3.pdf',
+    "PDFs/Strings/Violins/Violin 3/Sally's Song Violin 3.pdf"
+  ],
+
+        */
 
         let currentInstrument = '';
         let currentPage = 0;
 
         const instrumentData = {
-            'Woodwinds': ['Piccolo', 'Flute 1', 'Flute 2', 'Oboe (Opt. Fl. 3)', 'Bb Clarinet 1', 'Bb Clarinet 2', 'Bb Clarinet 3', 'Bass Clarinet', 'Alto Saxophone 1', 'Alto Saxophone 2', 'Tenor Saxophone', 'Baritone Saxophone', 'Bassoon'],
-            'Brass': ['Bb Trumpet 1', 'Bb Trumpet 2', 'Bb Trumpet 3', 'Bb Trumpet, simplified', 'F Horn 1', 'F Horn 2', 'F Horn 3', 'F Horn 4', 'Trombone 1', 'Trombone 2', 'Trombone 3', 'Euphonium', 'Euphonium, simplified', 'Tuba'],
+            'Woodwinds': ['Piccolo', 'Flute 1', 'Flute 2', 'Oboe', 'Clarinet 1', 'Clarinet 2', 'Clarinet 3', 'Bass Clarinet', 'Alto Sax 1', 'Alto Sax 2', 'Tenor Sax', 'Bassoon'],
+            'Brass': ['Trumpet 1', 'Trumpet 2', 'Trumpet 3', 'F Horn 1', 'F Horn 2', 'F Horn 3', 'F Horn 4', 'Trombone 1', 'Trombone 2', 'Trombone 3', 'Baritone', 'Tuba'],
             'Percussion': ['Percussion 1', 'Aux Percussion', 'Mallets 1', 'Marimba', 'Vibraphone', 'Glockenspiel, Chimes', 'Piano'],
             'Strings': ['Violin 1', 'Violin 2', 'Violin 3', 'Cello 1', 'Cello 2', 'Contrabass']
         };
@@ -217,13 +217,13 @@
         function selectInstrument(instrument) {
             selectPart.textContent = instrument;
             instruments.classList.remove('show');
-            // Handle the selected instrument (you can reuse your existing logic here)
-            console.log('Selected instrument:', instrument);
-            currentInstrument = instrument.toLowerCase().replace(/ /g, '_');
-            if (currentInstrument) {
+            currentInstrument = instrument.toLowerCase().replace(/ /g, '_').replace(/[()]/g, '');
+            if (currentInstrument && pdfData[currentInstrument]) {
                 currentPage = 0;
                 viewer.classList.add('active');
                 showPDF();
+            } else {
+                console.log('No PDF data available for:', currentInstrument);
             }
         }
 
@@ -247,7 +247,7 @@
 
         function showPDF() {
             if (currentInstrument && pdfData[currentInstrument]) {
-                pdfContainer.innerHTML = `<img src="${pdfData[currentInstrument][currentPage]}" alt="Sheet music">`;
+                pdfContainer.innerHTML = `<iframe src="${pdfData[currentInstrument][currentPage]}"></iframe>`;
             }
         }
 
