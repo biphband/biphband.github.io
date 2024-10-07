@@ -308,6 +308,34 @@
             }
         }
 
+        function showInstruments(family) {
+    instruments.innerHTML = '';
+    instrumentData[family].forEach(instrument => {
+        const button = document.createElement('button');
+        button.textContent = instrument;
+        button.onclick = (e) => {
+            e.stopPropagation();
+            selectInstrument(instrument);
+        };
+        instruments.appendChild(button);
+    });
+    instrumentFamilies.classList.remove('show');
+    instruments.classList.add('show');
+}
+
+function selectInstrument(instrument) {
+    selectPart.textContent = instrument;
+    instruments.classList.remove('show');
+    currentInstrument = instrument.toLowerCase().replace(/ /g, '_').replace(/[()]/g, '');
+    if (currentInstrument && pdfData[currentInstrument]) {
+        currentPage = 1;
+        viewer.classList.add('active');
+        loadPDF();
+    } else {
+        console.log('No PDF data available for:', currentInstrument);
+    }
+}
+
         function populateInstrumentFamilies() {
             for (let family in instrumentData) {
                 const button = document.createElement('button');
