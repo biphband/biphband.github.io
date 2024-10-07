@@ -1,8 +1,3 @@
-let currentInstrument = '';
-let currentPage = 1;
-let selectedIndex = -1;
-let pdfDoc = null;
-
 const instrumentData = {
     'Woodwinds': ['Piccolo', 'Flute 1', 'Flute 2', 'Oboe', 'Clarinet 1', 'Clarinet 2', 'Clarinet 3', 'Bass Clarinet', 'Alto Sax 1', 'Alto Sax 2', 'Tenor Sax', 'Bassoon'],
     'Brass': ['Trumpet 1', 'Trumpet 2', 'Trumpet 3', 'F Horn 1', 'F Horn 2', 'F Horn 3', 'F Horn 4', 'Trombone 1', 'Trombone 2', 'Trombone 3', 'Baritone', 'Tuba'],
