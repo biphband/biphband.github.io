@@ -308,6 +308,18 @@
             }
         }
 
+        function populateInstrumentFamilies() {
+            for (let family in instrumentData) {
+                const button = document.createElement('button');
+                button.textContent = family;
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    showInstruments(family);
+                };
+                instrumentFamilies.appendChild(button);
+            }
+        }
+
         selectPart.onclick = (e) => {
             e.stopPropagation();
             instrumentFamilies.classList.toggle('show');
