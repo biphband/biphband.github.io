@@ -67,7 +67,7 @@ const studentData = {
     "Mary Chen": "Flute 2",
     "Tiffany Chen": "Flute 2",
     "Tony Yiren": "Flute 2",
-    "Mianmian Lyu": "Flute 2",
+    "Mianmian Lyu": "Piccolo",
     "Henry Shi": "Clarinet 1",
     "Helen Hu": "Clarinet 2",
     "Ivy Zeng": "Clarinet 3",
