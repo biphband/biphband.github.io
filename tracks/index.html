@@ -129,7 +129,7 @@ body::before {
 
         function playTrack(index) {
             const track = practiceTracks[index];
-            audioPlayer.src = `/mp3s/${track}`;
+            audioPlayer.src = `mp3s/${track}`;
             audioPlayer.play();
             updateActiveTrack(index);
         }
