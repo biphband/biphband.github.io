@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIPH Halloween Music Practice Tracks</title>
+    <link rel="icon" href="images/jack.png">
+    <style>
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background: rgb(255, 255, 255); /* White background */
+    position: relative;
+    overflow: hidden; /* Prevents scrollbars */
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('images/The Pumpkin King Poster no text.png') no-repeat top center / cover;
+    opacity: 0.3; /* Adjust opacity as needed */
+    z-index: 0; /* Behind the content */
+}
+        #player {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        #audio-player {
+            margin-top: 20px;
+            width: 100%;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0);
+            max-width: 500px;
+            margin-bottom: 20px;
+            box-shadow: 0px 8px 8px 10px rgba(0,0,0,0.1);
+        }
+        #playlist {
+            width: 100%;
+            max-width: 500px;
+            background-color: rgb(242, 242, 242);
+            border-radius: 5px;
+            padding: 10px;
+            max-height: calc(100% - 250px);
+            overflow-y: auto;
+            box-shadow: 0px 8px 8px 10px rgba(0,0,0,0.1);
+        }
+        .playlist-item {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .playlist-item:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        .playlist-item.active {
+            background-color: rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+        }
+        #autoplay-toggle {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        #autoplay-toggle label {
+            margin-left: 10px;
+            font-weight: bold;
+            color: rgb(0, 0, 0);
+        }
+    </style>
+</head>
+<body>
+    <div id="player">
+        <h2 id="playlist-title">BIPH Halloween Music Practice Tracks</h2>
+        <audio id="audio-player" controls></audio>
+        <div id="autoplay-toggle">
+            <input type="checkbox" id="autoplay-checkbox" checked>
+            <label for="autoplay-checkbox">Autoplay next song</label>
+        </div>
+        <div id="playlist"></div>
+    </div>
+
+    <script>
+        const audioPlayer = document.getElementById('audio-player');
+        const playlist = document.getElementById('playlist');
+        const autoplayCheckbox = document.getElementById('autoplay-checkbox');
+
+        const practiceTracks = [
+            "And They Call Him Sandy Claws.mp3",
+            "Christmas Eve Montage.mp3",
+            "Elves Transition.mp3",
+            "Finale.mp3",
+            "Kidnap The Sandy Claws.mp3",
+            "Oh Fare Thee Well.mp3",
+            "Oogie Boogies Song.mp3",
+            "Pay the Price.mp3",
+            "Sally Gets Caught.mp3",
+            "Sally Sneaks Transition.mp3",
+            "Sally's Song.mp3",
+            "Sally's Vision.mp3",
+            "This is Halloween.mp3",
+            "Whats This.mp3",
+            "Yet Year After Year.mp3"
+        ];
+
+        function loadPlaylist() {
+            playlist.innerHTML = '';
+            practiceTracks.forEach((track, index) => {
+                const item = document.createElement('div');
+                item.className = 'playlist-item';
+                item.textContent = track.replace('.mp3', '');
+                item.onclick = () => playTrack(index);
+                playlist.appendChild(item);
+            });
+        }
+
+        function playTrack(index) {
+            const track = practiceTracks[index];
+            audioPlayer.src = `/mp3s/${track}`;
+            audioPlayer.play();
+            updateActiveTrack(index);
+        }
+
+        function updateActiveTrack(index) {
+            const items = playlist.getElementsByClassName('playlist-item');
+            for (let i = 0; i < items.length; i++) {
+                items[i].classList.toggle('active', i === index);
+            }
+        }
+
+        audioPlayer.addEventListener('ended', () => {
+            if (autoplayCheckbox.checked) {
+                const currentIndex = practiceTracks.findIndex(track => track === audioPlayer.src.split('/').pop());
+                const nextIndex = (currentIndex + 1) % practiceTracks.length;
+                playTrack(nextIndex);
+            }
+        });
+
+        // Load the playlist when the page loads
+        loadPlaylist();
+    </script>
+</body>
+</html>
