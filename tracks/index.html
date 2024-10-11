@@ -6,27 +6,26 @@
     <title>BIPH Halloween Music Practice Tracks</title>
     <link rel="icon" href="images/jack.png">
     <style>
-body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: Arial, sans-serif;
-    background: rgb(255, 255, 255); /* White background */
-    position: relative;
-    overflow: hidden; /* Prevents scrollbars */
-}
-
-body::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('images/The Pumpkin King Poster no text.png') no-repeat top center / cover;
-    opacity: 0.3; /* Adjust opacity as needed */
-    z-index: 0; /* Behind the content */
-}
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background: rgb(255, 255, 255);
+            position: relative;
+            overflow: hidden;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('images/The Pumpkin King Poster no text.png') no-repeat top center / cover;
+            opacity: 0.3;
+            z-index: 0;
+        }
         #player {
             height: 100%;
             width: 100%;
@@ -72,13 +71,45 @@ body::before {
         }
         #autoplay-toggle {
             margin-bottom: 15px;
+            font-weight: bolder;
             display: flex;
             align-items: center;
         }
-        #autoplay-toggle label {
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            vertical-align: middle;
             margin-left: 10px;
-            font-weight: bold;
-            color: rgb(0, 0, 0);
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
         }
     </style>
 </head>
@@ -87,8 +118,11 @@ body::before {
         <h2 id="playlist-title">BIPH Halloween Music Practice Tracks</h2>
         <audio id="audio-player" controls></audio>
         <div id="autoplay-toggle">
-            <input type="checkbox" id="autoplay-checkbox" checked>
-            <label for="autoplay-checkbox">Autoplay next song</label>
+            <span>Autoplay next song</span>
+            <label class="switch">
+                <input type="checkbox" id="autoplay-checkbox" checked>
+                <span class="slider"></span>
+            </label>
         </div>
         <div id="playlist"></div>
     </div>
@@ -116,6 +150,8 @@ body::before {
             "Yet Year After Year.mp3"
         ];
 
+        let currentTrackIndex = 0;
+
         function loadPlaylist() {
             playlist.innerHTML = '';
             practiceTracks.forEach((track, index) => {
@@ -128,6 +164,7 @@ body::before {
         }
 
         function playTrack(index) {
+            currentTrackIndex = index;
             const track = practiceTracks[index];
             audioPlayer.src = `mp3s/${track}`;
             audioPlayer.play();
@@ -143,9 +180,8 @@ body::before {
 
         audioPlayer.addEventListener('ended', () => {
             if (autoplayCheckbox.checked) {
-                const currentIndex = practiceTracks.findIndex(track => track === audioPlayer.src.split('/').pop());
-                const nextIndex = (currentIndex + 1) % practiceTracks.length;
-                playTrack(nextIndex);
+                currentTrackIndex = (currentTrackIndex + 1) % practiceTracks.length;
+                playTrack(currentTrackIndex);
             }
         });
 
