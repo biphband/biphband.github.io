@@ -66,7 +66,7 @@
             background-color: rgba(0, 0, 0, 0.1);
         }
         .playlist-item.active {
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color: #e6f3ff;
             font-weight: bold;
         }
         #autoplay-toggle {
@@ -84,18 +84,18 @@
             margin-left: 10px;
         }
         .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #8c8c8c;
-    transition: .4s;
-    border: 1px solid rgba(44, 44, 44, 0.473); /* Solid outline */
-    border-radius: 34px;
-    box-shadow: 1px 1px 6px 1px rgba(0,0,0,0.2);
-}
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #8c8c8c;
+            transition: .4s;
+            border: 1px solid rgba(44, 44, 44, 0.473);
+            border-radius: 34px;
+            box-shadow: 1px 1px 6px 1px rgba(0,0,0,0.2);
+        }
         .slider:before {
             position: absolute;
             content: "";
@@ -112,6 +112,68 @@
         }
         input:checked + .slider:before {
             transform: translateX(20px);
+        }
+        .category {
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            background-color: rgba(0, 0, 0, 0.1);
+            padding: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        .category:hover {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        .category::before {
+            content: '\25BC';
+            margin-right: 10px;
+            transition: transform 0.3s;
+        }
+        .category.collapsed::before {
+            transform: rotate(-90deg);
+        }
+        .category-content {
+            overflow: hidden;
+            max-height: 1000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .category-content.collapsed {
+            max-height: 0;
+        }
+        .subcategory {
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            padding-left: 10px;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        .subcategory:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        .subcategory::before {
+            content: '\25BC';
+            margin-right: 10px;
+            transition: transform 0.3s;
+        }
+        .subcategory.collapsed::before {
+            transform: rotate(-90deg);
+        }
+        .subcategory-content {
+            overflow: hidden;
+            max-height: 500px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .subcategory-content.collapsed {
+            max-height: 0;
         }
     </style>
 </head>
@@ -134,56 +196,121 @@
         const playlist = document.getElementById('playlist');
         const autoplayCheckbox = document.getElementById('autoplay-checkbox');
 
-        const practiceTracks = [
-            "And They Call Him Sandy Claws.mp3",
-            "Christmas Eve Montage.mp3",
-            "Elves Transition.mp3",
-            "Finale.mp3",
-            "Kidnap The Sandy Claws.mp3",
-            "Oh Fare Thee Well.mp3",
-            "Oogie Boogies Song.mp3",
-            "Pay the Price.mp3",
-            "Sally Gets Caught.mp3",
-            "Sally Sneaks Transition.mp3",
-            "Sally's Song.mp3",
-            "Sally's Vision.mp3",
-            "This is Halloween.mp3",
-            "Whats This.mp3",
-            "Year After Year.mp3"
-        ];
+        const practiceTracks = {
+            "WHOLE GROUP": {
+                "Main Songs": [
+                    "This is Halloween.mp3",
+                    "Whats This.mp3",
+                    "Sally's Song.mp3",
+                    "Kidnap The Sandy Claws.mp3",
+                    "Oogie Boogies Song.mp3",
+                    "Finale.mp3"
+                ],
+                "Transition Pieces": [
+                    "And They Call Him Sandy Claws.mp3",
+                    "Pay the Price.mp3",
+                    "Christmas Eve.mp3",
+                    "Sally Sneaks.mp3",
+                    "Sally Gets Caught.mp3"
+                ]
+            },
+            "SMALL GROUP": {
+                "Band": [
+                    "Jack's Lament.mp3",
+                    "Jack's Lament Piano Solo.mp3",
+                    "Oh Fare Thee Well.mp3",
+                    "Sally's Vision.mp3",
+                    "Oh Fare Thee Well Reprise.mp3",
+                    "Kidnap The Sandy Claws Woodwinds.mp3",
+                    "Christmas Eve Reprise.mp3",
+                    "Halloween Transition.mp3",
+                    "Elves Transition.mp3",
+                    "Year After Year.mp3",
+                    "Year After Year Reprise.mp3"
+                ],
+                "String Ensemble": [
+                    "Kidnap The Sandy Claws Strings.mp3",
+                    "Kidnap The Sandy Claws Strings (short).mp3"
+                ]
+            }
+        };
 
         let currentTrackIndex = 0;
+        let allTracks = [];
 
         function loadPlaylist() {
             playlist.innerHTML = '';
-            practiceTracks.forEach((track, index) => {
-                const item = document.createElement('div');
-                item.className = 'playlist-item';
-                item.textContent = track.replace('.mp3', '');
-                item.onclick = () => playTrack(index);
-                playlist.appendChild(item);
-            });
+            allTracks = [];
+
+            for (const category in practiceTracks) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category collapsed';
+                categoryDiv.textContent = category;
+                categoryDiv.onclick = toggleCategory;
+                playlist.appendChild(categoryDiv);
+
+                const categoryContent = document.createElement('div');
+                categoryContent.className = 'category-content collapsed';
+                playlist.appendChild(categoryContent);
+
+                for (const subcategory in practiceTracks[category]) {
+                    const subcategoryDiv = document.createElement('div');
+                    subcategoryDiv.className = 'subcategory collapsed';
+                    subcategoryDiv.textContent = subcategory;
+                    subcategoryDiv.onclick = toggleSubcategory;
+                    categoryContent.appendChild(subcategoryDiv);
+
+                    const subcategoryContent = document.createElement('div');
+                    subcategoryContent.className = 'subcategory-content collapsed';
+                    categoryContent.appendChild(subcategoryContent);
+
+                    practiceTracks[category][subcategory].forEach((track) => {
+                        const item = document.createElement('div');
+                        item.className = 'playlist-item';
+                        item.textContent = track.replace('.mp3', '');
+                        item.onclick = () => playTrack(track);
+                        subcategoryContent.appendChild(item);
+                        allTracks.push(track);
+                    });
+                }
+            }
         }
 
-        function playTrack(index) {
-            currentTrackIndex = index;
-            const track = practiceTracks[index];
+        function toggleCategory(event) {
+            event.stopPropagation();
+            const category = event.target;
+            const content = category.nextElementSibling;
+            category.classList.toggle('collapsed');
+            content.classList.toggle('collapsed');
+        }
+
+        function toggleSubcategory(event) {
+            event.stopPropagation();
+            const subcategory = event.target;
+            const content = subcategory.nextElementSibling;
+            subcategory.classList.toggle('collapsed');
+            content.classList.toggle('collapsed');
+        }
+
+        function playTrack(track) {
+            currentTrackIndex = allTracks.indexOf(track);
             audioPlayer.src = `mp3s/${track}`;
             audioPlayer.play();
-            updateActiveTrack(index);
+            updateActiveTrack(currentTrackIndex);
         }
 
         function updateActiveTrack(index) {
             const items = playlist.getElementsByClassName('playlist-item');
             for (let i = 0; i < items.length; i++) {
-                items[i].classList.toggle('active', i === index);
+                items[i].classList.remove('active');
             }
+            items[index].classList.add('active');
         }
 
         audioPlayer.addEventListener('ended', () => {
             if (autoplayCheckbox.checked) {
-                currentTrackIndex = (currentTrackIndex + 1) % practiceTracks.length;
-                playTrack(currentTrackIndex);
+                currentTrackIndex = (currentTrackIndex + 1) % allTracks.length;
+                playTrack(allTracks[currentTrackIndex]);
             }
         });
 
