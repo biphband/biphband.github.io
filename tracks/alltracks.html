@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Playlist</title>
+    <style>
+                body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background: rgba(255, 255, 255, 0.573);
+            position: relative;
+            overflow: hidden;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('images/The Pumpkin King Poster no text.png') no-repeat top center / cover;
+            opacity: 0.3;
+            z-index: -10;
+        }
+        .container {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        #playlist {
+            list-style: none;
+            width: 80%;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        #playlist li {
+            cursor: pointer;
+            padding: 5px;
+            font-size: 14px;
+        }
+        #playlist li:hover {
+            background-color: #9f9f9f53;
+        }
+        #playlist li.active {
+            background-color: #9c9c9c90;
+            font-weight: bold;
+        }
+        #audio-player {
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <audio id="audio-player" controls></audio>
+        <ul id="playlist">
+            <li data-src="mp3s/This is Halloween.mp3">1 - This is Halloween</li>
+            <li data-src="mp3s/Year After Year.mp3">2 - Year After Year</li>
+            <li data-src="mp3s/Oh Fare Thee Well.mp3">3 - Oh Fare Thee Well</li>
+            <li data-src="mp3s/Whats This.mp3">4 - What's this?</li>
+            <li data-src="mp3s/Year After Year Reprise.mp3">5 - Year After Year Reprise</li>
+            <li data-src="mp3s/And They Call Him Sandy Claws.mp3">6 - And they call him...</li>
+            <li data-src="mp3s/Sally's Song Intro.mp3">7 - Sally's song intro</li>
+            <li data-src="mp3s/Sally's Song.mp3">8 - Sally's Song</li>
+            <li data-src="mp3s/Sally's Vision.mp3">9 - Sally's Vision</li>
+            <li data-src="mp3s/Pay the Price.mp3">10 - Pay the price</li>
+            <li data-src="mp3s/Kidnap The Sandy Claws.mp3">11 - Kidnap the Sandy Claws</li>
+            <li data-src="mp3s/Jack's Lament.mp3">12 - Jack's Lament</li>
+            <li data-src="mp3s/Elves.mp3">13 - Elves</li>
+            <li data-src="mp3s/Jack's Lament Reprise.mp3">14 - Jack's Lament Reprise</li>
+            <li data-src="mp3s/Kidnap The Sandy Claws Strings.mp3">15 - Kidnap Sandy Claws (Strings)</li>
+            <li data-src="mp3s/Oogie Boogies Song.mp3">16 - Oogie Boogie</li>
+            <li data-src="mp3s/Oh Fare Thee Well Reprise.mp3">17 - Oh Fare Thee Well Reprise</li>
+            <li data-src="mp3s/Christmas Eve.mp3">18 - Christmas Eve</li>
+            <li data-src="mp3s/Sally Sneaks.mp3">19 - Sally Sneaks</li>
+            <li data-src="mp3s/Sally Gets Caught.mp3">20 - Sally Gets Caught</li>
+            <li data-src="mp3s/Spooktacular Fun.mp3">21 - Spooktacular Fun</li>
+            <li data-src="mp3s/Christmas Eve Reprise.mp3">22 - Christmas Eve Reprise</li>
+            <li data-src="mp3s/Sally's Song Reprise.mp3">23 - Sally's Song Reprise</li>
+            <li data-src="mp3s/Halloween Transition.mp3">24 - Halloween Transition</li>
+            <li data-src="mp3s/Finale.mp3">25 -  Finale</li>
+        </ul>
+    </div>
+
+    <script>
+        const audioPlayer = document.getElementById('audio-player');
+        const playlist = document.getElementById('playlist');
+        const songs = playlist.querySelectorAll('li');
+
+        let currentSong = 0;
+
+        function playSong(index) {
+            const song = songs[index];
+            audioPlayer.src = song.getAttribute('data-src');
+            audioPlayer.play();
+            song.classList.add('active');
+        }
+
+        function nextSong() {
+            songs[currentSong].classList.remove('active');
+            currentSong = (currentSong + 1) % songs.length;
+            playSong(currentSong);
+        }
+
+        audioPlayer.addEventListener('ended', nextSong);
+
+        songs.forEach((song, index) => {
+            song.addEventListener('click', () => {
+                songs[currentSong].classList.remove('active');
+                currentSong = index;
+                playSong(currentSong);
+            });
+        });
+
+        // Play the first song
+        playSong(currentSong);
+    </script>
+</body>
+</html>
