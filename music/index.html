@@ -155,6 +155,42 @@
             font-size: 12px;
             font-weight: bold;
         }
+
+
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .popup img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .popup-button {
+            padding: 10px 20px;
+            margin: 20px; /* Adjusts spacing from the bottom */
+            font-size: 16px;
+            cursor: pointer;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
 </head>
@@ -165,14 +201,25 @@
             <input type="text" id="search-input" placeholder="Type your name...">
             <div id="search-results"></div>
         </div>
-        <div id="or-divider">OR</div>
-        <h2>Select your part</h2>
+
+
+        <h3>Can't find your name?</h3>
         <div class="dropdown">
             <button id="select-part">Select your part</button>
             <div id="instrument-families" class="dropdown-content"></div>
         </div>
         <div id="instruments" class="dropdown-content"></div>
+        <div id="or-divider"></div>
+        <div id="or-divider"></div>
+        <div id="or-divider"></div>
+        <div id="or-divider"></div>
+        <button class="popup-button" id="openPopup">View Concert Seating Layout</button>
+        <div class="popup" id="imagePopup">
+            <button class="close-btn" id="closePopup">&times;</button>
+            <img src="images/Halloween Layout.png" alt="Popup Image" />
+        </div>
     </div>
+
     <div id="viewer">
         <div id="hamburger">⇦</div>
         <div id="pdf-container">
@@ -342,6 +389,7 @@
         }
 
         function populateInstrumentFamilies() {
+            instrumentFamilies.innerHTML = ''; // Clear existing content
             for (let family in instrumentData) {
                 const button = document.createElement('button');
                 button.textContent = family;
@@ -363,6 +411,29 @@
             instrumentFamilies.classList.remove('show');
             instruments.classList.remove('show');
         });
+
+
+
+        const openPopup = document.getElementById('openPopup');
+        const closePopup = document.getElementById('closePopup');
+        const imagePopup = document.getElementById('imagePopup');
+
+        openPopup.addEventListener('click', () => {
+            imagePopup.style.display = 'flex';
+        });
+
+        closePopup.addEventListener('click', () => {
+            imagePopup.style.display = 'none';
+        });
+
+        // Close popup on clicking outside the image
+        imagePopup.addEventListener('click', (e) => {
+            if (e.target === imagePopup) {
+                imagePopup.style.display = 'none';
+            }
+        });
+
+
 
         hamburger.addEventListener('click', () => {
             viewer.classList.remove('active');
