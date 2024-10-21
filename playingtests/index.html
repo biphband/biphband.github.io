@@ -6,182 +6,205 @@
     <title>Playing Test</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to bottom, #f0f0f0, #c0c0c0);
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 80%;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: center;
-        }
-        h1, h2 {
-            font-family: Arial, sans-serif;
-            color: black;
-        }
-        h1 {
-            margin-bottom: 0;
-        }
-        h2 {
-            margin-top: 0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 5px;
-            background-color: rgba(255, 255, 255, 0.5);
-            font-family: Arial, sans-serif;
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-        th:first-child, td:first-child {
-            width: 30px;
-        }
-        th:nth-child(2), td:nth-child(2) {
-            width: 100px;
-        }
-        th:nth-child(3), td:nth-child(3) {
-            width: 100px;
-        }
-        .category-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .category-box {
-            flex: 1;
-            margin: 0 10px;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .rhythm { background-color: rgba(255, 107, 107, 0.5); border: 2px solid #FF6B6B; }
-        .pitch { background-color: rgba(78, 205, 196, 0.5); border: 2px solid #4ECDC4; }
-        .expression { background-color: rgba(69, 183, 209, 0.5); border: 2px solid #45B7D1; }
-        .tone { background-color: rgba(255, 160, 122, 0.5); border: 2px solid #FFA07A; }
-        
-        #studentView .category {
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 10px;
-            text-align: left;
-        }
-        #studentView .category h2 {
-            margin-bottom: 5px;
-        }
-        #studentView .category .category-points {
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-        .bar-chart {
-            width: 100%;
-            height: 400px;
-            background-color: #f0f0f0;
-            margin-top: 20px;
-            position: relative;
-            border: 1px solid #ddd;
-            overflow: hidden;
-            padding: 40px 40px 40px 60px;
-            box-sizing: border-box;
-        }
-        .bar {
-            position: absolute;
-            bottom: 40px;
-            width: 8%;
-            transition: height 0.5s;
-        }
-        .bar-label {
-            position: absolute;
-            bottom: 10px;
-            width: 8%;
-            text-align: center;
-        }
-        .horizontal-lines {
-            position: absolute;
-            width: calc(100% - 100px);
-            height: calc(100% - 80px);
-            top: 40px;
-            left: 60px;
-        }
-        .horizontal-line {
-            position: absolute;
-            width: 100%;
-            border-top: 1px solid #ddd;
-        }
-        .y-axis-label {
-            position: absolute;
-            left: -55px;
-            width: 50px;
-            text-align: right;
-        }
-        #studentNameDisplay {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-        }
-        button {
-            margin-top: 10px;
-            padding: 10px 20px;
-            font-size: 1em;
-            cursor: pointer;
-        }
-        .deduction {
-            font-size: 1.2em;
-            text-align: center;
-            width: 100%;
-        }
-        .feedback {
-            width: 100%;
-            box-sizing: border-box;
-        }
-        #compositeScore {
-            font-size: 1.5em;
-        }
-        #studentName, #testDate {
-            font-size: 1.2em;
-            padding: 10px;
-            margin-bottom: 20px;
-            width: 200px;
-        }
-        .deduction-control {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .deduction-control button {
-            font-size: 1.2em;
-            width: 30px;
-            height: 30px;
-            padding: 0;
-            margin: 0 5px;
-        }
-        #studentView .category p {
-            margin: 10px 0;
-        }
-        .remove-row {
-            cursor: pointer;
-            color: black;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        .add-row {
-            cursor: pointer;
-            color: green;
-            font-weight: bold;
-            font-size: 1.2em;
-            display: block;
-            margin-top: 0;
-            margin-bottom: 20px;
-        }
-        .category-table {
-            margin-bottom: 5px;
-        }
+           font-family: Arial, sans-serif;
+           margin: 0;
+           padding: 0;
+           background: linear-gradient(to bottom, #f0f0f0, #c0c0c0);
+           min-height: 100vh;
+       }
+       .container {
+           max-width: 80%;
+           margin: 0 auto;
+           padding: 20px;
+           text-align: center;
+       }
+       h1, h2 {
+           font-family: Arial, sans-serif;
+           color: black;
+       }
+       h1 {
+           margin-bottom: 0;
+       }
+       h2 {
+           margin-top: 0;
+       }
+       input[type="text"], input[type="date"], textarea {
+           width: 80%;
+           padding: 8px;
+           margin-bottom: 10px;
+           border: 1px solid #ddd;
+           border-radius: 4px;
+       }
+       table {
+           width: 100%;
+           border-collapse: collapse;
+           margin-bottom: 5px;
+           background-color: rgba(255, 255, 255, 0.5);
+           font-family: Arial, sans-serif;
+       }
+       th, td {
+           padding: 10px;
+           border: 1px solid #ddd;
+       }
+       th:first-child, td:first-child {
+           width: 30px;
+       }
+       th:nth-child(2), td:nth-child(2) {
+           width: 100px;
+       }
+       th:nth-child(3), td:nth-child(3) {
+           width: 100px;
+       }
+       .category-row {
+           display: flex;
+           justify-content: space-between;
+           margin-bottom: 20px;
+       }
+       .category-box {
+           flex: 1;
+           margin: 0 10px;
+           padding: 10px;
+           border-radius: 5px;
+           box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+       }
+       .rhythm { background-color: rgba(255, 107, 107, 0.5); border: 2px solid #FF6B6B; }
+       .pitch { background-color: rgba(78, 205, 196, 0.5); border: 2px solid #4ECDC4; }
+       .expression { background-color: rgba(69, 183, 209, 0.5); border: 2px solid #45B7D1; }
+       .tone { background-color: rgba(255, 160, 122, 0.5); border: 2px solid #FFA07A; }
+       
+       #studentView .category {
+           background-color: white;
+           border: 1px solid #ddd;
+           border-radius: 5px;
+           padding: 10px;
+           margin-bottom: 10px;
+           text-align: left;
+           line-height: 1.3;
+       }
+       #studentView .category h2 {
+           margin-bottom: 5px;
+       }
+       #studentView .category .category-points {
+           margin-top: 0;
+           margin-bottom: 15px;
+       }
+       .bar-chart {
+           width: 100%;
+           height: 400px;
+           background-color: #f0f0f0;
+           margin-top: 20px;
+           margin-bottom: 20px;
+           position: relative;
+           border: 1px solid #ddd;
+           overflow: hidden;
+           padding: 40px 40px 40px 60px;
+           box-sizing: border-box;
+       }
+       .bar {
+           position: absolute;
+           transform: translateX(40%); 
+           bottom: 40px;
+           width: 8%;
+           transition: height 0.5s;
+       }
+       .bar-label {
+           position: absolute;
+           transform: translateX(40%); 
+           bottom: 10px;
+           width: 8%;
+           text-align: center;
+       }
+       .horizontal-lines {
+           position: absolute;
+           width: calc(100% - 100px);
+           height: calc(100% - 80px);
+           top: 40px;
+           left: 60px;
+       }
+       .horizontal-line {
+           position: absolute;
+           width: 100%;
+           border-top: 1px solid #ddd;
+       }
+       .y-axis-label {
+           position: absolute;
+           left: -55px;
+           width: 50px;
+           text-align: right;
+       }
+       #studentNameDisplay {
+           font-size: 1.5em;
+           margin-bottom: 10px;
+       }
+       button {
+           margin-top: 10px;
+           padding: 10px 20px;
+           font-size: 1em;
+           cursor: pointer;
+       }
+       .deduction {
+           font-size: 1.2em;
+           text-align: center;
+           width: 100%;
+       }
+       .feedback {
+           width: 100%;
+           box-sizing: border-box;
+       }
+       #compositeScore {
+           font-size: 1.5em;
+       }
+       #studentName, #testDate, #songTitle {
+           font-size: 1.2em;
+           padding: 10px;
+           margin-bottom: 20px;
+           width: 200px;
+       }
+       #songTitleDisplay {
+           margin-bottom: 10px;
+       }
+       .deduction-control {
+           display: flex;
+           justify-content: center;
+           align-items: center;
+       }
+       .deduction-control button {
+           font-size: 1.2em;
+           width: 30px;
+           height: 30px;
+           padding: 0;
+           margin: 0 5px;
+       }
+       #studentView .category p {
+           margin: 10px 0;
+       }
+       .remove-row {
+           cursor: pointer;
+           color: black;
+           font-weight: bold;
+           margin-right: 10px;
+       }
+       .add-row {
+           cursor: pointer;
+           color: green;
+           font-weight: bold;
+           font-size: 1.2em;
+           display: block;
+           margin-top: 0;
+           margin-bottom: 20px;
+       }
+       .category-table {
+           margin-bottom: 5px;
+       }
+       #overallComments {
+           display: block;
+           margin: 0 auto 20px;
+           width: 80%;
+           max-width: 600px;
+       }
+       #compile {
+           margin-top: 0px;
+       }
     </style>
 </head>
 <body>
@@ -192,6 +215,7 @@
         <div id="teacherView">
             <input type="text" id="studentName" placeholder="Student Name">
             <input type="date" id="testDate">
+            <input type="text" id="songTitle" placeholder="Song Title">
             
             <div id="categoryTables"></div>
             
@@ -217,20 +241,24 @@
             <p>Total Points: <span id="totalPoints">100</span></p>
             <p>Composite Score: <span id="compositeScore">100%</span></p>
             
+            <textarea id="overallComments" rows="4" placeholder="Overall comments"></textarea>
+            
             <button id="compile">Compile</button>
         </div>
         
         <div id="studentView" style="display:none;">
             <div id="studentNameDisplay"></div>
+            <div id="songTitleDisplay"></div>
             
             <div id="categoryContainer"></div>
             
             <div class="bar-chart">
                 <div class="horizontal-lines">
                     <div class="horizontal-line" style="bottom: 0%;"><span class="y-axis-label">0</span></div>
-                    <div class="horizontal-line" style="bottom: 25%;"><span class="y-axis-label">6.25</span></div>
-                    <div class="horizontal-line" style="bottom: 50%;"><span class="y-axis-label">12.5</span></div>
-                    <div class="horizontal-line" style="bottom: 75%;"><span class="y-axis-label">18.75</span></div>
+                    <div class="horizontal-line" style="bottom: 20%;"><span class="y-axis-label">5</span></div>
+                    <div class="horizontal-line" style="bottom: 40%;"><span class="y-axis-label">10</span></div>
+                    <div class="horizontal-line" style="bottom: 60%;"><span class="y-axis-label">15</span></div>
+                    <div class="horizontal-line" style="bottom: 80%;"><span class="y-axis-label">20</span></div>
                     <div class="horizontal-line" style="bottom: 100%;"><span class="y-axis-label">25</span></div>
                 </div>
                 <div class="bar rhythm" id="rhythmBar"></div>
@@ -243,7 +271,10 @@
                 <div class="bar-label" style="left: 78%;">Tone</div>
             </div>
             
-            <p><strong>Overall Score:</strong> <span id="overallScore"></span></p>
+            <strong style="margin-top: 500px; padding-top: 20px;">Composite Score:</strong>
+            <h1 style="margin-top: -0px;"><span id="overallScore"></span></h1>
+            
+            <div id="overallCommentsDisplay"></div>
             
             <button id="backToEdit">Back to Edit</button>
             <button id="exportPDF">Export as PDF</button>
@@ -263,6 +294,8 @@
         const exportPDFBtn = document.getElementById('exportPDF');
         const testDateInput = document.getElementById('testDate');
         const testDateDisplay = document.getElementById('testDateDisplay');
+        const overallComments = document.getElementById('overallComments');
+        const overallCommentsDisplay = document.getElementById('overallCommentsDisplay');
 
         const categories = {
             rhythm: { name: 'Rhythm', color: 'rgba(255, 107, 107, 0.5)', points: 25 },
@@ -279,7 +312,7 @@
                     <th></th>
                     <th>Measure(s)</th>
                     <th>Deduction</th>
-                    <th>Feedback</th>
+                    <th>${categories[category].name}</th>
                 </tr>
             `;
             categoryTables.appendChild(table);
@@ -369,9 +402,20 @@
 
         function compileStudentView() {
             const studentName = document.getElementById('studentName').value;
+            const songTitle = document.getElementById('songTitle').value;
+            if (!studentName.trim()) {
+                alert("Please enter a student name before compiling.");
+                return;
+            }
+            if (!songTitle.trim()) {
+                alert("Please enter a song title before compiling.");
+                return;
+            }
+
             const testDate = document.getElementById('testDate').value;
             document.getElementById('studentNameDisplay').textContent = studentName;
-            document.getElementById('testDateDisplay').textContent = new Date(testDate).toLocaleDateString();
+            document.getElementById('songTitleDisplay').textContent = songTitle;
+            document.getElementById('testDateDisplay').textContent = formatDate(new Date(testDate));
 
             const categoryContainer = document.getElementById('categoryContainer');
             categoryContainer.innerHTML = '';
@@ -396,9 +440,12 @@
 
                     categories[category].points -= deduction;
 
-                    const feedbackP = document.createElement('p');
-                    feedbackP.textContent = `${measures ? `Measure(s) ${measures}: ` : ''}${feedback.charAt(0).toUpperCase() + feedback.slice(1)}`;
-                    categoryDiv.appendChild(feedbackP);
+                    if (feedback.trim()) {
+                        const feedbackP = document.createElement('p');
+                        const measuresLabel = /^\d+$/.test(measures.trim()) ? 'Measure:' : 'Measures:';
+                        feedbackP.textContent = `${measures ? `${measuresLabel} ${measures}: ` : ''}${feedback.charAt(0).toUpperCase() + feedback.slice(1)}`;
+                        categoryDiv.appendChild(feedbackP);
+                    }
                 });
 
                 categoryDiv.querySelector('.category-points span').textContent = categories[category].points;
@@ -414,7 +461,14 @@
             }
 
             const totalPoints = Object.values(categories).reduce((sum, category) => sum + category.points, 0);
-            document.getElementById('overallScore').textContent = `${totalPoints}/100 (${totalPoints}%)`;
+            document.getElementById('overallScore').textContent = `${totalPoints}%`;
+
+            const overallCommentsText = overallComments.value.trim();
+            if (overallCommentsText) {
+                overallCommentsDisplay.innerHTML = `<h3>Overall Comments:</h3><p>${overallCommentsText}</p>`;
+            } else {
+                overallCommentsDisplay.innerHTML = '';
+            }
 
             teacherView.style.display = 'none';
             studentView.style.display = 'block';
@@ -427,35 +481,114 @@
         });
 
         exportPDFBtn.addEventListener('click', () => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'pt', 'a4');
-            const studentViewElement = document.getElementById('studentView');
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const studentViewElement = document.getElementById('studentView');
 
-            html2canvas(studentViewElement).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = 210;
-                const pageHeight = 295;
-                const imgHeight = canvas.height * imgWidth / canvas.width;
-                let heightLeft = imgHeight;
-                let position = 0;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
+    // Set font styles
+    doc.setFont('helvetica');
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
 
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    doc.addPage();
-                    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
+    // Add title and metadata
+    doc.text('Playing Test', pageWidth / 2, 15, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text(`${formatDate(new Date(testDateInput.value))}`, pageWidth / 2, 22, { align: 'center' });
+    doc.text(`${document.getElementById('studentName').value}`, pageWidth / 2, 29, { align: 'center' });
+    doc.text(`${document.getElementById('songTitle').value}`, pageWidth / 2, 36, { align: 'center' });
+
+    // Add category information
+    let yOffset = 50;
+    for (let category in categories) {
+        const categoryDiv = studentViewElement.querySelector(`.category.${category}`);
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text(categoryDiv.querySelector('.category-title').textContent, 20, yOffset);
+        yOffset += 5;
+        
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(categoryDiv.querySelector('.category-points').textContent, 20, yOffset);
+        yOffset += 7;
+
+        doc.setFontSize(10);
+        categoryDiv.querySelectorAll('p:not(.category-points)').forEach(feedbackP => {
+            let feedbackText = feedbackP.textContent;
+            const colonIndex = feedbackText.indexOf(':');
+            if (colonIndex !== -1) {
+                const measuresPart = feedbackText.substring(0, colonIndex).trim();
+                const feedbackPart = feedbackText.substring(colonIndex + 1).trim();
+                
+                if (/^\d+(-\d+)?$/.test(measuresPart)) {
+                    // If measuresPart is numeric (including ranges), use "Measure(s) "
+                    feedbackText = `Measure${measuresPart.includes('-') ? 's' : ''} ${measuresPart}: ${feedbackPart}`;
+                } else {
+                    // If measuresPart is text, capitalize it and keep the colon
+                    feedbackText = `${measuresPart.charAt(0).toUpperCase() + measuresPart.slice(1)}: ${feedbackPart}`;
                 }
-
-                doc.save('student_feedback.pdf');
-            });
+            }
+            
+            const lines = doc.splitTextToSize(feedbackText, pageWidth - 40);
+            doc.text(lines, 20, yOffset);
+            yOffset += 4 * lines.length;
         });
+
+        yOffset += 7;
+    }
+
+    // Add bar chart as an image
+    html2canvas(document.querySelector('.bar-chart')).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 160;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        doc.addImage(imgData, 'PNG', (pageWidth - imgWidth) / 2, yOffset, imgWidth, imgHeight);
+        yOffset += imgHeight + 10;
+
+        // Add composite score
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`Composite Score: ${document.getElementById('overallScore').textContent}`, 20, yOffset);
+        yOffset += 10;
+
+        // Add overall comments
+        const overallCommentsText = overallComments.value.trim();
+        if (overallCommentsText) {
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Overall Comments:', 20, yOffset);
+            yOffset += 7;
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            const commentLines = doc.splitTextToSize(overallCommentsText, pageWidth - 40);
+            doc.text(commentLines, 20, yOffset);
+        }
+
+        // Save the PDF
+        const studentName = document.getElementById('studentName').value;
+        const testDate = document.getElementById('testDate').value;
+        const songTitle = document.getElementById('songTitle').value;
+        
+        const formattedDate = formatDate(new Date(testDate)).replace(/\//g, '-');
+
+        const filename = `${studentName} - ${songTitle} - Playing Test - ${formattedDate}.pdf`;
+
+        doc.save(filename);
+    });
+});
 
         testDateInput.addEventListener('change', (e) => {
-            testDateDisplay.textContent = new Date(e.target.value).toLocaleDateString();
+            testDateDisplay.textContent = formatDate(new Date(e.target.value));
         });
+
+        function formatDate(date) {
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${month}/${day}/${year}`;
+        }
 
         // Initialize with one table per category
         for (let category in categories) {
@@ -465,7 +598,7 @@
         // Set initial date
         const currentDate = new Date();
         testDateInput.valueAsDate = currentDate;
-        testDateDisplay.textContent = currentDate.toLocaleDateString();
+        testDateDisplay.textContent = formatDate(currentDate);
     </script>
 </body>
 </html>
