@@ -6,13 +6,15 @@
     <title>BIPH Halloween Music</title>
     <link rel="icon" href="images/jack.png">
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: Arial, sans-serif;
-            background: #000 url('images/The Pumpkin King Poster no text.png') no-repeat top center/cover fixed;
-        }
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background: #000 url('images/The Pumpkin King Poster no text.png') no-repeat top center;
+    background-size: cover;
+    overflow: hidden;
+}
         #landing, #viewer {
             height: 100%;
             width: 100%;
@@ -20,6 +22,7 @@
             top: 0;
             left: 0;
             transition: transform 0.3s ease-in-out;
+            overflow: hidden;
         }
         #landing {
             background-color: rgba(240, 240, 240, 0.9);
@@ -45,8 +48,7 @@
         #pdf-viewer {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            object-position: top;
+            object-fit: contain;
         }
         #hamburger {
             position: fixed;
@@ -155,9 +157,6 @@
             font-size: 12px;
             font-weight: bold;
         }
-
-
-
         .popup {
             display: none;
             position: fixed;
@@ -169,14 +168,15 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            overflow: hidden;
         }
         .popup img {
             margin-top: -100px;
-    width: 75%; /* Start at 100% width */
-    max-height: none; /* Allow image to grow beyond its original size */
-    object-fit: contain;
-    transition: transform 0.2s; /* Smooth zoom transition */
-}
+            width: 75%;
+            max-height: none;
+            object-fit: contain;
+            transition: transform 0.2s;
+        }
         .close-btn {
             position: fixed;
             top: 10px;
@@ -197,7 +197,7 @@
         }
         .popup-button {
             padding: 10px 20px;
-            margin: 20px; /* Adjusts spacing from the bottom */
+            margin: 20px;
             font-size: 16px;
             cursor: pointer;
         }
