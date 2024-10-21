@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playing Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #f0f0f0, #c0c0c0);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        h1, h2 {
+            font-family: Arial, sans-serif;
+            color: black;
+        }
+        h1 {
+            margin-bottom: 0;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 5px;
+            background-color: rgba(255, 255, 255, 0.5);
+            font-family: Arial, sans-serif;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        th:first-child, td:first-child {
+            width: 30px;
+        }
+        th:nth-child(2), td:nth-child(2) {
+            width: 100px;
+        }
+        th:nth-child(3), td:nth-child(3) {
+            width: 100px;
+        }
+        .category-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .category-box {
+            flex: 1;
+            margin: 0 10px;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .rhythm { background-color: rgba(255, 107, 107, 0.5); border: 2px solid #FF6B6B; }
+        .pitch { background-color: rgba(78, 205, 196, 0.5); border: 2px solid #4ECDC4; }
+        .expression { background-color: rgba(69, 183, 209, 0.5); border: 2px solid #45B7D1; }
+        .tone { background-color: rgba(255, 160, 122, 0.5); border: 2px solid #FFA07A; }
+        
+        #studentView .category {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        #studentView .category h2 {
+            margin-bottom: 5px;
+        }
+        #studentView .category .category-points {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .bar-chart {
+            width: 100%;
+            height: 400px;
+            background-color: #f0f0f0;
+            margin-top: 20px;
+            position: relative;
+            border: 1px solid #ddd;
+            overflow: hidden;
+            padding: 40px 40px 40px 60px;
+            box-sizing: border-box;
+        }
+        .bar {
+            position: absolute;
+            bottom: 40px;
+            width: 8%;
+            transition: height 0.5s;
+        }
+        .bar-label {
+            position: absolute;
+            bottom: 10px;
+            width: 8%;
+            text-align: center;
+        }
+        .horizontal-lines {
+            position: absolute;
+            width: calc(100% - 100px);
+            height: calc(100% - 80px);
+            top: 40px;
+            left: 60px;
+        }
+        .horizontal-line {
+            position: absolute;
+            width: 100%;
+            border-top: 1px solid #ddd;
+        }
+        .y-axis-label {
+            position: absolute;
+            left: -55px;
+            width: 50px;
+            text-align: right;
+        }
+        #studentNameDisplay {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        .deduction {
+            font-size: 1.2em;
+            text-align: center;
+            width: 100%;
+        }
+        .feedback {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #compositeScore {
+            font-size: 1.5em;
+        }
+        #studentName, #testDate {
+            font-size: 1.2em;
+            padding: 10px;
+            margin-bottom: 20px;
+            width: 200px;
+        }
+        .deduction-control {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .deduction-control button {
+            font-size: 1.2em;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            margin: 0 5px;
+        }
+        #studentView .category p {
+            margin: 10px 0;
+        }
+        .remove-row {
+            cursor: pointer;
+            color: black;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .add-row {
+            cursor: pointer;
+            color: green;
+            font-weight: bold;
+            font-size: 1.2em;
+            display: block;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .category-table {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Playing Test</h1>
+        <h2 id="testDateDisplay"></h2>
+        
+        <div id="teacherView">
+            <input type="text" id="studentName" placeholder="Student Name">
+            <input type="date" id="testDate">
+            
+            <div id="categoryTables"></div>
+            
+            <div class="category-row">
+                <div class="category-box rhythm">
+                    <h3>Rhythm</h3>
+                    <p><span id="rhythmPoints">25</span>/25</p>
+                </div>
+                <div class="category-box pitch">
+                    <h3>Pitch</h3>
+                    <p><span id="pitchPoints">25</span>/25</p>
+                </div>
+                <div class="category-box expression">
+                    <h3>Expression</h3>
+                    <p><span id="expressionPoints">25</span>/25</p>
+                </div>
+                <div class="category-box tone">
+                    <h3>Tone</h3>
+                    <p><span id="tonePoints">25</span>/25</p>
+                </div>
+            </div>
+            
+            <p>Total Points: <span id="totalPoints">100</span></p>
+            <p>Composite Score: <span id="compositeScore">100%</span></p>
+            
+            <button id="compile">Compile</button>
+        </div>
+        
+        <div id="studentView" style="display:none;">
+            <div id="studentNameDisplay"></div>
+            
+            <div id="categoryContainer"></div>
+            
+            <div class="bar-chart">
+                <div class="horizontal-lines">
+                    <div class="horizontal-line" style="bottom: 0%;"><span class="y-axis-label">0</span></div>
+                    <div class="horizontal-line" style="bottom: 25%;"><span class="y-axis-label">6.25</span></div>
+                    <div class="horizontal-line" style="bottom: 50%;"><span class="y-axis-label">12.5</span></div>
+                    <div class="horizontal-line" style="bottom: 75%;"><span class="y-axis-label">18.75</span></div>
+                    <div class="horizontal-line" style="bottom: 100%;"><span class="y-axis-label">25</span></div>
+                </div>
+                <div class="bar rhythm" id="rhythmBar"></div>
+                <div class="bar pitch" id="pitchBar"></div>
+                <div class="bar expression" id="expressionBar"></div>
+                <div class="bar tone" id="toneBar"></div>
+                <div class="bar-label" style="left: 9%;">Rhythm</div>
+                <div class="bar-label" style="left: 32%;">Pitch</div>
+                <div class="bar-label" style="left: 55%;">Expression</div>
+                <div class="bar-label" style="left: 78%;">Tone</div>
+            </div>
+            
+            <p><strong>Overall Score:</strong> <span id="overallScore"></span></p>
+            
+            <button id="backToEdit">Back to Edit</button>
+            <button id="exportPDF">Export as PDF</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>
+        const categoryTables = document.getElementById('categoryTables');
+        const totalPointsSpan = document.getElementById('totalPoints');
+        const compositeScoreSpan = document.getElementById('compositeScore');
+        const compileBtn = document.getElementById('compile');
+        const teacherView = document.getElementById('teacherView');
+        const studentView = document.getElementById('studentView');
+        const backToEditBtn = document.getElementById('backToEdit');
+        const exportPDFBtn = document.getElementById('exportPDF');
+        const testDateInput = document.getElementById('testDate');
+        const testDateDisplay = document.getElementById('testDateDisplay');
+
+        const categories = {
+            rhythm: { name: 'Rhythm', color: 'rgba(255, 107, 107, 0.5)', points: 25 },
+            pitch: { name: 'Pitch', color: 'rgba(78, 205, 196, 0.5)', points: 25 },
+            expression: { name: 'Expression', color: 'rgba(69, 183, 209, 0.5)', points: 25 },
+            tone: { name: 'Tone', color: 'rgba(255, 160, 122, 0.5)', points: 25 }
+        };
+
+        function createCategoryTable(category) {
+            const table = document.createElement('table');
+            table.className = `category-table ${category}`;
+            table.innerHTML = `
+                <tr>
+                    <th></th>
+                    <th>Measure(s)</th>
+                    <th>Deduction</th>
+                    <th>Feedback</th>
+                </tr>
+            `;
+            categoryTables.appendChild(table);
+
+            const addRowButton = document.createElement('span');
+            addRowButton.className = 'add-row';
+            addRowButton.textContent = '+';
+            addRowButton.onclick = () => createFeedbackRow(category, table);
+            categoryTables.appendChild(addRowButton);
+
+            createFeedbackRow(category, table);
+        }
+
+        function createFeedbackRow(category, table) {
+            const row = table.insertRow(-1);
+            row.style.backgroundColor = categories[category].color;
+
+            row.innerHTML = `
+                <td>
+                    ${table.rows.length > 2 ? '<span class="remove-row">×</span>' : ''}
+                </td>
+                <td><input type="text" placeholder="Measure(s)"></td>
+                <td>
+                    <div class="deduction-control">
+                        <button class="minus">-</button>
+                        <span class="deduction">0</span>
+                        <button class="plus">+</button>
+                    </div>
+                </td>
+                <td><textarea class="feedback" rows="3" placeholder="Feedback"></textarea></td>
+            `;
+
+            if (table.rows.length > 2) {
+                const removeRowSpan = row.querySelector('.remove-row');
+                removeRowSpan.addEventListener('click', () => {
+                    table.deleteRow(row.rowIndex);
+                    updateTotalPoints();
+                });
+            }
+
+            const deductionControl = row.querySelector('.deduction-control');
+            const deductionSpan = deductionControl.querySelector('.deduction');
+            const minusBtn = deductionControl.querySelector('.minus');
+            const plusBtn = deductionControl.querySelector('.plus');
+
+            minusBtn.addEventListener('click', () => {
+                let value = parseInt(deductionSpan.textContent);
+                if (value > 0) {
+                    deductionSpan.textContent = value - 1;
+                    updateTotalPoints();
+                }
+            });
+
+            plusBtn.addEventListener('click', () => {
+                let value = parseInt(deductionSpan.textContent);
+                if (value < 25) {
+                    deductionSpan.textContent = value + 1;
+                    updateTotalPoints();
+                }
+            });
+
+            updateTotalPoints();
+        }
+
+        function updateTotalPoints() {
+            for (let category in categories) {
+                categories[category].points = 25;
+            }
+
+            categoryTables.querySelectorAll('.category-table').forEach(table => {
+                const category = table.className.split(' ')[1];
+                table.querySelectorAll('tr:not(:first-child)').forEach(row => {
+                    const deduction = parseInt(row.querySelector('.deduction').textContent) || 0;
+                    categories[category].points -= deduction;
+                });
+            });
+
+            let total = Object.values(categories).reduce((sum, category) => sum + category.points, 0);
+            
+            for (let category in categories) {
+                document.getElementById(`${category}Points`).textContent = categories[category].points;
+            }
+
+            totalPointsSpan.textContent = total;
+            compositeScoreSpan.textContent = total + '%';
+        }
+
+        function compileStudentView() {
+            const studentName = document.getElementById('studentName').value;
+            const testDate = document.getElementById('testDate').value;
+            document.getElementById('studentNameDisplay').textContent = studentName;
+            document.getElementById('testDateDisplay').textContent = new Date(testDate).toLocaleDateString();
+
+            const categoryContainer = document.getElementById('categoryContainer');
+            categoryContainer.innerHTML = '';
+
+            for (let category in categories) {
+                categories[category].points = 25;
+            }
+
+            categoryTables.querySelectorAll('.category-table').forEach(table => {
+                const category = table.className.split(' ')[1];
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = `category ${category}`;
+                categoryDiv.innerHTML = `
+                    <h2 class="category-title">${categories[category].name}</h2>
+                    <p class="category-points">Points: <span>${categories[category].points}</span>/25</p>
+                `;
+
+                table.querySelectorAll('tr:not(:first-child)').forEach(row => {
+                    const deduction = parseInt(row.querySelector('.deduction').textContent) || 0;
+                    const measures = row.cells[1].querySelector('input').value;
+                    const feedback = row.querySelector('.feedback').value;
+
+                    categories[category].points -= deduction;
+
+                    const feedbackP = document.createElement('p');
+                    feedbackP.textContent = `${measures ? `Measure(s) ${measures}: ` : ''}${feedback.charAt(0).toUpperCase() + feedback.slice(1)}`;
+                    categoryDiv.appendChild(feedbackP);
+                });
+
+                categoryDiv.querySelector('.category-points span').textContent = categories[category].points;
+                categoryContainer.appendChild(categoryDiv);
+            });
+
+            for (let category in categories) {
+                const bar = document.getElementById(`${category}Bar`);
+                bar.style.height = `${(categories[category].points / 25) * 80}%`;
+                bar.style.left = `${Object.keys(categories).indexOf(category) * 23 + 9}%`;
+                bar.style.backgroundColor = categories[category].color;
+                bar.style.border = `2px solid ${categories[category].color.replace('0.5', '1').replace('rgba', 'rgb').replace(')', '')}`;
+            }
+
+            const totalPoints = Object.values(categories).reduce((sum, category) => sum + category.points, 0);
+            document.getElementById('overallScore').textContent = `${totalPoints}/100 (${totalPoints}%)`;
+
+            teacherView.style.display = 'none';
+            studentView.style.display = 'block';
+        }
+
+        compileBtn.addEventListener('click', compileStudentView);
+        backToEditBtn.addEventListener('click', () => {
+            teacherView.style.display = 'block';
+            studentView.style.display = 'none';
+        });
+
+        exportPDFBtn.addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'pt', 'a4');
+            const studentViewElement = document.getElementById('studentView');
+
+            html2canvas(studentViewElement).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210;
+                const pageHeight = 295;
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+
+                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    doc.addPage();
+                    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                doc.save('student_feedback.pdf');
+            });
+        });
+
+        testDateInput.addEventListener('change', (e) => {
+            testDateDisplay.textContent = new Date(e.target.value).toLocaleDateString();
+        });
+
+        // Initialize with one table per category
+        for (let category in categories) {
+            createCategoryTable(category);
+        }
+
+        // Set initial date
+        const currentDate = new Date();
+        testDateInput.valueAsDate = currentDate;
+        testDateDisplay.textContent = currentDate.toLocaleDateString();
+    </script>
+</body>
+</html>
