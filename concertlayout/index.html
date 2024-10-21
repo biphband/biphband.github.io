@@ -249,103 +249,103 @@
 
     <script>
         const canvas = document.getElementById('canvas');
-        const stage = document.getElementById('stage');
-        const floatingMenu = document.getElementById('floatingMenu');
-        const addPlayerBtn = document.getElementById('addPlayer');
-        const removePlayerBtn = document.getElementById('removePlayer');
-        const downloadPNGBtn = document.getElementById('downloadPNG');
-        const exportJSONBtn = document.getElementById('exportJSON');
-        const importJSONBtn = document.getElementById('importJSONBtn');
-        const importJSONInput = document.getElementById('importJSON');
-        const hamburgerBtn = document.getElementById('hamburgerBtn');
-        const menuContent = document.getElementById('menuContent');
-        const toggleNamesBtn = document.getElementById('toggleNamesBtn');
-        const centerLine = document.getElementById('centerLine');
-        const rowLayoutSelect = document.getElementById('rowLayout');
+const stage = document.getElementById('stage');
+const floatingMenu = document.getElementById('floatingMenu');
+const addPlayerBtn = document.getElementById('addPlayer');
+const removePlayerBtn = document.getElementById('removePlayer');
+const downloadPNGBtn = document.getElementById('downloadPNG');
+const exportJSONBtn = document.getElementById('exportJSON');
+const importJSONBtn = document.getElementById('importJSONBtn');
+const importJSONInput = document.getElementById('importJSON');
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const menuContent = document.getElementById('menuContent');
+const toggleNamesBtn = document.getElementById('toggleNamesBtn');
+const centerLine = document.getElementById('centerLine');
+const rowLayoutSelect = document.getElementById('rowLayout');
 
-        const instrumentColors = {
-            'Violin 1': '#FF6B6B',
-            'Violin 2': '#FF8E8E',
-            'Violin 3': '#FFAD87',
-            'Viola': '#4ECDC4',
-            'Cello 1': '#45B7D1',
-            'Cello 2': '#5DADE2',
-            'Bass': '#FFA07A',
-            'Flute': '#98D8C8',
-            'Oboe': '#F7DC6F',
-            'Clarinet': '#D2B4DE',
-            'Bass Clarinet': '#C39BD3',
-            'Bassoon': '#F1948A',
-            'Alto Sax': '#F39C12',
-            'Tenor Sax': '#E67E22',
-            'Horn': '#D35400',
-            'Trumpet': '#E74C3C',
-            'Trombone': '#8E44AD',
-            'Baritone': '#9B59B6',
-            'Tuba': '#5B7D94',
-            'Percussion': '#95A5A6'
-        };
+const instrumentColors = {
+    'Violin 1': '#FF6B6B',
+    'Violin 2': '#FF8E8E',
+    'Violin 3': '#FFAD87',
+    'Viola': '#4ECDC4',
+    'Cello 1': '#45B7D1',
+    'Cello 2': '#5DADE2',
+    'Bass': '#FFA07A',
+    'Flute': '#98D8C8',
+    'Oboe': '#F7DC6F',
+    'Clarinet': '#D2B4DE',
+    'Bass Clarinet': '#C39BD3',
+    'Bassoon': '#F1948A',
+    'Alto Sax': '#F39C12',
+    'Tenor Sax': '#E67E22',
+    'Horn': '#D35400',
+    'Trumpet': '#E74C3C',
+    'Trombone': '#8E44AD',
+    'Baritone': '#9B59B6',
+    'Tuba': '#5B7D94',
+    'Percussion': '#95A5A6'
+};
 
-        let selectedElement = null;
-        let showNames = true;
-        let showNumbers = false;
-        let symmetryMode = false;
+let selectedElement = null;
+let showNames = true;
+let showNumbers = false;
+let symmetryMode = false;
 
-        function createPlayer(instrument, name, isInvisible = false) {
-            const player = document.createElement('div');
-            player.className = 'player';
-            if (!isInvisible) {
-                player.style.backgroundColor = instrumentColors[instrument];
-                player.textContent = name;
-                player.dataset.instrument = instrument;
-                player.dataset.name = name;
-                player.addEventListener('click', selectElement);
-            } else {
-                player.style.visibility = 'hidden';
+function createPlayer(instrument, name, isInvisible = false) {
+    const player = document.createElement('div');
+    player.className = 'player';
+    if (!isInvisible) {
+        player.style.backgroundColor = instrumentColors[instrument];
+        player.textContent = name;
+        player.dataset.instrument = instrument;
+        player.dataset.name = name;
+        player.addEventListener('click', selectElement);
+    } else {
+        player.style.visibility = 'hidden';
+    }
+    return player;
+}
+
+function createConductor() {
+    const conductor = document.createElement('div');
+    conductor.className = 'conductor';
+    conductor.style.position = 'absolute';
+    conductor.style.left = `${stage.clientWidth / 2 - 30}px`;
+    conductor.style.bottom = '10%';
+    conductor.addEventListener('click', toggleCenterLine);
+    stage.appendChild(conductor);
+}
+
+function toggleCenterLine(e) {
+    e.stopPropagation();
+    symmetryMode = !symmetryMode;
+    centerLine.style.display = symmetryMode ? 'block' : 'none';
+    showNumbers = symmetryMode;
+    updatePlayerNames();
+    highlightCenterPlayers();
+}
+
+function highlightCenterPlayers() {
+    document.querySelectorAll('.row').forEach(row => {
+        const players = Array.from(row.children).filter(player => player.style.visibility !== 'hidden');
+        const middleIndex = Math.floor(players.length / 2);
+
+        players.forEach((player, index) => {
+            player.classList.remove('center-highlighted');
+            if (showNumbers) {
+                if (players.length % 2 === 1 && index === middleIndex) {
+                    player.classList.add('center-highlighted');
+                } else if (players.length % 2 === 0 && (index === middleIndex - 1 || index === middleIndex)) {
+                    player.classList.add('center-highlighted');
+                }
             }
-            return player;
-        }
-
-        function createConductor() {
-            const conductor = document.createElement('div');
-            conductor.className = 'conductor';
-            conductor.style.position = 'absolute';
-            conductor.style.left = `${stage.clientWidth / 2 - 30}px`;
-            conductor.style.bottom = '10%';
-            conductor.addEventListener('click', toggleCenterLine);
-            stage.appendChild(conductor);
-        }
-
-        function toggleCenterLine(e) {
-            e.stopPropagation();
-            symmetryMode = !symmetryMode;
-            centerLine.style.display = symmetryMode ? 'block' : 'none';
-            showNumbers = symmetryMode;
-            updatePlayerNames();
-            highlightCenterPlayers();
-        }
-
-        function highlightCenterPlayers() {
-            document.querySelectorAll('.row').forEach(row => {
-                const players = Array.from(row.children).filter(player => player.style.visibility !== 'hidden');
-                const middleIndex = Math.floor(players.length / 2);
-
-                players.forEach((player, index) => {
-                    player.classList.remove('center-highlighted');
-                    if (showNumbers) {
-                        if (players.length % 2 === 1 && index === middleIndex) {
-                            player.classList.add('center-highlighted');
-                        } else if (players.length % 2 === 0 && (index === middleIndex - 1 || index === middleIndex)) {
-                            player.classList.add('center-highlighted');
-                        }
-                    }
-                });
-            });
-        }
+        });
+    });
+}
 
 function createDefaultLayout() {
     const layout = [
-        { // Row 1
+    { // Row 1
             layout: 'arc',
             players: [
                 { instrument: 'Violin 1', name: 'Catherine' },
@@ -361,7 +361,6 @@ function createDefaultLayout() {
                 { instrument: 'Violin 3', name: 'Ziqi' },
                 { instrument: 'Violin 3', name: 'Celine' },
                 { instrument: 'Cello 1', name: 'Vivi' },
-                { instrument: 'Cello 1', name: 'Melody He' },
                 { instrument: 'Cello 1', name: 'Mandy' },
                 { instrument: 'Cello 1', name: 'Hubert' }
             ]
@@ -371,7 +370,6 @@ function createDefaultLayout() {
             players: [
                 { instrument: 'Flute', name: 'Ms. North' },
                 { instrument: 'Flute', name: 'Chris' },
-                { instrument: 'Flute', name: 'Alan' },
                 { instrument: 'Flute', name: 'William' },
                 { instrument: 'Flute', name: 'Leo Li' },
                 { instrument: 'Flute', name: 'June' },
@@ -392,6 +390,7 @@ function createDefaultLayout() {
             layout: 'arc',
             players: [
                 { instrument: 'Trumpet', name: 'Mr. Wright' },
+                { instrument: 'Trumpet', name: 'Mr. Jordi' },
                 { instrument: 'Trumpet', name: 'Jojo' },
                 { instrument: 'Trumpet', name: 'James' },
                 { instrument: 'Trumpet', name: 'Owen' },
@@ -399,7 +398,6 @@ function createDefaultLayout() {
                 { instrument: 'Horn', name: 'Haefen' },
                 { instrument: 'Horn', name: 'Sophie' },
                 { instrument: 'Trombone', name: 'Daniel' },
-                { instrument: 'Trombone', name: 'Jerry' },
                 { instrument: 'Baritone', name: 'Steven' },
                 { instrument: 'Tuba', name: 'Calvin Z' },
                 { instrument: 'Tuba', name: 'Ethan' },
@@ -421,7 +419,7 @@ function createDefaultLayout() {
                 { instrument: 'Bassoon', name: 'Stuart' }
             ]
         },
-        { // Row 5
+ /*       { // Row 5
             layout: 'straight',
             players: [
                 { instrument: 'Percussion', name: 'Jacky' },
@@ -434,7 +432,7 @@ function createDefaultLayout() {
                 { instrument: 'Percussion', name: 'Kevin Cai' },
                 { instrument: 'Percussion', name: 'Frankie' },
             ]
-        }
+        }     */
     ];
 
     applyLayout(layout);
@@ -449,7 +447,6 @@ function applyLayout(layout = null) {
         const row = document.createElement('div');
         row.className = 'row';
         row.dataset.rowIndex = i;
-        // Use the layout property from the layout array
         row.dataset.layout = layout[i].layout || 'full-arc';
         row.style.bottom = `${60 + i * rowSpacings[i]}px`;
         
@@ -461,23 +458,7 @@ function applyLayout(layout = null) {
         }
         
         stage.appendChild(row);
-        // Arrange players based on the layout property
-        switch (row.dataset.layout) {
-            case 'full-arc':
-                arrangePlayersInArc(row, Math.PI * 0.9);
-                break;
-            case 'medium-arc':
-                arrangePlayersInArc(row, Math.PI * 0.6);
-                break;
-            case 'slight-arc':
-                arrangePlayersInArc(row, Math.PI * 0.3);
-                break;
-            case 'straight':
-                arrangePlayersInStraightLine(row);
-                break;
-            default:
-                arrangePlayersInArc(row, Math.PI * 0.9);
-        }
+        updateRowArrangement(row);
     }
 
     createConductor();
@@ -496,7 +477,6 @@ function arrangePlayersInArc(row, arcAngle) {
         const x = centerX + radius * Math.cos(angle) - player.clientWidth / 2;
         const y = radius * Math.sin(angle) - player.clientHeight / 2;
         
-        // Ensure players don't get too close to the sides
         const minX = 0;
         const maxX = stage.clientWidth - player.clientWidth - 0;
         const clampedX = Math.max(minX, Math.min(maxX, x));
@@ -510,264 +490,270 @@ function arrangePlayersInStraightLine(row) {
     const players = Array.from(row.children);
     const rowIndex = parseInt(row.dataset.rowIndex);
     const totalWidth = players.reduce((sum, player) => sum + player.clientWidth, 0);
-    const spacing = 10; // Adjust this value to change the spacing between players
+    const spacing = 10;
     const totalSpacing = (players.length - 1) * spacing;
     const startX = (stage.clientWidth - totalWidth - totalSpacing) / 2;
 
     let currentX = startX;
     players.forEach((player, index) => {
         player.style.left = `${currentX}px`;
-        player.style.bottom = `${280 + rowIndex * 50}px`; // Adjust vertical positioning to be above arc rows
+        player.style.bottom = `${280 + rowIndex * 50}px`;
         currentX += player.clientWidth + spacing;
     });
 }
 
-        function selectElement(e) {
-            if (selectedElement) {
-                selectedElement.classList.remove('highlighted');
-            }
-            selectedElement = e.target;
-            selectedElement.classList.add('highlighted');
+function selectElement(e) {
+    if (selectedElement) {
+        selectedElement.classList.remove('highlighted');
+    }
+    selectedElement = e.target;
+    selectedElement.classList.add('highlighted');
 
-            if (selectedElement.classList.contains('player')) {
-                showFloatingMenu(e.clientX, e.clientY);
+    if (selectedElement.classList.contains('player')) {
+        showFloatingMenu(e.clientX, e.clientY);
+    }
+}
+
+function showFloatingMenu() {
+    const floatingMenu = document.getElementById('floatingMenu');
+    floatingMenu.style.display = 'block';
+    
+    const menuWidth = floatingMenu.offsetWidth;
+    const menuHeight = floatingMenu.offsetHeight;
+    const x = (window.innerWidth - menuWidth) / 2;
+    const y = (window.innerHeight - menuHeight) / 2;
+
+    floatingMenu.style.left = `${x}px`;
+    floatingMenu.style.top = `${y}px`;
+
+    document.getElementById('elementName').value = selectedElement.dataset.name;
+    document.getElementById('sectionType').value = selectedElement.dataset.instrument;
+    rowLayoutSelect.value = selectedElement.closest('.row').dataset.layout;
+}
+
+addPlayerBtn.addEventListener('click', () => {
+    if (selectedElement) {
+        const newPlayer = createPlayer(selectedElement.dataset.instrument, '');
+        selectedElement.parentNode.insertBefore(newPlayer, selectedElement.nextSibling);
+        const row = selectedElement.closest('.row');
+        updateRowArrangement(row);
+        updatePlayerNames();
+    }
+    floatingMenu.style.display = 'none';
+});
+
+removePlayerBtn.addEventListener('click', () => {
+    if (selectedElement && selectedElement.classList.contains('player')) {
+        const row = selectedElement.closest('.row');
+        selectedElement.remove();
+        updateRowArrangement(row);
+        selectedElement = null;
+        floatingMenu.style.display = 'none';
+        updatePlayerNames();
+    }
+});
+
+downloadPNGBtn.addEventListener('click', () => {
+    html2canvas(stage, {backgroundColor: null}).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'orchestra_layout.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+});
+
+exportJSONBtn.addEventListener('click', () => {
+    const layout = [];
+    document.querySelectorAll('.row').forEach(row => {
+        const rowPlayers = Array.from(row.children).map(player => ({
+            instrument: player.dataset.instrument,
+            name: player.dataset.name,
+            isInvisible: player.style.visibility === 'hidden'
+        }));
+        layout.push({
+            players: rowPlayers,
+            layout: row.dataset.layout
+        });
+    });
+    const jsonData = JSON.stringify(layout);
+    const blob = new Blob([jsonData], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'orchestra_layout.json';
+    link.click();
+});
+
+importJSONBtn.addEventListener('click', () => {
+    importJSONInput.click();
+});
+
+importJSONInput.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const layout = JSON.parse(e.target.result);
+            applyImportedLayout(layout);
+        };
+        reader.readAsText(file);
+    }
+});
+
+function applyImportedLayout(layout) {
+    stage.innerHTML = '';
+    const rowSpacings = [50, 40, 35, 28, 25];
+
+    layout.forEach((rowData, i) => {
+        const row = document.createElement('div');
+        row.className = 'row';
+        row.dataset.rowIndex = i;
+        row.dataset.layout = rowData.layout || 'arc';
+        row.style.bottom = `${10 + i * rowSpacings[i]}px`;
+        
+        rowData.players.forEach(item => {
+            const player = createPlayer(item.instrument, item.name, item.isInvisible);
+            row.appendChild(player);
+        });
+        
+        stage.appendChild(row);
+        updateRowArrangement(row);
+    });
+
+    createConductor();
+    updatePlayerNames();
+}
+
+hamburgerBtn.addEventListener('click', () => {
+    menuContent.style.display = menuContent.style.display === 'none' ? 'block' : 'none';
+});
+
+toggleNamesBtn.addEventListener('click', () => {
+    showNames = !showNames;
+    updatePlayerNames();
+});
+
+function updatePlayerNames() {
+    document.querySelectorAll('.row').forEach(row => {
+        const players = Array.from(row.children).filter(player => player.style.visibility !== 'hidden');
+        const middleIndex = Math.floor(players.length / 2);
+
+        players.forEach((player, index) => {
+            if (showNumbers) {
+                const number = index < middleIndex ? index + 1 : players.length - index;
+                player.innerHTML = `
+                    <div style="text-align: center;">
+                        <span class="number">${number}.</span><br>
+                        ${player.dataset.name}
+                    </div>
+                `;
+            } else {
+                player.textContent = showNames ? player.dataset.name : player.dataset.instrument;
             }
+        });
+    });
+    highlightCenterPlayers();
+}
+
+document.getElementById('elementName').addEventListener('input', updatePlayerInfo);
+document.getElementById('sectionType').addEventListener('change', updatePlayerInfo);
+rowLayoutSelect.addEventListener('change', updateRowLayout);
+
+function updatePlayerInfo() {
+    if (selectedElement) {
+        const name = document.getElementById('elementName').value;
+        const instrument = document.getElementById('sectionType').value;
+        
+        selectedElement.dataset.name = name;
+        selectedElement.dataset.instrument = instrument;
+        selectedElement.style.backgroundColor = instrumentColors[instrument];
+        
+        updatePlayerNames();
+        highlightCenterPlayers();
+    }
+}
+
+function updateRowLayout() {
+    if (selectedElement) {
+        const layout = rowLayoutSelect.value;
+        const row = selectedElement.closest('.row');
+        
+        if (layout !== row.dataset.layout) {
+            row.dataset.layout = layout;
+            updateRowArrangement(row);
         }
+    }
+}
 
+function updateRowArrangement(row) {
+    const layout = row.dataset.layout;
+    switch (layout) {
+        case 'full-arc':
+            arrangePlayersInArc(row, Math.PI * 0.9);
+            break;
+        case 'medium-arc':
+            arrangePlayersInArc(row, Math.PI * 0.6);
+            break;
+        case 'slight-arc':
+            arrangePlayersInArc(row, Math.PI * 0.3);
+            break;
+        case 'straight':
+            arrangePlayersInStraightLine(row);
+            break;
+        default:
+            arrangePlayersInArc(row, Math.PI * 0.9);
+    }
+    highlightCenterPlayers();
+}
 
-        function showFloatingMenu() {
-            const floatingMenu = document.getElementById('floatingMenu'); // Ensure you have the correct ID for your floating menu
-            floatingMenu.style.display = 'block';
-            
-            // Calculate the center position
-            const menuWidth = floatingMenu.offsetWidth;
-            const menuHeight = floatingMenu.offsetHeight;
-            const x = (window.innerWidth - menuWidth) / 2;
-            const y = (window.innerHeight - menuHeight) / 2;
-
-            floatingMenu.style.left = `${x}px`;
-            floatingMenu.style.top = `${y}px`;
-
-            document.getElementById('elementName').value = selectedElement.dataset.name;
-            document.getElementById('sectionType').value = selectedElement.dataset.instrument;
-            rowLayoutSelect.value = selectedElement.closest('.row').dataset.layout;
+downloadPNGBtn.addEventListener('click', () => {
+    html2canvas(stage, {
+        backgroundColor: null,
+        ignoreElements: (element) => {
+            return element.id === 'floatingMenu' || element.id === 'menuContent';
         }
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'orchestra_layout.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+});
 
-
-        addPlayerBtn.addEventListener('click', () => {
-            if (selectedElement) {
-                const newPlayer = createPlayer(selectedElement.dataset.instrument, '');
-                selectedElement.parentNode.insertBefore(newPlayer, selectedElement.nextSibling);
-                const row = selectedElement.closest('.row');
-                if (row.dataset.layout === 'arc') {
-                    arrangePlayersInArc(row);
-                } else {
-                    arrangePlayersInStraightLine(row);
-                }
-                updatePlayerNames();
-            }
-            floatingMenu.style.display = 'none';
-        });
-
-        removePlayerBtn.addEventListener('click', () => {
-            if (selectedElement && selectedElement.classList.contains('player')) {
-                const row = selectedElement.closest('.row');
-                selectedElement.remove();
-                if (row.dataset.layout === 'arc') {
-                    arrangePlayersInArc(row);
-                } else {
-                    arrangePlayersInStraightLine(row);
-                }
-                selectedElement = null;
-                floatingMenu.style.display = 'none';
-                updatePlayerNames();
-            }
-        });
-
-        downloadPNGBtn.addEventListener('click', () => {
-            html2canvas(stage, {backgroundColor: null}).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'orchestra_layout.png';
-                link.href = canvas.toDataURL();
-                link.click();
-            });
-        });
-
-        exportJSONBtn.addEventListener('click', () => {
-            const layout = [];
-            document.querySelectorAll('.row').forEach(row => {
-                const rowPlayers = Array.from(row.children).map(player => ({
-                    instrument: player.dataset.instrument,
-                    name: player.dataset.name,
-                    isInvisible: player.style.visibility === 'hidden'
-                }));
-                layout.push({
-                    players: rowPlayers,
-                    layout: row.dataset.layout
-                });
-            });
-            const jsonData = JSON.stringify(layout);
-            const blob = new Blob([jsonData], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'orchestra_layout.json';
-            link.click();
-        });
-
-        importJSONBtn.addEventListener('click', () => {
-            importJSONInput.click();
-        });
-
-        importJSONInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const layout = JSON.parse(e.target.result);
-                    applyImportedLayout(layout);
-                };
-                reader.readAsText(file);
-            }
-        });
-
-        function applyImportedLayout(layout) {
-            stage.innerHTML = '';
-            const rowSpacings = [50, 40, 35, 28, 25];
-
-            layout.forEach((rowData, i) => {
-                const row = document.createElement('div');
-                row.className = 'row';
-                row.dataset.rowIndex = i;
-                row.dataset.layout = rowData.layout || 'arc';
-                row.style.bottom = `${10 + i * rowSpacings[i]}px`;
-                
-                rowData.players.forEach(item => {
-                    const player = createPlayer(item.instrument, item.name, item.isInvisible);
-                    row.appendChild(player);
-                });
-                
-                stage.appendChild(row);
-                if (row.dataset.layout === 'arc') {
-                    arrangePlayersInArc(row);
-                } else {
-                    arrangePlayersInStraightLine(row);
-                }
-            });
-
-            createConductor();
+stage.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('player') && !e.target.classList.contains('conductor')) {
+        if (symmetryMode) {
+            symmetryMode = false;
+            centerLine.style.display = 'none';
+            showNumbers = false;
             updatePlayerNames();
-        }
-
-        hamburgerBtn.addEventListener('click', () => {
-            menuContent.style.display = menuContent.style.display === 'none' ? 'block' : 'none';
-        });
-
-        toggleNamesBtn.addEventListener('click', () => {
-            showNames = !showNames;
-            updatePlayerNames();
-        });
-
-        function updatePlayerNames() {
-            document.querySelectorAll('.row').forEach(row => {
-                const players = Array.from(row.children).filter(player => player.style.visibility !== 'hidden');
-                const middleIndex = Math.floor(players.length / 2);
-
-                players.forEach((player, index) => {
-                    if (showNumbers) {
-                        const number = index < middleIndex ? index + 1 : players.length - index;
-                        player.innerHTML = `
-                            <div style="text-align: center;">
-                                <span class="number">${number}.</span><br>
-                                ${player.dataset.name}
-                            </div>
-                        `;
-                    } else {
-                        player.textContent = showNames ? player.dataset.name : player.dataset.instrument;
-                    }
-                });
-            });
             highlightCenterPlayers();
         }
+    }
+});
 
-        // Add event listeners for real-time updates
-        document.getElementById('elementName').addEventListener('input', updatePlayerInfo);
-        document.getElementById('sectionType').addEventListener('change', updatePlayerInfo);
-        rowLayoutSelect.addEventListener('change', updateRowLayout);
+createDefaultLayout();
 
-        function updatePlayerInfo() {
-            if (selectedElement) {
-                const name = document.getElementById('elementName').value;
-                const instrument = document.getElementById('sectionType').value;
-                
-                selectedElement.dataset.name = name;
-                selectedElement.dataset.instrument = instrument;
-                selectedElement.style.backgroundColor = instrumentColors[instrument];
-                
-                updatePlayerNames();
-            }
+document.addEventListener('click', (e) => {
+    if (!floatingMenu.contains(e.target) && !e.target.classList.contains('player')) {
+        floatingMenu.style.display = 'none';
+        if (selectedElement) {
+            selectedElement.classList.remove('highlighted');
+            selectedElement = null;
         }
+    }
+    if (!menuContent.contains(e.target) && e.target !== hamburgerBtn) {
+        menuContent.style.display = 'none';
+    }
+});
 
-        function updateRowLayout() {
-            if (selectedElement) {
-                const layout = rowLayoutSelect.value;
-                const row = selectedElement.closest('.row');
-                
-                if (layout !== row.dataset.layout) {
-                    row.dataset.layout = layout;
-                    if (layout === 'arc') {
-                        arrangePlayersInArc(row);
-                    } else {
-                        arrangePlayersInStraightLine(row);
-                    }
-                }
-            }
-        }
-
-        // Modify the click event listener for the stage
-        stage.addEventListener('click', (e) => {
-            if (!e.target.classList.contains('player') && !e.target.classList.contains('conductor')) {
-                if (symmetryMode) {
-                    symmetryMode = false;
-                    centerLine.style.display = 'none';
-                    showNumbers = false;
-                    updatePlayerNames();
-                    highlightCenterPlayers();
-                }
-            }
-        });
-
-        // Initialize
-        createDefaultLayout();
-
-        // Close floating menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!floatingMenu.contains(e.target) && !e.target.classList.contains('player')) {
-                floatingMenu.style.display = 'none';
-                if (selectedElement) {
-                    selectedElement.classList.remove('highlighted');
-                    selectedElement = null;
-                }
-            }
-            if (!menuContent.contains(e.target) && e.target !== hamburgerBtn) {
-                menuContent.style.display = 'none';
-            }
-        });
-
-        // Resize handler
-        window.addEventListener('resize', () => {
-            document.querySelectorAll('.row').forEach(row => {
-                if (row.dataset.layout === 'arc') {
-                    arrangePlayersInArc(row);
-                } else {
-                    arrangePlayersInStraightLine(row);
-                }
-            });
-            const conductor = document.querySelector('.conductor');
-            if (conductor) {
-                conductor.style.left = `${stage.clientWidth / 2 - conductor.clientWidth / 2}px`;
-            }
-        });
+window.addEventListener('resize', () => {
+    document.querySelectorAll('.row').forEach(updateRowArrangement);
+    const conductor = document.querySelector('.conductor');
+    if (conductor) {
+        conductor.style.left = `${stage.clientWidth / 2 - conductor.clientWidth / 2}px`;
+    }
+});
     </script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </body>
