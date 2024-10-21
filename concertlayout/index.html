@@ -3,182 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orchestra Layout Creator</title>
+    <title>Orchestra Seating Chart</title>
     <link rel="icon" href="../icons/BGicon.png">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to bottom, #aec6cb, #4f6175);
-            overflow: hidden;
-        }
-        .container {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-            margin: 10px 0;
-        }
-        #canvas {
-            flex-grow: 1;
-            width: 100%;
-            background-color: transparent;
-            position: relative;
-            overflow: hidden;
-        }
-        #stage {
-            width: 100%;
-            height: 100%;
-            background-color: transparent;
-            position: relative;
-        }
-        .row {
-            position: absolute;
-            width: 100%;
-        }
-        .player, .conductor {
-            width: 5vw;
-            height: 5vw;
-            min-width: 30px;
-            min-height: 30px;
-            max-width: 50px;
-            max-height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2vw;
-            color: #fff;
-            cursor: move;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            border: 2px solid #fff;
-            position: absolute;
-            text-align: center;
-            word-wrap: break-word;
-            padding: 5px;
-            box-sizing: border-box;
-        }
-        .conductor {
-            width: 6vw;
-            height: 6vw;
-            min-width: 36px;
-            min-height: 36px;
-            max-width: 60px;
-            max-height: 60px;
-            background-color: #000;
-            z-index: 10;
-        }
-        .highlighted {
-            box-shadow: 0 0 10px 5px rgba(255,255,0,0.5);
-        }
-        #floatingMenu {
-            position: absolute;
-            background-color: #fff;
-            border: 1px solid #333;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            display: none;
-            width: 200px;
-            z-index: 1000;
-        }
-        #floatingMenu button, #floatingMenu input, #floatingMenu select {
-            margin: 8px 0;
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        #floatingMenu button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        #floatingMenu button:hover {
-            background-color: #45a049;
-        }
-        #controls {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 1000;
-        }
-        .hamburger {
-            font-size: 24px;
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
-        #menuContent {
-            display: none;
-            position: absolute;
-            top: 40px;
-            left: 0;
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        #menuContent button {
-            display: block;
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 5px;
-            background-color: #f0f0f0;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        #menuContent button:hover {
-            background-color: #e0e0e0;
-        }
-        #toggleNamesBtn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 8px 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            z-index: 1000;
-        }
-        #toggleNamesBtn:hover {
-            background-color: #45a049;
-        }
-        #centerLine {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            width: 0;
-            height: 100%;
-            border-left: 2px dotted #000;
-            display: none;
-            z-index: 5;
-        }
-        .number {
-            font-size: 16px; /* Make the number text larger */
-            color: rgb(255, 255, 255); /* Set text color */
-        }
-    </style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(to bottom, #aec6cb, #4f6175);
+        overflow: hidden;
+    }
+    .container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+        margin: 10px 0;
+    }
+    #canvas {
+        flex-grow: 1;
+        width: 100%;
+        background-color: transparent;
+        position: relative;
+        overflow: hidden;
+    }
+    #stage {
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+        position: relative;
+    }
+    .row {
+        position: absolute;
+        width: 100%;
+    }
+    .player, .conductor {
+        width: 55px; 
+        height: 55px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        cursor: move;
+        font-size: 12px; /* Adjusted to be consistent */
+        text-align: center;
+        border: 1px solid #000; /* Changed to a single border style */
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+    .player {
+        background-color: transparent; /* Default background */
+        color: #fff; /* Default text color */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .conductor {
+        background-color: #000;
+        z-index: 10;
+        margin-left: 3px;
+    }
+    .highlighted, .player.highlighted, .center-highlighted {
+        box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.5);
+    }
+    #floatingMenu {
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #333;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    display: none;
+    width: 200px;
+    z-index: 1000;
+}
+
+#floatingMenu .label {
+    font-size: 12px; /* Smaller font size */
+    color: gray; /* Gray text color */
+}
+
+#floatingMenu button, 
+#floatingMenu select {
+    margin: 8px 0;
+    width: 100%; 
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+#floatingMenu input {
+    margin: 8px 0;
+    width: 90%; /* Adjusted from 91% to 90% */
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+#floatingMenu button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#floatingMenu button:hover {
+    background-color: #45a049;
+}
+
+    #controls {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1000;
+    }
+    .hamburger {
+        font-size: 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+    #menuContent {
+        display: none;
+        position: absolute;
+        top: 40px;
+        left: 0;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    #menuContent button {
+        display: block;
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 5px;
+        background-color: #f0f0f0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    #menuContent button:hover {
+        background-color: #e0e0e0;
+    }
+    #toggleNamesBtn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 8px 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        z-index: 1000;
+    }
+    #toggleNamesBtn:hover {
+        background-color: #45a049;
+    }
+    #centerLine {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        border-left: 2px dotted #ffffff;
+        z-index: -2;
+        display: none;
+    }
+    .number {
+        font-size: 16px; /* Make the number text larger */
+        color: rgb(255, 255, 255); /* Set text color */
+    }
+</style>
 </head>
+
+
 <body>
     <div class="container">
-        <h1>Winter Concert 2024</h1>
+        <h1>Halloween Concert Layout 2024</h1>
         <div id="canvas">
             <div id="stage"></div>
             <div id="centerLine"></div>
@@ -199,6 +213,7 @@
     <button id="toggleNamesBtn">Toggle Names</button>
 
     <div id="floatingMenu">
+        <div class="label">Player info:</div>
         <input type="text" id="elementName" placeholder="Name">
         <select id="sectionType">
             <option value="Violin 1">Violin 1</option>
@@ -222,60 +237,20 @@
             <option value="Tuba">Tuba</option>
             <option value="Percussion">Percussion</option>
         </select>
-        <button id="applyCustomization">Apply Changes</button>
         <button id="addPlayer">Add Player</button>
         <button id="removePlayer">Remove Player</button>
+        <div class="label"><br>Row shape:</div>
+        <select id="rowLayout">
+            <option value="arc">Arc</option>
+            <option value="straight">Straight Line</option>
+        </select>
     </div>
 
-    <style>
-        .player {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            cursor: pointer;
-            font-size: 12px;
-            text-align: center;
-            border: 1px solid #000;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
-
-        .player.highlighted {
-            box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.5);
-        }
-        .center-highlighted {
-            box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.5);
-        }
-
-        #centerLine {
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 1px;
-            border-left: 2px dotted #ffffff;
-            z-index: -2;
-            display: none;
-        }
-
-        .conductor {
-            width: 60px;
-            height: 60px;
-            background-color: #000;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-    </style>
 
     <script>
         const canvas = document.getElementById('canvas');
         const stage = document.getElementById('stage');
         const floatingMenu = document.getElementById('floatingMenu');
-        const applyCustomizationBtn = document.getElementById('applyCustomization');
         const addPlayerBtn = document.getElementById('addPlayer');
         const removePlayerBtn = document.getElementById('removePlayer');
         const downloadPNGBtn = document.getElementById('downloadPNG');
@@ -286,6 +261,7 @@
         const menuContent = document.getElementById('menuContent');
         const toggleNamesBtn = document.getElementById('toggleNamesBtn');
         const centerLine = document.getElementById('centerLine');
+        const rowLayoutSelect = document.getElementById('rowLayout');
 
         const instrumentColors = {
             'Violin 1': '#FF6B6B',
@@ -313,7 +289,7 @@
         let selectedElement = null;
         let showNames = true;
         let showNumbers = false;
-        let offsetX, offsetY;
+        let symmetryMode = false;
 
         function createPlayer(instrument, name, isInvisible = false) {
             const player = document.createElement('div');
@@ -342,8 +318,9 @@
 
         function toggleCenterLine(e) {
             e.stopPropagation();
-            centerLine.style.display = centerLine.style.display === 'none' ? 'block' : 'none';
-            showNumbers = centerLine.style.display !== 'none';
+            symmetryMode = !symmetryMode;
+            centerLine.style.display = symmetryMode ? 'block' : 'none';
+            showNumbers = symmetryMode;
             updatePlayerNames();
             highlightCenterPlayers();
         }
@@ -366,138 +343,184 @@
             });
         }
 
-        function createDefaultLayout() {
-            const layout = [
-                [
-                    { instrument: 'Violin 1', name: 'Catherine' },
-                    { instrument: 'Violin 1', name: 'Alex Huang' },
-                    { instrument: 'Violin 1', name: 'Steven' },
-                    { instrument: 'Violin 1', name: 'Shine' },
-                    { instrument: 'Violin 2', name: 'Emily' },
-                    { instrument: 'Violin 2', name: 'Yaffa' },
-                    { instrument: 'Violin 2', name: 'Jenny' },
-                    { instrument: 'Violin 3', name: 'Angelina' },
-                    { instrument: 'Violin 3', name: 'Odelia' },
-                    { instrument: 'Violin 3', name: 'Fiona' },
-                    { instrument: 'Violin 3', name: 'Ziqi' },
-                    { instrument: 'Violin 3', name: 'Celine' },
-                ],
-                [
-                    { instrument: 'Flute', name: 'Ms. North' },
-                    { instrument: 'Flute', name: 'Chris' },
-                    { instrument: 'Flute', name: 'Alan' },
-                    { instrument: 'Flute', name: 'William' },
-                    { instrument: 'Flute', name: 'Leo Li' },
-                    { instrument: 'Flute', name: 'June' },
-                    { instrument: 'Flute', name: 'Sissi' },
-                    { instrument: 'Flute', name: 'Grace' },
-                    { instrument: 'Flute', name: 'Mianmian' },
-                    { instrument: 'Flute', name: 'Lucy' },
-                    { instrument: 'Cello 1', name: 'Vivi' },
-                    { instrument: 'Cello 1', name: 'Melody He' },
-                    { instrument: 'Cello 1', name: 'Mandy' },
-                    { instrument: 'Cello 1', name: 'Hubert' }
-                ],
-                [
-                    { instrument: 'Alto Sax', name: 'Stephen' },
-                    { instrument: 'Alto Sax', name: 'Agu' },
-                    { instrument: 'Alto Sax', name: 'Michael' },
-                    { instrument: 'Alto Sax', name: 'Francis' },
-                    { instrument: 'Alto Sax', name: 'Steve' },
-                    { instrument: 'Tenor Sax', name: 'Dr. Davis' },
-                    { instrument: 'Clarinet', name: 'Henry' },
-                    { instrument: 'Clarinet', name: 'Helen Hu' },
-                    { instrument: 'Clarinet', name: 'Anne' },
-                    { instrument: 'Clarinet', name: 'Jim' },
-                    { instrument: 'Bass Clarinet', name: 'Calvin' },
-                    { instrument: 'Bassoon', name: 'Stuart' },
-                    { instrument: 'Cello 2', name: 'Jennifer' },
-                    { instrument: 'Cello 2', name: 'Helen Nie' },
-                    { instrument: 'Cello 2', name: 'Pai' }
-                ],
-                [
-                    { instrument: 'Trumpet', name: 'Mr. Wright' },
-                    { instrument: 'Trumpet', name: 'Jojo' },
-                    { instrument: 'Trumpet', name: 'James' },
-                    { instrument: 'Trumpet', name: 'Owen' },
-                    { instrument: 'Horn', name: 'Christi' },
-                    { instrument: 'Horn', name: 'Haefen' },
-                    { instrument: 'Horn', name: 'Sophie' },
-                    { instrument: 'Trombone', name: 'Daniel' },
-                    { instrument: 'Trombone', name: 'Jerry' },
-                    { instrument: 'Baritone', name: 'Steven' },
-                    { instrument: 'Tuba', name: 'Calvin Z' },
-                    { instrument: 'Tuba', name: 'Ethan' },
-                    { instrument: 'Bass', name: 'Rene' },
-                    { instrument: 'Bass', name: 'Luna' },
-                    { instrument: 'Bass', name: 'Kevin Chen' }
-                ],
-                [
-                    { instrument: 'Percussion', name: 'Invisible', isInvisible: true },
-                    { instrument: 'Percussion', name: 'Jacky' },
-                    { instrument: 'Percussion', name: 'Ben' },
-                    { instrument: 'Percussion', name: 'Bruce' },
-                    { instrument: 'Percussion', name: 'James' },
-                    { instrument: 'Percussion', name: 'Johnny' },
-                    { instrument: 'Percussion', name: 'Aurora' },
-                    { instrument: 'Percussion', name: 'Tiger' },
-                    { instrument: 'Percussion', name: 'Kevin' },
-                    { instrument: 'Percussion', name: 'Frankie' },
-                    { instrument: 'Percussion', name: 'Invisible', isInvisible: true }
-                ]
-            ];
-
-            applyLayout(layout);
+function createDefaultLayout() {
+    const layout = [
+        { // Row 1
+            layout: 'arc',
+            players: [
+                { instrument: 'Violin 1', name: 'Catherine' },
+                { instrument: 'Violin 1', name: 'Alex Huang' },
+                { instrument: 'Violin 1', name: 'Steven' },
+                { instrument: 'Violin 1', name: 'Shine' },
+                { instrument: 'Violin 2', name: 'Emily' },
+                { instrument: 'Violin 2', name: 'Yaffa' },
+                { instrument: 'Violin 2', name: 'Jenny' },
+                { instrument: 'Violin 3', name: 'Angelina' },
+                { instrument: 'Violin 3', name: 'Odelia' },
+                { instrument: 'Violin 3', name: 'Fiona' },
+                { instrument: 'Violin 3', name: 'Ziqi' },
+                { instrument: 'Violin 3', name: 'Celine' },
+                { instrument: 'Cello 1', name: 'Vivi' },
+                { instrument: 'Cello 1', name: 'Melody He' },
+                { instrument: 'Cello 1', name: 'Mandy' },
+                { instrument: 'Cello 1', name: 'Hubert' }
+            ]
+        },
+        { // Row 2
+            layout: 'arc',
+            players: [
+                { instrument: 'Flute', name: 'Ms. North' },
+                { instrument: 'Flute', name: 'Chris' },
+                { instrument: 'Flute', name: 'Alan' },
+                { instrument: 'Flute', name: 'William' },
+                { instrument: 'Flute', name: 'Leo Li' },
+                { instrument: 'Flute', name: 'June' },
+                { instrument: 'Flute', name: 'Sissi' },
+                { instrument: 'Flute', name: 'Grace' },
+                { instrument: 'Flute', name: 'Mianmian' },
+                { instrument: 'Flute', name: 'Lucy' },
+                { instrument: 'Clarinet', name: 'Henry' },
+                { instrument: 'Clarinet', name: 'Helen Hu' },
+                { instrument: 'Clarinet', name: 'Anne' },
+                { instrument: 'Clarinet', name: 'Jim' },
+                { instrument: 'Cello 2', name: 'Jennifer' },
+                { instrument: 'Cello 2', name: 'Helen Nie' },
+                { instrument: 'Cello 2', name: 'Pai' }
+            ]
+        },
+        { // Row 3
+            layout: 'arc',
+            players: [
+                { instrument: 'Trumpet', name: 'Mr. Wright' },
+                { instrument: 'Trumpet', name: 'Jojo' },
+                { instrument: 'Trumpet', name: 'James' },
+                { instrument: 'Trumpet', name: 'Owen' },
+                { instrument: 'Horn', name: 'Christi' },
+                { instrument: 'Horn', name: 'Haefen' },
+                { instrument: 'Horn', name: 'Sophie' },
+                { instrument: 'Trombone', name: 'Daniel' },
+                { instrument: 'Trombone', name: 'Jerry' },
+                { instrument: 'Baritone', name: 'Steven' },
+                { instrument: 'Tuba', name: 'Calvin Z' },
+                { instrument: 'Tuba', name: 'Ethan' },
+                { instrument: 'Bass', name: 'Rene' },
+                { instrument: 'Bass', name: 'Luna' },
+                { instrument: 'Bass', name: 'Kevin Chen' }
+            ]
+        },
+        { // Row 4
+            layout: 'straight',
+            players: [
+                { instrument: 'Alto Sax', name: 'Stephen' },
+                { instrument: 'Alto Sax', name: 'Agu' },
+                { instrument: 'Alto Sax', name: 'Michael' },
+                { instrument: 'Alto Sax', name: 'Francis' },
+                { instrument: 'Alto Sax', name: 'Steve' },
+                { instrument: 'Tenor Sax', name: 'Dr. Davis' },
+                { instrument: 'Bass Clarinet', name: 'Calvin Y' },
+                { instrument: 'Bassoon', name: 'Stuart' }
+            ]
+        },
+        { // Row 5
+            layout: 'straight',
+            players: [
+                { instrument: 'Percussion', name: 'Jacky' },
+                { instrument: 'Percussion', name: 'Ben' },
+                { instrument: 'Percussion', name: 'Bruce' },
+                { instrument: 'Percussion', name: 'James' },
+                { instrument: 'Percussion', name: 'Johnny' },
+                { instrument: 'Percussion', name: 'Aurora' },
+                { instrument: 'Percussion', name: 'Tiger' },
+                { instrument: 'Percussion', name: 'Kevin Cai' },
+                { instrument: 'Percussion', name: 'Frankie' },
+            ]
         }
+    ];
 
-        function applyLayout(layout = null) {
-            stage.innerHTML = '';
-            const rowCount = layout ? layout.length : 5;
-            const rowSpacings = [50, 40, 35, 28, 25];
+    applyLayout(layout);
+}
 
-            for (let i = 0; i < rowCount; i++) {
-                const row = document.createElement('div');
-                row.className = 'row';
-                row.dataset.rowIndex = i;
-                row.style.bottom = `${10 + i * rowSpacings[i]}px`;
-                
-                if (layout && layout[i]) {
-                    layout[i].forEach(item => {
-                        const player = createPlayer(item.instrument, item.name, item.isInvisible);
-                        row.appendChild(player);
-                    });
-                }
-                
-                stage.appendChild(row);
-                arrangePlayersInArc(row);
-            }
+function applyLayout(layout = null) {
+    stage.innerHTML = '';
+    const rowCount = layout ? layout.length : 5;
+    const rowSpacings = [50, 40, 35, 28, 25];
 
-            createConductor();
-            updatePlayerNames();
-        }
-
-        function arrangePlayersInArc(row) {
-            const players = Array.from(row.children);
-            const rowIndex = parseInt(row.dataset.rowIndex);
-            const centerX = stage.clientWidth / 2;
-            const radius = 300 + rowIndex * 50;
-            const arcAngle = Math.PI * 0.8;
-            const startAngle = Math.PI / 2 - arcAngle / 2;
-            
-            players.forEach((player, index) => {
-                const angle = startAngle + ((players.length - 1 - index) / (players.length - 1)) * arcAngle;
-                const x = centerX + radius * Math.cos(angle) - player.clientWidth / 2;
-                const y = radius * Math.sin(angle) - player.clientHeight / 2;
-                
-                // Ensure players don't get too close to the sides
-                const minX = 20;
-                const maxX = stage.clientWidth - player.clientWidth - 20;
-                const clampedX = Math.max(minX, Math.min(maxX, x));
-                
-                player.style.left = `${clampedX}px`;
-                player.style.bottom = `${y}px`;
+    for (let i = 0; i < rowCount; i++) {
+        const row = document.createElement('div');
+        row.className = 'row';
+        row.dataset.rowIndex = i;
+        // Use the layout property from the layout array
+        row.dataset.layout = layout[i].layout || 'full-arc';
+        row.style.bottom = `${60 + i * rowSpacings[i]}px`;
+        
+        if (layout && layout[i].players) {
+            layout[i].players.forEach(item => {
+                const player = createPlayer(item.instrument, item.name, item.isInvisible);
+                row.appendChild(player);
             });
         }
+        
+        stage.appendChild(row);
+        // Arrange players based on the layout property
+        switch (row.dataset.layout) {
+            case 'full-arc':
+                arrangePlayersInArc(row, Math.PI * 0.9);
+                break;
+            case 'medium-arc':
+                arrangePlayersInArc(row, Math.PI * 0.6);
+                break;
+            case 'slight-arc':
+                arrangePlayersInArc(row, Math.PI * 0.3);
+                break;
+            case 'straight':
+                arrangePlayersInStraightLine(row);
+                break;
+            default:
+                arrangePlayersInArc(row, Math.PI * 0.9);
+        }
+    }
+
+    createConductor();
+    updatePlayerNames();
+}
+
+function arrangePlayersInArc(row, arcAngle) {
+    const players = Array.from(row.children);
+    const rowIndex = parseInt(row.dataset.rowIndex);
+    const centerX = stage.clientWidth / 2;
+    const radius = 300 + rowIndex * 50;
+    const startAngle = Math.PI / 2 - arcAngle / 2;
+    
+    players.forEach((player, index) => {
+        const angle = startAngle + ((players.length - 1 - index) / (players.length - 1)) * arcAngle;
+        const x = centerX + radius * Math.cos(angle) - player.clientWidth / 2;
+        const y = radius * Math.sin(angle) - player.clientHeight / 2;
+        
+        // Ensure players don't get too close to the sides
+        const minX = 0;
+        const maxX = stage.clientWidth - player.clientWidth - 0;
+        const clampedX = Math.max(minX, Math.min(maxX, x));
+        
+        player.style.left = `${clampedX}px`;
+        player.style.bottom = `${y}px`;
+    });
+}
+
+function arrangePlayersInStraightLine(row) {
+    const players = Array.from(row.children);
+    const rowIndex = parseInt(row.dataset.rowIndex);
+    const totalWidth = players.reduce((sum, player) => sum + player.clientWidth, 0);
+    const spacing = 10; // Adjust this value to change the spacing between players
+    const totalSpacing = (players.length - 1) * spacing;
+    const startX = (stage.clientWidth - totalWidth - totalSpacing) / 2;
+
+    let currentX = startX;
+    players.forEach((player, index) => {
+        player.style.left = `${currentX}px`;
+        player.style.bottom = `${280 + rowIndex * 50}px`; // Adjust vertical positioning to be above arc rows
+        currentX += player.clientWidth + spacing;
+    });
+}
 
         function selectElement(e) {
             if (selectedElement) {
@@ -511,36 +534,36 @@
             }
         }
 
-        function showFloatingMenu(x, y) {
+
+        function showFloatingMenu() {
+            const floatingMenu = document.getElementById('floatingMenu'); // Ensure you have the correct ID for your floating menu
             floatingMenu.style.display = 'block';
+            
+            // Calculate the center position
+            const menuWidth = floatingMenu.offsetWidth;
+            const menuHeight = floatingMenu.offsetHeight;
+            const x = (window.innerWidth - menuWidth) / 2;
+            const y = (window.innerHeight - menuHeight) / 2;
+
             floatingMenu.style.left = `${x}px`;
             floatingMenu.style.top = `${y}px`;
 
             document.getElementById('elementName').value = selectedElement.dataset.name;
             document.getElementById('sectionType').value = selectedElement.dataset.instrument;
+            rowLayoutSelect.value = selectedElement.closest('.row').dataset.layout;
         }
 
-        applyCustomizationBtn.addEventListener('click', () => {
-            if (selectedElement) {
-                const name = document.getElementById('elementName').value;
-                const instrument = document.getElementById('sectionType').value;
-                if (name) {
-                    selectedElement.dataset.name = name;
-                }
-                if (instrument) {
-                    selectedElement.dataset.instrument = instrument;
-                    selectedElement.style.backgroundColor = instrumentColors[instrument];
-                }
-                updatePlayerNames();
-            }
-            floatingMenu.style.display = 'none';
-        });
 
         addPlayerBtn.addEventListener('click', () => {
             if (selectedElement) {
                 const newPlayer = createPlayer(selectedElement.dataset.instrument, '');
                 selectedElement.parentNode.insertBefore(newPlayer, selectedElement.nextSibling);
-                arrangePlayersInArc(selectedElement.closest('.row'));
+                const row = selectedElement.closest('.row');
+                if (row.dataset.layout === 'arc') {
+                    arrangePlayersInArc(row);
+                } else {
+                    arrangePlayersInStraightLine(row);
+                }
                 updatePlayerNames();
             }
             floatingMenu.style.display = 'none';
@@ -550,7 +573,11 @@
             if (selectedElement && selectedElement.classList.contains('player')) {
                 const row = selectedElement.closest('.row');
                 selectedElement.remove();
-                arrangePlayersInArc(row);
+                if (row.dataset.layout === 'arc') {
+                    arrangePlayersInArc(row);
+                } else {
+                    arrangePlayersInStraightLine(row);
+                }
                 selectedElement = null;
                 floatingMenu.style.display = 'none';
                 updatePlayerNames();
@@ -574,7 +601,10 @@
                     name: player.dataset.name,
                     isInvisible: player.style.visibility === 'hidden'
                 }));
-                layout.push(rowPlayers);
+                layout.push({
+                    players: rowPlayers,
+                    layout: row.dataset.layout
+                });
             });
             const jsonData = JSON.stringify(layout);
             const blob = new Blob([jsonData], {type: 'application/json'});
@@ -595,11 +625,39 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const layout = JSON.parse(e.target.result);
-                    applyLayout(layout);
+                    applyImportedLayout(layout);
                 };
                 reader.readAsText(file);
             }
         });
+
+        function applyImportedLayout(layout) {
+            stage.innerHTML = '';
+            const rowSpacings = [50, 40, 35, 28, 25];
+
+            layout.forEach((rowData, i) => {
+                const row = document.createElement('div');
+                row.className = 'row';
+                row.dataset.rowIndex = i;
+                row.dataset.layout = rowData.layout || 'arc';
+                row.style.bottom = `${10 + i * rowSpacings[i]}px`;
+                
+                rowData.players.forEach(item => {
+                    const player = createPlayer(item.instrument, item.name, item.isInvisible);
+                    row.appendChild(player);
+                });
+                
+                stage.appendChild(row);
+                if (row.dataset.layout === 'arc') {
+                    arrangePlayersInArc(row);
+                } else {
+                    arrangePlayersInStraightLine(row);
+                }
+            });
+
+            createConductor();
+            updatePlayerNames();
+        }
 
         hamburgerBtn.addEventListener('click', () => {
             menuContent.style.display = menuContent.style.display === 'none' ? 'block' : 'none';
@@ -632,6 +690,53 @@
             highlightCenterPlayers();
         }
 
+        // Add event listeners for real-time updates
+        document.getElementById('elementName').addEventListener('input', updatePlayerInfo);
+        document.getElementById('sectionType').addEventListener('change', updatePlayerInfo);
+        rowLayoutSelect.addEventListener('change', updateRowLayout);
+
+        function updatePlayerInfo() {
+            if (selectedElement) {
+                const name = document.getElementById('elementName').value;
+                const instrument = document.getElementById('sectionType').value;
+                
+                selectedElement.dataset.name = name;
+                selectedElement.dataset.instrument = instrument;
+                selectedElement.style.backgroundColor = instrumentColors[instrument];
+                
+                updatePlayerNames();
+            }
+        }
+
+        function updateRowLayout() {
+            if (selectedElement) {
+                const layout = rowLayoutSelect.value;
+                const row = selectedElement.closest('.row');
+                
+                if (layout !== row.dataset.layout) {
+                    row.dataset.layout = layout;
+                    if (layout === 'arc') {
+                        arrangePlayersInArc(row);
+                    } else {
+                        arrangePlayersInStraightLine(row);
+                    }
+                }
+            }
+        }
+
+        // Modify the click event listener for the stage
+        stage.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('player') && !e.target.classList.contains('conductor')) {
+                if (symmetryMode) {
+                    symmetryMode = false;
+                    centerLine.style.display = 'none';
+                    showNumbers = false;
+                    updatePlayerNames();
+                    highlightCenterPlayers();
+                }
+            }
+        });
+
         // Initialize
         createDefaultLayout();
 
@@ -652,7 +757,11 @@
         // Resize handler
         window.addEventListener('resize', () => {
             document.querySelectorAll('.row').forEach(row => {
-                arrangePlayersInArc(row);
+                if (row.dataset.layout === 'arc') {
+                    arrangePlayersInArc(row);
+                } else {
+                    arrangePlayersInStraightLine(row);
+                }
             });
             const conductor = document.querySelector('.conductor');
             if (conductor) {
@@ -662,3 +771,4 @@
     </script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </body>
+</html>
