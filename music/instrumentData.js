@@ -95,6 +95,7 @@ const studentData = {
     "Stuart Yang": "Bassoon",
     "Mr. Denzel Wright": "Trumpet 1",
     "Tison Wu": "Trumpet 1",
+    "Mr. Jordi Navarrette": "Trumpet 2",
     "Tom Ma": "Trumpet 2",
     "Jojo Da": "Trumpet 2",
     "James Dai": "Trumpet 3",
