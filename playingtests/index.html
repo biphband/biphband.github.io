@@ -422,35 +422,48 @@
 
             for (let category in categories) {
                 categories[category].points = 25;
-            }
+        }
 
-            categoryTables.querySelectorAll('.category-table').forEach(table => {
-                const category = table.className.split(' ')[1];
-                const categoryDiv = document.createElement('div');
-                categoryDiv.className = `category ${category}`;
-                categoryDiv.innerHTML = `
-                    <h2 class="category-title">${categories[category].name}</h2>
-                    <p class="category-points">Points: <span>${categories[category].points}</span>/25</p>
-                `;
+        categoryTables.querySelectorAll('.category-table').forEach(table => {
+        const category = table.className.split(' ')[1];
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = `category ${category}`;
+        categoryDiv.innerHTML = `
+            <h2 class="category-title">${categories[category].name}</h2>
+            <p class="category-points">Points: <span>${categories[category].points}</span>/25</p>
+        `;
 
-                table.querySelectorAll('tr:not(:first-child)').forEach(row => {
-                    const deduction = parseInt(row.querySelector('.deduction').textContent) || 0;
-                    const measures = row.cells[1].querySelector('input').value;
-                    const feedback = row.querySelector('.feedback').value;
+        table.querySelectorAll('tr:not(:first-child)').forEach(row => {
+            const deduction = parseInt(row.querySelector('.deduction').textContent) || 0;
+            const measures = row.cells[1].querySelector('input').value.trim();
+            const feedback = row.querySelector('.feedback').value.trim();
 
-                    categories[category].points -= deduction;
+            categories[category].points -= deduction;
 
-                    if (feedback.trim()) {
-                        const feedbackP = document.createElement('p');
-                        const measuresLabel = /^\d+$/.test(measures.trim()) ? 'Measure:' : 'Measures:';
-                        feedbackP.textContent = `${measures ? `${measuresLabel} ${measures}: ` : ''}${feedback.charAt(0).toUpperCase() + feedback.slice(1)}`;
-                        categoryDiv.appendChild(feedbackP);
+            if (feedback) {
+                const feedbackP = document.createElement('p');
+                let feedbackText = '';
+
+                if (measures) {
+                    if (/^\d+$/.test(measures)) {
+                        feedbackText = `Measure ${measures}: `;
+                    } else if (/^\d+-\d+$/.test(measures)) {
+                        feedbackText = `Measures ${measures}: `;
+                    } else {
+                        // Capitalize the text if it's not a number
+                        feedbackText = `${measures.charAt(0).toUpperCase() + measures.slice(1)}: `;
                     }
-                });
+                }
 
-                categoryDiv.querySelector('.category-points span').textContent = categories[category].points;
-                categoryContainer.appendChild(categoryDiv);
-            });
+                feedbackText += feedback.charAt(0).toUpperCase() + feedback.slice(1);
+                feedbackP.textContent = feedbackText;
+                categoryDiv.appendChild(feedbackP);
+            }
+        });
+
+        categoryDiv.querySelector('.category-points span').textContent = categories[category].points;
+        categoryContainer.appendChild(categoryDiv);
+    });
 
             for (let category in categories) {
                 const bar = document.getElementById(`${category}Bar`);
@@ -584,11 +597,9 @@
         });
 
         function formatDate(date) {
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const year = date.getFullYear();
-            return `${month}/${day}/${year}`;
-        }
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+}
 
         // Initialize with one table per category
         for (let category in categories) {
