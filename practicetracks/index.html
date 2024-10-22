@@ -124,7 +124,7 @@
             });
         }
 
-        document.getElementById('backButton').addEventListener('click', () => {
+        function goBack() {
             if (document.getElementById('songPage').style.display === 'block') {
                 document.getElementById('songPage').style.display = 'none';
                 document.getElementById('songGallery').style.display = 'block';
@@ -136,6 +136,20 @@
                 document.getElementById('songGallery').style.display = 'none';
                 document.getElementById('instrumentSelection').style.display = 'block';
                 document.getElementById('backButton').style.display = 'none';
+            }
+        }
+
+        document.getElementById('backButton').addEventListener('click', goBack);
+
+        // Add event listener for keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            const backButton = document.getElementById('backButton');
+            if (backButton.style.display !== 'none') {
+                // Check for Command+[ (Mac) or Alt+Left Arrow (Windows)
+                if ((event.metaKey && event.key === '[') || (event.altKey && event.key === 'ArrowLeft')) {
+                    event.preventDefault(); // Prevent default browser back action
+                    goBack();
+                }
             }
         });
 
