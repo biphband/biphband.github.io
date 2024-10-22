@@ -41,7 +41,6 @@ const songData = {
         { title: '20. Sally Gets Caught', pdf: 'PDFs/Woodwinds/Flute 1/20. Sally Gets Caught Flute 1,2.pdf', audio: 'mp3s/Woodwinds/Flute 1/Sally Gets Caught-Flute_1,2.mp3' },
         { title: '25. Finale', pdf: 'PDFs/Woodwinds/Flute 1/25. Finale-Flute_1.pdf', audio: 'mp3s/Woodwinds/Flute 1/Finale-Flute_1.mp3' },
     ],
-
     'Flute 2': [
         { title: '1. This is Halloween', pdf: 'PDFs/Woodwinds/Flute 2/1. This is Halloween-Flute_1,_2.pdf', audio: 'mp3s/Woodwinds/Flute 2/This is Halloween-Flute_1,_2.mp3' },
         { title: "4. What's This", pdf: 'PDFs/Woodwinds/Flute 2/4. What\'s This - Flute 2.pdf', audio: 'mp3s/Woodwinds/Flute 2/Whats This-Flute_2.mp3' },
@@ -55,6 +54,19 @@ const songData = {
         { title: '20. Sally Gets Caught', pdf: 'PDFs/Woodwinds/Flute 2/20. Sally Gets Caught Flute 1,2.pdf', audio: 'mp3s/Woodwinds/Flute 2/Sally Gets Caught-Flute_1,2.mp3' },
         { title: '25. Finale', pdf: 'PDFs/Woodwinds/Flute 2/25. Finale-Flute_2.pdf', audio: 'mp3s/Woodwinds/Flute 2/Finale-Flute_2.mp3' },
     ],
+    'Flute 3': [
+    { title: '1. This is Halloween', pdf: 'PDFs/Woodwinds/Flute 3/1. This is Halloween-Oboe_(Opt._Fl._3).pdf', audio: 'mp3s/Woodwinds/Flute 3/This is Halloween-Oboe_(Opt._Fl._3).mp3' },
+    { title: "4. What's This", pdf: 'PDFs/Woodwinds/Flute 3/4. What\'s This-Oboe_(Opt._Fl._3).pdf', audio: 'mp3s/Woodwinds/Flute 3/Whats This-Oboe_(Opt._Fl._3).mp3' },
+    { title: '6. And They Call Him Sandy Claws', pdf: 'PDFs/Woodwinds/Flute 3/6. And They Call Him Sandy Claws-Flute.pdf', audio: 'mp3s/Woodwinds/Flute 3/And They Call Him Sandy Claws-Flute.mp3' },
+    { title: "8. Sally's Song", pdf: 'PDFs/Woodwinds/Flute 3/8. Sally\'s Song-Oboe_(Opt._Fl._3).pdf', audio: 'mp3s/Woodwinds/Flute 3/Sally\'s Song-Oboe_(Opt._Fl._3).mp3' },
+    { title: '10. Pay the Price', pdf: 'PDFs/Woodwinds/Flute 3/10. Pay the Price Transition-Flute_1,2.pdf', audio: 'mp3s/Woodwinds/Flute 3/Pay the Price-Flute_1,2.mp3' },
+    { title: '11. Kidnap The Sandy Claws', pdf: 'PDFs/Woodwinds/Flute 3/11. Kidnap The Sandy Claws-Oboe.pdf', audio: 'mp3s/Woodwinds/Flute 3/Kidnap The Sandy Claws-Oboe.mp3' },
+    { title: '16. Oogie Boogie', pdf: 'PDFs/Woodwinds/Flute 3/16. Oogie Boogies Song-Oboe.pdf', audio: 'mp3s/Woodwinds/Flute 3/Oogie Boogies Song-Oboe.mp3' },
+    { title: '18. Christmas Eve Montage', pdf: 'PDFs/Woodwinds/Flute 3/18. Christmas Eve Montage-Oboe_(Opt._Fl._3).pdf', audio: 'mp3s/Woodwinds/Flute 3/Christmas Eve Montage-Oboe_(Opt._Fl._3).mp3' },
+    { title: '19. Sally Sneaks', pdf: 'PDFs/Woodwinds/Flute 3/19. Sally Sneaks Transition-Flute_1,2.pdf', audio: 'mp3s/Woodwinds/Flute 3/Sally Sneaks Transition-Flute_1,2.mp3' },
+    { title: '20. Sally Gets Caught', pdf: 'PDFs/Woodwinds/Flute 3/20. Sally Gets Caught Flute 1,2.pdf', audio: 'mp3s/Woodwinds/Flute 3/Sally Gets Caught-Flute_1,2.mp3' },
+    { title: '25. Finale', pdf: 'PDFs/Woodwinds/Flute 3/25. Finale-Oboe.pdf', audio: 'mp3s/Woodwinds/Flute 3/Finale-Oboe.mp3' },
+],
     'Saxophone 2': [
         { title: '1. This is Halloween', pdf: 'PDFs/Woodwinds/Alto Sax 2/1. This is Halloween - Alto Saxophone 2.pdf', audio: 'mp3s/Woodwinds/Alto Sax 2/This is Halloween-Alto_Saxophone_2.mp3' },
         { title: "4. What's This", pdf: 'PDFs/Woodwinds/Alto Sax 2/4. What\'s This - Alto Saxophone 2.pdf', audio: 'mp3s/Woodwinds/Alto Sax 2/Whats This-Alto_Saxophone_2.mp3' },
