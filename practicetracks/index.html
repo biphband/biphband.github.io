@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Practice Website - F Horn 4</title>
+    <script src="https://unpkg.com/wavesurfer.js@6.6.3/dist/wavesurfer.min.js"></script>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(rgba(32, 32, 32, 0.98), rgba(0, 0, 0, 0.95)), 
+                url('images/The Pumpkin King Poster no text.png') no-repeat top center/cover fixed;
+    color: #ffffff;
+    min-height: 100vh;
+}
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .instrument-group {
+            margin-bottom: 30px;
+        }
+        .instrument-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .instrument-button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .instrument-button:hover {
+            background-color: #45a049;
+        }
+        .song-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .song-item {
+            width: 200px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .song-thumbnail {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            background-color: #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #fff;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .waveform-container {
+            width: 100%;
+            height: 200px;
+            background-color: transparent;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .pdf-viewer {
+            width: 100%;
+            height: 800px;
+            border: none;
+        }
+        #backButton, #playPauseButton {
+            position: fixed;
+            top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        #backButton {
+            left: 20px;
+        }
+        #playPauseButton {
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button id="backButton" style="display: none;">Back</button>
+        <button id="playPauseButton" style="display: none;">Play</button>
+        <div id="instrumentSelection">
+            <h1>Select Your Instrument</h1>
+            <div id="instrumentGroups"></div>
+        </div>
+        <div id="songGallery" style="display: none;">
+            <h2>Select a Song</h2>
+            <div class="song-gallery" id="songList"></div>
+        </div>
+        <div id="songPage" style="display: none;">
+            <div id="waveform"></div>
+            <iframe class="pdf-viewer" id="pdfViewer"></iframe>
+        </div>
+    </div>
+
+    <script>
+        const instrumentData = {
+            'Brass': ['F Horn 4'],
+        };
+
+        const songData = [
+            { title: '1. This is Halloween', pdf: 'PDFs/Brass/F Horn 4/1. This is Halloween-Horn_in_F_3,_4.pdf', audio: 'mp3s/individual/Brass/F Horn 4/1. This is Halloween-Horn_in_F_3,_4.mp3' },
+            { title: "4. What's This", pdf: 'PDFs/Brass/F Horn 4/4. What\'s This Horn in F 3, 4.pdf', audio: 'mp3s/individual/Brass/F Horn 4/4. What\'s This Horn in F 3, 4.mp3' },
+            { title: '6. And They Call Him Sandy Claws', pdf: 'PDFs/Brass/F Horn 4/6. And They Call Him Sandy Claws - F Horn.pdf', audio: 'mp3s/individual/Brass/F Horn 4/6. And They Call Him Sandy Claws - F Horn.mp3' },
+            { title: "8. Sally's Song", pdf: 'PDFs/Brass/F Horn 4/8. Sally\'s Song-Horn_in_F_3,_4.pdf', audio: 'mp3s/individual/Brass/F Horn 4/8. Sally\'s Song-Horn_in_F_3,_4.mp3' },
+            { title: '11. Kidnap The Sandy Claws', pdf: 'PDFs/Brass/F Horn 4/11. Kidnap The Sandy Claws-Horn_in_F.pdf', audio: 'mp3s/individual/Brass/F Horn 4/11. Kidnap The Sandy Claws-Horn_in_F.mp3' },
+            { title: '18. Christmas Eve Montage', pdf: 'PDFs/Brass/F Horn 4/18. Christmas Eve Montage-Horn_in_F_3,_4.pdf', audio: 'mp3s/individual/Brass/F Horn 4/18. Christmas Eve Montage-Horn_in_F_3,_4.mp3' },
+            { title: '20. Sally Gets Caught', pdf: 'PDFs/Brass/F Horn 4/20. Sally Gets Caught F Horn.pdf', audio: 'mp3s/individual/Brass/F Horn 4/20. Sally Gets Caught F Horn.mp3' },
+            { title: '25. Finale', pdf: 'PDFs/Brass/F Horn 4/25. Finale-Horn_in_F_3.4.pdf', audio: 'mp3s/individual/Brass/F Horn 4/25. Finale-Horn_in_F_3.4.mp3' },
+        ];
+
+        let selectedInstrument = '';
+        let wavesurfer;
+
+        function createInstrumentButtons() {
+            const container = document.getElementById('instrumentGroups');
+            for (const [group, instruments] of Object.entries(instrumentData)) {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'instrument-group';
+                groupDiv.innerHTML = `<h2>${group}</h2>`;
+                const listDiv = document.createElement('div');
+                listDiv.className = 'instrument-list';
+                instruments.forEach(instrument => {
+                    const button = document.createElement('button');
+                    button.className = 'instrument-button';
+                    button.textContent = instrument;
+                    button.onclick = () => selectInstrument(instrument);
+                    listDiv.appendChild(button);
+                });
+                groupDiv.appendChild(listDiv);
+                container.appendChild(groupDiv);
+            }
+        }
+
+        function selectInstrument(instrument) {
+            selectedInstrument = instrument;
+            document.getElementById('instrumentSelection').style.display = 'none';
+            document.getElementById('songGallery').style.display = 'block';
+            document.getElementById('backButton').style.display = 'block';
+            createSongGallery();
+        }
+
+        function createSongGallery() {
+            const container = document.getElementById('songList');
+            container.innerHTML = '';
+            songData.forEach(song => {
+                const songDiv = document.createElement('div');
+                songDiv.className = 'song-item';
+                songDiv.innerHTML = `
+                    <div class="song-thumbnail">${song.title}</div>
+                `;
+                songDiv.onclick = () => selectSong(song);
+                container.appendChild(songDiv);
+            });
+        }
+
+        function selectSong(song) {
+            document.getElementById('songGallery').style.display = 'none';
+            document.getElementById('songPage').style.display = 'block';
+            document.getElementById('pdfViewer').src = song.pdf;
+            document.getElementById('playPauseButton').style.display = 'block';
+            initializeWavesurfer(song.audio);
+        }
+
+        function initializeWavesurfer(audioSrc) {
+            if (wavesurfer) {
+                wavesurfer.destroy();
+            }
+
+            wavesurfer = WaveSurfer.create({
+                container: '#waveform',
+                waveColor: 'rgba(0, 255, 255, 0.3)',
+                progressColor: 'rgba(0, 255, 255, 0.8)',
+                responsive: true,
+                height: 200,
+                backgroundColor: 'transparent',
+                barWidth: 2,
+                barRadius: 3,
+                cursorColor: '#fff',
+                cursorWidth: 2,
+            });
+
+            wavesurfer.load(audioSrc);
+
+            wavesurfer.on('ready', function () {
+                document.getElementById('playPauseButton').onclick = function() {
+                    wavesurfer.playPause();
+                    this.textContent = wavesurfer.isPlaying() ? 'Pause' : 'Play';
+                };
+            });
+
+            wavesurfer.on('finish', function () {
+                document.getElementById('playPauseButton').textContent = 'Play';
+            });
+        }
+
+        document.getElementById('backButton').addEventListener('click', () => {
+            if (document.getElementById('songPage').style.display === 'block') {
+                document.getElementById('songPage').style.display = 'none';
+                document.getElementById('songGallery').style.display = 'block';
+                document.getElementById('playPauseButton').style.display = 'none';
+                if (wavesurfer) {
+                    wavesurfer.destroy();
+                }
+            } else if (document.getElementById('songGallery').style.display === 'block') {
+                document.getElementById('songGallery').style.display = 'none';
+                document.getElementById('instrumentSelection').style.display = 'block';
+                document.getElementById('backButton').style.display = 'none';
+            }
+        });
+
+        createInstrumentButtons();
+    </script>
+</body>
+</html>

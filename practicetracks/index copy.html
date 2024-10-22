@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIPH Halloween Music Practice Tracks</title>
+    <link rel="icon" href="images/jack.png">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background: #000 url('images/The Pumpkin King Poster no text.png') no-repeat top center/cover fixed;
+        }
+        #landing, #player {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: transform 0.3s ease-in-out;
+        }
+        #landing {
+            background-color: rgba(240, 240, 240, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #player {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        #player.active { transform: translateX(0); }
+        #hamburger {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f9f9f9;
+            min-width: 200px;
+            max-width: 80vw;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-height: 0;
+            overflow-y: auto;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            opacity: 0;
+            scrollbar-width: thin;
+            scrollbar-color: #888 #f1f1f1;
+        }
+        .dropdown-content::-webkit-scrollbar {
+            width: 10px;
+        }
+        .dropdown-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .dropdown-content::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+        .dropdown-content button {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+        .dropdown-content button:hover {
+            background-color: #f1f1f1;
+        }
+        .show {
+            max-height: 80vh;
+            opacity: 1;
+            transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
+        }
+        @media (min-height: 600px) { .show { max-height: 500px; } }
+        @media (min-height: 800px) { .show { max-height: 700px; } }
+        #select-part {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #search-container { margin-bottom: 20px; }
+        #search-input {
+            padding: 10px;
+            font-size: 16px;
+            width: 300px;
+            max-width: 80vw;
+        }
+        #search-results {
+            position: absolute;
+            background-color: white;
+            width: 300px;
+            max-width: 80vw;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1001;
+        }
+        #search-results div {
+            padding: 10px;
+            cursor: pointer;
+        }
+        #search-results div:hover { background-color: #f1f1f1; }
+        #search-results .selected { background-color: #e0e0e0; }
+        #or-divider {
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        #audio-player {
+            margin-top: 100px;
+            width: 100%;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0);
+            max-width: 500px;
+            margin-bottom: 20px;
+            box-shadow: 0px 8px 8px 10px rgba(0,0,0,0.1);
+        }
+        #playlist {
+            width: 100%;
+            max-width: 500px;
+            background-color: rgb(242, 242, 242);
+            border-radius: 5px;
+            padding: 10px;
+            max-height: calc(100% - 150px);
+            overflow-y: auto;
+            box-shadow: 0px 8px 8px 10px rgba(0,0,0,0.1);
+        }
+        .playlist-item {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .playlist-item:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        .playlist-item.active {
+            background-color: rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="landing">
+        <h1>Enter your name</h1>
+        <div id="search-container">
+            <input type="text" id="search-input" placeholder="Type your name...">
+            <div id="search-results"></div>
+        </div>
+        <div id="or-divider">OR</div>
+        <h2>Select your part</h2>
+        <div class="dropdown">
+            <button id="select-part">Select your part</button>
+            <div id="instrument-families" class="dropdown-content"></div>
+        </div>
+        <div id="instruments" class="dropdown-content"></div>
+    </div>
+    <div id="player">
+        <div id="hamburger">⇦</div>
+        <h2 id="instrument-title"></h2>
+        <audio id="audio-player" controls></audio>
+        <div id="playlist"></div>
+    </div>
+
+    <script src="instrumentData.js"></script> 
+    <script>
+        const landing = document.getElementById('landing');
+        const player = document.getElementById('player');
+        const selectPart = document.getElementById('select-part');
+        const instrumentFamilies = document.getElementById('instrument-families');
+        const instruments = document.getElementById('instruments');
+        const hamburger = document.getElementById('hamburger');
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+        const audioPlayer = document.getElementById('audio-player');
+        const playlist = document.getElementById('playlist');
+        const instrumentTitle = document.getElementById('instrument-title');
+
+        let currentInstrument = '';
+        let selectedIndex = -1;
+
+        const practiceTracks = [
+            "This Is Halloween",
+            "Jack's Lament",
+            "What's This?",
+            "Town Meeting Song",
+            "Jack's Obsession",
+            "Kidnap the Sandy Claws",
+            "Making Christmas",
+            "Oogie Boogie's Song",
+            "Sally's Song",
+            "Poor Jack",
+            "The Finale",
+            "Overture"
+        ];
+
+        function updateSearchResults() {
+            const query = searchInput.value.toLowerCase();
+            const matchingStudents = Object.keys(studentData).filter(student => 
+                student.toLowerCase().includes(query)
+            );
+
+            searchResults.innerHTML = '';
+            selectedIndex = -1;
+
+            matchingStudents.forEach((student, index) => {
+                const result = document.createElement('div');
+                result.textContent = student;
+                result.onclick = () => selectStudent(student);
+                searchResults.appendChild(result);
+            });
+
+            searchResults.style.display = matchingStudents.length > 0 ? 'block' : 'none';
+        }
+
+        function handleSearchBoxKeys(event) {
+            const results = Array.from(searchResults.children);
+
+            switch (event.key) {
+                case 'ArrowUp':
+                    event.preventDefault();
+                    selectedIndex = Math.max(0, selectedIndex - 1);
+                    updateSelectedResult();
+                    break;
+                case 'ArrowDown':
+                    event.preventDefault();
+                    selectedIndex = Math.min(results.length - 1, selectedIndex + 1);
+                    updateSelectedResult();
+                    break;
+                case 'Enter':
+                    if (selectedIndex >= 0 && selectedIndex < results.length) {
+                        selectStudent(results[selectedIndex].textContent);
+                    }
+                    break;
+            }
+        }
+
+        function updateSelectedResult() {
+            Array.from(searchResults.children).forEach((result, index) => {
+                result.className = index === selectedIndex ? 'selected' : '';
+            });
+        }
+
+        function selectStudent(studentName) {
+            const instrument = studentData[studentName];
+            if (instrument) {
+                selectInstrument(instrument);
+                searchInput.value = '';
+                searchResults.style.display = 'none';
+            }
+        }
+
+        function showInstruments(family) {
+            instruments.innerHTML = '';
+            instrumentData[family].forEach(instrument => {
+                const button = document.createElement('button');
+                button.textContent = instrument;
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    selectInstrument(instrument);
+                };
+                instruments.appendChild(button);
+            });
+            instrumentFamilies.classList.remove('show');
+            instruments.classList.add('show');
+        }
+
+        function selectInstrument(instrument) {
+            selectPart.textContent = instrument;
+            instruments.classList.remove('show');
+            currentInstrument = instrument;
+            instrumentTitle.textContent = instrument + " Practice Tracks";
+            player.classList.add('active');
+            loadPlaylist();
+        }
+
+        function loadPlaylist() {
+            playlist.innerHTML = '';
+            practiceTracks.forEach((track, index) => {
+                const item = document.createElement('div');
+                item.className = 'playlist-item';
+                item.textContent = track;
+                item.onclick = () => playTrack(index);
+                playlist.appendChild(item);
+            });
+        }
+
+        function playTrack(index) {
+            const track = practiceTracks[index];
+            audioPlayer.src = `audio/${currentInstrument}/${track}.mp3`;
+            audioPlayer.play();
+            updateActiveTrack(index);
+        }
+
+        function updateActiveTrack(index) {
+            const items = playlist.getElementsByClassName('playlist-item');
+            for (let i = 0; i < items.length; i++) {
+                items[i].classList.toggle('active', i === index);
+            }
+        }
+
+        function populateInstrumentFamilies() {
+            for (let family in instrumentData) {
+                const button = document.createElement('button');
+                button.textContent = family;
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    showInstruments(family);
+                };
+                instrumentFamilies.appendChild(button);
+            }
+        }
+
+        selectPart.onclick = (e) => {
+            e.stopPropagation();
+            instrumentFamilies.classList.toggle('show');
+            instruments.classList.remove('show');
+        };
+
+        document.addEventListener('click', () => {
+            instrumentFamilies.classList.remove('show');
+            instruments.classList.remove('show');
+        });
+
+        hamburger.addEventListener('click', () => {
+            player.classList.remove('active');
+            selectPart.textContent = 'Select your part';
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                player.classList.remove('active');
+                selectPart.textContent = 'Select your part';
+                audioPlayer.pause();
+                audioPlayer.currentTime = 0;
+            }
+        });
+
+        searchInput.addEventListener('input', updateSearchResults);
+        searchInput.addEventListener('keydown', handleSearchBoxKeys);
+
+        populateInstrumentFamilies();
+    </script>
+</body>
+</html>
