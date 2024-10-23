@@ -25,6 +25,11 @@ const instrumentData = {
              'Baritone'
         ]
     },
+    'Strings': {
+        'String Bass': [
+            'String Bass 2'
+        ]
+    }
 };
 
 const songData = {
@@ -172,4 +177,17 @@ const songData = {
         { title: '20. Sally Gets Caught', pdf: 'PDFs/Brass/Baritone/20. Sally Gets Caught-Baritone.pdf', audio: 'mp3s/Brass/Baritone/Sally Gets Caught-Baritone.mp3' },
         { title: '25. Finale', pdf: 'PDFs/Brass/Baritone/25. Finale-Euphonium.pdf', audio: 'mp3s/Brass/Baritone/Finale-Euphonium.mp3' },
     ],
+    'String Bass 2': [
+    { title: '1. This is Halloween', pdf: 'PDFs/Strings/String Bass 2/1. This is Halloween - String Bass 2.pdf', audio: 'mp3s/Strings/String Bass 2/This is Halloween-String_Bass_2.mp3' },
+    { title: "4. What's This", pdf: 'PDFs/Strings/String Bass 2/4. What\'s This - String Bass 2.pdf', audio: 'mp3s/Strings/String Bass 2/Whats This-String_Bass_2.mp3' },
+    { title: '6. And They Call Him Sandy Claws', pdf: 'PDFs/Strings/String Bass 2/6. And They Call Him Sandy Claws-Contrabass.pdf', audio: 'mp3s/Strings/String Bass 2/And They Call Him Sandy Claws-Contrabass.mp3' },
+    { title: "8. Sally's Song", pdf: 'PDFs/Strings/String Bass 2/8. Sally\'s Song Contrabass.pdf', audio: 'mp3s/Strings/String Bass 2/Sally\'s Song-Contrabass.mp3' },
+    { title: '10. Pay the Price', pdf: 'PDFs/Strings/String Bass 2/10. Pay the Price Transition-Contrabass.pdf', audio: 'mp3s/Strings/String Bass 2/Pay the Price-Contrabass.mp3' },
+    { title: '11. Kidnap The Sandy Claws', pdf: 'PDFs/Strings/String Bass 2/11. Kidnap The Sandy Claws-Double_Bass.pdf', audio: 'mp3s/Strings/String Bass 2/Kidnap The Sandy Claws-Double_Bass.mp3' },
+    { title: '15. Kidnap the Sandy Claws Strings', pdf: 'PDFs/Strings/String Bass 2/15. Kidnap the Sandy Claws Strings - Double Bass.pdf', audio: 'mp3s/Strings/String Bass 2/Kidnap The Sandy Claws Strings-Double_Bass.mp3' },
+    { title: '16. Oogie Boogie', pdf: 'PDFs/Strings/String Bass 2/16. Oogie Boogie - Bass, Simplified.pdf', audio: 'mp3s/Strings/String Bass 2/Oogie Boogies Song-Bass,_Simplified.mp3' },
+    { title: '18. Christmas Eve Montage', pdf: 'PDFs/Strings/String Bass 2/18. Christmas Eve - String Bass.pdf', audio: 'mp3s/Strings/String Bass 2/Christmas Eve Montage-String_Bass.mp3' },
+    { title: '20. Sally Gets Caught', pdf: 'PDFs/Strings/String Bass 2/20. Sally Gets Caught-Contrabass.pdf', audio: 'mp3s/Strings/String Bass 2/Sally Gets Caught-Contrabass.mp3' },
+    { title: '25. Finale', pdf: 'PDFs/Strings/String Bass 2/25. Finale-Acoustic_Bass.pdf', audio: 'mp3s/Strings/String Bass 2/Finale-String_Bass_2.mp3' },
+],
 };
