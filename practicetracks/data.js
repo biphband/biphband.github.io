@@ -26,9 +26,13 @@ const instrumentData = {
         ]
     },
     'Strings': {
-        'String Bass': [
+        'Violins': [
+            'Violin 2'
+        ],
+        'String Bass2': [
             'String Bass 2'
         ]
+
     }
 };
 
@@ -176,6 +180,18 @@ const songData = {
         { title: '18. Christmas Eve Montage', pdf: 'PDFs/Brass/Baritone/18. Christmas Eve Montage-Euphonium.pdf', audio: 'mp3s/Brass/Baritone/Christmas Eve Montage-Euphonium.mp3' },
         { title: '20. Sally Gets Caught', pdf: 'PDFs/Brass/Baritone/20. Sally Gets Caught-Baritone.pdf', audio: 'mp3s/Brass/Baritone/Sally Gets Caught-Baritone.mp3' },
         { title: '25. Finale', pdf: 'PDFs/Brass/Baritone/25. Finale-Euphonium.pdf', audio: 'mp3s/Brass/Baritone/Finale-Euphonium.mp3' },
+    ],
+    'Violin 2': [
+        { title: '1. This is Halloween', pdf: 'PDFs/Strings/Violin 2/1. This is Halloween-Violin_2.pdf', audio: 'mp3s/Strings/Violin 2/This is Halloween-Violin_2_new.mp3' },
+        { title: "4. What's This", pdf: 'PDFs/Strings/Violin 2/4. What\'s This-Violin_2_new.pdf', audio: 'mp3s/Strings/Violin 2/Whats This-Violin_2_new.mp3' },
+        { title: '6. And They Call Him Sandy Claws', pdf: 'PDFs/Strings/Violin 2/6. And They Call Him Sandy Claws - Violin 2.pdf', audio: 'mp3s/Strings/Violin 2/And They Call Him Sandy Claws-Violin_2.mp3' },
+        { title: "8. Sally's Song", pdf: 'PDFs/Strings/Violin 2/8. Sally\'s Song Violin 2.pdf', audio: 'mp3s/Strings/Violin 2/Sally\'s Song-Violin_2.mp3' },
+        { title: '11. Kidnap The Sandy Claws', pdf: 'PDFs/Strings/Violin 2/11. Kidnap The Sandy Claws-Violin_2.pdf', audio: 'mp3s/Strings/Violin 2/Kidnap The Sandy Claws-Violin_2.mp3' },
+        { title: '15. Kidnap The Sandy Claws Strings', pdf: 'PDFs/Strings/Violin 2/15. Kidnap The Sandy Claws Strings Reprise Violin_2.pdf', audio: 'mp3s/Strings/Violin 2/Kidnap The Sandy Claws Strings v2-Violin_2.mp3' },
+        { title: '16. Oogie Boogie', pdf: 'PDFs/Strings/Violin 2/16. Oogie Boogies Song-Violin_2.pdf', audio: 'mp3s/Strings/Violin 2/Oogie Boogies Song-Violin_2.mp3' },
+        { title: '18. Christmas Eve Montage', pdf: 'PDFs/Strings/Violin 2/18. Christmas Eve - Violin 2.pdf', audio: 'mp3s/Strings/Violin 2/Christmas Eve Montage-Violin_2.mp3' },
+        { title: '20. Sally Gets Caught', pdf: 'PDFs/Strings/Violin 2/20. Sally Gets Caught-Violin_2.pdf', audio: 'mp3s/Strings/Violin 2/Sally Gets Caught-Violin_2.mp3' },
+        { title: '25. Finale', pdf: 'PDFs/Strings/Violin 2/25. Finale - Violin 2.pdf', audio: 'mp3s/Strings/Violin 2/Finale-Violin_2.mp3' },
     ],
     'String Bass 2': [
     { title: '1. This is Halloween', pdf: 'PDFs/Strings/String Bass 2/1. This is Halloween - String Bass 2.pdf', audio: 'mp3s/Strings/String Bass 2/This is Halloween-String_Bass_2.mp3' },
