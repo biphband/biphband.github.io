@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Pumpkin King</title>
     <link rel="icon" href="images/jack.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
        body {
             font-family: 'Courier New', Courier, monospace;
@@ -139,21 +140,74 @@
             background-color: #f0f0f0; /* Light gray background on hover */
             transition: background-color 0.3s;
         }
-        /* PDF Viewer Styles */
-        .pdf-viewer {
-        width: 100%;
-        height: 90vh; /* Makes it 90% of viewport height */
-        margin: 20px 0;
+
+        .pdf-container {
+        width: 100vw; /* Full viewport width */
+        margin: 20px auto; /* Center horizontally with auto margins */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%); /* Center the container */
     }
 
-    @media screen and (max-width: 768px) {
-        .pdf-viewer {
-            height: 80vh; /* Slightly smaller on mobile */
-        }
+    .pdf-page {
+        width: 100%;
+        margin: 10px 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        display: flex;
+        justify-content: center;
+    }
+
+    .pdf-canvas {
+        width: 100vw; /* Full viewport width */
+        height: auto; /* Maintain aspect ratio */
+        max-width: none;
     }
 
     </style>
         <script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+async function renderPDF(url, containerId) {
+    try {
+        const loadingTask = pdfjsLib.getDocument(url);
+        const pdf = await loadingTask.promise;
+        const container = document.getElementById(containerId);
+        container.innerHTML = ''; // Clear existing content
+
+        // Render each page
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 1.5 });
+
+            const pageContainer = document.createElement('div');
+            pageContainer.className = 'pdf-page';
+
+            const canvas = document.createElement('canvas');
+            canvas.className = 'pdf-canvas';
+            const context = canvas.getContext('2d');
+
+            // Set canvas dimensions
+            const scale = container.clientWidth / viewport.width;
+            const scaledViewport = page.getViewport({ scale: scale });
+            canvas.width = scaledViewport.width;
+            canvas.height = scaledViewport.height;
+
+            pageContainer.appendChild(canvas);
+            container.appendChild(pageContainer);
+
+            // Render PDF page
+            await page.render({
+                canvasContext: context,
+                viewport: scaledViewport
+            }).promise;
+        }
+    } catch (error) {
+        console.error('Error rendering PDF:', error);
+    }
+}
 
 window.onload = function() {
     const hamburgerBtn = document.querySelector('.hamburger-btn');
@@ -357,17 +411,17 @@ window.onload = function() {
     
 
     function updatePDFs(part) {
-        const pdfViewers = document.querySelectorAll('.pdf-viewer');
-        pdfViewers.forEach((viewer, index) => {
-            if (part === 'none') {
-                viewer.src = 'select-part.pdf';
-            } else {
-                const [section, instrument] = part.split('/');
-                const songNumber = index + 1;
-                viewer.src = `PDFs/${section}/${instrument}/Song ${songNumber}.pdf`;
+                const pdfContainers = document.querySelectorAll('.pdf-container');
+                pdfContainers.forEach((container, index) => {
+                    if (part === 'none') {
+                        renderPDF('select-part.pdf', container.id);
+                    } else {
+                        const [section, instrument] = part.split('/');
+                        const songNumber = index + 1;
+                        renderPDF(`PDFs/${section}/${instrument}/Song ${songNumber}.pdf`, container.id);
+                    }
+                });
             }
-        });
-    }
 };
 
         </script>
@@ -441,8 +495,7 @@ window.onload = function() {
     
         <div class="menu-item main-menu-item">Conductor Scores</div>
         <div class="submenu">
-            <div>Full Conductor Score</div>
-            <div>Strings Only</div>
+            <div class="part-select" data-part="Conductor/">Full Conductor Score</div>
         </div>
     </div>
 
@@ -460,7 +513,7 @@ window.onload = function() {
 
             <!-- SONG -->
             <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 1 - This is Halloween</label>
-            <iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+            <div id="pdf-container-1" class="pdf-container"></div>
 
         <p class="action">(The celebrations conclude and the people of Halloween Town discuss the success of the celebrations.)</p>
         <p class="character">Big Witch:</p>
@@ -491,7 +544,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 2 - Year After Year</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-2" class="pdf-container"></div>
 
     </div>
     
@@ -509,7 +562,7 @@ window.onload = function() {
 
     <!-- SONG -->
     <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 3 - Oh Fare Thee Well</label>
-    <iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+    <div id="pdf-container-3" class="pdf-container"></div>
 
     </div>
     
@@ -562,7 +615,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 4 - What's this?</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-4" class="pdf-container"></div>
 
 <!-- SFX -->
 <label style="font-size: small; background-color: rgb(39, 135, 69); color: white; padding: 10px; margin-bottom: 100px;">SFX 3 - Banging head on pole</label>
@@ -573,7 +626,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 5 - Year After Year Reprise</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-5" class="pdf-container"></div>
 
 
     </div>
@@ -670,14 +723,14 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 6 - And they call him...</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-6" class="pdf-container"></div>
 
         <p class="dialogue">And they call him 'Sandy Claws'.</p>
         <p class="action">(Jack cackles he crowd applauses and cackles with him)</p>
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 7 - Sally's song intro</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-7" class="pdf-container"></div>
 
 
     </div>
@@ -715,7 +768,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 8 - Sally's Song</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-8" class="pdf-container"></div>
 
 
         <p class="dialogue">He loves me, he loves not, he loves me, he loves me not, he-</p>
@@ -725,7 +778,7 @@ window.onload = function() {
 
 <!-- SONG 5 -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 9 - Sally’s Vision</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-9" class="pdf-container"></div>
 
 
         <p class="action">(She stops as suddenly, the flower transforms into a beautiful Christmas tree set with decorations. Suddenly, the Christmas tree catches fire and burns to a crisp.)</p>
@@ -736,7 +789,7 @@ window.onload = function() {
         
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 10 - Pay the price</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-10" class="pdf-container"></div>
 
     </div>
 
@@ -846,7 +899,7 @@ window.onload = function() {
  
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 11 - Kidnap the Sandy Claws</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-11" class="pdf-container"></div>
 
 
         <p class="action">(Scene ends with the trio walking off with weapons and a great big Halloween bag)</p>
@@ -854,7 +907,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 12 - Jack's Lament</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-12" class="pdf-container"></div>
 
     </div>
 
@@ -941,7 +994,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 13 - Elves</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-13" class="pdf-container"></div>
     </div>
     
     
@@ -971,7 +1024,7 @@ window.onload = function() {
         
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 14 - Jack’s Lament Reprise</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-14" class="pdf-container"></div>
 
     </div>
     
@@ -1027,7 +1080,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 15 - Kidnap Sandy Claws (Strings)</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-15" class="pdf-container"></div>
 
 
     </div>
@@ -1062,7 +1115,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 16 - Oogie Boogie</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-16" class="pdf-container"></div>
         
         <p class="action">(The song concludes and the Trio start laughing intensely)</p>
         
@@ -1071,7 +1124,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 17 - Oh Fare Thee Well Reprise</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-17" class="pdf-container"></div>
 
     </div>
 
@@ -1106,7 +1159,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 18 - Christmas Eve</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-18" class="pdf-container"></div>
 
             </div>
     
@@ -1139,7 +1192,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 19 - Sally Sneaks</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-19" class="pdf-container"></div>
         
         <p class="character">Sally:</p>
         <p class="dialogue">Let’s get you out of here, quickly!</p>
@@ -1152,7 +1205,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 20 - Sally Gets Caught</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-20" class="pdf-container"></div>
 
         
         <p class="character">Sally:</p>
@@ -1165,7 +1218,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 21 - Spooktacular Fun</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-21" class="pdf-container"></div>
 
     
     <div class="scene">
@@ -1182,7 +1235,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 22 - Christmas Eve Reprise</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-22" class="pdf-container"></div>
 
 
     </div>
@@ -1239,7 +1292,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 23 - Sally's Song Reprise</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-23" class="pdf-container"></div>
 
 
         <p class="character">Jack:</p>
@@ -1262,7 +1315,7 @@ window.onload = function() {
 
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 24 - Halloween Transition</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-24" class="pdf-container"></div>
 
 </div>
     
@@ -1272,7 +1325,7 @@ window.onload = function() {
         
 <!-- SONG -->
 <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 25 - Halloween Finale</label>
-<iframe class="pdf-viewer" src="select-part.pdf"></iframe>
+<div id="pdf-container-25" class="pdf-container"></div>
         
         <p class="character">Small Witch:</p>
         <p class="dialogue">Jack?</p>
