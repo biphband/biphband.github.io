@@ -308,7 +308,7 @@
         }
 
         .song-list li {
-            padding: 10px;
+            padding-left: 20px;
             margin: 5px 0;
             background-color: #dfdfdf;
             border-radius: 5px;
@@ -329,23 +329,17 @@
             border-color: #515151;
             background-color: #ffffffb8;
             color: rgb(187, 187, 187);
-            padding: 10px 20px;
+            padding: 5px 15px;
             border-radius: 5px;
-            cursor: pointer;
             display: none;
             transition: background-color 0.3s;
+            z-index: 2000;
         }
         .scroll-top:hover {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
             border: none;
             background-color: #bababa;
             color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
             cursor: pointer;
-            display: none;
         }
 
         /* Add padding to the top to account for fixed navigation */
@@ -944,41 +938,51 @@ document.addEventListener('DOMContentLoaded', function() {
             const pdfNumber = this.getAttribute('data-pdf');
             const pdfElement = document.getElementById(`pdf-container-${pdfNumber}`);
             if (pdfElement) {
-                pdfElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                pdfElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
     });
 
     // Double tap to scroll to nav container
-    let lastTap = 0;
-    document.addEventListener('touchend', function(event) {
-        const currentTime = new Date().getTime();
-        const tapLength = currentTime - lastTap;
-        if (tapLength < 500 && tapLength > 0) {
-            const navContainer = document.querySelector('.nav-container');
-            if (navContainer) {
-                navContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        lastTap = currentTime;
-    });
-
-    // Show/hide scroll to nav button
-    const scrollTopButton = document.querySelector('.scroll-top');
-    window.addEventListener('scroll', function() {
-        if (window.pageYOffset > 300) {
-            scrollTopButton.style.display = 'block';
-        } else {
-            scrollTopButton.style.display = 'none';
-        }
-    });
-
-    scrollTopButton.addEventListener('click', function() {
+let lastTap = 0;
+document.addEventListener('touchend', function(event) {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+    if (tapLength < 500 && tapLength > 0) {
         const navContainer = document.querySelector('.nav-container');
         if (navContainer) {
-            navContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const navRect = navContainer.getBoundingClientRect();
+            const offset = navRect.top + window.pageYOffset - 50; // 50px above the nav
+            window.scrollTo({
+                top: offset,
+                behavior: 'smooth'
+            });
         }
-    });
+    }
+    lastTap = currentTime;
+});
+
+// Show/hide scroll to nav button
+const scrollTopButton = document.querySelector('.scroll-top');
+window.addEventListener('scroll', function() {
+    if (window.pageYOffset > 1000) {
+        scrollTopButton.style.display = 'block';
+    } else {
+        scrollTopButton.style.display = 'none';
+    }
+});
+
+scrollTopButton.addEventListener('click', function() {
+    const navContainer = document.querySelector('.nav-container');
+    if (navContainer) {
+        const navRect = navContainer.getBoundingClientRect();
+        const offset = navRect.top + window.pageYOffset - 50; // 50px above the nav
+        window.scrollTo({
+            top: offset,
+            behavior: 'smooth'
+        });
+    }
+});
 });
         </script>
 </head>
