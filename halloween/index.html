@@ -138,8 +138,12 @@
             display: block;
         }
         .menu-item {
-            padding: 15px;
+            padding: 5px;
+            padding-left: 15px;
             cursor: pointer;
+            border: solid;
+            border-color: #9090907a;
+            background-color: #f5f2f2;
         }
         .menu-item:hover {
             background-color: #f0f0f0;
@@ -185,7 +189,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background: linear-gradient(to bottom, rgb(201, 227, 240), rgba(5, 38, 82, 0.7));
     z-index: 990;
     overflow: auto;
 }
@@ -214,7 +218,7 @@
     position: fixed;
     top: 5px;
     right: 15px;
-    color: white;
+    color: black;
     font-size: 30px;
     font-weight: bold;
     cursor: pointer;
@@ -292,86 +296,98 @@
         this.container = document.getElementById(containerId);
         this.currentPage = 1;
         this.pdf = null;
-        this.scale = 2.5;
+        this.scale = 8; // Doubled scale for even higher resolution
+        this.pageImages = [];
         this.pageContainers = [];
         this.initialized = false;
-
+        this.loading = false;
+        this.loadingOverlay = this.createLoadingOverlay();
+        
         window.addEventListener('resize', () => this.handleResize());
     }
 
+    createLoadingOverlay() {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        `;
+        
+        const spinner = document.createElement('div');
+        spinner.textContent = 'Loading PDF...';
+        overlay.appendChild(spinner);
+        
+        this.container.style.position = 'relative';
+        this.container.appendChild(overlay);
+        return overlay;
+    }
+
     async loadPDF(url) {
+        if (this.loading) return;
+        
         try {
+            this.loading = true;
+            this.loadingOverlay.style.display = 'flex';
+            this.container.style.opacity = '0.5';
+            
             const loadingTask = pdfjsLib.getDocument(url);
             this.pdf = await loadingTask.promise;
-            await this.renderAllPages();
+            
+            // Pre-render all pages before showing any
+            await this.renderAllPagesAsImages();
+            
             this.initialized = true;
             this.updatePageVisibility();
+            
+            this.loading = false;
+            this.loadingOverlay.style.display = 'none';
+            this.container.style.opacity = '1';
         } catch (error) {
             console.error('Error loading PDF:', error);
+            this.loading = false;
+            this.loadingOverlay.style.display = 'none';
+            this.container.style.opacity = '1';
         }
     }
 
-    async renderAllPages() {
+    async renderAllPagesAsImages() {
         if (!this.pdf) return;
 
         this.container.innerHTML = '';
         this.pageContainers = [];
+        this.pageImages = [];
+
+        // Create all canvases and start rendering simultaneously
+        const renderPromises = [];
+        const pageContainers = [];
 
         for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
-            const page = await this.pdf.getPage(pageNum);
             const pageContainer = document.createElement('div');
             pageContainer.className = 'pdf-page';
             pageContainer.style.display = pageNum === this.currentPage ? 'block' : 'none';
 
-            const canvas = document.createElement('canvas');
-            canvas.className = 'pdf-canvas';
-            const context = canvas.getContext('2d');
-
-            const containerWidth = this.container.clientWidth;
-            const viewport = page.getViewport({ scale: this.scale });
-            const pixelRatio = window.devicePixelRatio || 1;
-            const scaledViewport = page.getViewport({ 
-                scale: (containerWidth / viewport.width) * this.scale * pixelRatio 
-            });
-
-            canvas.width = scaledViewport.width;
-            canvas.height = scaledViewport.height;
-            canvas.style.width = `${containerWidth}px`;
-            canvas.style.height = `${(containerWidth * viewport.height) / viewport.width}px`;
-
-            if (this.pdf.numPages > 1) {
-                if (pageNum > 1) {
-                    const prevButton = document.createElement('button');
-                    prevButton.className = 'page-nav prev';
-                    prevButton.onclick = () => this.previousPage();
-                    pageContainer.appendChild(prevButton);
-                }
-
-                if (pageNum < this.pdf.numPages) {
-                    const nextButton = document.createElement('button');
-                    nextButton.className = 'page-nav next';
-                    nextButton.onclick = () => this.nextPage();
-                    pageContainer.appendChild(nextButton);
-                }
-
-                const pageNumber = document.createElement('div');
-                pageNumber.className = 'page-number';
-                pageNumber.textContent = `${pageNum} / ${this.pdf.numPages}`;
-                pageContainer.appendChild(pageNumber);
-            }
-
-            pageContainer.appendChild(canvas);
-            this.container.appendChild(pageContainer);
-            this.pageContainers.push(pageContainer);
-
-            await page.render({
-                canvasContext: context,
-                viewport: scaledViewport,
-                intent: 'print',
-            }).promise;
+            const renderPromise = this.renderPage(pageNum, pageContainer);
+            renderPromises.push(renderPromise);
+            pageContainers.push(pageContainer);
         }
 
-        // Add click handlers for the left and right sides
+        // Wait for all pages to finish rendering
+        await Promise.all(renderPromises);
+
+        // Add all containers to the DOM at once
+        pageContainers.forEach(container => {
+            this.container.appendChild(container);
+            this.pageContainers.push(container);
+        });
+
         this.container.onclick = (e) => {
             const rect = this.container.getBoundingClientRect();
             const x = e.clientX - rect.left;
@@ -385,32 +401,92 @@
         };
     }
 
+    async renderPage(pageNum, pageContainer) {
+        const page = await this.pdf.getPage(pageNum);
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+
+        const containerWidth = this.container.clientWidth;
+        const viewport = page.getViewport({ scale: this.scale });
+        const pixelRatio = window.devicePixelRatio || 1;
+        const scaledViewport = page.getViewport({ 
+            scale: (containerWidth / viewport.width) * this.scale * pixelRatio 
+        });
+
+        canvas.width = scaledViewport.width;
+        canvas.height = scaledViewport.height;
+
+        await page.render({
+            canvasContext: context,
+            viewport: scaledViewport,
+            intent: 'print',
+            background: 'white'
+        }).promise;
+
+        // Convert canvas to image
+        const image = new Image();
+        await new Promise(resolve => {
+            image.onload = resolve;
+            image.src = canvas.toDataURL('image/png');
+        });
+        
+        image.style.width = '100%';
+        image.style.height = 'auto';
+        this.pageImages.push(image);
+
+        if (this.pdf.numPages > 1) {
+            if (pageNum > 1) {
+                const prevButton = document.createElement('button');
+                prevButton.className = 'page-nav prev';
+                prevButton.onclick = () => this.previousPage();
+                pageContainer.appendChild(prevButton);
+            }
+
+            if (pageNum < this.pdf.numPages) {
+                const nextButton = document.createElement('button');
+                nextButton.className = 'page-nav next';
+                nextButton.onclick = () => this.nextPage();
+                pageContainer.appendChild(nextButton);
+            }
+
+            const pageNumber = document.createElement('div');
+            pageNumber.className = 'page-number';
+            pageNumber.textContent = `${pageNum} / ${this.pdf.numPages}`;
+            pageContainer.appendChild(pageNumber);
+        }
+
+        pageContainer.appendChild(image);
+    }
+
     updatePageVisibility() {
         this.pageContainers.forEach((container, index) => {
             container.style.display = index + 1 === this.currentPage ? 'block' : 'none';
         });
     }
 
-    async nextPage() {
+    nextPage() {
         if (this.currentPage < this.pdf.numPages) {
             this.currentPage++;
             this.updatePageVisibility();
         }
     }
 
-    async previousPage() {
+    previousPage() {
         if (this.currentPage > 1) {
             this.currentPage--;
             this.updatePageVisibility();
         }
     }
 
-    async handleResize() {
-        if (this.initialized) {
-            await this.renderAllPages();
-        }
+    handleResize() {
+        // Do nothing on resize since we're using images
     }
 }
+
+
+
+
+
 
 window.onload = function() {
     const hamburgerBtn = document.querySelector('.hamburger-btn');
