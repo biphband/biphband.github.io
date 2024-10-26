@@ -80,7 +80,7 @@
             left: 0;
             width: 100%;
             height: 50px; /* Adjust height as needed */
-            background: rgba(255, 255, 255, 0.8); /* Semi-opaque white */
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0));
             display: flex;
             align-items: center;
             z-index: 800;
@@ -97,7 +97,7 @@
             cursor: pointer;
         }
         .hamburger-btn span {
-            width: 100%;
+            width: 30px;
             height: 3px;
             background-color: #333;
             transition: all 0.3s;
@@ -934,12 +934,21 @@ if (seatingImage) {
 document.addEventListener('DOMContentLoaded', function() {
     // Song navigation
     const songList = document.querySelectorAll('.song-list li');
+    const offset = -45; // Adjust this value to change the final scroll position
+
     songList.forEach(song => {
         song.addEventListener('click', function() {
             const pdfNumber = this.getAttribute('data-pdf');
             const pdfElement = document.getElementById(`pdf-container-${pdfNumber}`);
+            
             if (pdfElement) {
-                pdfElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const elementPosition = pdfElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - offset;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
             }
         });
     });
@@ -953,7 +962,7 @@ document.addEventListener('touchend', function(event) {
         const navContainer = document.querySelector('.nav-container');
         if (navContainer) {
             const navRect = navContainer.getBoundingClientRect();
-            const offset = navRect.top + window.pageYOffset - 50; // 50px above the nav
+            const offset = navRect.top + window.pageYOffset + 0; // 50px above the nav
             window.scrollTo({
                 top: offset,
                 behavior: 'smooth'
@@ -977,7 +986,7 @@ scrollTopButton.addEventListener('click', function() {
     const navContainer = document.querySelector('.nav-container');
     if (navContainer) {
         const navRect = navContainer.getBoundingClientRect();
-        const offset = navRect.top + window.pageYOffset - 50; // 50px above the nav
+        const offset = navRect.top + window.pageYOffset + 0; // 50px above the nav
         window.scrollTo({
             top: offset,
             behavior: 'smooth'
