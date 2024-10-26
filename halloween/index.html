@@ -189,7 +189,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, rgb(201, 227, 240), rgba(5, 38, 82, 0.7));
+    background: linear-gradient(to bottom, rgba(201, 227, 240, 0.932), rgba(5, 38, 82, 0.7));
     z-index: 990;
     overflow: auto;
 }
@@ -738,115 +738,126 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     let scale = 1;
-    const SCALE_FACTOR = 0.1;
-    const MAX_SCALE = 3;
-    const MIN_SCALE = 1;
+const SCALE_FACTOR = 0.1;
+const MAX_SCALE = 3;
+const MIN_SCALE = 1;
 
-    // Add variables for panning
-    let isPanning = false;
-    let startX, startY;
-    let currentX = 0;
-    let currentY = 0;
-    let translateX = 0;
-    let translateY = 0;
+// Add variables for panning
+let isPanning = false;
+let startX, startY;
+let currentX = 0;
+let currentY = 0;
+let translateX = 0;
+let translateY = 0;
 
-    function resetZoom() {
-        scale = 1;
+function resetZoom() {
+    scale = 1;
+    translateX = 0;
+    translateY = 0;
+    if (seatingImage) {
+        seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    }
+}
+
+function updateTransform() {
+    // If scale is at minimum, reset position to center
+    if (scale <= MIN_SCALE) {
         translateX = 0;
         translateY = 0;
-        if (seatingImage) {
-            seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-        }
+        currentX = 0;
+        currentY = 0;
     }
+    seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+}
 
-    if (seatingImage) {
-        // Add this line to prevent default dragging
-        seatingImage.setAttribute('draggable', false);
+if (seatingImage) {
+    // Add this line to prevent default dragging
+    seatingImage.setAttribute('draggable', false);
 
-        // Handle mouse wheel zoom
-        seatingImage.addEventListener('wheel', function(e) {
-            e.preventDefault();
-            const delta = e.deltaY > 0 ? -1 : 1;
-            scale += delta * SCALE_FACTOR;
-            scale = Math.min(Math.max(scale, MIN_SCALE), MAX_SCALE);
-            seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-        });
+    // Handle mouse wheel zoom
+    seatingImage.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -1 : 1;
+        scale += delta * SCALE_FACTOR;
+        scale = Math.min(Math.max(scale, MIN_SCALE), MAX_SCALE);
+        updateTransform();
+    });
 
-        // Handle mouse panning
-        seatingImage.addEventListener('mousedown', function(e) {
-            if (scale > 1) {
-                isPanning = true;
-                startX = e.clientX - translateX;
-                startY = e.clientY - translateY;
-                seatingImage.style.cursor = 'grabbing';
-            }
-        });
+    // Handle mouse panning
+    seatingImage.addEventListener('mousedown', function(e) {
+        if (scale > 1) {
+            isPanning = true;
+            startX = e.clientX - translateX;
+            startY = e.clientY - translateY;
+            seatingImage.style.cursor = 'grabbing';
+        }
+    });
 
-        document.addEventListener('mousemove', function(e) {
-            if (isPanning) {
-                currentX = e.clientX - startX;
-                currentY = e.clientY - startY;
-                translateX = currentX;
-                translateY = currentY;
-                seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-            }
-        });
-
-        document.addEventListener('mouseup', function() {
-            if (isPanning) {
-                isPanning = false;
-                seatingImage.style.cursor = 'grab';
-                // Store the final position
-                translateX = currentX;
-                translateY = currentY;
-            }
-        });
-
-        // Handle pinch zoom for touch devices
-        let initialDistance = 0;
-        let initialScale = 1;
-        let lastTouchX = 0;
-        let lastTouchY = 0;
-
-        seatingImage.addEventListener('touchstart', function(e) {
-            if (e.touches.length === 2) {
-                e.preventDefault();
-                initialDistance = Math.hypot(
-                    e.touches[0].pageX - e.touches[1].pageX,
-                    e.touches[0].pageY - e.touches[1].pageY
-                );
-                initialScale = scale;
-            } else if (e.touches.length === 1 && scale > 1) {
-                lastTouchX = e.touches[0].pageX - translateX;
-                lastTouchY = e.touches[0].pageY - translateY;
-            }
-        });
-
-        seatingImage.addEventListener('touchmove', function(e) {
-            if (e.touches.length === 2) {
-                e.preventDefault();
-                const currentDistance = Math.hypot(
-                    e.touches[0].pageX - e.touches[1].pageX,
-                    e.touches[0].pageY - e.touches[1].pageY
-                );
-                scale = initialScale * (currentDistance / initialDistance);
-                scale = Math.min(Math.max(scale, MIN_SCALE), MAX_SCALE);
-                seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-            } else if (e.touches.length === 1 && scale > 1) {
-                e.preventDefault();
-                currentX = e.touches[0].pageX - lastTouchX;
-                currentY = e.touches[0].pageY - lastTouchY;
-                translateX = currentX;
-                translateY = currentY;
-                seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-            }
-        });
-
-        seatingImage.addEventListener('touchend', function() {
+    document.addEventListener('mousemove', function(e) {
+        if (isPanning) {
+            currentX = e.clientX - startX;
+            currentY = e.clientY - startY;
             translateX = currentX;
             translateY = currentY;
-        });
-    }
+            updateTransform();
+        }
+    });
+
+    document.addEventListener('mouseup', function() {
+        if (isPanning) {
+            isPanning = false;
+            seatingImage.style.cursor = 'grab';
+            // Store the final position
+            translateX = currentX;
+            translateY = currentY;
+        }
+    });
+
+    // Handle pinch zoom for touch devices
+    let initialDistance = 0;
+    let initialScale = 1;
+    let lastTouchX = 0;
+    let lastTouchY = 0;
+
+    seatingImage.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 2) {
+            e.preventDefault();
+            initialDistance = Math.hypot(
+                e.touches[0].pageX - e.touches[1].pageX,
+                e.touches[0].pageY - e.touches[1].pageY
+            );
+            initialScale = scale;
+        } else if (e.touches.length === 1 && scale > 1) {
+            lastTouchX = e.touches[0].pageX - translateX;
+            lastTouchY = e.touches[0].pageY - translateY;
+        }
+    });
+
+    seatingImage.addEventListener('touchmove', function(e) {
+        if (e.touches.length === 2) {
+            e.preventDefault();
+            const currentDistance = Math.hypot(
+                e.touches[0].pageX - e.touches[1].pageX,
+                e.touches[0].pageY - e.touches[1].pageY
+            );
+            scale = initialScale * (currentDistance / initialDistance);
+            scale = Math.min(Math.max(scale, MIN_SCALE), MAX_SCALE);
+            updateTransform();
+        } else if (e.touches.length === 1 && scale > 1) {
+            e.preventDefault();
+            currentX = e.touches[0].pageX - lastTouchX;
+            currentY = e.touches[0].pageY - lastTouchY;
+            translateX = currentX;
+            translateY = currentY;
+            updateTransform();
+        }
+    });
+
+    seatingImage.addEventListener('touchend', function() {
+        translateX = currentX;
+        translateY = currentY;
+    });
+}
 });
         </script>
 </head>
