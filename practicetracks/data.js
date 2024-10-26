@@ -105,7 +105,7 @@ const songData = {
     'Trumpet 2': [
         { title: '1. This is Halloween', pdf: 'PDFs/Brass/Trumpet 2/1. This is Halloween-Bb_Trumpet_2,_3.pdf', audio: 'mp3s/Brass/Trumpet 2/This is Halloween-Bb_Trumpet_2,_3.mp3' },
         { title: '2. Year After Year', pdf: 'PDFs/Brass/Trumpet 2/2. Year After Year-Bb_Trumpet_2,_3.pdf', audio: 'mp3s/Brass/Trumpet 2/Year After Year-Bb_Trumpet_2,_3.mp3' },
-        { title: '4. What\'s This', pdf: 'PDFs/Brass/Trumpet 2/4. What\'s This Trumpet 2.pdf', audio: 'mp3s/Brass/Trumpet 2/Whats This-Trumpet_1,2.mp3' },
+        { title: '4. What\'s This', pdf: 'PDFs/Brass/Trumpet 2/4. What\'s This Trumpet 2.pdf', audio: 'mp3s/Brass/Trumpet 2/Whats This-Trumpet_2.mp3' },
         { title: '8. Sally\'s Song', pdf: 'PDFs/Brass/Trumpet 2/8. Sally\'s Song-Bb_Trumpet_2,_3.pdf', audio: 'mp3s/Brass/Trumpet 2/Sally\'s Song-Bb_Trumpet_2,_3.mp3' },
         { title: '10. Pay the Price', pdf: 'PDFs/Brass/Trumpet 2/10. Pay the Price Transition-Bb_Trumpet_2.pdf', audio: 'mp3s/Brass/Trumpet 2/Pay the Price-Bb_Trumpet_2.mp3' },
         { title: '11. Kidnap The Sandy Claws', pdf: 'PDFs/Brass/Trumpet 2/11. Kidnap The Sandy Claws-Bb_Trumpet_2.pdf', audio: 'mp3s/Brass/Trumpet 2/Kidnap The Sandy Claws-Bb_Trumpet_2.mp3' },
