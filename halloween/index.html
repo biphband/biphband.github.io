@@ -83,7 +83,7 @@
             background: rgba(255, 255, 255, 0.8); /* Semi-opaque white */
             display: flex;
             align-items: center;
-            z-index: 1000;
+            z-index: 800;
         }
         .hamburger-btn {
             margin-left: 15px;
@@ -103,20 +103,32 @@
             transition: all 0.3s;
         }
         .menu-container {
-            position: fixed;
-            top: 50px; /* Adjusted this value */
-            left: -300px;
-            width: 300px;
-            height: calc(100vh - 50px); /* Adjusted to account for the new top */
-            background: white;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            transition: left 0.3s;
-            overflow-y: auto;
-            z-index: 999;
-        }
-        .menu-container.active {
-            left: 0;
-        }
+    position: fixed;
+    top: 50px;
+    left: -300px;
+    width: 300px;
+    height: calc(100vh - 50px);
+    background: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    transition: left 0.3s;
+    overflow-y: auto;
+    z-index: 950;
+    display: flex;
+    flex-direction: column;
+}
+.menu-container.active {
+    left: 0;
+}
+
+.menu-top-section {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.menu-bottom-section {
+    margin-top: auto;
+    padding-bottom: 10px;
+}
         .submenu {
             margin-left: 20px;
             display: none;
@@ -126,7 +138,7 @@
             display: block;
         }
         .menu-item {
-            padding: 10px;
+            padding: 15px;
             cursor: pointer;
         }
         .menu-item:hover {
@@ -140,6 +152,75 @@
             background-color: #f0f0f0; /* Light gray background on hover */
             transition: background-color 0.3s;
         }
+
+
+        .menu-logo {
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.seating-button {
+    width: 90%;
+    margin: 10px auto;
+    padding: 10px;
+    background-color: #444;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    display: block;
+}
+
+.seating-button:hover {
+    background-color: #555;
+}
+
+
+
+
+.seating-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 990;
+    overflow: auto;
+}
+
+.overlay-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#seatingImage {
+    max-width: 90%;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    user-select: none;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+
+.close-button {
+    position: fixed;
+    top: 5px;
+    right: 15px;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+}
+
 
         .pdf-container {
     width: 100vw;
@@ -201,95 +282,132 @@
     border-radius: 15px;
     font-size: 12px;
 }
+
     </style>
         <script>
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-class PDFViewer {
+            class PDFViewer {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.currentPage = 1;
         this.pdf = null;
         this.scale = 2.5;
+        this.pageContainers = [];
+        this.initialized = false;
+
+        window.addEventListener('resize', () => this.handleResize());
     }
 
     async loadPDF(url) {
         try {
             const loadingTask = pdfjsLib.getDocument(url);
             this.pdf = await loadingTask.promise;
-            await this.renderCurrentPage();
+            await this.renderAllPages();
+            this.initialized = true;
+            this.updatePageVisibility();
         } catch (error) {
             console.error('Error loading PDF:', error);
         }
     }
 
-    async renderCurrentPage() {
+    async renderAllPages() {
         if (!this.pdf) return;
 
         this.container.innerHTML = '';
-        const page = await this.pdf.getPage(this.currentPage);
-        const viewport = page.getViewport({ scale: this.scale });
+        this.pageContainers = [];
 
-        const pageContainer = document.createElement('div');
-        pageContainer.className = 'pdf-page';
+        for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
+            const page = await this.pdf.getPage(pageNum);
+            const pageContainer = document.createElement('div');
+            pageContainer.className = 'pdf-page';
+            pageContainer.style.display = pageNum === this.currentPage ? 'block' : 'none';
 
-        const canvas = document.createElement('canvas');
-        canvas.className = 'pdf-canvas';
-        const context = canvas.getContext('2d');
+            const canvas = document.createElement('canvas');
+            canvas.className = 'pdf-canvas';
+            const context = canvas.getContext('2d');
 
-        const containerWidth = this.container.clientWidth;
-        const pixelRatio = window.devicePixelRatio || 1;
-        const scaledViewport = page.getViewport({ 
-            scale: (containerWidth / viewport.width) * this.scale * pixelRatio 
-        });
+            const containerWidth = this.container.clientWidth;
+            const viewport = page.getViewport({ scale: this.scale });
+            const pixelRatio = window.devicePixelRatio || 1;
+            const scaledViewport = page.getViewport({ 
+                scale: (containerWidth / viewport.width) * this.scale * pixelRatio 
+            });
 
-        canvas.width = scaledViewport.width;
-        canvas.height = scaledViewport.height;
-        canvas.style.width = `${containerWidth}px`;
-        canvas.style.height = `${(containerWidth * viewport.height) / viewport.width}px`;
+            canvas.width = scaledViewport.width;
+            canvas.height = scaledViewport.height;
+            canvas.style.width = `${containerWidth}px`;
+            canvas.style.height = `${(containerWidth * viewport.height) / viewport.width}px`;
 
-        if (this.pdf.numPages > 1) {
-            if (this.currentPage > 1) {
-                const prevButton = document.createElement('button');
-                prevButton.className = 'page-nav prev';
-                prevButton.onclick = () => this.previousPage();
-                pageContainer.appendChild(prevButton);
+            if (this.pdf.numPages > 1) {
+                if (pageNum > 1) {
+                    const prevButton = document.createElement('button');
+                    prevButton.className = 'page-nav prev';
+                    prevButton.onclick = () => this.previousPage();
+                    pageContainer.appendChild(prevButton);
+                }
+
+                if (pageNum < this.pdf.numPages) {
+                    const nextButton = document.createElement('button');
+                    nextButton.className = 'page-nav next';
+                    nextButton.onclick = () => this.nextPage();
+                    pageContainer.appendChild(nextButton);
+                }
+
+                const pageNumber = document.createElement('div');
+                pageNumber.className = 'page-number';
+                pageNumber.textContent = `${pageNum} / ${this.pdf.numPages}`;
+                pageContainer.appendChild(pageNumber);
             }
 
-            if (this.currentPage < this.pdf.numPages) {
-                const nextButton = document.createElement('button');
-                nextButton.className = 'page-nav next';
-                nextButton.onclick = () => this.nextPage();
-                pageContainer.appendChild(nextButton);
-            }
+            pageContainer.appendChild(canvas);
+            this.container.appendChild(pageContainer);
+            this.pageContainers.push(pageContainer);
 
-            const pageNumber = document.createElement('div');
-            pageNumber.className = 'page-number';
-            pageNumber.textContent = `${this.currentPage} / ${this.pdf.numPages}`;
-            pageContainer.appendChild(pageNumber);
+            await page.render({
+                canvasContext: context,
+                viewport: scaledViewport,
+                intent: 'print',
+            }).promise;
         }
 
-        pageContainer.appendChild(canvas);
-        this.container.appendChild(pageContainer);
+        // Add click handlers for the left and right sides
+        this.container.onclick = (e) => {
+            const rect = this.container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const width = rect.width;
+            
+            if (x < width * 0.2) {
+                this.previousPage();
+            } else if (x > width * 0.8) {
+                this.nextPage();
+            }
+        };
+    }
 
-        await page.render({
-            canvasContext: context,
-            viewport: scaledViewport,
-            intent: 'print',
-        }).promise;
+    updatePageVisibility() {
+        this.pageContainers.forEach((container, index) => {
+            container.style.display = index + 1 === this.currentPage ? 'block' : 'none';
+        });
     }
 
     async nextPage() {
         if (this.currentPage < this.pdf.numPages) {
             this.currentPage++;
-            await this.renderCurrentPage();
+            this.updatePageVisibility();
         }
     }
 
     async previousPage() {
         if (this.currentPage > 1) {
             this.currentPage--;
-            await this.renderCurrentPage();
+            this.updatePageVisibility();
+        }
+    }
+
+    async handleResize() {
+        if (this.initialized) {
+            await this.renderAllPages();
         }
     }
 }
@@ -476,6 +594,15 @@ window.onload = function() {
         menuContainer.classList.toggle('active');
     });
 
+            // Close the menu if clicked outside
+            document.addEventListener('click', (event) => {
+            const isClickInsideMenu = menuContainer.contains(event.target);
+            const isClickInsideButton = hamburgerBtn.contains(event.target);
+            if (!isClickInsideMenu && !isClickInsideButton) {
+                menuContainer.classList.remove('active');
+            }
+        });
+
     mainMenuItems.forEach(item => {
         item.addEventListener('click', () => {
             const submenu = item.nextElementSibling;
@@ -505,6 +632,146 @@ window.onload = function() {
         });
     }
 };
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const seatingButton = document.getElementById('seatingButton');
+    const seatingOverlay = document.getElementById('seatingOverlay');
+    const closeButton = document.querySelector('.close-button');
+    const seatingImage = document.getElementById('seatingImage');
+    
+    if (seatingButton) {
+        seatingButton.addEventListener('click', function() {
+            if (seatingOverlay) {
+                seatingOverlay.style.display = 'block';
+                resetZoom();
+            }
+        });
+    }
+
+    if (closeButton) {
+        closeButton.addEventListener('click', function() {
+            if (seatingOverlay) {
+                seatingOverlay.style.display = 'none';
+                resetZoom();
+            }
+        });
+    }
+
+    let scale = 1;
+    const SCALE_FACTOR = 0.1;
+    const MAX_SCALE = 3;
+    const MIN_SCALE = 1;
+
+    // Add variables for panning
+    let isPanning = false;
+    let startX, startY;
+    let currentX = 0;
+    let currentY = 0;
+    let translateX = 0;
+    let translateY = 0;
+
+    function resetZoom() {
+        scale = 1;
+        translateX = 0;
+        translateY = 0;
+        if (seatingImage) {
+            seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        }
+    }
+
+    if (seatingImage) {
+        // Add this line to prevent default dragging
+        seatingImage.setAttribute('draggable', false);
+
+        // Handle mouse wheel zoom
+        seatingImage.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -1 : 1;
+            scale += delta * SCALE_FACTOR;
+            scale = Math.min(Math.max(scale, MIN_SCALE), MAX_SCALE);
+            seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        });
+
+        // Handle mouse panning
+        seatingImage.addEventListener('mousedown', function(e) {
+            if (scale > 1) {
+                isPanning = true;
+                startX = e.clientX - translateX;
+                startY = e.clientY - translateY;
+                seatingImage.style.cursor = 'grabbing';
+            }
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (isPanning) {
+                currentX = e.clientX - startX;
+                currentY = e.clientY - startY;
+                translateX = currentX;
+                translateY = currentY;
+                seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            }
+        });
+
+        document.addEventListener('mouseup', function() {
+            if (isPanning) {
+                isPanning = false;
+                seatingImage.style.cursor = 'grab';
+                // Store the final position
+                translateX = currentX;
+                translateY = currentY;
+            }
+        });
+
+        // Handle pinch zoom for touch devices
+        let initialDistance = 0;
+        let initialScale = 1;
+        let lastTouchX = 0;
+        let lastTouchY = 0;
+
+        seatingImage.addEventListener('touchstart', function(e) {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                initialDistance = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                initialScale = scale;
+            } else if (e.touches.length === 1 && scale > 1) {
+                lastTouchX = e.touches[0].pageX - translateX;
+                lastTouchY = e.touches[0].pageY - translateY;
+            }
+        });
+
+        seatingImage.addEventListener('touchmove', function(e) {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                const currentDistance = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                scale = initialScale * (currentDistance / initialDistance);
+                scale = Math.min(Math.max(scale, MIN_SCALE), MAX_SCALE);
+                seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            } else if (e.touches.length === 1 && scale > 1) {
+                e.preventDefault();
+                currentX = e.touches[0].pageX - lastTouchX;
+                currentY = e.touches[0].pageY - lastTouchY;
+                translateX = currentX;
+                translateY = currentY;
+                seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            }
+        });
+
+        seatingImage.addEventListener('touchend', function() {
+            translateX = currentX;
+            translateY = currentY;
+        });
+    }
+});
         </script>
 </head>
 <body>
@@ -517,6 +784,7 @@ window.onload = function() {
         </button>
     </div>
     <div class="menu-container">
+        <div class="menu-top-section">
         <div class="menu-item main-menu-item">Woodwinds</div>
         <div class="submenu">
             <div class="part-select" data-part="Woodwinds/Piccolo">Piccolo</div>
@@ -578,6 +846,27 @@ window.onload = function() {
         <div class="submenu">
             <div class="part-select" data-part="Conductor/">Full Conductor Score</div>
         </div>
+    </div>
+
+    <div class="menu-bottom-section">
+    <button id="seatingButton" class="seating-button">View Seating Layout</button>
+
+    <div class="menu-logo">
+        Share access to this site: 
+        <img src="images/biphband.github.io:halloween.png">
+    </div>
+</div>
+
+<div id="seatingOverlay" class="seating-overlay">
+    <div class="overlay-content">
+    <span class="close-button">&times;</span>
+    <img id="seatingImage" src="images/Halloween Layout.png" alt="Seating Layout">
+    </div>
+    </div>
+    </div>
+
+</div>
+
     </div>
 
     <div class="scene">
