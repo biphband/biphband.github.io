@@ -111,7 +111,6 @@
     background: white;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
     transition: left 0.3s;
-    overflow-y: auto;
     z-index: 950;
     display: flex;
     flex-direction: column;
@@ -123,11 +122,13 @@
 .menu-top-section {
     flex: 1;
     overflow-y: auto;
+    min-height: 0; /* Important for proper flex behavior */
 }
 
 .menu-bottom-section {
-    margin-top: auto;
-    padding-bottom: 10px;
+    flex-shrink: 0; /* Prevents shrinking */
+    padding: 10px;
+    margin-bottom: 55px;
 }
         .submenu {
             margin-left: 20px;
@@ -160,8 +161,15 @@
 
         .menu-logo {
     width: 100%;
+    max-height: 150px; /* Adjust this value as needed */
     text-align: center;
-    margin-top: 10px;
+    margin: 10px 0;
+}
+
+.menu-logo img {
+    width: 200px;
+    max-height: 100%;
+    object-fit: contain;
 }
 
 .seating-button {
@@ -289,198 +297,205 @@
 
     </style>
         <script>
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-            class PDFViewer {
+class PDFViewer {
     constructor(containerId) {
-        this.container = document.getElementById(containerId);
-        this.currentPage = 1;
-        this.pdf = null;
-        this.scale = 8; // Doubled scale for even higher resolution
-        this.pageImages = [];
-        this.pageContainers = [];
-        this.initialized = false;
+    this.container = document.getElementById(containerId);
+    this.currentPage = 1;
+    this.pdf = null;
+    this.scale = 4; // Reduced scale for better performance
+    this.pageImages = [];
+    this.pageContainers = [];
+    this.initialized = false;
+    this.loading = false;
+    this.loadingOverlay = this.createLoadingOverlay();
+    this.pagesLoaded = new Set();
+    
+    window.addEventListener('resize', () => this.handleResize());
+}
+
+createLoadingOverlay() {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    `;
+    
+    const spinner = document.createElement('div');
+    spinner.textContent = 'Loading PDF...';
+    overlay.appendChild(spinner);
+    
+    this.container.style.position = 'relative';
+    this.container.appendChild(overlay);
+    return overlay;
+}
+
+async loadPDF(url) {
+    if (this.loading) return;
+    
+    try {
+        this.loading = true;
+        this.loadingOverlay.style.display = 'flex';
+        this.container.style.opacity = '0.5';
+        
+        const loadingTask = pdfjsLib.getDocument(url);
+        this.pdf = await loadingTask.promise;
+        
+        // Pre-render all pages before showing any
+        await this.renderAllPagesAsImages();
+        
+        this.initialized = true;
+        this.updatePageVisibility();
+        
         this.loading = false;
-        this.loadingOverlay = this.createLoadingOverlay();
-        
-        window.addEventListener('resize', () => this.handleResize());
+        this.loadingOverlay.style.display = 'none';
+        this.container.style.opacity = '1';
+    } catch (error) {
+        console.error('Error loading PDF:', error);
+        this.loading = false;
+        this.loadingOverlay.style.display = 'none';
+        this.container.style.opacity = '1';
+    }
+}
+
+async renderAllPagesAsImages() {
+    if (!this.pdf) return;
+
+    this.container.innerHTML = '';
+    this.pageContainers = [];
+    this.pageImages = [];
+
+    // Create all canvases and start rendering simultaneously
+    const renderPromises = [];
+    const pageContainers = [];
+
+    for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
+        const pageContainer = document.createElement('div');
+        pageContainer.className = 'pdf-page';
+        pageContainer.style.display = pageNum === this.currentPage ? 'block' : 'none';
+
+        const renderPromise = this.renderPage(pageNum, pageContainer);
+        renderPromises.push(renderPromise);
+        pageContainers.push(pageContainer);
     }
 
-    createLoadingOverlay() {
-        const overlay = document.createElement('div');
-        overlay.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        `;
-        
-        const spinner = document.createElement('div');
-        spinner.textContent = 'Loading PDF...';
-        overlay.appendChild(spinner);
-        
-        this.container.style.position = 'relative';
-        this.container.appendChild(overlay);
-        return overlay;
-    }
+    // Wait for all pages to finish rendering
+    await Promise.all(renderPromises);
 
-    async loadPDF(url) {
-        if (this.loading) return;
+    // Add all containers to the DOM at once
+    pageContainers.forEach(container => {
+        this.container.appendChild(container);
+        this.pageContainers.push(container);
+    });
+
+    this.container.onclick = (e) => {
+        const rect = this.container.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const width = rect.width;
         
-        try {
-            this.loading = true;
-            this.loadingOverlay.style.display = 'flex';
-            this.container.style.opacity = '0.5';
-            
-            const loadingTask = pdfjsLib.getDocument(url);
-            this.pdf = await loadingTask.promise;
-            
-            // Pre-render all pages before showing any
-            await this.renderAllPagesAsImages();
-            
-            this.initialized = true;
-            this.updatePageVisibility();
-            
-            this.loading = false;
-            this.loadingOverlay.style.display = 'none';
-            this.container.style.opacity = '1';
-        } catch (error) {
-            console.error('Error loading PDF:', error);
-            this.loading = false;
-            this.loadingOverlay.style.display = 'none';
-            this.container.style.opacity = '1';
+        if (x < width * 0.2) {
+            this.previousPage();
+        } else if (x > width * 0.8) {
+            this.nextPage();
         }
-    }
+    };
+}
 
-    async renderAllPagesAsImages() {
-        if (!this.pdf) return;
+async renderPage(pageNum, pageContainer) {
+    const page = await this.pdf.getPage(pageNum);
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
 
-        this.container.innerHTML = '';
-        this.pageContainers = [];
-        this.pageImages = [];
+    const containerWidth = this.container.clientWidth;
+    const viewport = page.getViewport({ scale: this.scale });
+    const pixelRatio = window.devicePixelRatio || 1;
+    const scaledViewport = page.getViewport({ 
+        scale: (containerWidth / viewport.width) * this.scale * pixelRatio 
+    });
 
-        // Create all canvases and start rendering simultaneously
-        const renderPromises = [];
-        const pageContainers = [];
+    canvas.width = scaledViewport.width;
+    canvas.height = scaledViewport.height;
 
-        for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
-            const pageContainer = document.createElement('div');
-            pageContainer.className = 'pdf-page';
-            pageContainer.style.display = pageNum === this.currentPage ? 'block' : 'none';
+    await page.render({
+        canvasContext: context,
+        viewport: scaledViewport,
+        intent: 'print',
+        background: 'white'
+    }).promise;
 
-            const renderPromise = this.renderPage(pageNum, pageContainer);
-            renderPromises.push(renderPromise);
-            pageContainers.push(pageContainer);
-        }
+    // Convert canvas to image
+    const image = new Image();
+    await new Promise(resolve => {
+        image.onload = resolve;
+        image.src = canvas.toDataURL('image/png');
+    });
+    
+    image.style.width = '100%';
+    image.style.height = 'auto';
+    this.pageImages.push(image);
 
-        // Wait for all pages to finish rendering
-        await Promise.all(renderPromises);
-
-        // Add all containers to the DOM at once
-        pageContainers.forEach(container => {
-            this.container.appendChild(container);
-            this.pageContainers.push(container);
-        });
-
-        this.container.onclick = (e) => {
-            const rect = this.container.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const width = rect.width;
-            
-            if (x < width * 0.2) {
-                this.previousPage();
-            } else if (x > width * 0.8) {
-                this.nextPage();
-            }
-        };
-    }
-
-    async renderPage(pageNum, pageContainer) {
-        const page = await this.pdf.getPage(pageNum);
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-
-        const containerWidth = this.container.clientWidth;
-        const viewport = page.getViewport({ scale: this.scale });
-        const pixelRatio = window.devicePixelRatio || 1;
-        const scaledViewport = page.getViewport({ 
-            scale: (containerWidth / viewport.width) * this.scale * pixelRatio 
-        });
-
-        canvas.width = scaledViewport.width;
-        canvas.height = scaledViewport.height;
-
-        await page.render({
-            canvasContext: context,
-            viewport: scaledViewport,
-            intent: 'print',
-            background: 'white'
-        }).promise;
-
-        // Convert canvas to image
-        const image = new Image();
-        await new Promise(resolve => {
-            image.onload = resolve;
-            image.src = canvas.toDataURL('image/png');
-        });
-        
-        image.style.width = '100%';
-        image.style.height = 'auto';
-        this.pageImages.push(image);
-
-        if (this.pdf.numPages > 1) {
-            if (pageNum > 1) {
-                const prevButton = document.createElement('button');
-                prevButton.className = 'page-nav prev';
-                prevButton.onclick = () => this.previousPage();
-                pageContainer.appendChild(prevButton);
-            }
-
-            if (pageNum < this.pdf.numPages) {
-                const nextButton = document.createElement('button');
-                nextButton.className = 'page-nav next';
-                nextButton.onclick = () => this.nextPage();
-                pageContainer.appendChild(nextButton);
-            }
-
-            const pageNumber = document.createElement('div');
-            pageNumber.className = 'page-number';
-            pageNumber.textContent = `${pageNum} / ${this.pdf.numPages}`;
-            pageContainer.appendChild(pageNumber);
+    if (this.pdf.numPages > 1) {
+        if (pageNum > 1) {
+            const prevButton = document.createElement('button');
+            prevButton.className = 'page-nav prev';
+            prevButton.onclick = () => this.previousPage();
+            pageContainer.appendChild(prevButton);
         }
 
-        pageContainer.appendChild(image);
+        if (pageNum < this.pdf.numPages) {
+            const nextButton = document.createElement('button');
+            nextButton.className = 'page-nav next';
+            nextButton.onclick = () => this.nextPage();
+            pageContainer.appendChild(nextButton);
+        }
+
+        const pageNumber = document.createElement('div');
+        pageNumber.className = 'page-number';
+        pageNumber.textContent = `${pageNum} / ${this.pdf.numPages}`;
+        pageContainer.appendChild(pageNumber);
     }
 
-    updatePageVisibility() {
+    pageContainer.appendChild(image);
+}
+
+updatePageVisibility() {
+        if (!this.pageContainers) return;
+        
+        // Ensure currentPage is within valid range
+        this.currentPage = Math.max(1, Math.min(this.currentPage, this.pdf.numPages));
+        
         this.pageContainers.forEach((container, index) => {
-            container.style.display = index + 1 === this.currentPage ? 'block' : 'none';
+            const pageNum = index + 1;
+            container.style.display = pageNum === this.currentPage ? 'flex' : 'none';
         });
     }
 
     nextPage() {
         if (this.currentPage < this.pdf.numPages) {
-            this.currentPage++;
+            this.currentPage = Math.min(this.currentPage + 0.5, this.pdf.numPages);
             this.updatePageVisibility();
         }
     }
 
     previousPage() {
         if (this.currentPage > 1) {
-            this.currentPage--;
+            this.currentPage = Math.max(this.currentPage - 0.5, 1);
             this.updatePageVisibility();
         }
     }
 
-    handleResize() {
-        // Do nothing on resize since we're using images
-    }
+handleResize() {
+    // Do nothing on resize since we're using images
+}
 }
 
 
