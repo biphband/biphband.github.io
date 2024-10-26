@@ -197,7 +197,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, rgba(201, 227, 240, 0.932), rgba(5, 38, 82, 0.7));
+    background: linear-gradient(to bottom, rgba(201, 227, 240, 0.9), rgba(5, 38, 82, 0.98));
     z-index: 990;
     overflow: auto;
 }
@@ -295,6 +295,64 @@
     font-size: 12px;
 }
 
+
+
+
+
+
+
+        .song-list {
+            list-style: none;
+            max-width: 550px;
+            margin: 0 auto;
+        }
+
+        .song-list li {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #dfdfdf;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .song-list li:hover {
+            background-color: #bebebe;
+        }
+
+        .scroll-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            border-style: dotted;
+            border-width: 1px;
+            border-color: #515151;
+            background-color: #ffffffb8;
+            color: rgb(187, 187, 187);
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            transition: background-color 0.3s;
+        }
+        .scroll-top:hover {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            border: none;
+            background-color: #bababa;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+
+        /* Add padding to the top to account for fixed navigation */
+        .content {
+            padding-top: 500px;
+        }
+
     </style>
         <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -304,7 +362,7 @@ class PDFViewer {
     this.container = document.getElementById(containerId);
     this.currentPage = 1;
     this.pdf = null;
-    this.scale = 4; // Reduced scale for better performance
+    this.scale = 2; // Reduced scale for better performance
     this.pageImages = [];
     this.pageContainers = [];
     this.initialized = false;
@@ -874,6 +932,54 @@ if (seatingImage) {
     });
 }
 });
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Song navigation
+    const songList = document.querySelectorAll('.song-list li');
+    songList.forEach(song => {
+        song.addEventListener('click', function() {
+            const pdfNumber = this.getAttribute('data-pdf');
+            const pdfElement = document.getElementById(`pdf-container-${pdfNumber}`);
+            if (pdfElement) {
+                pdfElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    });
+
+    // Double tap to scroll to nav container
+    let lastTap = 0;
+    document.addEventListener('touchend', function(event) {
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTap;
+        if (tapLength < 500 && tapLength > 0) {
+            const navContainer = document.querySelector('.nav-container');
+            if (navContainer) {
+                navContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        lastTap = currentTime;
+    });
+
+    // Show/hide scroll to nav button
+    const scrollTopButton = document.querySelector('.scroll-top');
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            scrollTopButton.style.display = 'block';
+        } else {
+            scrollTopButton.style.display = 'none';
+        }
+    });
+
+    scrollTopButton.addEventListener('click', function() {
+        const navContainer = document.querySelector('.nav-container');
+        if (navContainer) {
+            navContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+});
         </script>
 </head>
 <body>
@@ -978,6 +1084,40 @@ if (seatingImage) {
             by Ian Ratcliffe</h2>
         <h3><p><br>Music arranged for the BIPH Orchestra<br>by Garrison Tubbs</p></h3>
     </div>
+
+    <div class="nav-container">
+        <h2>Tracklist<p></p></h2>
+        <ul class="song-list">
+            <li data-pdf="1">1 - This is Halloween</li>
+            <li data-pdf="2">2 - Year After Year</li>
+            <li data-pdf="3">3 - Oh Fare Thee Well</li>
+            <li data-pdf="4">4 - What's this?</li>
+            <li data-pdf="5">5 - Year After Year Reprise</li>
+            <li data-pdf="6">6 - And they call him...</li>
+            <li data-pdf="7">7 - Sally's song intro</li>
+            <li data-pdf="8">8 - Sally's Song</li>
+            <li data-pdf="9">9 - Sally's Vision</li>
+            <li data-pdf="10">10 - Pay the price</li>
+            <li data-pdf="11">11 - Kidnap the Sandy Claws</li>
+            <li data-pdf="12">12 - Jack's Lament</li>
+            <li data-pdf="13">13 - Elves</li>
+            <li data-pdf="14">14 - Jack's Lament Reprise</li>
+            <li data-pdf="15">15 - Kidnap Sandy Claws (Strings)</li>
+            <li data-pdf="16">16 - Oogie Boogie</li>
+            <li data-pdf="17">17 - Oh Fare Thee Well Reprise</li>
+            <li data-pdf="18">18 - Christmas Eve</li>
+            <li data-pdf="19">19 - Sally Sneaks</li>
+            <li data-pdf="20">20 - Sally Gets Caught</li>
+            <li data-pdf="21">21 - Spooktacular Fun</li>
+            <li data-pdf="22">22 - Christmas Eve Reprise</li>
+            <li data-pdf="23">23 - Sally's Song Reprise</li>
+            <li data-pdf="24">24 - Halloween Transition</li>
+            <li data-pdf="25">25 - Finale</li>
+        </ul>
+    </div>
+    <div class="scene">
+    </div>
+    <button class="scroll-top">Tracklist</button>
 
     <div class="scene">
         <p class="scene-heading">Scene 1 - Halloween Town</p>
