@@ -28,7 +28,9 @@ const instrumentData = {
     'Strings': {
         'Violins': [
             'Violin 2',
-            'Violin 3'
+            'Violin 3',
+            'Cello 1',
+            'Cello 2'
         ],
         'String Bass2': [
             'String Bass 2'
@@ -205,6 +207,34 @@ const songData = {
     { title: '18. Christmas Eve Montage', pdf: 'PDFs/Strings/Violin 3/18. Christmas Eve - Violin 3.pdf', audio: 'mp3s/Strings/Violin 3/Christmas Eve Montage-Violin_3.mp3' },
     { title: '20. Sally Gets Caught', pdf: 'PDFs/Strings/Violin 3/20. Sally Gets Caught - Violin 2.pdf', audio: 'mp3s/Strings/Violin 3/Sally Gets Caught-Violin_2.mp3' },
     { title: '25. Finale', pdf: 'PDFs/Strings/Violin 3/25. Finale - Violin 3.pdf', audio: 'mp3s/Strings/Violin 3/Finale-Violin_3.mp3' },
+],
+'Cello 1': [
+    { title: '1. This is Halloween', pdf: 'PDFs/Strings/Cello 1/1. This is Halloween-Cello_1.pdf', audio: 'mp3s/Strings/Cello 1/This is Halloween-Cello_1.mp3' },
+    { title: "4. What's This", pdf: 'PDFs/Strings/Cello 1/4. What\'s This - Cello.pdf', audio: 'mp3s/Strings/Cello 1/Whats This-Cello.mp3' },
+    { title: '6. And They Call Him Sandy Claws', pdf: 'PDFs/Strings/Cello 1/6. And They Call Him Sandy Claws - Cello 1, 2.pdf', audio: 'mp3s/Strings/Cello 1/And They Call Him Sandy Claws-Cello_1,_2.mp3' },
+    { title: "8. Sally's Song", pdf: 'PDFs/Strings/Cello 1/8. Sally\'s Song Cello.pdf', audio: 'mp3s/Strings/Cello 1/Sally\'s Song-Cello.mp3' },
+    { title: '9. Sally\'s Vision', pdf: 'PDFs/Strings/Cello 1/9. Sally\'s Vision-Violoncello.pdf', audio: 'mp3s/Strings/Cello 1/Sally\'s Vision-Violoncello.mp3' },
+    { title: '11. Kidnap The Sandy Claws', pdf: 'PDFs/Strings/Cello 1/11. Kidnap The Sandy Claws-Cello.pdf', audio: 'mp3s/Strings/Cello 1/Kidnap The Sandy Claws-Violoncello.mp3' },
+    { title: '15. Kidnap The Sandy Claws Strings', pdf: 'PDFs/Strings/Cello 1/15. Kidnap The Sandy Claws Strings Reprise Violoncello.pdf', audio: 'mp3s/Strings/Cello 1/Kidnap The Sandy Claws Strings-Violoncello.mp3' },
+    { title: '16. Oogie Boogie\'s Song', pdf: 'PDFs/Strings/Cello 1/16. Oogie Boogies Song-Cello_1.pdf', audio: 'mp3s/Strings/Cello 1/Oogie Boogies Song-Cello_1.mp3' },
+    { title: '18. Christmas Eve Montage', pdf: 'PDFs/Strings/Cello 1/18. Christmas Eve - Cello.pdf', audio: 'mp3s/Strings/Cello 1/Christmas Eve Montage-Cello.mp3' },
+    { title: '20. Sally Gets Caught', pdf: 'PDFs/Strings/Cello 1/20. Sally Gets Caught-Cello_1.pdf', audio: 'mp3s/Strings/Cello 1/Sally Gets Caught-Cello_1.mp3' },
+    { title: '21. Spooktacular Fun', pdf: 'PDFs/Strings/Cello 1/21. Spooktacular Fun-Violoncello.pdf', audio: 'mp3s/Strings/Cello 1/Spooktacular Fun-Violoncello.mp3' },
+    { title: '25. Finale', pdf: 'PDFs/Strings/Cello 1/25. Finale - Cello 1.pdf', audio: 'mp3s/Strings/Cello 1/Finale-Cello_1.mp3' },
+],
+'Cello 2': [
+    { title: '1. This is Halloween', pdf: 'PDFs/Strings/Cello 2/1. This is Halloween-Cello_2.pdf', audio: 'mp3s/Strings/Cello 2/This is Halloween-Cello_2.mp3' },
+    { title: "4. What's This", pdf: 'PDFs/Strings/Cello 2/4. What\'s This - Cello.pdf', audio: 'mp3s/Strings/Cello 2/Whats This-Cello.mp3' },
+    { title: '6. And They Call Him Sandy Claws', pdf: 'PDFs/Strings/Cello 2/6. And They Call Him Sandy Claws - Cello 1, 2.pdf', audio: 'mp3s/Strings/Cello 2/And They Call Him Sandy Claws-Cello_1,_2.mp3' },
+    { title: "8. Sally's Song", pdf: 'PDFs/Strings/Cello 2/8. Sally\'s Song Cello.pdf', audio: 'mp3s/Strings/Cello 2/Sally\'s Song-Cello.mp3' },
+    { title: '9. Sally\'s Vision', pdf: 'PDFs/Strings/Cello 2/9. Sally\'s Vision-Violoncello.pdf', audio: 'mp3s/Strings/Cello 2/Sally\'s Vision-Violoncello.mp3' },
+    { title: '11. Kidnap The Sandy Claws', pdf: 'PDFs/Strings/Cello 2/11. Kidnap The Sandy Claws-Cello.pdf', audio: 'mp3s/Strings/Cello 2/Kidnap The Sandy Claws-Violoncello.mp3' },
+    { title: '15. Kidnap The Sandy Claws Strings', pdf: 'PDFs/Strings/Cello 2/15. Kidnap The Sandy Claws Strings Reprise Violoncello.pdf', audio: 'mp3s/Strings/Cello 2/Kidnap The Sandy Claws Strings-Violoncello.mp3' },
+    { title: '16. Oogie Boogie\'s Song', pdf: 'PDFs/Strings/Cello 2/16. Oogie Boogies Song-Cello_2.pdf', audio: 'mp3s/Strings/Cello 2/Oogie Boogies Song-Cello_2.mp3' },
+    { title: '18. Christmas Eve Montage', pdf: 'PDFs/Strings/Cello 2/18. Christmas Eve - Cello.pdf', audio: 'mp3s/Strings/Cello 2/Christmas Eve Montage-Cello.mp3' },
+    { title: '20. Sally Gets Caught', pdf: 'PDFs/Strings/Cello 2/20. Sally Gets Caught-Cello_2.pdf', audio: 'mp3s/Strings/Cello 2/Sally Gets Caught-Cello_2.mp3' },
+    { title: '21. Spooktacular Fun', pdf: 'PDFs/Strings/Cello 2/21. Spooktacular Fun-Violoncello.pdf', audio: 'mp3s/Strings/Cello 2/Spooktacular Fun-Violoncello.mp3' },
+    { title: '25. Finale', pdf: 'PDFs/Strings/Cello 2/25. Finale - Cello 2.pdf', audio: 'mp3s/Strings/Cello 2/Finale-Cello_2.mp3' },
 ],
     'String Bass 2': [
     { title: '1. This is Halloween', pdf: 'PDFs/Strings/String Bass 2/1. This is Halloween - String Bass 2.pdf', audio: 'mp3s/Strings/String Bass 2/This is Halloween-String_Bass_2.mp3' },
