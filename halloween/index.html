@@ -249,6 +249,17 @@
     transform: translateX(-50%);
 }
 
+.pdf-container2 {
+    width: 100vw;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
 .pdf-page {
     width: 100%;
     margin: 10px 0;
@@ -766,19 +777,32 @@ window.onload = function() {
         });
     });
 
-    function updatePDFs(part) {
-        const pdfContainers = document.querySelectorAll('.pdf-container');
-        pdfContainers.forEach((container, index) => {
-            const viewer = new PDFViewer(container.id);
-            if (part === 'none') {
-                viewer.loadPDF('select-part.pdf');
+    
+
+Copy
+function updatePDFs(part) {
+    const pdfContainers = document.querySelectorAll('.pdf-container, .pdf-container2');
+    pdfContainers.forEach((container, index) => {
+        const viewer = new PDFViewer(container.id);
+        if (part === 'none') {
+            viewer.loadPDF('select-part.pdf');
+        } else {
+            const [section, instrument] = part.split('/');
+            let songNumber;
+
+            // Adjust song number based on the container ID
+            if (container.id === 'pdf-container-18b') {
+                songNumber = '18b'; // Special case for "18b"
             } else {
-                const [section, instrument] = part.split('/');
-                const songNumber = index + 1;
-                viewer.loadPDF(`PDFs/${section}/${instrument}/Song ${songNumber}.pdf`);
+                // Adjust for previous songs
+                songNumber = index >= 18 ? index - 1 : index + 1; // Keep normal indexing
+                if (index > 17) songNumber++; // Skip the 19th song number for "18b"
             }
-        });
-    }
+
+            viewer.loadPDF(`PDFs/${section}/${instrument}/Song ${songNumber}.pdf`);
+        }
+    });
+}
 };
 
 
@@ -1123,6 +1147,7 @@ scrollTopButton.addEventListener('click', function() {
             <li data-pdf="16">16 - Oogie Boogie</li>
             <li data-pdf="17">17 - Oh Fare Thee Well Reprise</li>
             <li data-pdf="18">18 - Christmas Eve</li>
+            <li data-pdf="18b">18b - Jack Is Fallen</li>
             <li data-pdf="19">19 - Sally Sneaks</li>
             <li data-pdf="20">20 - Sally Gets Caught</li>
             <li data-pdf="21">21 - Spooktacular Fun</li>
@@ -1807,6 +1832,11 @@ scrollTopButton.addEventListener('click', function() {
 <label style="font-size: small; background-color: rgb(95, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">VID 2 - Jack’s Falling</label>
 </div>
 </div>
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 18b - Jack Is Fallen</label>
+<div id="pdf-container-18b" class="pdf-container2"></div>
+
     <div class="scene">
         <p class="scene-heading">Scene 16 - Sally to the Rescue</p>
         <p class="action">(Oogie Boogie is tormenting Sandy Claws)</p>
