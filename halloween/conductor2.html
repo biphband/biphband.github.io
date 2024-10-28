@@ -366,14 +366,12 @@
 
     </style>
         <script>
-       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
        class SimplePDFViewer {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.currentPage = 1;
         this.pdf = null;
-        this.scale = 1.5;
+        this.scale = 2; // Increased scale for better quality
         
         // Create canvas element
         this.canvas = document.createElement('canvas');
@@ -383,6 +381,38 @@
         
         // Add navigation controls
         this.addControls();
+        
+        // Add click navigation
+        this.addClickNavigation();
+    }
+
+    addClickNavigation() {
+        this.container.addEventListener('click', (e) => {
+            const rect = this.container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const width = rect.width;
+            
+            // Check if click is in the left 20% or right 20%
+            if (x < width * 0.2) {
+                this.previousPage();
+            } else if (x > width * 0.8) {
+                this.nextPage();
+            }
+        });
+
+        // Add touch support
+        this.container.addEventListener('touchend', (e) => {
+            const rect = this.container.getBoundingClientRect();
+            const touch = e.changedTouches[0];
+            const x = touch.clientX - rect.left;
+            const width = rect.width;
+            
+            if (x < width * 0.2) {
+                this.previousPage();
+            } else if (x > width * 0.8) {
+                this.nextPage();
+            }
+        });
     }
 
     addControls() {
@@ -403,11 +433,17 @@
 
         const prevBtn = document.createElement('button');
         prevBtn.textContent = '← Previous';
-        prevBtn.onclick = () => this.previousPage();
+        prevBtn.onclick = (e) => {
+            e.stopPropagation(); // Prevent container click
+            this.previousPage();
+        };
 
         const nextBtn = document.createElement('button');
         nextBtn.textContent = 'Next →';
-        nextBtn.onclick = () => this.nextPage();
+        nextBtn.onclick = (e) => {
+            e.stopPropagation(); // Prevent container click
+            this.nextPage();
+        };
 
         const pageInfo = document.createElement('span');
         pageInfo.style.color = 'white';
@@ -436,19 +472,28 @@
 
         try {
             const page = await this.pdf.getPage(this.currentPage);
-            const viewport = page.getViewport({ scale: this.scale });
-
-            // Make canvas size match viewport
+            
+            // Calculate the optimal scale for high quality
             const containerWidth = this.container.clientWidth;
-            const scaleFactor = containerWidth / viewport.width;
-            const adjustedViewport = page.getViewport({ scale: this.scale * scaleFactor });
+            const viewport = page.getViewport({ scale: 1.0 });
+            const pixelRatio = window.devicePixelRatio || 1;
+            const scaleFactor = (containerWidth / viewport.width) * pixelRatio;
+            const finalScale = this.scale * scaleFactor;
+            
+            // Create high-resolution viewport
+            const finalViewport = page.getViewport({ scale: finalScale });
 
-            this.canvas.width = adjustedViewport.width;
-            this.canvas.height = adjustedViewport.height;
+            // Set canvas size to match the viewport
+            this.canvas.width = finalViewport.width;
+            this.canvas.height = finalViewport.height;
 
+            // Render with high quality settings
             const renderContext = {
                 canvasContext: this.canvas.getContext('2d'),
-                viewport: adjustedViewport
+                viewport: finalViewport,
+                intent: 'print', // Higher quality setting
+                renderInteractiveForms: false,
+                background: 'white'
             };
 
             await page.render(renderContext).promise;
@@ -477,7 +522,7 @@
 
 // Initialize everything when the page loads
 window.onload = function() {
-    // Initialize hamburger menu with simpler implementation
+    // Initialize hamburger menu
     const hamburgerBtn = document.querySelector('.hamburger-btn');
     const menuContainer = document.querySelector('.menu-container');
 
@@ -510,6 +555,8 @@ window.onload = function() {
     });
 };
 
+// Set PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 
 
