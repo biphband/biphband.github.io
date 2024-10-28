@@ -365,180 +365,174 @@
 
     </style>
         <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 class PDFViewer {
     constructor(containerId) {
-    this.container = document.getElementById(containerId);
-    this.currentPage = 1;
-    this.pdf = null;
-    this.scale = 2; // Reduced scale for better performance
-    this.pageImages = [];
-    this.pageContainers = [];
-    this.initialized = false;
-    this.loading = false;
-    this.loadingOverlay = this.createLoadingOverlay();
-    this.pagesLoaded = new Set();
-    
-    window.addEventListener('resize', () => this.handleResize());
-}
-
-createLoadingOverlay() {
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.9);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    `;
-    
-    const spinner = document.createElement('div');
-    spinner.textContent = 'Loading PDF...';
-    overlay.appendChild(spinner);
-    
-    this.container.style.position = 'relative';
-    this.container.appendChild(overlay);
-    return overlay;
-}
-
-async loadPDF(url) {
-    if (this.loading) return;
-    
-    try {
-        this.loading = true;
-        this.loadingOverlay.style.display = 'flex';
-        this.container.style.opacity = '0.5';
-        
-        const loadingTask = pdfjsLib.getDocument(url);
-        this.pdf = await loadingTask.promise;
-        
-        // Pre-render all pages before showing any
-        await this.renderAllPagesAsImages();
-        
-        this.initialized = true;
-        this.updatePageVisibility();
-        
+        this.container = document.getElementById(containerId);
+        this.currentPage = 1;
+        this.pdf = null;
+        this.scale = 2;
+        this.pageImages = [];
+        this.pageContainers = [];
+        this.initialized = false;
         this.loading = false;
-        this.loadingOverlay.style.display = 'none';
-        this.container.style.opacity = '1';
-    } catch (error) {
-        console.error('Error loading PDF:', error);
-        this.loading = false;
-        this.loadingOverlay.style.display = 'none';
-        this.container.style.opacity = '1';
-    }
-}
-
-async renderAllPagesAsImages() {
-    if (!this.pdf) return;
-
-    this.container.innerHTML = '';
-    this.pageContainers = [];
-    this.pageImages = [];
-
-    // Create all canvases and start rendering simultaneously
-    const renderPromises = [];
-    const pageContainers = [];
-
-    for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
-        const pageContainer = document.createElement('div');
-        pageContainer.className = 'pdf-page';
-        pageContainer.style.display = pageNum === this.currentPage ? 'block' : 'none';
-
-        const renderPromise = this.renderPage(pageNum, pageContainer);
-        renderPromises.push(renderPromise);
-        pageContainers.push(pageContainer);
-    }
-
-    // Wait for all pages to finish rendering
-    await Promise.all(renderPromises);
-
-    // Add all containers to the DOM at once
-    pageContainers.forEach(container => {
-        this.container.appendChild(container);
-        this.pageContainers.push(container);
-    });
-
-    this.container.onclick = (e) => {
-        const rect = this.container.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const width = rect.width;
+        this.loadingOverlay = this.createLoadingOverlay();
+        this.pagesLoaded = new Set();
         
-        if (x < width * 0.2) {
-            this.previousPage();
-        } else if (x > width * 0.8) {
-            this.nextPage();
-        }
-    };
-}
-
-async renderPage(pageNum, pageContainer) {
-    const page = await this.pdf.getPage(pageNum);
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-
-    const containerWidth = this.container.clientWidth;
-    const viewport = page.getViewport({ scale: this.scale });
-    const pixelRatio = window.devicePixelRatio || 1;
-    const scaledViewport = page.getViewport({ 
-        scale: (containerWidth / viewport.width) * this.scale * pixelRatio 
-    });
-
-    canvas.width = scaledViewport.width;
-    canvas.height = scaledViewport.height;
-
-    await page.render({
-        canvasContext: context,
-        viewport: scaledViewport,
-        intent: 'print',
-        background: 'white'
-    }).promise;
-
-    // Convert canvas to image
-    const image = new Image();
-    await new Promise(resolve => {
-        image.onload = resolve;
-        image.src = canvas.toDataURL('image/png');
-    });
-    
-    image.style.width = '100%';
-    image.style.height = 'auto';
-    this.pageImages.push(image);
-
-    if (this.pdf.numPages > 1) {
-        if (pageNum > 1) {
-            const prevButton = document.createElement('button');
-            prevButton.className = 'page-nav prev';
-            prevButton.onclick = () => this.previousPage();
-            pageContainer.appendChild(prevButton);
-        }
-
-        if (pageNum < this.pdf.numPages) {
-            const nextButton = document.createElement('button');
-            nextButton.className = 'page-nav next';
-            nextButton.onclick = () => this.nextPage();
-            pageContainer.appendChild(nextButton);
-        }
-
-        const pageNumber = document.createElement('div');
-        pageNumber.className = 'page-number';
-        pageNumber.textContent = `${pageNum} / ${this.pdf.numPages}`;
-        pageContainer.appendChild(pageNumber);
+        window.addEventListener('resize', () => this.handleResize());
     }
 
-    pageContainer.appendChild(image);
-}
+    createLoadingOverlay() {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        `;
+        
+        const spinner = document.createElement('div');
+        spinner.textContent = 'Loading PDF...';
+        overlay.appendChild(spinner);
+        
+        this.container.style.position = 'relative';
+        this.container.appendChild(overlay);
+        return overlay;
+    }
 
-updatePageVisibility() {
+    async loadPDF(url) {
+        if (this.loading) return;
+        
+        try {
+            this.loading = true;
+            this.loadingOverlay.style.display = 'flex';
+            this.container.style.opacity = '0.5';
+            
+            const loadingTask = pdfjsLib.getDocument(url);
+            this.pdf = await loadingTask.promise;
+            
+            await this.renderAllPagesAsImages();
+            
+            this.initialized = true;
+            this.updatePageVisibility();
+            
+            this.loading = false;
+            this.loadingOverlay.style.display = 'none';
+            this.container.style.opacity = '1';
+        } catch (error) {
+            console.error('Error loading PDF:', error);
+            this.loading = false;
+            this.loadingOverlay.style.display = 'none';
+            this.container.style.opacity = '1';
+        }
+    }
+
+    async renderAllPagesAsImages() {
+        if (!this.pdf) return;
+
+        this.container.innerHTML = '';
+        this.pageContainers = [];
+        this.pageImages = [];
+
+        const renderPromises = [];
+        const pageContainers = [];
+
+        for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
+            const pageContainer = document.createElement('div');
+            pageContainer.className = 'pdf-page';
+            pageContainer.style.display = pageNum === this.currentPage ? 'block' : 'none';
+
+            const renderPromise = this.renderPage(pageNum, pageContainer);
+            renderPromises.push(renderPromise);
+            pageContainers.push(pageContainer);
+        }
+
+        await Promise.all(renderPromises);
+
+        pageContainers.forEach(container => {
+            this.container.appendChild(container);
+            this.pageContainers.push(container);
+        });
+
+        this.container.onclick = (e) => {
+            const rect = this.container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const width = rect.width;
+            
+            if (x < width * 0.2) {
+                this.previousPage();
+            } else if (x > width * 0.8) {
+                this.nextPage();
+            }
+        };
+    }
+
+    async renderPage(pageNum, pageContainer) {
+        const page = await this.pdf.getPage(pageNum);
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+
+        const containerWidth = this.container.clientWidth;
+        const viewport = page.getViewport({ scale: this.scale });
+        const pixelRatio = window.devicePixelRatio || 1;
+        const scaledViewport = page.getViewport({ 
+            scale: (containerWidth / viewport.width) * this.scale * pixelRatio 
+        });
+
+        canvas.width = scaledViewport.width;
+        canvas.height = scaledViewport.height;
+
+        await page.render({
+            canvasContext: context,
+            viewport: scaledViewport,
+            intent: 'print',
+            background: 'white'
+        }).promise;
+
+        const image = new Image();
+        await new Promise(resolve => {
+            image.onload = resolve;
+            image.src = canvas.toDataURL('image/png');
+        });
+        
+        image.style.width = '100%';
+        image.style.height = 'auto';
+        this.pageImages.push(image);
+
+        if (this.pdf.numPages > 1) {
+            if (pageNum > 1) {
+                const prevButton = document.createElement('button');
+                prevButton.className = 'page-nav prev';
+                prevButton.onclick = () => this.previousPage();
+                pageContainer.appendChild(prevButton);
+            }
+
+            if (pageNum < this.pdf.numPages) {
+                const nextButton = document.createElement('button');
+                nextButton.className = 'page-nav next';
+                nextButton.onclick = () => this.nextPage();
+                pageContainer.appendChild(nextButton);
+            }
+
+            const pageNumber = document.createElement('div');
+            pageNumber.className = 'page-number';
+            pageNumber.textContent = `${pageNum} / ${this.pdf.numPages}`;
+            pageContainer.appendChild(pageNumber);
+        }
+
+        pageContainer.appendChild(image);
+    }
+
+    updatePageVisibility() {
         if (!this.pageContainers) return;
         
-        // Ensure currentPage is within valid range
         this.currentPage = Math.max(1, Math.min(this.currentPage, this.pdf.numPages));
         
         this.pageContainers.forEach((container, index) => {
@@ -561,207 +555,31 @@ updatePageVisibility() {
         }
     }
 
-handleResize() {
-    // Do nothing on resize since we're using images
+    handleResize() {
+        // Do nothing on resize since we're using images
+    }
 }
-}
-
-
-
-
-
 
 window.onload = function() {
     const hamburgerBtn = document.querySelector('.hamburger-btn');
     const menuContainer = document.querySelector('.menu-container');
     const mainMenuItems = document.querySelectorAll('.main-menu-item');
-    let selectedPart = 'none';
 
-    function showInstrumentFamilyPrompt() {
-        const overlay = document.createElement('div');
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        `;
-
-        const promptBox = document.createElement('div');
-        promptBox.style.cssText = `
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 80%;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3);
-        `;
-
-        const title = document.createElement('h2');
-        title.textContent = 'Select Your Instrument Family';
-        title.style.marginBottom = '20px';
-
-        const familyContainer = document.createElement('div');
-        familyContainer.style.cssText = `
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        `;
-
-        const families = ['Woodwinds', 'Brass', 'Percussion', 'Strings'];
-        families.forEach(family => {
-            const button = document.createElement('button');
-            button.textContent = family;
-            button.style.cssText = `
-                padding: 15px;
-                font-size: 16px;
-                border: 2px solid #ccc;
-                border-radius: 8px;
-                background: white;
-                cursor: pointer;
-                transition: all 0.3s ease;
-            `;
-            
-            button.addEventListener('mouseover', () => {
-                button.style.background = '#f0f0f0';
-                button.style.transform = 'scale(1.05)';
-            });
-            
-            button.addEventListener('mouseout', () => {
-                button.style.background = 'white';
-                button.style.transform = 'scale(1)';
-            });
-            
-            button.addEventListener('click', () => {
-                overlay.remove();
-                showInstrumentPrompt(family);
-            });
-            
-            familyContainer.appendChild(button);
-        });
-
-        promptBox.appendChild(title);
-        promptBox.appendChild(familyContainer);
-        overlay.appendChild(promptBox);
-        document.body.appendChild(overlay);
-    }
-
-    function showInstrumentPrompt(family) {
-        const overlay = document.createElement('div');
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        `;
-
-        const promptBox = document.createElement('div');
-        promptBox.style.cssText = `
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 80%;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3);
-        `;
-
-        const title = document.createElement('h2');
-        title.textContent = `Select Your ${family} Instrument`;
-        title.style.marginBottom = '20px';
-
-        const backButton = document.createElement('button');
-        backButton.textContent = '← Back to Families';
-        backButton.style.cssText = `
-            padding: 8px 16px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: white;
-            cursor: pointer;
-        `;
-        backButton.addEventListener('click', () => {
-            overlay.remove();
-            showInstrumentFamilyPrompt();
-        });
-
-        const instrumentList = document.createElement('div');
-        instrumentList.style.cssText = `
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        `;
-
-        const submenu = Array.from(document.querySelectorAll('.submenu')).find(
-            submenu => submenu.previousElementSibling.textContent === family
-        );
-
-        if (submenu) {
-            Array.from(submenu.children).forEach(child => {
-                const button = document.createElement('button');
-                button.textContent = child.textContent;
-                button.style.cssText = `
-                    padding: 12px;
-                    border: 1px solid #ccc;
-                    border-radius: 4px;
-                    background: white;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                `;
-
-                button.addEventListener('mouseover', () => {
-                    button.style.background = '#f0f0f0';
-                    button.style.transform = 'scale(1.02)';
-                });
-
-                button.addEventListener('mouseout', () => {
-                    button.style.background = 'white';
-                    button.style.transform = 'scale(1)';
-                });
-
-                button.addEventListener('click', () => {
-                    selectedPart = child.getAttribute('data-part');
-                    updatePDFs(selectedPart);
-                    overlay.remove();
-                });
-
-                instrumentList.appendChild(button);
-            });
-        }
-
-        promptBox.appendChild(backButton);
-        promptBox.appendChild(title);
-        promptBox.appendChild(instrumentList);
-        overlay.appendChild(promptBox);
-        document.body.appendChild(overlay);
-    }
-
-    showInstrumentFamilyPrompt();
-
+    // Hamburger menu functionality
     hamburgerBtn.addEventListener('click', () => {
         menuContainer.classList.toggle('active');
     });
 
-            // Close the menu if clicked outside
-            document.addEventListener('click', (event) => {
-            const isClickInsideMenu = menuContainer.contains(event.target);
-            const isClickInsideButton = hamburgerBtn.contains(event.target);
-            if (!isClickInsideMenu && !isClickInsideButton) {
-                menuContainer.classList.remove('active');
-            }
-        });
+    // Close the menu if clicked outside
+    document.addEventListener('click', (event) => {
+        const isClickInsideMenu = menuContainer.contains(event.target);
+        const isClickInsideButton = hamburgerBtn.contains(event.target);
+        if (!isClickInsideMenu && !isClickInsideButton) {
+            menuContainer.classList.remove('active');
+        }
+    });
 
+    // Main menu item click handling
     mainMenuItems.forEach(item => {
         item.addEventListener('click', () => {
             const submenu = item.nextElementSibling;
@@ -769,40 +587,21 @@ window.onload = function() {
         });
     });
 
-    document.querySelectorAll('.part-select').forEach(item => {
-        item.addEventListener('click', () => {
-            selectedPart = item.getAttribute('data-part');
-            updatePDFs(selectedPart);
-            menuContainer.classList.remove('active');
-        });
-    });
-
-    
-
-Copy
-function updatePDFs(part) {
+    // Load conductor PDFs
     const pdfContainers = document.querySelectorAll('.pdf-container, .pdf-container2');
     pdfContainers.forEach((container, index) => {
         const viewer = new PDFViewer(container.id);
-        if (part === 'none') {
-            viewer.loadPDF('select-part.pdf');
+        let songNumber;
+
+        if (container.id === 'pdf-container-18b') {
+            songNumber = '18b';
         } else {
-            const [section, instrument] = part.split('/');
-            let songNumber;
-
-            // Adjust song number based on the container ID
-            if (container.id === 'pdf-container-18b') {
-                songNumber = '18b'; // Special case for "18b"
-            } else {
-                // Adjust for previous songs
-                songNumber = index >= 18 ? index - 1 : index + 1; // Keep normal indexing
-                if (index > 17) songNumber++; // Skip the 19th song number for "18b"
-            }
-
-            viewer.loadPDF(`PDFs/${section}/${instrument}/Song ${songNumber}.pdf`);
+            songNumber = index >= 18 ? index - 1 : index + 1;
+            if (index > 17) songNumber++;
         }
+
+        viewer.loadPDF(`PDFs/conductor/Song ${songNumber}.pdf`);
     });
-}
 };
 
 
