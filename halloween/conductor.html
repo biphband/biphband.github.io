@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Pumpkin King</title>
+    <link rel="icon" href="images/jack.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+       body {
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 30%;
+            margin-bottom: 10px;
+        } 
+        h2 {
+            text-align: center;
+            margin-top: -10px;
+            margin-bottom: -10px;
+        }
+        h3 {
+            margin-bottom: 50%;
+            text-align: center;
+        }
+        .scene {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 20px;
+        }
+        .scene-heading {
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .action {
+            margin-bottom: 10px;
+        }
+        .character {
+            margin-left: 20px;
+            margin-bottom: 0;
+        }
+        .dialogue {
+            margin-left: 40px;
+            margin-top: 0;
+        }
+        .transition {
+            text-align: right;
+            font-style: italic;
+        }
+        .audio-player {
+            margin: 20px 0;
+            padding: 10px; 
+            border-radius: 5px;
+            max-width: 300px;
+        }
+        .sfx {
+            background-color: #d4edda;
+        }
+        .band {
+            background-color: #cce5ff;
+        }
+        .audio-player label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: small;
+        }
+        .music-cue, .sfx-cue, .proj-cue {
+            font-style: italic;
+            color: #666;
+        }
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px; /* Adjust height as needed */
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.445), rgba(255, 255, 255, 0));
+            display: flex;
+            align-items: center;
+            z-index: 800;
+        }
+        .hamburger-btn {
+            margin-left: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 40px;
+            height: 21px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        .hamburger-btn span {
+            width: 30px;
+            height: 3px;
+            background-color: #333;
+            transition: all 0.3s;
+        }
+        .menu-container {
+    position: fixed;
+    top: 50px;
+    left: -300px;
+    width: 300px;
+    height: calc(100vh - 50px);
+    background: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    transition: left 0.3s;
+    z-index: 950;
+    display: flex;
+    flex-direction: column;
+}
+.menu-container.active {
+    left: 0;
+}
+
+.menu-top-section {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0; /* Important for proper flex behavior */
+}
+
+.menu-bottom-section {
+    flex-shrink: 0; /* Prevents shrinking */
+    padding: 10px;
+    margin-bottom: 55px;
+}
+        .submenu {
+            margin-left: 20px;
+            display: none;
+            cursor: pointer;
+        }
+        .submenu.active {
+            display: block;
+        }
+        .menu-item {
+            padding: 5px;
+            padding-left: 15px;
+            cursor: pointer;
+            border: solid;
+            border-color: #9090907a;
+            background-color: #f5f2f2;
+        }
+        .menu-item:hover {
+            background-color: #f0f0f0;
+        }
+        .part-select {
+            padding: 5px;
+            cursor: pointer;
+        }
+        .part-select:hover {
+            background-color: #f0f0f0; /* Light gray background on hover */
+            transition: background-color 0.3s;
+        }
+
+
+        .menu-logo {
+    width: 100%;
+    max-height: 150px; /* Adjust this value as needed */
+    text-align: center;
+    margin: 10px 0;
+    margin-top: 0px;
+    margin-bottom: 40px;
+}
+
+.menu-logo img {
+    width: 200px;
+    max-height: 100%;
+    margin-top: 0px;
+    margin-bottom: -10px;
+    object-fit: contain;
+}
+
+.seating-button {
+    width: 90%;
+    margin: 10px auto;
+    padding: 10px;
+    background-color: #444;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    display: block;
+}
+
+.seating-button:hover {
+    background-color: #555;
+}
+
+
+
+
+.seating-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(201, 227, 240, 0.9), rgba(5, 38, 82, 0.98));
+    z-index: 990;
+    overflow: auto;
+}
+
+.overlay-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#seatingImage {
+    max-width: 90%;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    user-select: none;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+
+.close-button {
+    position: fixed;
+    top: 5px;
+    right: 15px;
+    color: black;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+
+        .pdf-container {
+    width: 100vw;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.pdf-container2 {
+    width: 100vw;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.pdf-page {
+    width: 100%;
+    margin: 10px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.pdf-canvas {
+    width: 100vw;
+    height: auto;
+    max-width: none;
+}
+
+.page-nav {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 20%;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.page-nav:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.page-nav.prev {
+    left: 0;
+}
+
+.page-nav.next {
+    right: 0;
+}
+
+.page-number {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+}
+
+
+
+
+
+
+
+        .song-list {
+            list-style: none;
+            max-width: 550px;
+            margin: 0 auto;
+        }
+
+        .song-list li {
+            padding-left: 20px;
+            padding-block: 10px;
+            margin: 5px 0;
+            background-color: #dfdfdf;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .song-list li:hover {
+            background-color: #bebebe;
+        }
+
+        .scroll-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            border-style: dotted;
+            border-width: 1px;
+            border-color: #515151;
+            background-color: #ffffffb8;
+            color: rgb(187, 187, 187);
+            padding: 5px 15px;
+            border-radius: 5px;
+            display: none;
+            transition: background-color 0.3s;
+            z-index: 2000;
+        }
+        .scroll-top:hover {
+            border: none;
+            background-color: #bababa;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* Add padding to the top to account for fixed navigation */
+        .content {
+            padding-top: 500px;
+        }
+
+    </style>
+        <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+class PDFViewer {
+    constructor(containerId) {
+    this.container = document.getElementById(containerId);
+    this.currentPage = 1;
+    this.pdf = null;
+    this.scale = 2; // Reduced scale for better performance
+    this.pageImages = [];
+    this.pageContainers = [];
+    this.initialized = false;
+    this.loading = false;
+    this.loadingOverlay = this.createLoadingOverlay();
+    this.pagesLoaded = new Set();
+    
+    window.addEventListener('resize', () => this.handleResize());
+}
+
+createLoadingOverlay() {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    `;
+    
+    const spinner = document.createElement('div');
+    spinner.textContent = 'Loading PDF...';
+    overlay.appendChild(spinner);
+    
+    this.container.style.position = 'relative';
+    this.container.appendChild(overlay);
+    return overlay;
+}
+
+async loadPDF(url) {
+    if (this.loading) return;
+    
+    try {
+        this.loading = true;
+        this.loadingOverlay.style.display = 'flex';
+        this.container.style.opacity = '0.5';
+        
+        const loadingTask = pdfjsLib.getDocument(url);
+        this.pdf = await loadingTask.promise;
+        
+        // Pre-render all pages before showing any
+        await this.renderAllPagesAsImages();
+        
+        this.initialized = true;
+        this.updatePageVisibility();
+        
+        this.loading = false;
+        this.loadingOverlay.style.display = 'none';
+        this.container.style.opacity = '1';
+    } catch (error) {
+        console.error('Error loading PDF:', error);
+        this.loading = false;
+        this.loadingOverlay.style.display = 'none';
+        this.container.style.opacity = '1';
+    }
+}
+
+async renderAllPagesAsImages() {
+    if (!this.pdf) return;
+
+    this.container.innerHTML = '';
+    this.pageContainers = [];
+    this.pageImages = [];
+
+    // Create all canvases and start rendering simultaneously
+    const renderPromises = [];
+    const pageContainers = [];
+
+    for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
+        const pageContainer = document.createElement('div');
+        pageContainer.className = 'pdf-page';
+        pageContainer.style.display = pageNum === this.currentPage ? 'block' : 'none';
+
+        const renderPromise = this.renderPage(pageNum, pageContainer);
+        renderPromises.push(renderPromise);
+        pageContainers.push(pageContainer);
+    }
+
+    // Wait for all pages to finish rendering
+    await Promise.all(renderPromises);
+
+    // Add all containers to the DOM at once
+    pageContainers.forEach(container => {
+        this.container.appendChild(container);
+        this.pageContainers.push(container);
+    });
+
+    this.container.onclick = (e) => {
+        const rect = this.container.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const width = rect.width;
+        
+        if (x < width * 0.2) {
+            this.previousPage();
+        } else if (x > width * 0.8) {
+            this.nextPage();
+        }
+    };
+}
+
+async renderPage(pageNum, pageContainer) {
+    const page = await this.pdf.getPage(pageNum);
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+
+    const containerWidth = this.container.clientWidth;
+    const viewport = page.getViewport({ scale: this.scale });
+    const pixelRatio = window.devicePixelRatio || 1;
+    const scaledViewport = page.getViewport({ 
+        scale: (containerWidth / viewport.width) * this.scale * pixelRatio 
+    });
+
+    canvas.width = scaledViewport.width;
+    canvas.height = scaledViewport.height;
+
+    await page.render({
+        canvasContext: context,
+        viewport: scaledViewport,
+        intent: 'print',
+        background: 'white'
+    }).promise;
+
+    // Convert canvas to image
+    const image = new Image();
+    await new Promise(resolve => {
+        image.onload = resolve;
+        image.src = canvas.toDataURL('image/png');
+    });
+    
+    image.style.width = '100%';
+    image.style.height = 'auto';
+    this.pageImages.push(image);
+
+    if (this.pdf.numPages > 1) {
+        if (pageNum > 1) {
+            const prevButton = document.createElement('button');
+            prevButton.className = 'page-nav prev';
+            prevButton.onclick = () => this.previousPage();
+            pageContainer.appendChild(prevButton);
+        }
+
+        if (pageNum < this.pdf.numPages) {
+            const nextButton = document.createElement('button');
+            nextButton.className = 'page-nav next';
+            nextButton.onclick = () => this.nextPage();
+            pageContainer.appendChild(nextButton);
+        }
+
+        const pageNumber = document.createElement('div');
+        pageNumber.className = 'page-number';
+        pageNumber.textContent = `${pageNum} / ${this.pdf.numPages}`;
+        pageContainer.appendChild(pageNumber);
+    }
+
+    pageContainer.appendChild(image);
+}
+
+updatePageVisibility() {
+        if (!this.pageContainers) return;
+        
+        // Ensure currentPage is within valid range
+        this.currentPage = Math.max(1, Math.min(this.currentPage, this.pdf.numPages));
+        
+        this.pageContainers.forEach((container, index) => {
+            const pageNum = index + 1;
+            container.style.display = pageNum === this.currentPage ? 'flex' : 'none';
+        });
+    }
+
+    nextPage() {
+        if (this.currentPage < this.pdf.numPages) {
+            this.currentPage = Math.min(this.currentPage + 0.5, this.pdf.numPages);
+            this.updatePageVisibility();
+        }
+    }
+
+    previousPage() {
+        if (this.currentPage > 1) {
+            this.currentPage = Math.max(this.currentPage - 0.5, 1);
+            this.updatePageVisibility();
+        }
+    }
+
+handleResize() {
+    // Do nothing on resize since we're using images
+}
+}
+
+
+
+
+
+
+window.onload = function() {
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    const menuContainer = document.querySelector('.menu-container');
+    const mainMenuItems = document.querySelectorAll('.main-menu-item');
+    let selectedPart = 'none';
+
+    function showInstrumentFamilyPrompt() {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        `;
+
+        const promptBox = document.createElement('div');
+        promptBox.style.cssText = `
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 80%;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        `;
+
+        const title = document.createElement('h2');
+        title.textContent = 'Select Your Instrument Family';
+        title.style.marginBottom = '20px';
+
+        const familyContainer = document.createElement('div');
+        familyContainer.style.cssText = `
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        `;
+
+        const families = ['Woodwinds', 'Brass', 'Percussion', 'Strings'];
+        families.forEach(family => {
+            const button = document.createElement('button');
+            button.textContent = family;
+            button.style.cssText = `
+                padding: 15px;
+                font-size: 16px;
+                border: 2px solid #ccc;
+                border-radius: 8px;
+                background: white;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            `;
+            
+            button.addEventListener('mouseover', () => {
+                button.style.background = '#f0f0f0';
+                button.style.transform = 'scale(1.05)';
+            });
+            
+            button.addEventListener('mouseout', () => {
+                button.style.background = 'white';
+                button.style.transform = 'scale(1)';
+            });
+            
+            button.addEventListener('click', () => {
+                overlay.remove();
+                showInstrumentPrompt(family);
+            });
+            
+            familyContainer.appendChild(button);
+        });
+
+        promptBox.appendChild(title);
+        promptBox.appendChild(familyContainer);
+        overlay.appendChild(promptBox);
+        document.body.appendChild(overlay);
+    }
+
+    function showInstrumentPrompt(family) {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        `;
+
+        const promptBox = document.createElement('div');
+        promptBox.style.cssText = `
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 80%;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        `;
+
+        const title = document.createElement('h2');
+        title.textContent = `Select Your ${family} Instrument`;
+        title.style.marginBottom = '20px';
+
+        const backButton = document.createElement('button');
+        backButton.textContent = '← Back to Families';
+        backButton.style.cssText = `
+            padding: 8px 16px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+        `;
+        backButton.addEventListener('click', () => {
+            overlay.remove();
+            showInstrumentFamilyPrompt();
+        });
+
+        const instrumentList = document.createElement('div');
+        instrumentList.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        `;
+
+        const submenu = Array.from(document.querySelectorAll('.submenu')).find(
+            submenu => submenu.previousElementSibling.textContent === family
+        );
+
+        if (submenu) {
+            Array.from(submenu.children).forEach(child => {
+                const button = document.createElement('button');
+                button.textContent = child.textContent;
+                button.style.cssText = `
+                    padding: 12px;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    background: white;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                `;
+
+                button.addEventListener('mouseover', () => {
+                    button.style.background = '#f0f0f0';
+                    button.style.transform = 'scale(1.02)';
+                });
+
+                button.addEventListener('mouseout', () => {
+                    button.style.background = 'white';
+                    button.style.transform = 'scale(1)';
+                });
+
+                button.addEventListener('click', () => {
+                    selectedPart = child.getAttribute('data-part');
+                    updatePDFs(selectedPart);
+                    overlay.remove();
+                });
+
+                instrumentList.appendChild(button);
+            });
+        }
+
+        promptBox.appendChild(backButton);
+        promptBox.appendChild(title);
+        promptBox.appendChild(instrumentList);
+        overlay.appendChild(promptBox);
+        document.body.appendChild(overlay);
+    }
+
+    showInstrumentFamilyPrompt();
+
+    hamburgerBtn.addEventListener('click', () => {
+        menuContainer.classList.toggle('active');
+    });
+
+            // Close the menu if clicked outside
+            document.addEventListener('click', (event) => {
+            const isClickInsideMenu = menuContainer.contains(event.target);
+            const isClickInsideButton = hamburgerBtn.contains(event.target);
+            if (!isClickInsideMenu && !isClickInsideButton) {
+                menuContainer.classList.remove('active');
+            }
+        });
+
+    mainMenuItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const submenu = item.nextElementSibling;
+            submenu.classList.toggle('active');
+        });
+    });
+
+    document.querySelectorAll('.part-select').forEach(item => {
+        item.addEventListener('click', () => {
+            selectedPart = item.getAttribute('data-part');
+            updatePDFs(selectedPart);
+            menuContainer.classList.remove('active');
+        });
+    });
+
+    
+
+Copy
+function updatePDFs(part) {
+    const pdfContainers = document.querySelectorAll('.pdf-container, .pdf-container2');
+    pdfContainers.forEach((container, index) => {
+        const viewer = new PDFViewer(container.id);
+        if (part === 'none') {
+            viewer.loadPDF('select-part.pdf');
+        } else {
+            const [section, instrument] = part.split('/');
+            let songNumber;
+
+            // Adjust song number based on the container ID
+            if (container.id === 'pdf-container-18b') {
+                songNumber = '18b'; // Special case for "18b"
+            } else {
+                // Adjust for previous songs
+                songNumber = index >= 18 ? index - 1 : index + 1; // Keep normal indexing
+                if (index > 17) songNumber++; // Skip the 19th song number for "18b"
+            }
+
+            viewer.loadPDF(`PDFs/${section}/${instrument}/Song ${songNumber}.pdf`);
+        }
+    });
+}
+};
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const seatingButton = document.getElementById('seatingButton');
+    const seatingOverlay = document.getElementById('seatingOverlay');
+    const closeButton = document.querySelector('.close-button');
+    const seatingImage = document.getElementById('seatingImage');
+    
+    if (seatingButton) {
+        seatingButton.addEventListener('click', function() {
+            if (seatingOverlay) {
+                seatingOverlay.style.display = 'block';
+                resetZoom();
+            }
+        });
+    }
+
+    if (closeButton) {
+        closeButton.addEventListener('click', function() {
+            if (seatingOverlay) {
+                seatingOverlay.style.display = 'none';
+                resetZoom();
+            }
+        });
+    }
+
+    let scale = 1;
+const SCALE_FACTOR = 0.1;
+const MAX_SCALE = 3;
+const MIN_SCALE = 1;
+
+// Add variables for panning
+let isPanning = false;
+let startX, startY;
+let currentX = 0;
+let currentY = 0;
+let translateX = 0;
+let translateY = 0;
+
+function resetZoom() {
+    scale = 1;
+    translateX = 0;
+    translateY = 0;
+    if (seatingImage) {
+        seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    }
+}
+
+function updateTransform() {
+    // If scale is at minimum, reset position to center
+    if (scale <= MIN_SCALE) {
+        translateX = 0;
+        translateY = 0;
+        currentX = 0;
+        currentY = 0;
+    }
+    seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+}
+
+if (seatingImage) {
+    // Add this line to prevent default dragging
+    seatingImage.setAttribute('draggable', false);
+
+    // Handle mouse wheel zoom
+    seatingImage.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -1 : 1;
+        scale += delta * SCALE_FACTOR;
+        scale = Math.min(Math.max(scale, MIN_SCALE), MAX_SCALE);
+        updateTransform();
+    });
+
+    // Handle mouse panning
+    seatingImage.addEventListener('mousedown', function(e) {
+        if (scale > 1) {
+            isPanning = true;
+            startX = e.clientX - translateX;
+            startY = e.clientY - translateY;
+            seatingImage.style.cursor = 'grabbing';
+        }
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (isPanning) {
+            currentX = e.clientX - startX;
+            currentY = e.clientY - startY;
+            translateX = currentX;
+            translateY = currentY;
+            updateTransform();
+        }
+    });
+
+    document.addEventListener('mouseup', function() {
+        if (isPanning) {
+            isPanning = false;
+            seatingImage.style.cursor = 'grab';
+            // Store the final position
+            translateX = currentX;
+            translateY = currentY;
+        }
+    });
+
+    // Handle pinch zoom for touch devices
+    let initialDistance = 0;
+    let initialScale = 1;
+    let lastTouchX = 0;
+    let lastTouchY = 0;
+
+    seatingImage.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 2) {
+            e.preventDefault();
+            initialDistance = Math.hypot(
+                e.touches[0].pageX - e.touches[1].pageX,
+                e.touches[0].pageY - e.touches[1].pageY
+            );
+            initialScale = scale;
+        } else if (e.touches.length === 1 && scale > 1) {
+            lastTouchX = e.touches[0].pageX - translateX;
+            lastTouchY = e.touches[0].pageY - translateY;
+        }
+    });
+
+    seatingImage.addEventListener('touchmove', function(e) {
+        if (e.touches.length === 2) {
+            e.preventDefault();
+            const currentDistance = Math.hypot(
+                e.touches[0].pageX - e.touches[1].pageX,
+                e.touches[0].pageY - e.touches[1].pageY
+            );
+            scale = initialScale * (currentDistance / initialDistance);
+            scale = Math.min(Math.max(scale, MIN_SCALE), MAX_SCALE);
+            updateTransform();
+        } else if (e.touches.length === 1 && scale > 1) {
+            e.preventDefault();
+            currentX = e.touches[0].pageX - lastTouchX;
+            currentY = e.touches[0].pageY - lastTouchY;
+            translateX = currentX;
+            translateY = currentY;
+            updateTransform();
+        }
+    });
+
+    seatingImage.addEventListener('touchend', function() {
+        translateX = currentX;
+        translateY = currentY;
+    });
+}
+});
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Song navigation
+    const songList = document.querySelectorAll('.song-list li');
+    const offset = -45; // Adjust this value to change the final scroll position
+
+    songList.forEach(song => {
+        song.addEventListener('click', function() {
+            const pdfNumber = this.getAttribute('data-pdf');
+            const pdfElement = document.getElementById(`pdf-container-${pdfNumber}`);
+            
+            if (pdfElement) {
+                const elementPosition = pdfElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - offset;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Double tap to scroll to nav container
+let lastTap = 0;
+document.addEventListener('touchend', function(event) {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+    if (tapLength < 500 && tapLength > 0) {
+        const navContainer = document.querySelector('.nav-container');
+        if (navContainer) {
+            const navRect = navContainer.getBoundingClientRect();
+            const offset = navRect.top + window.pageYOffset + 0; // 50px above the nav
+            window.scrollTo({
+                top: offset,
+                behavior: 'smooth'
+            });
+        }
+    }
+    lastTap = currentTime;
+});
+
+// Show/hide scroll to nav button
+const scrollTopButton = document.querySelector('.scroll-top');
+window.addEventListener('scroll', function() {
+    if (window.pageYOffset > 1000) {
+        scrollTopButton.style.display = 'block';
+    } else {
+        scrollTopButton.style.display = 'none';
+    }
+});
+
+scrollTopButton.addEventListener('click', function() {
+    const navContainer = document.querySelector('.nav-container');
+    if (navContainer) {
+        const navRect = navContainer.getBoundingClientRect();
+        const offset = navRect.top + window.pageYOffset + 0; // 50px above the nav
+        window.scrollTo({
+            top: offset,
+            behavior: 'smooth'
+        });
+    }
+});
+});
+        </script>
+</head>
+<body>
+
+    <div class="top-bar">
+        <button class="hamburger-btn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+    <div class="menu-container">
+        <div class="menu-top-section">
+        <div class="menu-item main-menu-item">Woodwinds</div>
+        <div class="submenu">
+            <div class="part-select" data-part="Woodwinds/Piccolo">Piccolo</div>
+            <div class="part-select" data-part="Woodwinds/Flute 1">Flute 1</div>
+            <div class="part-select" data-part="Woodwinds/Flute 2">Flute 2</div>
+            <div class="part-select" data-part="Woodwinds/Flute 3">Flute 3</div>
+            <div class="part-select" data-part="Woodwinds/Clarinet 1">Clarinet 1</div>
+            <div class="part-select" data-part="Woodwinds/Clarinet 2">Clarinet 2</div>
+            <div class="part-select" data-part="Woodwinds/Clarinet 3">Clarinet 3</div>
+            <div class="part-select" data-part="Woodwinds/Bass Clarinet">Bass Clarinet</div>
+            <div class="part-select" data-part="Woodwinds/Alto Sax 1">Alto Sax 1</div>
+            <div class="part-select" data-part="Woodwinds/Alto Sax 2">Alto Sax 2</div>
+            <div class="part-select" data-part="Woodwinds/Tenor Sax">Tenor Sax</div>
+            <div class="part-select" data-part="Woodwinds/Bassoon">Bassoon</div>
+        </div>
+
+        <div class="menu-item main-menu-item">Brass</div>
+        <div class="submenu">
+            <div class="part-select" data-part="Brass/Trumpet 1">Trumpet 1</div>
+            <div class="part-select" data-part="Brass/Trumpet 2">Trumpet 2</div>
+            <div class="part-select" data-part="Brass/Trumpet 3">Trumpet 3</div>
+            <div class="part-select" data-part="Brass/F Horn 1">F Horn 1</div>
+            <div class="part-select" data-part="Brass/F Horn 2">F Horn 2</div>
+            <div class="part-select" data-part="Brass/F Horn 3">F Horn 3</div>
+            <div class="part-select" data-part="Brass/F Horn 4">F Horn 4</div>
+            <div class="part-select" data-part="Brass/Trombone 1">Trombone 1</div>
+            <div class="part-select" data-part="Brass/Trombone 2">Trombone 2</div>
+            <div class="part-select" data-part="Brass/Trombone 3">Trombone 3</div>
+            <div class="part-select" data-part="Brass/Baritone">Baritone</div>
+            <div class="part-select" data-part="Brass/Tuba">Tuba</div>
+        </div>
+
+        <div class="menu-item main-menu-item">Percussion</div>
+        <div class="submenu">
+            <div class="part-select" data-part="Percussion/Timpani">Timpani</div>
+            <div class="part-select" data-part="Percussion/Piano">Piano</div>
+            <div class="part-select" data-part="Percussion/Chimes, Glockenspiel">Chimes, Glockenspiel</div>
+            <div class="part-select" data-part="Percussion/Percussion 1">Percussion 1</div>
+            <div class="part-select" data-part="Percussion/Marimba">Marimba</div>
+            <div class="part-select" data-part="Percussion/Vibraphone">Vibraphone</div>
+            <div class="part-select" data-part="Percussion/Aux Percussion 1">Aux Percussion 1</div>
+            <div class="part-select" data-part="Percussion/Aux Percussion 2">Aux Percussion 2</div>
+            <div class="part-select" data-part="Percussion/Aux Percussion 3">Aux Percussion 3</div>
+        </div>
+    
+        <div class="menu-item main-menu-item">Strings</div>
+        <div class="submenu">
+            <div class="part-select" data-part="Strings/Violin 1">Violin 1</div>
+            <div class="part-select" data-part="Strings/Violin 2">Violin 2</div>
+            <div class="part-select" data-part="Strings/Violin 3">Violin 3</div>
+            <div class="part-select" data-part="Strings/Violin 4">Violin 4</div>
+            <div class="part-select" data-part="Strings/Cello 1">Cello 1</div>
+            <div class="part-select" data-part="Strings/Cello 2">Cello 2</div>
+            <div class="part-select" data-part="Strings/String Bass 1">String Bass 1</div>
+            <div class="part-select" data-part="Strings/String Bass 2">String Bass 2</div>
+        </div>
+    
+        <div class="menu-item main-menu-item">Conductor Scores</div>
+        <div class="submenu">
+            <div class="part-select" data-part="Conductor/">Full Conductor Score</div>
+        </div>
+    </div>
+
+    <div class="menu-bottom-section">
+    <button id="seatingButton" class="seating-button">View Seating Layout</button>
+
+    <div class="menu-logo">
+        <img src="images/biphband.github.io:halloween.png"><br>Share access to this site:</br>
+    </div>
+</div>
+
+<div id="seatingOverlay" class="seating-overlay">
+    <div class="overlay-content">
+    <span class="close-button">&times;</span>
+    <img id="seatingImage" src="images/Halloween Layout.png" alt="Seating Layout">
+    </div>
+    </div>
+    </div>
+
+</div>
+
+    </div>
+
+    <div class="scene">
+        <h1>The Pumpkin King</h1>
+        <h2>An abridged version of <br>
+            <i>Nightmare Before Christmas</i><br> 
+            by Ian Ratcliffe</h2>
+        <h3><p><br>Music arranged for the BIPH Orchestra<br>by Garrison Tubbs</p></h3>
+    </div>
+
+    <div class="nav-container">
+        <h2>Tracklist<p></p></h2>
+        <ul class="song-list">
+            <li data-pdf="1">1 - This is Halloween</li>
+            <li data-pdf="2">2 - Year After Year</li>
+            <li data-pdf="3">3 - Oh Fare Thee Well</li>
+            <li data-pdf="4">4 - What's this?</li>
+            <li data-pdf="5">5 - Year After Year Reprise</li>
+            <li data-pdf="6">6 - And they call him...</li>
+            <li data-pdf="7">7 - Sally's song intro</li>
+            <li data-pdf="8">8 - Sally's Song</li>
+            <li data-pdf="9">9 - Sally's Vision</li>
+            <li data-pdf="10">10 - Pay the price</li>
+            <li data-pdf="11">11 - Kidnap the Sandy Claws</li>
+            <li data-pdf="12">12 - Jack's Lament</li>
+            <li data-pdf="13">13 - Elves</li>
+            <li data-pdf="14">14 - Jack's Lament Reprise</li>
+            <li data-pdf="15">15 - Kidnap Sandy Claws (Strings)</li>
+            <li data-pdf="16">16 - Oogie Boogie</li>
+            <li data-pdf="17">17 - Oh Fare Thee Well Reprise</li>
+            <li data-pdf="18">18 - Christmas Eve</li>
+            <li data-pdf="18b">18b - Jack Is Fallen</li>
+            <li data-pdf="19">19 - Sally Sneaks</li>
+            <li data-pdf="20">20 - Sally Gets Caught</li>
+            <li data-pdf="21">21 - Spooktacular Fun</li>
+            <li data-pdf="22">22 - Christmas Eve Reprise</li>
+            <li data-pdf="23">23 - Sally's Song Reprise</li>
+            <li data-pdf="24">24 - Halloween Transition</li>
+            <li data-pdf="25">25 - Finale</li>
+        </ul>
+    </div>
+    <div class="scene">
+    </div>
+    <button class="scroll-top">Tracklist</button>
+
+    <div class="scene">
+        <p class="scene-heading">Scene 1 - Halloween Town</p>
+        <p class="action">(Dark atmosphere, mist swirls around as the people of Halloween Town gather to celebrate their favorite day)</p>
+
+            <!-- SONG -->
+            <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 1 - This is Halloween</label>
+            <div id="pdf-container-1" class="pdf-container"></div>
+
+        <p class="action">(The celebrations conclude and the people of Halloween Town discuss the success of the celebrations.)</p>
+        <p class="character">Big Witch:</p>
+        <p class="dialogue">Jack, that was horrific! It made my skin crawl!</p>
+        <p class="character">Medium Witch:</p>
+        <p class="dialogue">It made me mad with love and hate!</p>
+        <p class="character">ALL Vampire:</p>
+        <p class="dialogue">It made our hearts turn to ash.</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Yes, that's all very nice and I'm glad you had fun-</p>
+        <p class="character">Mayor:</p>
+        <p class="dialogue">Jack my boy! That was so scary I thought I was going to die all over again! I can’t wait to see how you do it even better next year!</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Oh yes, well I can’t wait to do it all again Mr. Mayor.</p>
+        <p class="character">Mayor:</p>
+        <p class="dialogue">Attaboy, Jack.</p>
+        <p class="action">(Turning to audience and residents of Halloween Town)</p>
+        <p class="action">Hurry up now! There’s only 364 days left until next Halloween, we can’t waste another minute. Let’s start preparations!</p>
+        <p class="action">(Hooting and cheering from the crowd off-stage and the Mayor runs off. Jack turns away and walks off-stage.)</p>
+        <p class="character">Finklestein:</p>
+        <p class="dialogue">There you are! You thought you could get away from me? I created you!</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">Let me go!</p>
+        <p class="action">(Sally pulls away, leaving her hand behind as she escapes off stage.)</p>
+        <p class="character">Finklestein:</p>
+        <p class="dialogue">Come back here!</p>
+        <p class="action">(He chases her off stage.)</p>
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 2 - Year After Year</label>
+<div id="pdf-container-2" class="pdf-container"></div>
+
+    </div>
+    
+    <div class="scene">
+        <p class="scene-heading">Scene 2 - Graveyard Pumpkin Patch</p>
+        <p class="action">(Jack walks solemnly to the top of a small curling mountain in the middle of the graveyard, the moon shines a thick yellow behind him)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">I just don’t understand, I live for Halloween, always have since I was…</p>
+        <p class="action">(Jack starts to count on his fingers but quickly gives up.)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Oh forget it, I don’t know how old I am. That’s part of the problem… Nobody knows how old they are, how long this Halloween has been going on! It’s timeless, without an end in sight and I Jack, the pumpkin king, can’t just go up to them and say “Hey everyone, I’m really tired of doing the same thing at the same time every year in and out!” I’m losing my mind. I need something fresh, something new… But what… What’s out there for me?</p>
+        <p class="action">(Jack walks off stage into the unknown, Sally reveals herself from behind a statue.)</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">Oh Jack, but you were made for Halloween.</p>
+
+    <!-- SONG -->
+    <label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 3 - Oh Fare Thee Well</label>
+    <div id="pdf-container-3" class="pdf-container"></div>
+
+    </div>
+    
+       
+    <div class="scene">
+        <p class="scene-heading">Scene 3 - Unknown Forest</p>
+        <p class="action">(Transition into Scene 3 as the mysterious forest looms ahead.)</p>
+        <p class="action">(Eventually Jack finds himself having walked a very long way away, even while he slept! He finds several great large trees with strange pictures; an Egg, a Turkey, a 4 leafed clover, and a Christmas tree.)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">I've never been here before, how strange…</p>
+
+        <!--VIDEO-->
+        <label style="font-size: small; background-color: rgb(95, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">VID 3a - Jack's journey</label>
+         </div>
+
+
+    <div class="scene">
+        <p class="scene-heading">Scene 4 - Searching for Jack</p>
+        <p class="action">(Back in Halloween town the townspeople are preparing for the next Halloween, the mayor walks up to Jack's house and rings the door bell, humming the tune from opening song)</p>
+        
+        <!--SFX-->
+         <label style="font-size: small; background-color: rgb(39, 135, 69); color: white; padding: 10px; margin-bottom: 100px;">SFX 1 - Jack's Doorbell</label>
+
+        
+        <p class="character">Mayor:</p>
+        <p class="dialogue">Jack! Come out! I have the plans for next Halloween, I think you're going to like it.</p>
+        <p class="action">(He waits, no reply. Others are watching him)</p>
+        <p class="character">Mayor:</p>
+        <p class="dialogue">Jack? Are you in there?</p>
+        <p class="action">(Still no reply, Mayor becomes angry)</p>
+        <p class="character">Mayor:</p>
+        <p class="dialogue">Where is Jack? Has anyone seen him?</p>
+        <p class="character">Wolfman:</p>
+        <p class="dialogue">No one's seen him since last night.</p>
+        <p class="character">Corpse kid:</p>
+        <p class="dialogue">I saw him walking to the graveyard.</p>
+        <p class="character">Bat child:</p>
+        <p class="dialogue">Maybe he got eaten by a great big snake!</p>
+        <p class="character">Mayor:</p>
+        <p class="dialogue">(Very angry) Well we've got to find him! Everyone look! We can't do Halloween without him! Sound the alarm!</p>
+
+        <!-- SFX -->
+        <label style="font-size: small; background-color: rgb(39, 135, 69); color: white; padding: 10px; margin-bottom: 100px;">SFX 2 - Spooky cat alarm</label>
+
+
+    <div class="scene">
+        <p class="scene-heading">Scene 5 - Christmas town</p>
+        <p class="action">(Jack suddenly finds himself through the door into a bank of snow, as the song starts up Jack reacts in wonderment at all the incredible Christmas things around him.)</p>
+  
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 4 - What's this?</label>
+<div id="pdf-container-4" class="pdf-container"></div>
+
+<!-- SFX -->
+<label style="font-size: small; background-color: rgb(39, 135, 69); color: white; padding: 10px; margin-bottom: 100px;">SFX 3 - Banging head on pole</label>
+       
+        <p class="action">(Jack hits his head on a nearby pole, and reads the sign)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Christmas town?</p>
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 5 - Year After Year Reprise</label>
+<div id="pdf-container-5" class="pdf-container"></div>
+
+
+    </div>
+
+
+    <div class="scene">
+        <p class="scene-heading">Scene 6 - Jack returns!</p>
+        <p class="action">(The Mayor is frantic, everyone in Halloween town seems to have given up looking for Jack)</p>
+        <p class="character">Mayor:</p>
+        <p class="dialogue">Has anyone found Jack yet?</p>
+        <p class="character">Clown:</p>
+        <p class="dialogue">I walked through the pumpkin patch…</p>
+        <p class="character">Corpse kid:</p>
+        <p class="dialogue">I swam in the tar pits…</p>
+        <p class="character">Big Witch:</p>
+        <p class="dialogue">I searched all the cauldrons…</p>
+        <p class="character">Medium witch:</p>
+        <p class="dialogue">I rummaged through the arcane library…</p>
+        <p class="character">Vampire #2:</p>
+        <p class="dialogue">I peered behind the Cyclops' eye…</p>
+        <p class="action">(All other creatures look at the vampire, knowing he did not look there.)</p>
+        <p class="character">Vampire #2:</p>
+        <p class="dialogue">I did!</p>
+        <p class="character">Mayor:</p>
+        <p class="dialogue">Did we dredge the lake?</p>
+        <p class="character">Clown:</p>
+        <p class="dialogue">I did yesterday…</p>
+        <p class="character">Bat kid:</p>
+        <p class="dialogue">Look there!</p>
+        <p class="action">(Jack walks through the gates a large red sack over one shoulder)</p>
+        <p class="character">Mayor:</p>
+        <p class="dialogue">(happy) Jack! You've returned!</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Call an emergency meeting, invite everyone!</p>
+        <p class="character">Mayor:</p>
+        <p class="dialogue">When?!</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Immediately!</p>
+
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS (misc) - Bruce tolling chimes</label>
+
+
+               <p class="action">(Transition to town hall, actors move chairs onto stage, all the while SFX cue plays)</p>
+    </div>
+
+
+
+
+    <div class="scene">
+        <p class="scene-heading">Scene 7 - Town meeting</p>
+        <p class="action">(Jack stands on stage, others are seated waiting for him to present.)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">I have come back from the most amazing place, full of things you cannot imagine, things so wild and interesting they escape from your most feverish nightmares! Allow me to show you the delight of Christmas land...</p>
+        <p class="action">(He reveals a Christmas tree with presents underneath, all the crowd gasps amazed. Jack picks up a present from under the tree.)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">This is called a present, it's a box wrapped up with a little bow, you give it to someone you like.</p>
+        <p class="character">Wolfman:</p>
+        <p class="dialogue">What's inside?</p>
+        <p class="character">Clown:</p>
+        <p class="dialogue">Is it dead?</p>
+        <p class="character">Wolfman:</p>
+        <p class="dialogue">Is it live?</p>
+        <p class="character">Clown and Wolf:</p>
+        <p class="dialogue">What's in it? What's in it?</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">That's not really the point, it's meant to be 'nice'.</p>
+        <p class="action">(The crowd starts to mutter amongst each other, Jack moves on to the next thing and brings out a Christmas stocking)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Pay attention now, we pick up this oversized sock, and hang it like this on the wall.</p>
+        <p class="character">Vampire 1:</p>
+        <p class="dialogue">What's inside?</p>
+        <p class="character">Vampire 2:</p>
+        <p class="dialogue">It's a foot!</p>
+        <p class="character">Vampire 3:</p>
+        <p class="dialogue">Is it rotten and covered in gook?</p>
+        <p class="character">Vampire 2:</p>
+        <p class="dialogue">Oooh! I love gook!</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">No, no foot. You can fill it with candy or small toys.</p>
+        <p class="character">Corpse kid:</p>
+        <p class="dialogue">Toys?</p>
+        <p class="character">Bat kid:</p>
+        <p class="dialogue">Do they bite?</p>
+        <p class="character">Corpse kid:</p>
+        <p class="dialogue">Do they snap?</p>
+        <p class="character">Bat kid:</p>
+        <p class="dialogue">Do they pop out and scare little boys?</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">No, you don't understand, that's not the point of Christmas land….</p>
+        <p class="action">(Aside) Well, I may as well give them what they want…</p>
+        <p class="dialogue">Now the ruler of this Christmas town is a fearsome king in red, he sits his throne on a chair of ice and stone. A great large monster, with a grand deep voice who takes to the skies on a moonlight night!</p>
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 6 - And they call him...</label>
+<div id="pdf-container-6" class="pdf-container"></div>
+
+        <p class="dialogue">And they call him 'Sandy Claws'.</p>
+        <p class="action">(Jack cackles he crowd applauses and cackles with him)</p>
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 7 - Sally's song intro</label>
+<div id="pdf-container-7" class="pdf-container"></div>
+
+
+    </div>
+
+
+    <div class="scene">
+        <p class="scene-heading">Scene 8 - Sally's vision</p>
+        <p class="action">(Sally meekly enters the science tower)</p>
+        <p class="character">Dr. Finklestein:</p>
+        <p class="dialogue">You've returned.</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">I had to…</p>
+        <p class="character">Dr. Finklestein:</p>
+        <p class="dialogue">For this?</p>
+        <p class="action">(Holding up her hand)</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">Yes…</p>
+        <p class="action">(She sits in a chair while the doctor repairs her hand)</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">I just can't help it, I'm restless.</p>
+        <p class="character">Dr. Finklestein:</p>
+        <p class="dialogue">It's just a phase my dear, it will pass.</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">But I don't want it to pass, I need to be out there seeing all that I can, doing even more!</p>
+        <p class="character">Dr. Finkelstein:</p>
+        <p class="dialogue">You are my creation! I'll have no more insubordination from you, or it will be the tower prison until next Halloween! Now, go make my soup. I have work to do.</p>
+        <p class="action">(Dr. Finklestein moves off stage, Sally moves to kitchen to make soup. She grabs the things she needs and starts to prepare)</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">Stupid soup… Stupid tower… Stupid doctor!</p>
+        <p class="action">(She slams the pot)</p>
+        <p class="dialogue">Is this what I was made for?! Making soup for some old doctor for my whole life? What kind of life is that?</p>
+        <p class="action">(She moves to window, looking out at Halloween town)</p>
+        <p class="dialogue">All this talk of Christmas, it's not good, too weird, too happy- what's wrong with Halloween? Everyone likes it, everyone knows it, things are changing and I don't like change. I'll show that doctor, next year I'll be in the great Halloween festival then he'll see I'm not fit for making 'soup' and cleaning the floors.</p>
+        <p class="action">(She picks an old nearly dead flower from the nearby windowsill, picking the petals all the while saying)</p>
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 8 - Sally's Song</label>
+<div id="pdf-container-8" class="pdf-container"></div>
+
+
+        <p class="dialogue">He loves me, he loves not, he loves me, he loves me not, he-</p>
+<!-- VIDEO -->
+<label style="font-size: small; background-color: rgb(95, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">VID 1 / MUS 9 - Sally’s Vision</label>
+</div>
+
+<!-- SONG 5 -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 9 - Sally’s Vision</label>
+<div id="pdf-container-9" class="pdf-container"></div>
+
+
+        <p class="action">(She stops as suddenly, the flower transforms into a beautiful Christmas tree set with decorations. Suddenly, the Christmas tree catches fire and burns to a crisp.)</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">Oh no, this 'Christmas' it's a disaster- I've got to warn Jack!</p>
+        <p class="action">(She runs off stage)</p>
+
+        
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 10 - Pay the price</label>
+<div id="pdf-container-10" class="pdf-container"></div>
+
+    </div>
+
+
+
+    <div class="scene">
+        <p class="scene-heading">Scene 9 - Jack's instructions</p>
+        <p class="action">(Jack is instructing a line of Halloween characters in how to prepare for Christmas)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">See here this is called a 'nutcracker', it works like this.</p>
+        <p class="action">(He demonstrates)</p>
+        <p class="dialogue">Think you can make it?</p>
+        <p class="character">Axe man:</p>
+        <p class="dialogue">I'll make it perfectly</p>
+        <p class="action">(He takes out his axe and looks menacingly at the nutcracker while walking away)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">This is a toy, it pops out of the box like this</p>
+        <p class="action">(He demonstrates)</p>
+        <p class="dialogue">What do you think?</p>
+        <p class="character">Vampire #1:</p>
+        <p class="dialogue">Hmm</p>
+        <p class="character">Vampire #2:</p>
+        <p class="dialogue">Some adjustments may need to be made…</p>
+        <p class="character">Corpse Kid:</p>
+        <p class="dialogue">Some exsanguination may be required….</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Aha.. okay, great.</p>
+        <p class="action">(Band leader approaches)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">I need a song to be played, it goes something like this</p>
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS (misc) - Bad Jingle Bells</label>
+
+        <p class="action">(Jack takes some bells and plays the first few notes of "Jingle Bells")</p>
+        <p class="character">Band Leader:</p>
+        <p class="dialogue">Alright boys, one and a two and a-</p>
+        <p class="action">(They play a very deep, haunting version of Jingle Bells)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Great!</p>
+        <p class="action">(Sally approaches)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">You have the most important job of all!</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">Jack you've got to listen; this is all a terrible mistake!</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Not terrible, it's supposed to be red. You see, here the coat is red and the trim is white.</p>
+        <p class="action">(Lock, Shock, and Barrel enter throwing things at the Mayor)</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">I had a vision, you've got to stop this now!</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Vision?</p>
+        <p class="character">Mayor:</p>
+        <p class="dialogue">Jack! Boogie's boys are here!</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Excellent!</p>
+        <p class="action">(Pushing past Sally)</p>
+        <p class="dialogue">You'll do great, I have no doubt. Just remember, white trim and red coat. Now, if you'd excuse me for a moment.</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">But…</p>
+        <p class="action">(Jack addresses the trio)</p>
+        <p class="character">Lock:</p>
+        <p class="dialogue">You called for us?</p>
+        <p class="character">Shock:</p>
+        <p class="dialogue">Will it be trick or treat, Jack?</p>
+        <p class="character">Barrel:</p>
+        <p class="dialogue">We're always up for something fun!</p>
+        <p class="action">(Each presenting themselves)</p>
+        <p class="character">Lock:</p>
+        <p class="dialogue">Lock</p>
+        <p class="character">Shock:</p>
+        <p class="dialogue">Shock</p>
+        <p class="character">Barrel:</p>
+        <p class="dialogue">And Barrel!</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">I have a special job for you three that will require your utmost care and attention… Are you up for the task?</p>
+        <p class="character">Shock:</p>
+        <p class="dialogue">Of course, Jack</p>
+        <p class="character">Lock:</p>
+        <p class="dialogue">Wha'dya need?</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">I need you to find Sandy Claws and bring him here.</p>
+        <p class="character">Lock, Shock, and Barrel:</p>
+        <p class="dialogue">Sandy Claws!</p>
+        <p class="character">Barrel:</p>
+        <p class="dialogue">We can do that!</p>
+        <p class="character">Shock:</p>
+        <p class="dialogue">Piece of Cake, Jack.</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Listen closely, you must go to the edge of the woods and find the tree with a Christmas door on it.</p>
+        <p class="character">Lock:</p>
+        <p class="dialogue">Let's go get a Sandy Claws!</p>
+        <p class="action">(The others chuckle in agreement)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">And another thing, leave that no good Oogie Boogie out of this!</p>
+        <p class="character">Barrel:</p>
+        <p class="dialogue">We wouldn't ask him for help.</p>
+        <p class="character">Lock:</p>
+        <p class="dialogue">Not for something like this.</p>
+        <p class="character">Shock:</p>
+        <p class="dialogue">We wouldn't dream of it!</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Are you sure?</p>
+        <p class="character">All together:</p>
+        <p class="dialogue">We promise!</p>
+        <p class="action">(Jack can't see, but all three giggle and sneakily cross their fingers behind their back, scene changes, Jack exits)</p>
+ 
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 11 - Kidnap the Sandy Claws</label>
+<div id="pdf-container-11" class="pdf-container"></div>
+
+
+        <p class="action">(Scene ends with the trio walking off with weapons and a great big Halloween bag)</p>
+
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 12 - Jack's Lament</label>
+<div id="pdf-container-12" class="pdf-container"></div>
+
+    </div>
+
+
+    <div class="scene">
+        <p class="scene-heading">Scene 10 - Making Christmas</p>
+        <p class="action">(All the members of Halloween town are making preparations for their Christmas)</p>
+        <p class="character">Clown:</p>
+        <p class="dialogue">Wont they be impressed? I am a genius! Look how I take this old rat and make it into a lovely hat!</p>
+        <p class="action">(Jack approaches)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">My compliments from me to you about your most delightful hat but does it really say "Christmas"?</p>
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS (misc) - Aurora Sleigh Bells</label>
+
+        <p class="action">(The clown thinks for a minute, Jack as well, some elves carrying Santa hats run across the stage as if from his memory, one even takes off his hat and points at it for the audience)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Ah! That's it!</p>
+        <p class="action">(He grabs a nearby bat)</p>
+        <p class="dialogue">Consider instead using this nice bat!</p>
+        <p class="character">Clown:</p>
+        <p class="dialogue">At once!</p>
+        <p class="action">(Jack moves on to a poor Vampire trying really hard to create a wreath)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Oh no that things been dead for far too long try something fresher, something pleasant!</p>
+        <p class="character">Vampire #1:</p>
+        <p class="dialogue">Hmm.. I've got just the thing</p>
+        <p class="action">(He takes out a fish and bunch of fresh poisonous looking leaves and starts working. Axe man is putting rotten fruit into a discolored present box. Jack approaches)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">My friend, a present should be a special thing. Little boys and girls won't have much use for old fruit… What do little boys and girls like…</p>
+        <p class="character">Axe man:</p>
+        <p class="dialogue">(Thinking for an almost uncomfortable amount of time….) They. Like……Bugs!</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">That's perfect! Here's some scorpions, make sure you fill the box up!</p>
+        <p class="action">(Sally approaches with his Santa costume)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">See! I knew you could do it! I'll look just the part.</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">Jack please, this is all wrong. I have a terrible feeling that-</p>
+        <p class="action">(She is interrupted by the Boogie Trio entering with a very suspicious bag)</p>
+        <p class="character">Lock:</p>
+        <p class="dialogue">Jack we got him!</p>
+        <p class="character">Shock:</p>
+        <p class="dialogue">Easy as one, two, three.</p>
+        <p class="character">Barrel:</p>
+        <p class="dialogue">Just like you said, he's really big.</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Wonderful! What are you waiting for, open it up!</p>
+        <p class="action">(They remove the sack revealing the Easter Bunny, he runs out and sees the Axe man)</p>
+        <p class="character">Axe man:</p>
+        <p class="dialogue">Bunny!</p>
+        <p class="action">(Easter bunny runs back and puts himself back into the bag)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Who is that!?</p>
+        <p class="character">Lock:</p>
+        <p class="dialogue">Sandy Claws!</p>
+        <p class="character">Shock:</p>
+        <p class="dialogue">We followed your instructions!</p>
+        <p class="character">Barrel:</p>
+        <p class="dialogue">We went through the door you told us about.</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Which door?!</p>
+        <p class="action">(The trio uncertainly look at each other)</p>
+        <p class="action">(He holds up a small picture of a Christmas tree)</p>
+        <p class="character">ALL TRIO:</p>
+        <p class="dialogue">Uhm...</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">I told you, there is more than one door. Sandy Claws is behind the door that looks like this!</p>
+        <p class="action">(Turning to the bagged rabbit and speaking slowly)</p>
+        <p class="dialogue">We're very sorry, please don't come out of the bag. Now, take this thing back to where it came from.</p>
+        <p class="action">(They start to argue, Jack contorts his face and lets loose a horrific scream)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Shall I send someone ELSE for sandy claws?</p>
+        <p class="character">Lock:</p>
+        <p class="dialogue">No!</p>
+        <p class="character">Barrel:</p>
+        <p class="dialogue">We can handle it.</p>
+        <p class="character">Shock:</p>
+        <p class="dialogue">We'll get it right this time.</p>
+        <p class="character">ALL TRIO:</p>
+        <p class="dialogue">For sure!</p>
+        <p class="action">(The trio runs off quickly taking the bag with them, transition to next scene)</p>
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 13 - Elves</label>
+<div id="pdf-container-13" class="pdf-container"></div>
+    </div>
+    
+    
+    <div class="scene">
+        <p class="scene-heading">Scene 11 - Santa Captured</p>
+        <p class="action">(In Christmas Town, Santa is checking his list and marking the names of naughty and nice children)</p>
+        <p class="character">Santa:</p>
+        <p class="dialogue">Nice, Nice, nice, nice, naughty, nice, nice… Oh, hardly any naughty children this year! How wonderful, a record year to be sure. I guess I’m going to have to pay those elves overtime for making so many toys… oh dear…</p>
+
+<!-- SFX -->
+<label style="font-size: small; background-color: rgb(39, 135, 69); color: white; padding: 10px; margin-bottom: 100px;">SFX 5 - Santa's Doorbell</label>
+
+        <p class="action">(He goes to sit down, but a Christmasy doorbell rings and so he goes over to the door and opens it. Lock, Shock, and Barrel stand outside with the bag)</p>
+        <p class="character">Lock:</p>
+        <p class="dialogue">Trick!</p>
+        <p class="character">Shock:</p>
+        <p class="dialogue">or…</p>
+        <p class="character">Barrel:</p>
+        <p class="dialogue">Treat!</p>
+        <p class="character">Santa:</p>
+        <p class="dialogue">What’s this about?</p>
+        <p class="character">Shock:</p>
+        <p class="dialogue">Actually for you it will just be…</p>
+        <p class="character">ALL TRIO:</p>
+        <p class="dialogue">TRICK!</p>
+        <p class="action">(They bag Santa and he screams all the way. Transition)</p>
+        
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 14 - Jack’s Lament Reprise</label>
+<div id="pdf-container-14" class="pdf-container"></div>
+
+    </div>
+    
+    <div class="scene">
+        <p class="scene-heading">Scene 12 - The Night Before Christmas</p>
+        <p class="action">(Back in Halloween Town, Everyone is gathering the presents and preparing the sleigh. Sally is putting the final touches on Jack’s Santa outfit)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">It’s perfect. Exactly how I thought it would look!</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">Jack, listen we’re going against the natural order of things. This is Halloween Town, we were born to scare and scream not sing and celebrate…</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">What do you mean? This is right! Look around you, everyone is loving Christmas. We’ve celebrated so many Halloweens, doesn’t it make you just a little sick? Hungry for something new? Well, Christmas is happening and there isn’t anything anyone can do to stop it!</p>
+        <p class="action">(Just then, the trio walks in with the bagged Santa)</p>
+        <p class="character">Lock:</p>
+        <p class="dialogue">This time we really got him!</p>
+        <p class="character">Shock:</p>
+        <p class="dialogue">Right through the Christmas door, just like you said.</p>
+        <p class="character">Barrel:</p>
+        <p class="dialogue">He’s really heavy.</p>
+        <p class="action">(They un-bag Santa who looks around at the horrifying creatures)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Sandy Claws himself! In person, I can hardly believe it… It’s a pleasure to meet you.</p>
+        <p class="action">(He shakes his hands)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">You have hands! No claws at all…</p>
+        <p class="character">Santa:</p>
+        <p class="dialogue">But- I’ve always done Christmas, please there must be some misunderstanding-</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">No need for you to worry about Christmas this year. Consider it a vacation for so many long years of service. Leave everything to me, you have nothing to worry about!</p>
+        <p class="action">(To the Trio)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Make sure he’s comfortable, boys.</p>
+        <p class="action">(They start to take Santa away, then Jack remembers)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Just a second fellas.</p>
+        <p class="action">(He plucks Santa’s hat from his head, placing it on his own to complete his costume)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">That’s what I’ve been missing! You don’t mind if I borrow it, do you?</p>
+        <p class="character">Santa:</p>
+        <p class="dialogue">Please, no…</p>
+        <p class="action">(Santa is taken off in his bag by the Trio)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Everyone! Make the final preparations. Christmas will be ours!</p>
+        <p class="action">(The crowd roars as all exit, Sally remains behind.)</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">There must be something… There must be something…</p>
+        <p class="action">(Thinking for a moment)</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">That’s it! If you won’t do anything to stop this, then I will.</p>
+        <p class="action">(She exits)</p>
+        
+
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 15 - Kidnap Sandy Claws (Strings)</label>
+<div id="pdf-container-15" class="pdf-container"></div>
+
+
+    </div>
+
+
+    
+    <div class="scene">
+        <p class="scene-heading">Scene 13 - Oogie Boogie</p>
+        <p class="action">(The Trio are taking Santa to Oogie Boogie’s hideout, they prepare to push him down the tunnel)</p>
+        <p class="character">Santa:</p>
+        <p class="dialogue">Naughty children! You won’t be getting any presents this Christmas!</p>
+        <p class="character">Barrel:</p>
+        <p class="dialogue">Quiet down big man.</p>
+        <p class="character">Lock:</p>
+        <p class="dialogue">We’re almost there.</p>
+        <p class="character">Santa:</p>
+        <p class="dialogue">Where are you taking me?</p>
+        <p class="character">Shock:</p>
+        <p class="dialogue">Somewhere safe.</p>
+        <p class="action">(They giggle together, taking him out of the bag they start pushing him down a tube but he’s too big)</p>
+        <p class="character">Barrel:</p>
+        <p class="dialogue">He’s too big, he won’t fit.</p>
+        <p class="character">Lock:</p>
+        <p class="dialogue">Push harder!</p>
+        <p class="character">Shock:</p>
+        <p class="dialogue">If he can fit down a chimney, he can fit down a…</p>
+        <p class="action">(They push; once, twice, and a third time saying)</p>
+        <p class="character">ALL TRIO:</p>
+        <p class="dialogue">Tunnel!</p>
+        <p class="action">(Santa falls down the tunnel tumbling into Oogie Boogie’s lair)</p>
+
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 16 - Oogie Boogie</label>
+<div id="pdf-container-16" class="pdf-container"></div>
+        
+        <p class="action">(The song concludes and the Trio start laughing intensely)</p>
+        
+
+
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 17 - Oh Fare Thee Well Reprise</label>
+<div id="pdf-container-17" class="pdf-container"></div>
+
+    </div>
+
+
+    <div class="scene">
+        <p class="scene-heading">Scene 14 - It's Christmas</p>
+        <p class="action">(All members of Halloween Town stand around listening to the Mayor give a speech, he drones on wordlessly as Sally sneaks around to a bucket of water)</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">I’m sorry Jack, but I have to stop Christmas… I don’t want anyone to get hurt.</p>
+        <p class="action">(She pours a vial of something into the bucket)</p>
+        <p class="character">Mayor:</p>
+        <p class="dialogue">…Think of us as you soar triumphantly through the sky outshining any star, your shadow a dark spot breaking the perfect circle that is the moon. We who are left behind here, will be thinking of you.</p>
+        <p class="action">(A thick Halloween fog starts to roll in)</p>
+        <p class="character">Mayor:</p>
+        <p class="dialogue">You who are our pride, you who are our glory, you who have frightened millions into an early grave; you who have devastated-</p>
+        <p class="action">(It starts to get hard to read)</p>
+        <p class="character">Mayor:</p>
+        <p class="dialogue">Uhm.. You who have…. Eh… Oh what is this fog?</p>
+        <p class="action">(The townspeople of Halloween start to mutter amongst each other disappointingly)</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">Oh dear, if you can’t fly I guess we’ll have to cancel Christmas…</p>
+        <p class="character">Corpse Kid:</p>
+        <p class="dialogue">No more Christmas…</p>
+        <p class="character">Dr. Finkelstein:</p>
+        <p class="dialogue">Don’t worry Jack, this light will cut right through the thick fog.</p>
+        <p class="action">(He places it on the sleigh)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">That’s it! Now there’s nothing that can stop us.</p>
+        <p class="action">(Jack enters the sleigh and starts off, transition occurs as members of Halloween Town cheer and yell holiday tidings)</p>
+        
+
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 18 - Christmas Eve</label>
+<div id="pdf-container-18" class="pdf-container"></div>
+
+            </div>
+    
+    
+    <div class="scene">
+        <p class="scene-heading">Scene 15 - Delivering Presents</p>
+        <p class="action">(Jack soars in the sky as clouds and wind rush by, the moon is shining brightly in the background. Jack prepares to drop presents into the chimneys of each house. He drops them in one at a time, the children come to inspect the presents, the presents then come to life and start chasing the children who run and scream terrified.)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Do you hear that? They love me! I knew those presents would bring them joy!</p>
+        <p class="action">(The military appears and starts getting ready to shoot down Jack.)</p>
+        <p class="character">Commander:</p>
+        <p class="dialogue">There he is! Blast him!</p>
+        <p class="action">(Jack’s sled explodes and he falls into a graveyard)</p>
+        
+<!-- VIDEO -->
+<label style="font-size: small; background-color: rgb(95, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">VID 2 - Jack’s Falling</label>
+</div>
+</div>
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 18b - Jack Is Fallen</label>
+<div id="pdf-container-18b" class="pdf-container2"></div>
+
+    <div class="scene">
+        <p class="scene-heading">Scene 16 - Sally to the Rescue</p>
+        <p class="action">(Oogie Boogie is tormenting Sandy Claws)</p>
+        <p class="character">Oogie:</p>
+        <p class="dialogue">How about another spin? I bet your pretty white beard you won’t get more than a 2… Hehehe</p>
+        <p class="character">Santa:</p>
+        <p class="dialogue">This is madness! You won’t get away with this forever.</p>
+        <p class="character">Oogie:</p>
+        <p class="dialogue">Oh just you wait Sandy… I’ve got to get my special dice for this roll. Don’t you go anywhere now… HeheHAHAHA</p>
+        <p class="action">(Oogie goes off to find his dice, Sally appears just off-stage. She sneaks over to him)</p>
+        
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 19 - Sally Sneaks</label>
+<div id="pdf-container-19" class="pdf-container"></div>
+        
+        <p class="character">Sally:</p>
+        <p class="dialogue">Let’s get you out of here, quickly!</p>
+        <p class="character">Santa:</p>
+        <p class="dialogue">Oh yes, finally…</p>
+        <p class="action">(She attempts to untie his bindings, but they are too tight and Boogie comes back around)</p>
+        <p class="character">Oogie:</p>
+        <p class="dialogue">WHAT? Do you think you are doing with my special prize?</p>
+        
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 20 - Sally Gets Caught</label>
+<div id="pdf-container-20" class="pdf-container"></div>
+
+        
+        <p class="character">Sally:</p>
+        <p class="dialogue">Oh no!</p>
+        <p class="character">Santa:</p>
+        <p class="dialogue">Oh no…</p>
+        <p class="character">Oogie:</p>
+        <p class="dialogue">Well… they say two IS better than one… What do you say we have some spooktacular fun HEHEHEHEHA!</p>
+      
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 21 - Spooktacular Fun</label>
+<div id="pdf-container-21" class="pdf-container"></div>
+
+    
+    <div class="scene">
+        <p class="scene-heading">Scene 17 - Jack Has Fallen</p>
+        <p class="action">(Jack is laying in a graveyard, presents laying all around him)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">What have I done? I’ve ruined everything… Christmas… Halloween… It’s all finished… I did everything I could to make it perfect… Presents wrapped to perfection… Stockings stuffed with all kinds of delicious things. The music. The decorations.</p>
+        <p class="dialogue">Oh what the heck, I tried my best, and even for a minute I touched the sky. I found that warm Christmas feeling that I’d been searching for my entire afterlife! This whole Christmas has given me even more ideas for what we could do NEXT year! And Halloween will be even more spectacularly horrifying than it ever has been before!</p>
+        <p class="action">(He laughs evil-like)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Wait- the moon! It’s still high up… The night is young! There’s still time to save Christmas! There’s still time to put things right! I’ve got to get Sandy Claws back…</p>
+        <p class="action">(Jack rushes out of the graveyard)</p>
+        
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 22 - Christmas Eve Reprise</label>
+<div id="pdf-container-22" class="pdf-container"></div>
+
+
+    </div>
+    
+    <div class="scene">
+        <p class="scene-heading">Scene 18 - Jack’s Daring Rescue</p>
+        <p class="action">(Back in Boogie’s lair, he is tormenting both Sally and Santa)</p>
+        <p class="character">Oogie:</p>
+        <p class="dialogue">Time to roll the dice!</p>
+        <p class="action">(He rolls)</p>
+        <p class="character">Oogie:</p>
+        <p class="dialogue">Eight!</p>
+        <p class="action">(He spins them 8 times)</p>
+        <p class="character">Oogie:</p>
+        <p class="dialogue">And Again!</p>
+        <p class="action">(He rolls, this time disappointed)</p>
+        <p class="character">Oogie:</p>
+        <p class="dialogue">What snake eyes???</p>
+        <p class="action">(He cheats the dice to something better)</p>
+        <p class="character">Oogie:</p>
+        <p class="dialogue">That’s better, eleven! Say goodbye Sandy man…!</p>
+        <p class="action">(He starts to spin, but Jack flies in)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Hello, Boogie.</p>
+        <p class="character">Oogie:</p>
+        <p class="dialogue">Jack! We-They-I was just having some fun! That’s all, nobody was gonna get hurt…</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">You’ve interfered for the last time, Boogie… This time, you’ll wish you were kept in a cell.</p>
+        <p class="character">Oogie:</p>
+        <p class="dialogue">Or… Maybe I’ll put you in one! Get him boys!</p>
+        <p class="action">(Oogie’s bats fly to attack Jack, but he scares them away. They fly off)</p>
+        <p class="action">(Jack walks towards Boogie, grabbing at a string attached to him as he attempts to escape)</p>
+        <p class="character">Oogie:</p>
+        <p class="dialogue">Farewell, bone man! See ya next Fall! Or maybe not hahaha!</p>
+        <p class="action">(Jack pulls at his string)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">You hurt my friends.</p>
+        <p class="action">(He pulls, Boogie seems distressed)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">You tried to ruin my Christmas.</p>
+        <p class="action">(He pulls again, Boogie knows what’s happening now and starts to plead)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">But most of all, you tried to ruin me.</p>
+        
+<!-- VIDEO -->
+<label style="font-size: small; background-color: rgb(95, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">VID 3 - Boogie’s Death</label>
+</div>
+
+        <p class="action">(He pulls the last time and Boogie falls into lava, the bugs that were him start to melt in the lava pit. The last of the bugs try to run but Santa squishes it under his foot.)</p>
+        <p class="character">Santa:</p>
+        <p class="dialogue">Good riddance!</p>
+
+
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 23 - Sally's Song Reprise</label>
+<div id="pdf-container-23" class="pdf-container"></div>
+
+
+        <p class="character">Jack:</p>
+        <p class="dialogue">Santa, I’m so very sorry for all of this… I’ve ruined Christmas…</p>
+        <p class="character">Santa:</p>
+        <p class="dialogue">Ruined? Christmas? Don’t be ridiculous.</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">You can still fix it? Is there still time?</p>
+        <p class="character">Santa:</p>
+        <p class="dialogue">Of course I can fix it! I am Santa Claus… Now if you’ll excuse me…</p>
+        <p class="action">(He disappears offstage in a wink)</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Wow, so that’s Santa Claus…</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">Come on Jack, let’s go home.</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">That’s the best idea I’ve heard all night…</p>
+        <p class="action">(They exit)</p>
+        
+
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 24 - Halloween Transition</label>
+<div id="pdf-container-24" class="pdf-container"></div>
+
+</div>
+    
+    <div class="scene">
+        <p class="scene-heading">Scene 19 - Jack, Sally Return to Halloween Town (Finale)</p>
+        <p class="action">(The monsters of Halloween Town are sleeping or crying, suddenly a musical cue plays and Jack returns with Sally and the trio)</p>
+        
+<!-- SONG -->
+<label style="font-size: small; background-color: rgb(39, 39, 135); color: white; padding: 10px; margin-bottom: 100px;">MUS 25 - Halloween Finale</label>
+<div id="pdf-container-25" class="pdf-container"></div>
+        
+        <p class="character">Small Witch:</p>
+        <p class="dialogue">Jack?</p>
+        <p class="character">Medium Witch:</p>
+        <p class="dialogue">Jack's back?</p>
+        <p class="character">Clown:</p>
+        <p class="dialogue">He’s back?</p>
+        <p class="character">Wolfman:</p>
+        <p class="dialogue">He’s alive?</p>
+        <p class="character">Mayor:</p>
+        <p class="dialogue">Jack’s returned!</p>
+        <p class="action">(Song continues and everyone sings, suddenly it starts snowing and jingle bells start playing. Santa is visible in the night sky, riding his sleigh.)</p>
+        <p class="character">Santa:</p>
+        <p class="dialogue">Happy Halloween!</p>
+        <p class="character">Jack:</p>
+        <p class="dialogue">Merry Christmas!</p>
+        <p class="character">Vampire 1:</p>
+        <p class="dialogue">What’s this?</p>
+        <p class="character">Vampire 2:</p>
+        <p class="dialogue">What’s this?</p>
+        <p class="character">Vampire 3:</p>
+        <p class="dialogue">There’s something in the air?</p>
+        <p class="character">Corpse Kid:</p>
+        <p class="dialogue">What’s this?</p>
+        <p class="character">Mayor:</p>
+        <p class="dialogue">It’s really very weird…</p>
+        <p class="character">Witches:</p>
+        <p class="dialogue">What’s this?</p>
+        <p class="character">Clown:</p>
+        <p class="dialogue">I haven't got a clue!</p>
+        <p class="character">All:</p>
+        <p class="dialogue">What’s this?</p>
+        <p class="character">Wolfman:</p>
+        <p class="dialogue">Must be some Christmas thing!</p>
+        <p class="character">Sally:</p>
+        <p class="dialogue">Merry Christmas to one, and to all a</p>
+        <p class="character">ALL:</p>
+        <p class="dialogue">Happy Halloween!</p>
+        <p class="action">(End)</p>
+</body>
+</html>
