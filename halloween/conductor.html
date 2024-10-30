@@ -553,7 +553,7 @@ window.onload = function() {
 document.addEventListener('DOMContentLoaded', function() {
     // Song navigation
     const songList = document.querySelectorAll('.song-list li');
-    const offset = -45; // Adjust this value to change the final scroll position
+    const offset = -15; // Adjust this value to change the final scroll position
 
     songList.forEach(song => {
         song.addEventListener('click', function() {
@@ -566,7 +566,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 window.scrollTo({
                     top: offsetPosition,
-                    behavior: 'smooth'
                 });
             }
         });
@@ -590,7 +589,6 @@ scrollTopButton.addEventListener('click', function() {
         const offset = navRect.top + window.pageYOffset + 0; // 50px above the nav
         window.scrollTo({
             top: offset,
-            behavior: 'smooth'
         });
     }
 });
