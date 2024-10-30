@@ -572,24 +572,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Double tap to scroll to nav container
-let lastTap = 0;
-document.addEventListener('touchend', function(event) {
-    const currentTime = new Date().getTime();
-    const tapLength = currentTime - lastTap;
-    if (tapLength < 500 && tapLength > 0) {
-        const navContainer = document.querySelector('.nav-container');
-        if (navContainer) {
-            const navRect = navContainer.getBoundingClientRect();
-            const offset = navRect.top + window.pageYOffset + 0; // 50px above the nav
-            window.scrollTo({
-                top: offset,
-                behavior: 'smooth'
-            });
-        }
-    }
-    lastTap = currentTime;
-});
 
 // Show/hide scroll to nav button
 const scrollTopButton = document.querySelector('.scroll-top');
