@@ -273,6 +273,7 @@
     width: 100vw;
     height: auto;
     max-width: none;
+    display: block;
 }
 
 .page-nav {
@@ -365,103 +366,29 @@
 
     </style>
         <script>
-       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-class PDFViewer {
+       class SimpleImageViewer {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.currentPage = 1;
-        this.pdf = null;
-        this.scale = 2;
-        this.pageImages = [];
-        this.pageContainers = [];
-        this.initialized = false;
-        this.loading = false;
-        this.loadingOverlay = this.createLoadingOverlay();
-        this.pagesLoaded = new Set();
+        this.totalPages = 0;
+        this.images = [];
         
-        window.addEventListener('resize', () => this.handleResize());
+        // Create image element
+        this.imageElement = document.createElement('img');
+        this.imageElement.style.width = '100%';
+        this.imageElement.style.height = 'auto';
+        this.imageElement.style.display = 'block';
+        this.container.appendChild(this.imageElement);
+        
+        // Add navigation controls
+        this.addControls();
+        
+        // Add click navigation
+        this.addClickNavigation();
     }
 
-    createLoadingOverlay() {
-        const overlay = document.createElement('div');
-        overlay.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        `;
-        
-        const spinner = document.createElement('div');
-        spinner.textContent = 'Loading PDF...';
-        overlay.appendChild(spinner);
-        
-        this.container.style.position = 'relative';
-        this.container.appendChild(overlay);
-        return overlay;
-    }
-
-    async loadPDF(url) {
-        if (this.loading) return;
-        
-        try {
-            this.loading = true;
-            this.loadingOverlay.style.display = 'flex';
-            this.container.style.opacity = '0.5';
-            
-            const loadingTask = pdfjsLib.getDocument(url);
-            this.pdf = await loadingTask.promise;
-            
-            await this.renderAllPagesAsImages();
-            
-            this.initialized = true;
-            this.updatePageVisibility();
-            
-            this.loading = false;
-            this.loadingOverlay.style.display = 'none';
-            this.container.style.opacity = '1';
-        } catch (error) {
-            console.error('Error loading PDF:', error);
-            this.loading = false;
-            this.loadingOverlay.style.display = 'none';
-            this.container.style.opacity = '1';
-        }
-    }
-
-    async renderAllPagesAsImages() {
-        if (!this.pdf) return;
-
-        this.container.innerHTML = '';
-        this.pageContainers = [];
-        this.pageImages = [];
-
-        const renderPromises = [];
-        const pageContainers = [];
-
-        for (let pageNum = 1; pageNum <= this.pdf.numPages; pageNum++) {
-            const pageContainer = document.createElement('div');
-            pageContainer.className = 'pdf-page';
-            pageContainer.style.display = pageNum === this.currentPage ? 'block' : 'none';
-
-            const renderPromise = this.renderPage(pageNum, pageContainer);
-            renderPromises.push(renderPromise);
-            pageContainers.push(pageContainer);
-        }
-
-        await Promise.all(renderPromises);
-
-        pageContainers.forEach(container => {
-            this.container.appendChild(container);
-            this.pageContainers.push(container);
-        });
-
-        this.container.onclick = (e) => {
+    addClickNavigation() {
+        this.container.addEventListener('click', (e) => {
             const rect = this.container.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const width = rect.width;
@@ -471,126 +398,144 @@ class PDFViewer {
             } else if (x > width * 0.8) {
                 this.nextPage();
             }
+        });
+
+        this.container.addEventListener('touchend', (e) => {
+            const rect = this.container.getBoundingClientRect();
+            const touch = e.changedTouches[0];
+            const x = touch.clientX - rect.left;
+            const width = rect.width;
+            
+            if (x < width * 0.2) {
+                this.previousPage();
+            } else if (x > width * 0.8) {
+                this.nextPage();
+            }
+        });
+    }
+
+    addControls() {
+        const controls = document.createElement('div');
+        controls.className = 'image-controls';
+        controls.style.cssText = `
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            border-radius: 5px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        `;
+
+        const prevBtn = document.createElement('button');
+        prevBtn.textContent = '← Previous';
+        prevBtn.onclick = (e) => {
+            e.stopPropagation();
+            this.previousPage();
         };
+
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = 'Next →';
+        nextBtn.onclick = (e) => {
+            e.stopPropagation();
+            this.nextPage();
+        };
+
+        const pageInfo = document.createElement('span');
+        pageInfo.style.color = 'white';
+        this.pageInfo = pageInfo;
+
+        controls.appendChild(prevBtn);
+        controls.appendChild(pageInfo);
+        controls.appendChild(nextBtn);
+        this.container.appendChild(controls);
     }
 
-    async renderPage(pageNum, pageContainer) {
-        const page = await this.pdf.getPage(pageNum);
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-
-        const containerWidth = this.container.clientWidth;
-        const viewport = page.getViewport({ scale: this.scale });
-        const pixelRatio = window.devicePixelRatio || 1;
-        const scaledViewport = page.getViewport({ 
-            scale: (containerWidth / viewport.width) * this.scale * pixelRatio 
-        });
-
-        canvas.width = scaledViewport.width;
-        canvas.height = scaledViewport.height;
-
-        await page.render({
-            canvasContext: context,
-            viewport: scaledViewport,
-            intent: 'print',
-            background: 'white'
-        }).promise;
-
-        const image = new Image();
-        await new Promise(resolve => {
-            image.onload = resolve;
-            image.src = canvas.toDataURL('image/png');
-        });
+    loadImages(songNumber) {
+        // Reset current state
+        this.images = [];
+        this.currentPage = 1;
         
-        image.style.width = '100%';
-        image.style.height = 'auto';
-        this.pageImages.push(image);
+        // Function to check if an image exists
+        const checkImage = (pageNum) => {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    this.images.push(img.src);
+                    resolve(true);
+                };
+                img.onerror = () => resolve(false);
+                img.src = `images/Scores/Song ${songNumber}-page${pageNum}.jpeg`;
+            });
+        };
 
-        if (this.pdf.numPages > 1) {
-            if (pageNum > 1) {
-                const prevButton = document.createElement('button');
-                prevButton.className = 'page-nav prev';
-                prevButton.onclick = () => this.previousPage();
-                pageContainer.appendChild(prevButton);
+        // Load all available images
+        const loadAllImages = async () => {
+            let pageNum = 1;
+            while (true) {
+                const exists = await checkImage(pageNum);
+                if (!exists) break;
+                pageNum++;
             }
-
-            if (pageNum < this.pdf.numPages) {
-                const nextButton = document.createElement('button');
-                nextButton.className = 'page-nav next';
-                nextButton.onclick = () => this.nextPage();
-                pageContainer.appendChild(nextButton);
+            
+            this.totalPages = this.images.length;
+            if (this.totalPages > 0) {
+                this.renderCurrentPage();
+            } else {
+                this.container.innerHTML = 'No images found for this song.';
             }
+        };
 
-            const pageNumber = document.createElement('div');
-            pageNumber.className = 'page-number';
-            pageNumber.textContent = `${pageNum} / ${this.pdf.numPages}`;
-            pageContainer.appendChild(pageNumber);
-        }
-
-        pageContainer.appendChild(image);
+        loadAllImages();
     }
 
-    updatePageVisibility() {
-        if (!this.pageContainers) return;
+    renderCurrentPage() {
+        if (this.images.length === 0) return;
         
-        this.currentPage = Math.max(1, Math.min(this.currentPage, this.pdf.numPages));
-        
-        this.pageContainers.forEach((container, index) => {
-            const pageNum = index + 1;
-            container.style.display = pageNum === this.currentPage ? 'flex' : 'none';
-        });
+        this.imageElement.src = this.images[this.currentPage - 1];
+        this.pageInfo.textContent = `${this.currentPage} / ${this.totalPages}`;
     }
 
     nextPage() {
-        if (this.currentPage < this.pdf.numPages) {
-            this.currentPage = Math.min(this.currentPage + 0.5, this.pdf.numPages);
-            this.updatePageVisibility();
+        if (this.currentPage < this.totalPages) {
+            this.currentPage++;
+            this.renderCurrentPage();
         }
     }
 
     previousPage() {
         if (this.currentPage > 1) {
-            this.currentPage = Math.max(this.currentPage - 0.5, 1);
-            this.updatePageVisibility();
+            this.currentPage--;
+            this.renderCurrentPage();
         }
-    }
-
-    handleResize() {
-        // Do nothing on resize since we're using images
     }
 }
 
+// Initialize everything when the page loads
 window.onload = function() {
+    // Initialize hamburger menu
     const hamburgerBtn = document.querySelector('.hamburger-btn');
     const menuContainer = document.querySelector('.menu-container');
-    const mainMenuItems = document.querySelectorAll('.main-menu-item');
 
-    // Hamburger menu functionality
-    hamburgerBtn.addEventListener('click', () => {
-        menuContainer.classList.toggle('active');
-    });
+    if (hamburgerBtn && menuContainer) {
+        hamburgerBtn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            menuContainer.classList.toggle('active');
+        }, false);
 
-    // Close the menu if clicked outside
-    document.addEventListener('click', (event) => {
-        const isClickInsideMenu = menuContainer.contains(event.target);
-        const isClickInsideButton = hamburgerBtn.contains(event.target);
-        if (!isClickInsideMenu && !isClickInsideButton) {
-            menuContainer.classList.remove('active');
-        }
-    });
+        hamburgerBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            menuContainer.classList.toggle('active');
+        }, false);
+    }
 
-    // Main menu item click handling
-    mainMenuItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const submenu = item.nextElementSibling;
-            submenu.classList.toggle('active');
-        });
-    });
-
-    // Load conductor PDFs
-    const pdfContainers = document.querySelectorAll('.pdf-container, .pdf-container2');
-    pdfContainers.forEach((container, index) => {
-        const viewer = new PDFViewer(container.id);
+    // Initialize image viewers
+    const imageContainers = document.querySelectorAll('.pdf-container, .pdf-container2');
+    imageContainers.forEach((container, index) => {
+        const viewer = new SimpleImageViewer(container.id);
         let songNumber;
 
         if (container.id === 'pdf-container-18b') {
@@ -600,162 +545,9 @@ window.onload = function() {
             if (index > 17) songNumber++;
         }
 
-        viewer.loadPDF(`PDFs/Conductor/Song ${songNumber}.pdf`);
+        viewer.loadImages(songNumber);
     });
 };
-
-
-
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    const seatingButton = document.getElementById('seatingButton');
-    const seatingOverlay = document.getElementById('seatingOverlay');
-    const closeButton = document.querySelector('.close-button');
-    const seatingImage = document.getElementById('seatingImage');
-    
-    if (seatingButton) {
-        seatingButton.addEventListener('click', function() {
-            if (seatingOverlay) {
-                seatingOverlay.style.display = 'block';
-                resetZoom();
-            }
-        });
-    }
-
-    if (closeButton) {
-        closeButton.addEventListener('click', function() {
-            if (seatingOverlay) {
-                seatingOverlay.style.display = 'none';
-                resetZoom();
-            }
-        });
-    }
-
-    let scale = 1;
-const SCALE_FACTOR = 0.1;
-const MAX_SCALE = 3;
-const MIN_SCALE = 1;
-
-// Add variables for panning
-let isPanning = false;
-let startX, startY;
-let currentX = 0;
-let currentY = 0;
-let translateX = 0;
-let translateY = 0;
-
-function resetZoom() {
-    scale = 1;
-    translateX = 0;
-    translateY = 0;
-    if (seatingImage) {
-        seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-    }
-}
-
-function updateTransform() {
-    // If scale is at minimum, reset position to center
-    if (scale <= MIN_SCALE) {
-        translateX = 0;
-        translateY = 0;
-        currentX = 0;
-        currentY = 0;
-    }
-    seatingImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-}
-
-if (seatingImage) {
-    // Add this line to prevent default dragging
-    seatingImage.setAttribute('draggable', false);
-
-    // Handle mouse wheel zoom
-    seatingImage.addEventListener('wheel', function(e) {
-        e.preventDefault();
-        const delta = e.deltaY > 0 ? -1 : 1;
-        scale += delta * SCALE_FACTOR;
-        scale = Math.min(Math.max(scale, MIN_SCALE), MAX_SCALE);
-        updateTransform();
-    });
-
-    // Handle mouse panning
-    seatingImage.addEventListener('mousedown', function(e) {
-        if (scale > 1) {
-            isPanning = true;
-            startX = e.clientX - translateX;
-            startY = e.clientY - translateY;
-            seatingImage.style.cursor = 'grabbing';
-        }
-    });
-
-    document.addEventListener('mousemove', function(e) {
-        if (isPanning) {
-            currentX = e.clientX - startX;
-            currentY = e.clientY - startY;
-            translateX = currentX;
-            translateY = currentY;
-            updateTransform();
-        }
-    });
-
-    document.addEventListener('mouseup', function() {
-        if (isPanning) {
-            isPanning = false;
-            seatingImage.style.cursor = 'grab';
-            // Store the final position
-            translateX = currentX;
-            translateY = currentY;
-        }
-    });
-
-    // Handle pinch zoom for touch devices
-    let initialDistance = 0;
-    let initialScale = 1;
-    let lastTouchX = 0;
-    let lastTouchY = 0;
-
-    seatingImage.addEventListener('touchstart', function(e) {
-        if (e.touches.length === 2) {
-            e.preventDefault();
-            initialDistance = Math.hypot(
-                e.touches[0].pageX - e.touches[1].pageX,
-                e.touches[0].pageY - e.touches[1].pageY
-            );
-            initialScale = scale;
-        } else if (e.touches.length === 1 && scale > 1) {
-            lastTouchX = e.touches[0].pageX - translateX;
-            lastTouchY = e.touches[0].pageY - translateY;
-        }
-    });
-
-    seatingImage.addEventListener('touchmove', function(e) {
-        if (e.touches.length === 2) {
-            e.preventDefault();
-            const currentDistance = Math.hypot(
-                e.touches[0].pageX - e.touches[1].pageX,
-                e.touches[0].pageY - e.touches[1].pageY
-            );
-            scale = initialScale * (currentDistance / initialDistance);
-            scale = Math.min(Math.max(scale, MIN_SCALE), MAX_SCALE);
-            updateTransform();
-        } else if (e.touches.length === 1 && scale > 1) {
-            e.preventDefault();
-            currentX = e.touches[0].pageX - lastTouchX;
-            currentY = e.touches[0].pageY - lastTouchY;
-            translateX = currentX;
-            translateY = currentY;
-            updateTransform();
-        }
-    });
-
-    seatingImage.addEventListener('touchend', function() {
-        translateX = currentX;
-        translateY = currentY;
-    });
-}
-});
-
-
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -780,24 +572,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Double tap to scroll to nav container
-let lastTap = 0;
-document.addEventListener('touchend', function(event) {
-    const currentTime = new Date().getTime();
-    const tapLength = currentTime - lastTap;
-    if (tapLength < 500 && tapLength > 0) {
-        const navContainer = document.querySelector('.nav-container');
-        if (navContainer) {
-            const navRect = navContainer.getBoundingClientRect();
-            const offset = navRect.top + window.pageYOffset + 0; // 50px above the nav
-            window.scrollTo({
-                top: offset,
-                behavior: 'smooth'
-            });
-        }
-    }
-    lastTap = currentTime;
-});
 
 // Show/hide scroll to nav button
 const scrollTopButton = document.querySelector('.scroll-top');
