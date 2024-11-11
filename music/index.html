@@ -3,39 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BIPH Halloween Music</title>
-    <link rel="icon" href="images/jack.png">
+    <title>BIPH Winter Concert 2024</title>
+    <link rel="icon" href="images/conductor.png">
     <style>
 body, html {
     margin: 0;
     padding: 0;
     height: 100%;
+    background-color: rgb(26, 33, 42);
     font-family: Arial, sans-serif;
-    background: #000 url('images/The Pumpkin King Poster no text.png') no-repeat top center;
-    background-size: cover;
     overflow: hidden;
 }
-        #landing, #viewer {
-            height: 100%;
-            width: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            transition: transform 0.3s ease-in-out;
-            overflow: hidden;
-        }
+
+.wrapper {
+    height: 100%;
+    margin: 0 auto;
+    background: url('images/Song for a Winters Night Poster.png') no-repeat center center;
+    background-size: cover; 
+}
+
+@media (orientation: landscape) {
+    .wrapper {
+        background-size: contain; /* Use contain for horizontal screens */
+    }
+}
+
+#landing, #viewer {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: transform 0.3s ease-in-out;
+    overflow: hidden;
+}
+
         #landing {
-            background-color: rgba(240, 240, 240, 0.9);
+            background-color: rgba(240, 240, 240, 0.46);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
         }
+
         #viewer {
             background-color: rgba(255, 255, 255, 0.2);
             transform: translateX(100%);
         }
+
         #viewer.active { transform: translateX(0); }
+
         #pdf-container {
             height: 100%;
             width: 100%;
@@ -45,11 +62,13 @@ body, html {
             position: relative;
             overflow: hidden;
         }
+
         #pdf-viewer {
             width: 100%;
             height: 100%;
             object-fit: contain;
         }
+
         #hamburger {
             position: fixed;
             top: 1%;
@@ -59,10 +78,12 @@ body, html {
             cursor: pointer;
             z-index: 1000;
         }
+
         .dropdown {
             position: relative;
             display: inline-block;
         }
+
         .dropdown-content {
             position: absolute;
             left: 50%;
@@ -79,15 +100,7 @@ body, html {
             scrollbar-width: thin;
             scrollbar-color: #888 #f1f1f1;
         }
-        .dropdown-content::-webkit-scrollbar {
-            width: 10px;
-        }
-        .dropdown-content::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        .dropdown-content::-webkit-scrollbar-thumb {
-            background: #888;
-        }
+
         .dropdown-content button {
             color: black;
             padding: 12px 16px;
@@ -99,52 +112,28 @@ body, html {
             background: none;
             cursor: pointer;
         }
+
         .dropdown-content button:hover {
             background-color: #f1f1f1;
         }
+
         .show {
             max-height: 80vh;
             opacity: 1;
             transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
         }
-        @media (min-height: 600px) { .show { max-height: 500px; } }
-        @media (min-height: 800px) { .show { max-height: 700px; } }
+
         #select-part {
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        #search-container { margin-bottom: 20px; }
-        #search-input {
-            padding: 10px;
-            font-size: 16px;
-            width: 300px;
-            max-width: 80vw;
-        }
-        #search-results {
-            position: absolute;
-            background-color: white;
-            width: 300px;
-            max-width: 80vw;
-            max-height: 200px;
-            overflow-y: auto;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1001;
+            background-color: #f0f0f0;
+            border: 2px solid #9b9b9b;
+            border-radius: 4px;
+            margin-top: 100px; /* Move down by 100px */
         }
-        #search-results div {
-            padding: 10px;
-            cursor: pointer;
-        }
-        #search-results div:hover { background-color: #f1f1f1; }
-        #search-results .selected { background-color: #e0e0e0; }
-        #or-divider {
-            margin: 20px 0;
-            font-size: 18px;
-            font-weight: bold;
-        }
+
         #page-indicator {
             position: absolute;
             bottom: 20px;
@@ -157,6 +146,7 @@ body, html {
             font-size: 12px;
             font-weight: bold;
         }
+
         .popup {
             display: none;
             position: fixed;
@@ -164,12 +154,13 @@ body, html {
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
+            background-image: radial-gradient(circle, rgba(132, 112, 81, 0.366), rgba(47, 61, 98, 0.82), rgb(34, 45, 68));
             justify-content: center;
             align-items: center;
             z-index: 1000;
             overflow: hidden;
         }
+
         .popup img {
             margin-top: -100px;
             width: 75%;
@@ -177,6 +168,7 @@ body, html {
             object-fit: contain;
             transition: transform 0.2s;
         }
+
         .close-btn {
             position: fixed;
             top: 10px;
@@ -187,6 +179,7 @@ body, html {
             border: none;
             cursor: pointer;
         }
+
         #imageContainer {
             width: 100%;
             height: 100%;
@@ -195,39 +188,36 @@ body, html {
             justify-content: center;
             align-items: center;
         }
+
         .popup-button {
-            padding: 10px 20px;
-            margin: 20px;
+            padding: 10px 30px;
+            width: 270px;
             font-size: 16px;
             cursor: pointer;
+            position: absolute; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            bottom: 40px;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
 </head>
 <body>
+    <div class="wrapper"></div>
     <div id="landing">
-        <h1>Enter your name</h1>
-        <div id="search-container">
-            <input type="text" id="search-input" placeholder="Type your name...">
-            <div id="search-results"></div>
-        </div>
-
-
-        <h3>Can't find your name?</h3>
         <div class="dropdown">
             <button id="select-part">Select your part</button>
             <div id="instrument-families" class="dropdown-content"></div>
         </div>
         <div id="instruments" class="dropdown-content"></div>
         <div id="or-divider"></div>
-        <div id="or-divider"></div>
-        <div id="or-divider"></div>
-        <div id="or-divider"></div>
         <button class="popup-button" id="openPopup">View Concert Seating Layout</button>
+    </div>
+
     <div class="popup" id="imagePopup">
         <button class="close-btn" id="closePopup">&times;</button>
         <div id="imageContainer">
-            <img src="images/Halloween Layout.png" alt="Popup Image" id="popupImage" />
+            <img src="images/Winter Concert Layout.png" alt="Popup Image" id="popupImage" />
         </div>
     </div>
 
@@ -248,14 +238,11 @@ body, html {
         const instruments = document.getElementById('instruments');
         const pdfContainer = document.getElementById('pdf-container');
         const hamburger = document.getElementById('hamburger');
-        const searchInput = document.getElementById('search-input');
-        const searchResults = document.getElementById('search-results');
         const pdfViewer = document.getElementById('pdf-viewer');
         const pageIndicator = document.getElementById('page-indicator');
 
         let currentInstrument = '';
         let currentPage = 1;
-        let selectedIndex = -1;
         let pdfDoc = null;
 
         async function loadPDF() {
@@ -316,62 +303,6 @@ body, html {
             pageIndicator.textContent = `Page ${currentPage} of ${pdfDoc.numPages}`;
         }
 
-        function updateSearchResults() {
-            const query = searchInput.value.toLowerCase();
-            const matchingStudents = Object.keys(studentData).filter(student => 
-                student.toLowerCase().includes(query)
-            );
-
-            searchResults.innerHTML = '';
-            selectedIndex = -1;
-
-            matchingStudents.forEach((student, index) => {
-                const result = document.createElement('div');
-                result.textContent = student;
-                result.onclick = () => selectStudent(student);
-                searchResults.appendChild(result);
-            });
-
-            searchResults.style.display = matchingStudents.length > 0 ? 'block' : 'none';
-        }
-
-        function handleSearchBoxKeys(event) {
-            const results = Array.from(searchResults.children);
-
-            switch (event.key) {
-                case 'ArrowUp':
-                    event.preventDefault();
-                    selectedIndex = Math.max(0, selectedIndex - 1);
-                    updateSelectedResult();
-                    break;
-                case 'ArrowDown':
-                    event.preventDefault();
-                    selectedIndex = Math.min(results.length - 1, selectedIndex + 1);
-                    updateSelectedResult();
-                    break;
-                case 'Enter':
-                    if (selectedIndex >= 0 && selectedIndex < results.length) {
-                        selectStudent(results[selectedIndex].textContent);
-                    }
-                    break;
-            }
-        }
-
-        function updateSelectedResult() {
-            Array.from(searchResults.children).forEach((result, index) => {
-                result.className = index === selectedIndex ? 'selected' : '';
-            });
-        }
-
-        function selectStudent(studentName) {
-            const instrument = studentData[studentName];
-            if (instrument) {
-                selectInstrument(instrument);
-                searchInput.value = '';
-                searchResults.style.display = 'none';
-            }
-        }
-
         function showInstruments(family) {
             instruments.innerHTML = '';
             instrumentData[family].forEach(instrument => {
@@ -400,7 +331,7 @@ body, html {
         }
 
         function populateInstrumentFamilies() {
-            instrumentFamilies.innerHTML = ''; // Clear existing content
+            instrumentFamilies.innerHTML = '';
             for (let family in instrumentData) {
                 const button = document.createElement('button');
                 button.textContent = family;
@@ -423,8 +354,6 @@ body, html {
             instruments.classList.remove('show');
         });
 
-
-
         const openPopup = document.getElementById('openPopup');
         const closePopup = document.getElementById('closePopup');
         const imagePopup = document.getElementById('imagePopup');
@@ -442,21 +371,18 @@ body, html {
             imagePopup.style.display = 'none';
         });
 
-
-        // Close popup on clicking outside the image
         imagePopup.addEventListener('click', (e) => {
             if (e.target === imagePopup) {
                 imagePopup.style.display = 'none';
             }
         });
-// Close popup on pressing Escape key
-document.addEventListener('keydown', (e) => {
+
+        document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 imagePopup.style.display = 'none';
             }
         });
 
-        // Zoom functionality
         imageContainer.addEventListener('wheel', (e) => {
             e.preventDefault();
             const scale = e.deltaY > 0 ? 0.9 : 1.1;
@@ -465,7 +391,6 @@ document.addEventListener('keydown', (e) => {
             img.style.height = `${img.offsetHeight * scale}px`;
         });
 
-        // Pan functionality
         imageContainer.addEventListener('mousedown', (e) => {
             isDragging = true;
             startX = e.pageX - imageContainer.offsetLeft;
@@ -493,18 +418,17 @@ document.addEventListener('keydown', (e) => {
             imageContainer.scrollTop = scrollTop - walkY;
         });
 
-
         hamburger.addEventListener('click', () => {
             viewer.classList.remove('active');
             selectPart.textContent = 'Select your part';
-            pdfDoc = null; // Reset pdfDoc when going back to the main screen
+            pdfDoc = null;
         });
 
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
                 viewer.classList.remove('active');
                 selectPart.textContent = 'Select your part';
-                pdfDoc = null; // Reset pdfDoc when going back to the main screen
+                pdfDoc = null;
             }
         });
 
@@ -525,9 +449,6 @@ document.addEventListener('keydown', (e) => {
                 changePage(-1);
             }
         });
-
-        searchInput.addEventListener('input', updateSearchResults);
-        searchInput.addEventListener('keydown', handleSearchBoxKeys);
 
         window.addEventListener('resize', () => {
             if (pdfDoc) {
