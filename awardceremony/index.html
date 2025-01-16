@@ -113,18 +113,18 @@
             pdfViewer.classList.remove('hidden');
 
             pdfContainer.innerHTML = `
-                <embed src="TheDreamofFlight.pdf" type="application/pdf">
+                <embed src="The Dream of Flight.pdf" type="application/pdf">
             `;
         }
 
         function downloadPDF() {
-            window.location.href = 'TheDreamofFlight.pdf';
+            window.location.href = 'The Dream of Flight.pdf';
         }
 
         function saveAsPDF() {
             const link = document.createElement('a');
-            link.href = 'TheDreamofFlight.pdf';
-            link.download = 'TheDreamofFlight.pdf';
+            link.href = 'The Dream of Flight.pdf';
+            link.download = 'The Dream of Flight.pdf';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -133,9 +133,9 @@
         function sharePDF() {
             if (navigator.share) {
                 navigator.share({
-                    title: 'TheDreamofFlight.pdf',
+                    title: 'The Dream of Flight.pdf',
                     text: 'Here is the music for the Spring Concert',
-                    url: 'TheDreamofFlight.pdf'
+                    url: 'The Dream of Flight.pdf'
                 })
                 .catch(error => console.log('Error sharing:', error));
             } else {
