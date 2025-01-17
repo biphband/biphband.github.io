@@ -113,18 +113,18 @@
             pdfViewer.classList.remove('hidden');
 
             pdfContainer.innerHTML = `
-                <embed src="springconcert2025.pdf" type="application/pdf">
+                <embed src="Video Games and Music.pdf" type="application/pdf">
             `;
         }
 
         function downloadPDF() {
-            window.location.href = 'springconcert2025.pdf';
+            window.location.href = 'Video Games and Music.pdf';
         }
 
         function saveAsPDF() {
             const link = document.createElement('a');
-            link.href = 'springconcert2025.pdf';
-            link.download = 'springconcert2025.pdf';
+            link.href = 'Video Games and Music.pdf';
+            link.download = 'Video Games and Music.pdf';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -133,9 +133,9 @@
         function sharePDF() {
             if (navigator.share) {
                 navigator.share({
-                    title: 'springconcert2025.pdf',
+                    title: 'Video Games and Music.pdf',
                     text: 'Here is the music for the Spring Concert',
-                    url: 'springconcert2025.pdf'
+                    url: 'Video Games and Music.pdf'
                 })
                 .catch(error => console.log('Error sharing:', error));
             } else {
