@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French Horn Practice</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/7.7.6/wavesurfer.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #2d2d2d; /* Charcoal background */
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .player-container {
+            background: #3a3a3a; /* Dark gray container */
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            width: 100%;
+            max-width: 700px;
+            transition: transform 0.3s ease;
+        }
+
+        .player-container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #b0b0b0; /* Light gray text */
+            margin-bottom: 20px;
+            font-size: 2em;
+            letter-spacing: 1px;
+        }
+
+        .waveform-wrapper {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        #waveform {
+            position: relative;
+            width: 100%;
+            height: 100px;
+            background: #2a3b4c; /* Darkish blue playbar */
+            border: 2px solid #6b8299; /* Light blue outline */
+            border-radius: 8px;
+            cursor: pointer;
+            overflow-x: auto; /* Enable horizontal scrolling when zoomed */
+        }
+
+        .zoom-controls {
+            position: absolute;
+            top: -30px;
+            right: 0;
+            display: flex;
+            gap: 5px;
+        }
+
+        .zoom-btn {
+            background: #5e768e; /* Muted blue */
+            color: #fff;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            padding: 0;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .zoom-btn:hover {
+            background: #4a6075; /* Darker muted blue */
+        }
+
+        .marker {
+            position: absolute;
+            top: 0;
+            width: 1px;
+            height: 100%;
+            background: #ff444480;
+            transition: transform 0.2s ease;
+            z-index: 10;
+        }
+
+        .marker::before {
+            content: '';
+            position: absolute;
+            left: -5px; /* Extend 5px to the left */
+            width: 11px; /* Total clickable width: 1px + 5px left + 5px right */
+            height: 100%;
+            z-index: 15; /* Ensure it’s clickable */
+        }
+
+        .marker:hover {
+            transform: scaleY(1.1);
+        }
+
+        .marker:hover::after {
+            content: attr(title);
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .time-display {
+            text-align: center;
+            margin: 10px 0;
+            color: #b0b0b0; /* Light gray */
+            font-size: 14px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        button, select {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #play-pause {
+            background: #5e768e; /* Muted blue */
+            color: #fff;
+        }
+
+        #play-pause.playing {
+            background: #ff4444; /* Red when playing */
+        }
+
+        #play-pause:hover {
+            background: #4a6075; /* Darker muted blue */
+            transform: scale(1.03);
+        }
+
+        #play-pause.playing:hover {
+            background: #e03e3e;
+        }
+
+        select {
+            background: #3a3a3a; /* Dark gray */
+            border: 2px solid #5e768e; /* Muted blue */
+            color: #b0b0b0;
+        }
+
+        select:hover {
+            border-color: #6b8299; /* Light blue */
+        }
+
+        .song-list {
+            margin-top: 20px;
+        }
+
+        .song-list h2 {
+            color: #b0b0b0;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .song-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .song-list li {
+            padding: 10px;
+            background: #454545; /* Medium gray */
+            margin-bottom: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #b0b0b0;
+        }
+
+        .song-list li:hover {
+            background: #5e768e; /* Muted blue */
+            transform: translateX(2px);
+        }
+
+        .song-title {
+            font-weight: bold;
+            margin-top: 10px;
+            color: #d0d0d0; /* Lighter gray */
+        }
+    </style>
+</head>
+<body>
+    <div class="player-container">
+        <h1>French Horn Practice</h1>
+        <div class="player">
+            <div class="waveform-wrapper">
+                <div class="zoom-controls">
+                    <button class="zoom-btn" id="zoom-out">-</button>
+                    <button class="zoom-btn" id="zoom-in">+</button>
+                </div>
+                <div id="waveform"></div>
+            </div>
+            <div class="time-display">
+                <span id="current-time">0:00</span> / <span id="total-time">0:00</span>
+            </div>
+            <div class="controls">
+                <button id="play-pause">Play</button>
+                <select id="speed">
+                    <option value="0.5">0.5x</option>
+                    <option value="0.6">0.6x</option>
+                    <option value="0.7">0.7x</option>
+                    <option value="0.8">0.8x</option>
+                    <option value="0.9">0.9x</option>
+                    <option value="1" selected>1x</option>
+                </select>
+            </div>
+            <div class="song-list">
+                <h2>Songs</h2>
+                <div id="song-list-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const playPauseBtn = document.getElementById('play-pause');
+            const speedSelect = document.getElementById('speed');
+            const currentTimeDisplay = document.getElementById('current-time');
+            const totalTimeDisplay = document.getElementById('total-time');
+            const waveformContainer = document.getElementById('waveform');
+            const songListContainer = document.getElementById('song-list-container');
+            const zoomInBtn = document.getElementById('zoom-in');
+            const zoomOutBtn = document.getElementById('zoom-out');
+            let zoomLevel = 1; // Start at fully zoomed out
+
+            // Define markers as an object
+            const songs = {
+                "Halo": [
+                    { name: "m42", time: 91 },
+                    { name: "m54", time: 114 }
+                ],
+                "Legends of Azeroth": [
+                    { name: "m5", time: 186 },
+                    { name: "m12", time: 203 },
+                    { name: "m23", time: 232 },
+                    { name: "m46", time: 292 }
+                ],
+                "The Dream of Flight": [
+                    { name: "m43", time: 436 },
+                    { name: "m75", time: 506 },
+                    { name: "m94", time: 547 },
+                    { name: "m122", time: 608 },
+                    { name: "m128", time: 621 },
+                    { name: "m142", time: 652 }
+                ],
+                "Super Mario Bros": [
+                    { name: "m1", time: 675 },
+                    { name: "m22", time: 708 },
+                    { name: "m25", time: 717 },
+                    { name: "m30", time: 729 },
+                    { name: "m35", time: 731 },
+                    { name: "m39", time: 737 }
+                ],
+                "Skyrim": [
+                    { name: "m13", time: 1227 },
+                    { name: "m21", time: 1240 },
+                    { name: "m29", time: 1256 },
+                    { name: "m37", time: 1268 },
+                    { name: "m45", time: 1282 },
+                    { name: "m56", time: 1301 },
+                    { name: "m72", time: 1329 },
+                    { name: "m81", time: 1343 },
+                    { name: "m93", time: 1364 },
+                    { name: "m100", time: 1377 }
+                ]
+            };
+
+            // Initialize WaveSurfer
+            const wavesurfer = WaveSurfer.create({
+                container: '#waveform',
+                waveColor: '#6b8299',
+                progressColor: '#5e768e',
+                cursorColor: '#d0d0d0',
+                barWidth: 2,
+                height: 100,
+                responsive: true,
+                backgroundColor: '#2a3b4c',
+                scrollParent: true, // Enable horizontal scrolling when zoomed
+                minPxPerSec: 20 // Minimum pixels per second for initial view
+            });
+
+            wavesurfer.load('Video Games and Music - Horns.mp3');
+
+            // Dynamically add markers and set initial zoom
+            wavesurfer.on('ready', () => {
+                const duration = wavesurfer.getDuration();
+                const containerWidth = waveformContainer.clientWidth;
+                wavesurfer.zoom(containerWidth / duration); // Fit full audio in view
+                zoomLevel = containerWidth / duration;
+
+                Object.entries(songs).forEach(([songTitle, markers]) => {
+                    markers.forEach(marker => {
+                        const percent = (marker.time / duration) * 100;
+                        const markerEl = document.createElement('div');
+                        markerEl.className = 'marker';
+                        markerEl.style.left = `${percent}%`;
+                        markerEl.dataset.time = marker.time;
+                        markerEl.title = `${songTitle} - ${marker.name}`;
+                        markerEl.addEventListener('click', () => {
+                            wavesurfer.setTime(parseFloat(marker.time));
+                            wavesurfer.play();
+                            playPauseBtn.classList.add('playing');
+                            playPauseBtn.textContent = 'Pause';
+                        });
+                        waveformContainer.appendChild(markerEl);
+                    });
+                });
+                totalTimeDisplay.textContent = formatTime(duration);
+            });
+
+            // Dynamically generate song list
+            Object.entries(songs).forEach(([songTitle, markers]) => {
+                const titleEl = document.createElement('div');
+                titleEl.className = 'song-title';
+                titleEl.textContent = songTitle;
+                songListContainer.appendChild(titleEl);
+
+                const ulEl = document.createElement('ul');
+                markers.forEach(marker => {
+                    const liEl = document.createElement('li');
+                    liEl.dataset.time = marker.time;
+                    liEl.textContent = marker.name;
+                    liEl.addEventListener('click', () => {
+                        wavesurfer.setTime(parseFloat(marker.time));
+                        wavesurfer.play();
+                        playPauseBtn.classList.add('playing');
+                        playPauseBtn.textContent = 'Pause';
+                    });
+                    ulEl.appendChild(liEl);
+                });
+                songListContainer.appendChild(ulEl);
+            });
+
+            // Time formatting function
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+            }
+
+            // Play/Pause control
+            playPauseBtn.addEventListener('click', () => {
+                if (wavesurfer.isPlaying()) {
+                    wavesurfer.pause();
+                    playPauseBtn.classList.remove('playing');
+                    playPauseBtn.textContent = 'Play';
+                } else {
+                    wavesurfer.play();
+                    playPauseBtn.classList.add('playing');
+                    playPauseBtn.textContent = 'Pause';
+                }
+            });
+
+            // Speed control
+            speedSelect.addEventListener('change', () => {
+                wavesurfer.setPlaybackRate(parseFloat(speedSelect.value));
+            });
+
+            // Update time display and auto-scroll when zoomed
+            wavesurfer.on('audioprocess', () => {
+                currentTimeDisplay.textContent = formatTime(wavesurfer.getCurrentTime());
+                if (zoomLevel > waveformContainer.clientWidth / wavesurfer.getDuration()) {
+                    const scrollLeft = (wavesurfer.getCurrentTime() / wavesurfer.getDuration()) * 
+                                    (waveformContainer.scrollWidth - waveformContainer.clientWidth);
+                    waveformContainer.scrollLeft = scrollLeft;
+                }
+            });
+
+            // Seek on waveform click
+            waveformContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('zoom-btn')) return; // Ignore clicks on zoom buttons
+                const rect = waveformContainer.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                wavesurfer.seekTo(percent);
+            });
+
+            // Zoom in function
+            zoomInBtn.addEventListener('click', () => {
+                zoomLevel *= 1.5; // Increase by 10%
+                wavesurfer.zoom(zoomLevel);
+            });
+
+            // Zoom out function
+            zoomOutBtn.addEventListener('click', () => {
+                const duration = wavesurfer.getDuration();
+                const containerWidth = waveformContainer.clientWidth;
+                const minZoom = containerWidth / duration; // Fully zoomed out
+                zoomLevel /= 1.1; // Decrease by 10%
+                if (zoomLevel < minZoom) zoomLevel = minZoom; // Prevent zooming out too far
+                wavesurfer.zoom(zoomLevel);
+            });
+        });
+    </script>
+</body>
+</html>
