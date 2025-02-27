@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background: #2d2d2d; /* Charcoal background */
+            background: #2d2d2d;
             margin: 0;
             padding: 40px;
             display: flex;
@@ -18,7 +18,7 @@
         }
 
         .player-container {
-            background: #3a3a3a; /* Dark gray container */
+            background: #3a3a3a;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             padding: 30px;
@@ -33,7 +33,7 @@
 
         h1 {
             text-align: center;
-            color: #b0b0b0; /* Light gray text */
+            color: #b0b0b0;
             margin-bottom: 20px;
             font-size: 2em;
             letter-spacing: 1px;
@@ -48,11 +48,11 @@
             position: relative;
             width: 100%;
             height: 100px;
-            background: #2a3b4c; /* Darkish blue playbar */
-            border: 2px solid #6b8299; /* Light blue outline */
+            background: #2a3b4c;
+            border: 2px solid #6b8299;
             border-radius: 8px;
             cursor: pointer;
-            overflow-x: auto; /* Enable horizontal scrolling when zoomed */
+            overflow: hidden;
         }
 
         .zoom-controls {
@@ -64,7 +64,7 @@
         }
 
         .zoom-btn {
-            background: #5e768e; /* Muted blue */
+            background: #5e768e;
             color: #fff;
             width: 25px;
             height: 25px;
@@ -80,51 +80,13 @@
         }
 
         .zoom-btn:hover {
-            background: #4a6075; /* Darker muted blue */
-        }
-
-        .marker {
-            position: absolute;
-            top: 0;
-            width: 1px;
-            height: 100%;
-            background: #ff444480;
-            transition: transform 0.2s ease;
-            z-index: 10;
-        }
-
-        .marker::before {
-            content: '';
-            position: absolute;
-            left: -5px; /* Extend 5px to the left */
-            width: 11px; /* Total clickable width: 1px + 5px left + 5px right */
-            height: 100%;
-            z-index: 15; /* Ensure it’s clickable */
-        }
-
-        .marker:hover {
-            transform: scaleY(1.1);
-        }
-
-        .marker:hover::after {
-            content: attr(title);
-            position: absolute;
-            top: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: #fff;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            white-space: nowrap;
-            z-index: 10;
+            background: #4a6075;
         }
 
         .time-display {
             text-align: center;
             margin: 10px 0;
-            color: #b0b0b0; /* Light gray */
+            color: #b0b0b0;
             font-size: 14px;
         }
 
@@ -145,17 +107,16 @@
         }
 
         #play-pause {
-            background: #5e768e; /* Muted blue */
+            background: #5e768e;
             color: #fff;
         }
 
         #play-pause.playing {
-            background: #ff4444; /* Red when playing */
+            background: #ff4444;
         }
 
         #play-pause:hover {
-            background: #4a6075; /* Darker muted blue */
-            transform: scale(1.03);
+            background: #4a6075;
         }
 
         #play-pause.playing:hover {
@@ -163,13 +124,13 @@
         }
 
         select {
-            background: #3a3a3a; /* Dark gray */
-            border: 2px solid #5e768e; /* Muted blue */
+            background: #3a3a3a;
+            border: 2px solid #5e768e;
             color: #b0b0b0;
         }
 
         select:hover {
-            border-color: #6b8299; /* Light blue */
+            border-color: #6b8299;
         }
 
         .song-list {
@@ -189,7 +150,7 @@
 
         .song-list li {
             padding: 10px;
-            background: #454545; /* Medium gray */
+            background: #454545;
             margin-bottom: 5px;
             border-radius: 8px;
             cursor: pointer;
@@ -198,14 +159,30 @@
         }
 
         .song-list li:hover {
-            background: #5e768e; /* Muted blue */
+            background: #5e768e;
             transform: translateX(2px);
         }
 
         .song-title {
             font-weight: bold;
             margin-top: 10px;
-            color: #d0d0d0; /* Lighter gray */
+            color: #d0d0d0;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(42, 59, 76, 0.9);
+            color: #b0b0b0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            border-radius: 8px;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -251,9 +228,10 @@
             const songListContainer = document.getElementById('song-list-container');
             const zoomInBtn = document.getElementById('zoom-in');
             const zoomOutBtn = document.getElementById('zoom-out');
-            let zoomLevel = 1; // Start at fully zoomed out
+            let zoomLevel = 1;
 
-            // Define markers as an object
+            const TOTAL_DURATION = 1429;
+
             const songs = {
                 "Halo": [
                     { name: "m42", time: 91 },
@@ -295,7 +273,6 @@
                 ]
             };
 
-            // Initialize WaveSurfer
             const wavesurfer = WaveSurfer.create({
                 container: '#waveform',
                 waveColor: '#6b8299',
@@ -305,40 +282,56 @@
                 height: 100,
                 responsive: true,
                 backgroundColor: '#2a3b4c',
-                scrollParent: true, // Enable horizontal scrolling when zoomed
-                minPxPerSec: 20 // Minimum pixels per second for initial view
+                normalize: true,
+                scrollParent: false
             });
+
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.className = 'loading-overlay';
+            loadingOverlay.textContent = 'Loading audio...';
+            waveformContainer.appendChild(loadingOverlay);
 
             wavesurfer.load('Video Games and Music - Horns.mp3');
 
-            // Dynamically add markers and set initial zoom
             wavesurfer.on('ready', () => {
                 const duration = wavesurfer.getDuration();
                 const containerWidth = waveformContainer.clientWidth;
-                wavesurfer.zoom(containerWidth / duration); // Fit full audio in view
-                zoomLevel = containerWidth / duration;
+                const initialPxPerSec = containerWidth / duration;
+                wavesurfer.zoom(initialPxPerSec);
+                zoomLevel = 1;
 
-                Object.entries(songs).forEach(([songTitle, markers]) => {
-                    markers.forEach(marker => {
-                        const percent = (marker.time / duration) * 100;
-                        const markerEl = document.createElement('div');
-                        markerEl.className = 'marker';
-                        markerEl.style.left = `${percent}%`;
-                        markerEl.dataset.time = marker.time;
-                        markerEl.title = `${songTitle} - ${marker.name}`;
-                        markerEl.addEventListener('click', () => {
-                            wavesurfer.setTime(parseFloat(marker.time));
-                            wavesurfer.play();
-                            playPauseBtn.classList.add('playing');
-                            playPauseBtn.textContent = 'Pause';
-                        });
-                        waveformContainer.appendChild(markerEl);
-                    });
-                });
+                loadingOverlay.remove();
                 totalTimeDisplay.textContent = formatTime(duration);
+                updateTimeDisplay();
             });
 
-            // Dynamically generate song list
+            function updateTimeDisplay() {
+                currentTimeDisplay.textContent = formatTime(wavesurfer.getCurrentTime());
+            }
+
+            function calculateScrollOffset(currentTime, duration, containerWidth, pixelsPerSecond) {
+                const waveformWidth = duration * pixelsPerSecond;
+                const playheadPosition = currentTime * pixelsPerSecond;
+                
+                if (currentTime < containerWidth / (2 * pixelsPerSecond)) {
+                    return 0;
+                } else if (currentTime > duration - (containerWidth / (2 * pixelsPerSecond))) {
+                    return waveformWidth - containerWidth;
+                } else {
+                    return playheadPosition - (containerWidth / 2);
+                }
+            }
+
+            function centerPlayhead() {
+                const currentTime = wavesurfer.getCurrentTime();
+                const duration = wavesurfer.getDuration();
+                const containerWidth = waveformContainer.clientWidth;
+                const pixelsPerSecond = (containerWidth / duration) * zoomLevel;
+                const scrollOffset = calculateScrollOffset(currentTime, duration, containerWidth, pixelsPerSecond);
+                
+                wavesurfer.drawer.wrapper.scrollLeft = scrollOffset;
+            }
+
             Object.entries(songs).forEach(([songTitle, markers]) => {
                 const titleEl = document.createElement('div');
                 titleEl.className = 'song-title';
@@ -351,7 +344,9 @@
                     liEl.dataset.time = marker.time;
                     liEl.textContent = marker.name;
                     liEl.addEventListener('click', () => {
-                        wavesurfer.setTime(parseFloat(marker.time));
+                        const time = parseFloat(marker.time);
+                        wavesurfer.setTime(time);
+                        updateTimeDisplay();
                         wavesurfer.play();
                         playPauseBtn.classList.add('playing');
                         playPauseBtn.textContent = 'Pause';
@@ -361,63 +356,91 @@
                 songListContainer.appendChild(ulEl);
             });
 
-            // Time formatting function
             function formatTime(seconds) {
                 const minutes = Math.floor(seconds / 60);
                 const secs = Math.floor(seconds % 60);
                 return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
             }
 
-            // Play/Pause control
             playPauseBtn.addEventListener('click', () => {
+                wavesurfer.playPause();
                 if (wavesurfer.isPlaying()) {
-                    wavesurfer.pause();
-                    playPauseBtn.classList.remove('playing');
-                    playPauseBtn.textContent = 'Play';
-                } else {
-                    wavesurfer.play();
                     playPauseBtn.classList.add('playing');
                     playPauseBtn.textContent = 'Pause';
+                } else {
+                    playPauseBtn.classList.remove('playing');
+                    playPauseBtn.textContent = 'Play';
                 }
+                updateTimeDisplay();
             });
 
-            // Speed control
             speedSelect.addEventListener('change', () => {
                 wavesurfer.setPlaybackRate(parseFloat(speedSelect.value));
             });
 
-            // Update time display and auto-scroll when zoomed
-            wavesurfer.on('audioprocess', () => {
-                currentTimeDisplay.textContent = formatTime(wavesurfer.getCurrentTime());
-                if (zoomLevel > waveformContainer.clientWidth / wavesurfer.getDuration()) {
-                    const scrollLeft = (wavesurfer.getCurrentTime() / wavesurfer.getDuration()) * 
-                                    (waveformContainer.scrollWidth - waveformContainer.clientWidth);
-                    waveformContainer.scrollLeft = scrollLeft;
-                }
+            wavesurfer.on('timeupdate', () => {
+                updateTimeDisplay();
+                centerPlayhead();
             });
 
-            // Seek on waveform click
-            waveformContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('zoom-btn')) return; // Ignore clicks on zoom buttons
+            wavesurfer.on('seek', () => {
+                updateTimeDisplay();
+                centerPlayhead();
+            });
+
+            let isScrubbing = false;
+            waveformContainer.addEventListener('mousedown', (e) => {
+                isScrubbing = true;
+                updatePlayheadPosition(e);
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isScrubbing) updatePlayheadPosition(e);
+            });
+
+            document.addEventListener('mouseup', () => {
+                isScrubbing = false;
+            });
+
+            waveformContainer.addEventListener('touchstart', (e) => {
+                isScrubbing = true;
+                updatePlayheadPosition(e.touches[0]);
+            });
+
+            waveformContainer.addEventListener('touchmove', (e) => {
+                if (isScrubbing) updatePlayheadPosition(e.touches[0]);
+            });
+
+            waveformContainer.addEventListener('touchend', () => {
+                isScrubbing = false;
+            });
+
+            function updatePlayheadPosition(e) {
                 const rect = waveformContainer.getBoundingClientRect();
-                const percent = (e.clientX - rect.left) / rect.width;
-                wavesurfer.seekTo(percent);
-            });
+                const containerWidth = rect.width;
+                const pixelsPerSecond = (containerWidth / TOTAL_DURATION) * zoomLevel;
+                const clickX = e.clientX - rect.left;
+                const time = clickX / pixelsPerSecond;
+                wavesurfer.setTime(time);
+                updateTimeDisplay();
+                centerPlayhead();
+            }
 
-            // Zoom in function
             zoomInBtn.addEventListener('click', () => {
-                zoomLevel *= 1.5; // Increase by 10%
-                wavesurfer.zoom(zoomLevel);
+                zoomLevel *= 1.5;
+                const containerWidth = waveformContainer.clientWidth;
+                const pixelsPerSecond = (containerWidth / TOTAL_DURATION) * zoomLevel;
+                wavesurfer.zoom(pixelsPerSecond);
+                centerPlayhead();
             });
 
-            // Zoom out function
             zoomOutBtn.addEventListener('click', () => {
-                const duration = wavesurfer.getDuration();
+                zoomLevel /= 1.5;
+                if (zoomLevel < 1) zoomLevel = 1;
                 const containerWidth = waveformContainer.clientWidth;
-                const minZoom = containerWidth / duration; // Fully zoomed out
-                zoomLevel /= 1.1; // Decrease by 10%
-                if (zoomLevel < minZoom) zoomLevel = minZoom; // Prevent zooming out too far
-                wavesurfer.zoom(zoomLevel);
+                const pixelsPerSecond = (containerWidth / TOTAL_DURATION) * zoomLevel;
+                wavesurfer.zoom(pixelsPerSecond);
+                centerPlayhead();
             });
         });
     </script>
