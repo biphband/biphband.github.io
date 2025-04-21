@@ -113,18 +113,18 @@
             pdfViewer.classList.remove('hidden');
 
             pdfContainer.innerHTML = `
-                <embed src="Pomp_and_Circumstance.pdf" type="application/pdf">
+                <embed src="Graduation Ceremony 2025.pdf" type="application/pdf">
             `;
         }
 
         function downloadPDF() {
-            window.location.href = 'Pomp_and_Circumstance.pdf';
+            window.location.href = 'Graduation Ceremony 2025.pdf';
         }
 
         function saveAsPDF() {
             const link = document.createElement('a');
-            link.href = 'Pomp_and_Circumstance.pdf';
-            link.download = 'Pomp_and_Circumstance.pdf';
+            link.href = 'Graduation Ceremony 2025.pdf';
+            link.download = 'Graduation Ceremony 2025.pdf';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -133,9 +133,9 @@
         function sharePDF() {
             if (navigator.share) {
                 navigator.share({
-                    title: 'Pomp_and_Circumstance.pdf',
+                    title: 'Graduation Ceremony 2025.pdf',
                     text: 'Here is the music for graduation',
-                    url: 'Pomp_and_Circumstance.pdf'
+                    url: 'Graduation Ceremony 2025.pdf'
                 })
                 .catch(error => console.log('Error sharing:', error));
             } else {
