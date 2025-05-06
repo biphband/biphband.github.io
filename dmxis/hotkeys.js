@@ -12,6 +12,15 @@ document.addEventListener('keydown', function(event) {
                     currentMode === 'Auditorium' ? auditoriumFixtures : 
                     currentMode === 'Mobile' ? mobileFixtures : [];
     const isFixtureLabelGrid = activeElement.closest('.fixture-label-grid') || document.activeElement.classList.contains('fixture-label');
+    const isMenuOpen = document.getElementById('menu').classList.contains('open');
+
+    // Handle 'Escape' key to close menu if open and no modals or inputs are active
+    if (event.key === 'Escape' && !isColorMenu && !isSearchMenu && !isValueInput && !isSlider && isMenuOpen) {
+        event.preventDefault();
+        const menu = document.getElementById('menu');
+        menu.classList.remove('open');
+        return;
+    }
 
     // Helper function to get sorted fixtures
     function getSortedFixtures() {
@@ -128,6 +137,16 @@ document.addEventListener('keydown', function(event) {
             (isSearchMenu && activeElement.classList.contains('search-input'))) {
             return;
         }
+    }
+
+    // 'm': Toggle hamburger menu
+    if (event.key === 'm' && !isValueInput && !isSlider && !isColorMenu && !isSearchMenu) {
+        if (activeElement.classList.contains('search-input') || activeElement.classList.contains('color-input')) {
+            return;
+        }
+        event.preventDefault();
+        toggleMenu();
+        return;
     }
 
     // Cmd+C: Copy selected fixture values and colors with parameter names
@@ -422,7 +441,9 @@ document.addEventListener('keydown', function(event) {
                     if (sliderStates.has(sliderId)) {
                         const state = sliderStates.get(sliderId);
                         state.current = originalValue;
-                        state.target = originalValue;
+                        state
+
+        .target = originalValue;
                     } else {
                         sliderStates.set(sliderId, {
                             current: originalValue,

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DMXIS2</title>
+    <title>DMXIS</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -45,17 +45,19 @@
         }
 
         .menu {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 200px;
-            height: 100%;
-            background: #33333396;
-            padding: 2vw;
-            padding-top: 3.5rem;
-            transition: left 0.3s ease-in-out;
-            z-index: 999;
-        }
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 200px;
+    height: 100%;
+    background: #222222cc;
+    padding: 2vw;
+    padding-top: 3.5rem;
+    transition: left 0.3s ease-in-out;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+}
 
         .menu.open {
             left: 0;
@@ -64,7 +66,7 @@
         .menu button {
             display: block;
             width: 100%;
-            padding: 1vw;
+            padding: 0.5vw; /* Reduced padding to make buttons less tall */
             margin: 0.5vw 0;
             background: #555;
             border: none;
@@ -78,6 +80,30 @@
             background: #666;
         }
 
+        .menu .section-title {
+            font-size: clamp(0.8rem, 1.2vw, 1rem);
+            color: #aaa;
+            margin: 1vw 0 0.5vw;
+            padding-left: 0.5vw;
+        }
+
+        .menu .midi-section {
+            margin-top: 1vw;
+            border-top: 1px solid #555;
+
+        }
+
+
+.menu-footer {
+    position: relative;
+    bottom: -20vw; /* Adjust as needed */
+    left: 0;
+    right: 0;
+    font-size: clamp(0.6rem, 0.8vw, 0.8rem);
+    color: #ffffff56;
+    text-align: center;
+    padding-top: 2vw;
+}
         .split-container {
             display: flex;
             flex: 1;
@@ -484,9 +510,19 @@
         <div style="width: 2.5vw;"></div>
     </div>
     <div class="menu" id="menu">
-        <button onclick="changeMode('Black Box')">Black Box</button>
-        <button onclick="changeMode('Auditorium')">Auditorium</button>
-        <button onclick="changeMode('Mobile')">Mobile</button>
+        <div class="mode-section">
+            <div class="section-title">Modes</div>
+            <button onclick="changeMode('Black Box')">Black Box</button>
+            <button onclick="changeMode('Auditorium')">Auditorium</button>
+            <button onclick="changeMode('Mobile')">Mobile</button>
+        </div>
+        <div class="midi-section">
+            <div class="section-title">MIDI Output</div>
+            <button onclick="selectMIDIOutput('Network Session 1')">Mac, Wireless</button>
+            <button onclick="selectMIDIOutput('IAC Driver Bus 1')">Mac, Wired</button>
+            <button onclick="selectMIDIOutput('loopMIDI Port')">PC, Wired</button>
+        </div>
+        <div class="menu-footer">Site last updated on May 06, 2025</div>
     </div>
     <div class="split-container">
         <div class="left-container">

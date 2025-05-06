@@ -15,9 +15,36 @@ let selectedFixtures = new Set();
 let isColorWheelOpen = false;
 let copiedFixtureData = null; // Store copied fixture data (channels and labels)
 
+const MOTORIZED_PAR_BLACKOUT_VALUES = {
+    'Colors': 56,
+    'Strobe': 127,
+    'Shutter': 0,
+    'Gobos': 0,
+    'Prism': 127,
+    'Prism Rotate': 0,
+    'Fan Out': 127,
+    'Blur': 127,
+    'Focus': 64,
+    'Pan': 82,
+    'Small Pan': 0,
+    'Tilt': 38,
+    'Small Tilt': 0,
+    'Presets': 0,
+    'Reset': 0,
+    'Bulb': 0,
+    '-': 0
+};
+
 function toggleMenu() {
     const menu = document.getElementById('menu');
     menu.classList.toggle('open');
+}
+
+function closeMenu() {
+    const menu = document.getElementById('menu');
+    if (menu.classList.contains('open')) {
+        menu.classList.remove('open');
+    }
 }
 
 function changeMode(mode) {
@@ -27,6 +54,24 @@ function changeMode(mode) {
     selectedChannels = new Set();
     lastSelectedChannel = null;
     selectedFixtures = new Set();
+    // Reset faderValues for Motorized Pars to default blackout values
+    const fixtures = getCurrentModeFixtures();
+    fixtures.forEach(fixture => {
+        if (fixture.type === 'Motorized Par') {
+            const params = fixtureParameters[fixture.type];
+            for (let ch = fixture.from; ch <= fixture.to; ch++) {
+                const idx = ch - 1;
+                const paramIndex = (ch - fixture.from) % params.length;
+                const paramName = params[paramIndex].name;
+                faderValues[idx] = MOTORIZED_PAR_BLACKOUT_VALUES[paramName] || 0;
+            }
+        } else {
+            for (let ch = fixture.from; ch <= fixture.to; ch++) {
+                const idx = ch - 1;
+                faderValues[idx] = 0;
+            }
+        }
+    });
     const grid = document.getElementById('faderGrid');
     grid.querySelectorAll('.fixture-group').forEach(group => group.remove());
     createFaders();
@@ -55,15 +100,66 @@ function initMIDI() {
 
 function onMIDISuccess(midiAccess) {
     const outputs = Array.from(midiAccess.outputs.values());
-    midiOutput = outputs.find(output => output.name === 'Network Session 8');
-    //midiOutput = outputs.find(output => output.name === 'IAC Driver Bus 1');
-    if (!midiOutput) {
-        console.error('MIDI: No output named "IAC Driver Bus 1" found');
+    // Available MIDI output options
+    const midiOptions = [
+        'Network Session 1', // Mac, Wireless
+        'IAC Driver Bus 1',  // Mac, Wired
+        'loopMIDI Port'      // PC, Wired
+    ];
+
+    // Find available outputs that match our options
+    const availableOutputs = outputs.filter(output => midiOptions.includes(output.name));
+
+    // Default selection logic: prefer 'IAC Driver Bus 1' if available, otherwise first available
+    if (availableOutputs.length > 0) {
+        midiOutput = availableOutputs.find(output => output.name === 'IAC Driver Bus 1') || availableOutputs[0];
+        console.log(`MIDI: Selected output "${midiOutput.name}"`);
+    } else {
+        console.error('MIDI: No supported MIDI output found');
     }
+
+    // Update menu to highlight selected MIDI output
+    updateMIDISelectionUI();
 }
 
 function onMIDIFailure() {
     console.error('MIDI: Failed to access MIDI devices');
+}
+
+function selectMIDIOutput(outputName) {
+    if (navigator.requestMIDIAccess) {
+        navigator.requestMIDIAccess().then(midiAccess => {
+            const outputs = Array.from(midiAccess.outputs.values());
+            const selectedOutput = outputs.find(output => output.name === outputName);
+            if (selectedOutput) {
+                midiOutput = selectedOutput;
+                console.log(`MIDI: Switched to output "${outputName}"`);
+                // Resend current fader values to the new MIDI output
+                for (let i = 0; i < faderValues.length; i++) {
+                    const value = faderValues[i];
+                    const midiChannel = Math.floor(i / 128);
+                    const ccNumber = i % 128;
+                    sendMIDICC(midiChannel, ccNumber, value);
+                }
+                updateMIDISelectionUI();
+            } else {
+                console.error(`MIDI: Output "${outputName}" not found`);
+            }
+            toggleMenu();
+        }, onMIDIFailure);
+    }
+}
+
+function updateMIDISelectionUI() {
+    const midiButtons = document.querySelectorAll('.menu .midi-section button');
+    midiButtons.forEach(button => {
+        const outputName = button.getAttribute('onclick').match(/selectMIDIOutput\('([^']+)'\)/)[1];
+        if (midiOutput && outputName === midiOutput.name) {
+            button.style.background = '#a5a5a5';
+        } else {
+            button.style.background = '#555';
+        }
+    });
 }
 
 function sendMIDICC(midiChannel, cc, value) {
@@ -154,23 +250,37 @@ function blackout() {
     const fixtures = getCurrentModeFixtures();
     const channelsToBlackout = new Set();
     const labelChanges = new Map();
-    
-    // Collect all channels and set label states for all fixtures
+    const channelChanges = new Map();
+
     fixtures.forEach(fixture => {
-        for (let ch = fixture.from; ch <= fixture.to; ch++) {
-            channelsToBlackout.add(ch - 1);
+        if (fixture.type === 'Motorized Par') {
+            // Handle Motorized Par fixtures with specific values
+            const params = fixtureParameters[fixture.type];
+            for (let ch = fixture.from; ch <= fixture.to; ch++) {
+                const idx = ch - 1;
+                const paramIndex = (ch - fixture.from) % params.length;
+                const paramName = params[paramIndex].name;
+                const targetValue = MOTORIZED_PAR_BLACKOUT_VALUES[paramName] || 0;
+                channelsToBlackout.add(idx);
+                channelChanges.set(idx, {
+                    initialValue: faderValues[idx] || 0,
+                    targetValue: targetValue
+                });
+            }
+        } else {
+            // Other fixtures: set all channels to 0
+            for (let ch = fixture.from; ch <= fixture.to; ch++) {
+                const idx = ch - 1;
+                channelsToBlackout.add(idx);
+                channelChanges.set(idx, {
+                    initialValue: faderValues[idx] || 0,
+                    targetValue: 0
+                });
+            }
         }
         labelChanges.set(fixture.from, {
             hex: '#333333',
             opacity: 0
-        });
-    });
-
-    const channelChanges = new Map();
-    channelsToBlackout.forEach(idx => {
-        channelChanges.set(idx, {
-            initialValue: faderValues[idx] || 0,
-            targetValue: 0
         });
     });
 
@@ -182,12 +292,35 @@ function blackoutSelectedFixtures() {
     const channelsToBlackout = new Set();
     const affectedFixtures = [];
     const labelChanges = new Map();
-    
+    const channelChanges = new Map();
+
     selectedFixtures.forEach(fixtureStart => {
         const fixture = getCurrentModeFixtures().find(f => f.from === fixtureStart);
         if (fixture) {
-            for (let ch = fixture.from; ch <= fixture.to; ch++) {
-                channelsToBlackout.add(ch - 1);
+            if (fixture.type === 'Motorized Par') {
+                // Handle Motorized Par fixtures with specific values
+                const params = fixtureParameters[fixture.type];
+                for (let ch = fixture.from; ch <= fixture.to; ch++) {
+                    const idx = ch - 1;
+                    const paramIndex = (ch - fixture.from) % params.length;
+                    const paramName = params[paramIndex].name;
+                    const targetValue = MOTORIZED_PAR_BLACKOUT_VALUES[paramName] || 0;
+                    channelsToBlackout.add(idx);
+                    channelChanges.set(idx, {
+                        initialValue: faderValues[idx] || 0,
+                        targetValue: targetValue
+                    });
+                }
+            } else {
+                // Other fixtures: set all channels to 0
+                for (let ch = fixture.from; ch <= fixture.to; ch++) {
+                    const idx = ch - 1;
+                    channelsToBlackout.add(idx);
+                    channelChanges.set(idx, {
+                        initialValue: faderValues[idx] || 0,
+                        targetValue: 0
+                    });
+                }
             }
             affectedFixtures.push(fixture);
             labelChanges.set(fixtureStart, {
@@ -195,14 +328,6 @@ function blackoutSelectedFixtures() {
                 opacity: 0
             });
         }
-    });
-
-    const channelChanges = new Map();
-    channelsToBlackout.forEach(idx => {
-        channelChanges.set(idx, {
-            initialValue: faderValues[idx] || 0,
-            targetValue: 0
-        });
     });
 
     fadeChannelsAndLabels(channelChanges, labelChanges, affectedFixtures);
@@ -214,7 +339,6 @@ function fadeChannelsAndLabels(channelChanges, labelChanges, fixtures) {
     const STEP_INTERVAL = FADE_DURATION / STEPS;
     let step = 0;
 
-    // Initialize(section truncated for brevity)
     // Initialize label background states for affected fixtures
     labelChanges.forEach((change, fixtureStart) => {
         labelBackgroundStates.set(`label-${fixtureStart}`, {
@@ -438,6 +562,7 @@ function createFaders() {
 
             const midiChannel = Math.floor(faderIndex / 128);
             const ccNumber = faderIndex % 128;
+            sendMIDICC(midiChannel, ccNumber, faderValues[faderIndex]); // Send initial MIDI value
 
             sliderStates.set(fader.id, {
                 current: faderValues[faderIndex],
@@ -445,98 +570,6 @@ function createFaders() {
                 midiChannel: midiChannel,
                 ccNumber: ccNumber
             });
-
-            container.onclick = (e) => {
-                if (e.target === fader || e.target === valueInput) return;
-                selectContainer(container, e.shiftKey, e.metaKey);
-            };
-
-            container.ondblclick = (e) => {
-                selectSameParameterContainers(container, e.metaKey);
-            };
-
-            fader.oninput = (e) => {
-                const val = parseInt(e.target.value);
-                const faderIndex = parseInt(e.target.id.replace('fader-', ''));
-                faderValues[faderIndex] = val;
-                const state = sliderStates.get(e.target.id);
-                state.target = val;
-                valueInput.value = Math.round((val / 127) * 100);
-
-                // Check if this is a shutter channel
-                if (fixture && channel === fixture.from) {
-                    const label = document.querySelector(`.fixture-label[data-fixture="${fixture.from}"]`);
-                    if (label && val === 0) {
-                        labelBackgroundStates.set(`label-${fixture.from}`, {
-                            currentOpacity: labelBackgroundStates.get(`label-${fixture.from}`)?.currentOpacity || 0,
-                            targetOpacity: 0,
-                            hex: labelBackgroundStates.get(`label-${fixture.from}`)?.hex || '#333333',
-                            rgba: hexToRGBA(labelBackgroundStates.get(`label-${fixture.from}`)?.hex || '#333333', 0)
-                        });
-                        label.style.backgroundColor = hexToRGBA(labelBackgroundStates.get(`label-${fixture.from}`)?.hex || '#333333', 0);
-                        if (!labelAnimationFrameId) {
-                            labelAnimationFrameId = requestAnimationFrame(updateLabelBackgrounds);
-                        }
-                    }
-                }
-
-                selectedChannels.forEach(ch => {
-                    const idx = ch - 1;
-                    faderValues[idx] = val;
-                    const sliderId = `fader-${idx}`;
-                    const midiChannel = Math.floor(idx / 128);
-                    const ccNumber = idx % 128;
-
-                    if (sliderStates.has(sliderId)) {
-                        const s = sliderStates.get(sliderId);
-                        s.target = val;
-                        const slider = document.getElementById(sliderId);
-                        if (slider) {
-                            slider.value = val;
-                            const vi = slider.parentElement.querySelector('.fader-value');
-                            if (vi && !vi.classList.contains('editable')) {
-                                vi.value = Math.round((val / 127) * 100);
-                            }
-                        }
-                    } else {
-                        sliderStates.set(sliderId, {
-                            current: faderValues[idx],
-                            target: val,
-                            midiChannel: midiChannel,
-                            ccNumber: ccNumber
-                        });
-                    }
-
-                    // Check if selected channel is a shutter channel
-                    const selFixture = fixtures.find(f => ch === f.from);
-                    if (selFixture && ch === selFixture.from && val === 0) {
-                        const label = document.querySelector(`.fixture-label[data-fixture="${selFixture.from}"]`);
-                        if (label) {
-                            labelBackgroundStates.set(`label-${selFixture.from}`, {
-                                currentOpacity: labelBackgroundStates.get(`label-${selFixture.from}`)?.currentOpacity || 0,
-                                targetOpacity: 0,
-                                hex: labelBackgroundStates.get(`label-${selFixture.from}`)?.hex || '#333333',
-                                rgba: hexToRGBA(labelBackgroundStates.get(`label-${selFixture.from}`)?.hex || '#333333', 0)
-                            });
-                            label.style.backgroundColor = hexToRGBA(labelBackgroundStates.get(`label-${selFixture.from}`)?.hex || '#333333', 0);
-                            if (!labelAnimationFrameId) {
-                                labelAnimationFrameId = requestAnimationFrame(updateLabelBackgrounds);
-                            }
-                        }
-                    }
-                });
-
-                if (selectedChannels.size === 0) {
-                    selectContainer(container);
-                }
-
-                if (!animationFrameId) {
-                    animationFrameId = requestAnimationFrame(updateSliders);
-                }
-            };
-
-            fader.onmousedown = () => selectContainer(container);
-            fader.ontouchstart = () => selectContainer(container);
 
             container.appendChild(label);
             container.appendChild(fader);
@@ -550,6 +583,24 @@ function createFaders() {
                 updateFixtureTitle(container);
                 highlightFixture(channel);
             }
+
+            fader.addEventListener('input', () => {
+                const value = parseInt(fader.value);
+                faderValues[faderIndex] = value;
+                sliderStates.get(fader.id).target = value;
+                valueInput.value = Math.round((value / 127) * 100);
+                sendMIDICC(midiChannel, ccNumber, value);
+                updateFixtureLabelBackground(channel);
+            });
+
+            valueInput.addEventListener('click', () => {
+                valueInput.select();
+            });
+
+            container.addEventListener('click', (e) => {
+                if (e.target === fader || e.target === valueInput) return;
+                handleChannelSelection(channel, e);
+            });
         }
         grid.appendChild(faderRow);
     }
@@ -586,6 +637,10 @@ document.addEventListener('click', (e) => {
     const isColorWheel = e.target.closest('#colorWheelModal');
     const isFixtureTypeButton = e.target.closest('.fixture-type-button');
     const isColorModal = e.target.closest('.color-modal');
+    const menu = document.getElementById('menu');
+    if (!isMenu && !isHamburger && menu.classList.contains('open')) {
+        closeMenu();
+    }
     if (!isFaderContainer && !isFixtureGroup && !isFixtureLabel && !isMenu && !isHamburger && !isPageButton && !isColorWheel && !isFixtureTypeButton && !isColorModal && (selectedChannels.size > 0 || selectedFixtures.size > 0)) {
         deselectAll();
     }
