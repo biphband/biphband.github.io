@@ -104,7 +104,7 @@ function onMIDISuccess(midiAccess) {
     const midiOptions = [
         'Network Session 1', // Mac, Wireless
         'IAC Driver Bus 1',  // Mac, Wired
-        'loopMIDI Port'      // PC, Wired
+        'loopMIDI Port 1'      // PC, Wired
     ];
 
     // Find available outputs that match our options
