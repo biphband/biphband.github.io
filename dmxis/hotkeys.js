@@ -149,8 +149,8 @@ document.addEventListener('keydown', function(event) {
         return;
     }
 
-    // Cmd+C: Copy selected fixture values and colors with parameter names
-    if (event.metaKey && event.key === 'c' && !isValueInput && !isSlider && !isColorMenu && !isSearchMenu) {
+        // Cmd+C or Ctrl+C: Copy selected fixture values and colors with parameter names
+        if ((event.metaKey || event.ctrlKey) && event.key === 'c' && !isValueInput && !isSlider && !isColorMenu && !isSearchMenu) {
         event.preventDefault();
         if (selectedFixtures.size > 0) {
             copiedFixtureData = {
@@ -204,8 +204,8 @@ document.addEventListener('keydown', function(event) {
         return;
     }
 
-    // Cmd+V: Paste copied fixture values and colors by parameter name
-    if (event.metaKey && event.key === 'v' && !isValueInput && !isSlider && !isColorMenu && !isSearchMenu) {
+        // Cmd+V or Ctrl+V: Paste copied fixture values and colors by parameter name
+        if ((event.metaKey || event.ctrlKey) && event.key === 'v' && !isValueInput && !isSlider && !isColorMenu && !isSearchMenu) {
         event.preventDefault();
         if (copiedFixtureData && (selectedChannels.size > 0 || selectedFixtures.size > 0)) {
             const channelsToUpdate = new Set();
@@ -316,8 +316,8 @@ document.addEventListener('keydown', function(event) {
         return;
     }
 
-    // Cmd+A: Select all channels
-    if (event.metaKey && event.key === 'a' && !isValueInput) {
+        // Cmd+A or Ctrl+A: Select all channels
+        if ((event.metaKey || event.ctrlKey) && event.key === 'a' && !isValueInput) {
         event.preventDefault();
         selectedChannels.clear();
         selectedFixtures.clear();
@@ -470,8 +470,8 @@ document.addEventListener('keydown', function(event) {
         return;
     }
 
-    // Arrow Left/Right: Navigate channels or fixtures
-    if (['ArrowLeft', 'ArrowRight'].includes(event.key) && !isValueInput && !event.metaKey && !isColorMenu && !isSearchMenu) {
+        // Arrow Left/Right: Navigate channels or fixtures
+        if (['ArrowLeft', 'ArrowRight'].includes(event.key) && !isValueInput && !(event.metaKey || event.ctrlKey) && !isColorMenu && !isSearchMenu) {
         event.preventDefault();
         const sortedFixtures = getSortedFixtures();
         const validFixtures = sortedFixtures.filter(f => f !== null);
@@ -609,7 +609,7 @@ document.addEventListener('keydown', function(event) {
         let step;
         if (event.shiftKey) {
             step = 127;
-        } else if (event.metaKey) {
+        } else if (event.metaKey || event.ctrlKey) {
             step = 32;
         } else if (event.altKey) {
             step = 13;
@@ -682,8 +682,8 @@ document.addEventListener('keydown', function(event) {
         return;
     }
 
-    // Cmd+Arrow Left/Right: Change page
-    if (event.metaKey && ['ArrowLeft', 'ArrowRight'].includes(event.key)) {
+        // Cmd+Arrow Left/Right or Ctrl+Arrow Left/Right: Change page
+        if ((event.metaKey || event.ctrlKey) && ['ArrowLeft', 'ArrowRight'].includes(event.key)) {
         event.preventDefault();
         if (event.key === 'ArrowLeft' && currentPage > 0) {
             changePage(currentPage - 1);
