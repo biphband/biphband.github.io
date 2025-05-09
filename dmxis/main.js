@@ -500,6 +500,73 @@ function createMacroButtons() {
     }
 }
 
+// Add this new function in main.js
+function handleChannelSelection(channel, event) {
+    const allContainers = Array.from(document.querySelectorAll('.fader-container'));
+    const container = allContainers.find(c => parseInt(c.dataset.channel) === channel);
+
+    if (event.metaKey || event.ctrlKey) {
+        // Command+Click or Ctrl+Click: Toggle channel selection
+        if (selectedChannels.has(channel)) {
+            selectedChannels.delete(channel);
+            container.classList.remove('selected');
+            container.classList.remove('highlighted');
+        } else {
+            selectedChannels.add(channel);
+            container.classList.add('selected');
+            updateFixtureTitle(container);
+            highlightFixture(channel);
+        }
+        lastSelectedChannel = channel;
+    } else if (event.shiftKey && lastSelectedChannel !== null) {
+        // Shift+Click: Select range of channels
+        const currentIndex = allContainers.findIndex(c => parseInt(c.dataset.channel) === channel);
+        const lastIndex = allContainers.findIndex(c => parseInt(c.dataset.channel) === lastSelectedChannel);
+        const startIndex = Math.min(currentIndex, lastIndex);
+        const endIndex = Math.max(currentIndex, lastIndex);
+
+        selectedChannels.clear();
+        for (let i = startIndex; i <= endIndex; i++) {
+            const ch = parseInt(allContainers[i].dataset.channel);
+            selectedChannels.add(ch);
+            allContainers[i].classList.add('selected');
+            updateFixtureTitle(allContainers[i]);
+            highlightFixture(ch);
+        }
+        lastSelectedChannel = channel;
+    } else {
+        // Single Click: Select only this channel
+        selectedChannels.clear();
+        selectedChannels.add(channel);
+        lastSelectedChannel = channel;
+
+        allContainers.forEach(c => {
+            const ch = parseInt(c.dataset.channel);
+            if (ch === channel) {
+                c.classList.add('selected');
+                updateFixtureTitle(c);
+                highlightFixture(ch);
+            } else {
+                c.classList.remove('selected');
+                c.classList.remove('highlighted');
+            }
+        });
+    }
+
+    // Update fixture groups to reflect channel selection
+    document.querySelectorAll('.fixture-group').forEach(group => {
+        const channels = group.dataset.channels.split(',').map(Number);
+        if (channels.some(ch => selectedChannels.has(ch))) {
+            group.classList.add('active');
+        } else {
+            group.classList.remove('active');
+        }
+    });
+
+    updateFixtureGroupPositions();
+}
+
+// Update the createFaders function in main.js (replace the existing one)
 function createFaders() {
     sliderStates.clear();
     const grid = document.getElementById('faderGrid');
@@ -598,6 +665,7 @@ function createFaders() {
             });
 
             container.addEventListener('click', (e) => {
+                // Prevent handling click if the fader or value input is the target
                 if (e.target === fader || e.target === valueInput) return;
                 handleChannelSelection(channel, e);
             });

@@ -149,8 +149,8 @@ document.addEventListener('keydown', function(event) {
         return;
     }
 
-        // Cmd+C or Ctrl+C: Copy selected fixture values and colors with parameter names
-        if ((event.metaKey || event.ctrlKey) && event.key === 'c' && !isValueInput && !isSlider && !isColorMenu && !isSearchMenu) {
+    // Cmd+C or Ctrl+C: Copy selected fixture values and colors with parameter names
+    if ((event.metaKey || event.ctrlKey) && event.key === 'c' && !isValueInput && !isSlider && !isColorMenu && !isSearchMenu) {
         event.preventDefault();
         if (selectedFixtures.size > 0) {
             copiedFixtureData = {
@@ -204,8 +204,8 @@ document.addEventListener('keydown', function(event) {
         return;
     }
 
-        // Cmd+V or Ctrl+V: Paste copied fixture values and colors by parameter name
-        if ((event.metaKey || event.ctrlKey) && event.key === 'v' && !isValueInput && !isSlider && !isColorMenu && !isSearchMenu) {
+    // Cmd+V or Ctrl+V: Paste copied fixture values and colors by parameter name
+    if ((event.metaKey || event.ctrlKey) && event.key === 'v' && !isValueInput && !isSlider && !isColorMenu && !isSearchMenu) {
         event.preventDefault();
         if (copiedFixtureData && (selectedChannels.size > 0 || selectedFixtures.size > 0)) {
             const channelsToUpdate = new Set();
@@ -218,7 +218,6 @@ document.addEventListener('keydown', function(event) {
                     const fixture = fixtures.find(f => f.from === fixtureStart);
                     if (fixture && fixture.type in fixtureParameters) {
                         const params = fixtureParameters[fixture.type];
-                        // Map copied parameters to target fixture's channels
                         copiedFixtureData.channels.forEach(({ parameter, value }) => {
                             const paramIndex = params.findIndex(p => p.name === parameter);
                             if (paramIndex !== -1) {
@@ -234,7 +233,6 @@ document.addEventListener('keydown', function(event) {
                             }
                         });
                         fixturesToUpdate.push(fixture);
-                        // Apply label color from the first copied fixture or specific fixture
                         const labelState = copiedFixtureData.labels.get(fixtureStart) || copiedFixtureData.labels.values().next().value;
                         if (labelState) {
                             labelChanges.set(fixtureStart, {
@@ -245,7 +243,6 @@ document.addEventListener('keydown', function(event) {
                     }
                 });
             } else {
-                // Handle channel selection (less precise, map to same parameter if possible)
                 selectedChannels.forEach(ch => {
                     const idx = ch - 1;
                     const fixture = fixtures.find(f => ch >= f.from && ch <= f.to);
@@ -316,8 +313,8 @@ document.addEventListener('keydown', function(event) {
         return;
     }
 
-        // Cmd+A or Ctrl+A: Select all channels
-        if ((event.metaKey || event.ctrlKey) && event.key === 'a' && !isValueInput) {
+    // Cmd+A or Ctrl+A: Select all channels
+    if ((event.metaKey || event.ctrlKey) && event.key === 'a' && !isValueInput) {
         event.preventDefault();
         selectedChannels.clear();
         selectedFixtures.clear();
@@ -441,9 +438,7 @@ document.addEventListener('keydown', function(event) {
                     if (sliderStates.has(sliderId)) {
                         const state = sliderStates.get(sliderId);
                         state.current = originalValue;
-                        state
-
-        .target = originalValue;
+                        state.target = originalValue;
                     } else {
                         sliderStates.set(sliderId, {
                             current: originalValue,
@@ -470,133 +465,214 @@ document.addEventListener('keydown', function(event) {
         return;
     }
 
-        // Arrow Left/Right: Navigate channels or fixtures
-        if (['ArrowLeft', 'ArrowRight'].includes(event.key) && !isValueInput && !(event.metaKey || event.ctrlKey) && !isColorMenu && !isSearchMenu) {
+    // Arrow Left/Right: Navigate channels or fixtures
+    if (['ArrowLeft', 'ArrowRight'].includes(event.key) && !isValueInput && !(event.metaKey || event.ctrlKey) && !isColorMenu && !isSearchMenu) {
         event.preventDefault();
-        const sortedFixtures = getSortedFixtures();
-        const validFixtures = sortedFixtures.filter(f => f !== null);
-        const fixtureLabelGrid = document.getElementById('fixtureLabelGrid');
-        const fixtureLabels = Array.from(fixtureLabelGrid.querySelectorAll('.fixture-label:not(.empty)'));
+        const pageStart = currentPage * FADERS_PER_PAGE + 1;
+        const pageEnd = pageStart + FADERS_PER_PAGE - 1;
 
-        // If no fixture is selected, select the first valid fixture on right arrow
-        if (currentHighlightedFixture === null && selectedFixtures.size === 0 && validFixtures.length > 0) {
-            if (event.key === 'ArrowRight') {
-                const firstFixture = validFixtures[0];
-                selectFixture(firstFixture.from);
-                const selectedItem = fixtureLabels.find(label => parseInt(label.dataset.fixture) === firstFixture.from);
-                if (selectedItem) {
-                    selectedItem.focus();
-                    selectedItem.scrollIntoView({ block: 'nearest' });
-                }
-                setTimeout(updateFixtureGroupPositions, 100);
-            }
-            return;
-        }
-
-        if (isFixtureLabelGrid || currentHighlightedFixture !== null) {
-            // Navigate fixtures based on their sorted order
-            const currentFixtureIndex = sortedFixtures.findIndex(f => f && f.from === currentHighlightedFixture);
-            let newFixtureIndex = currentFixtureIndex;
-
-            if (event.key === 'ArrowLeft') {
-                do {
-                    newFixtureIndex = newFixtureIndex > 0 ? newFixtureIndex - 1 : sortedFixtures.length - 1;
-                } while (sortedFixtures[newFixtureIndex] === null && newFixtureIndex !== currentFixtureIndex);
+        if (selectedChannels.size > 0) {
+            // Channel navigation when channels are selected
+            let nextIndex;
+            if (currentIndex === -1) {
+                // If no channel is focused, select the first channel on the page
+                nextIndex = 0;
             } else {
-                do {
-                    newFixtureIndex = newFixtureIndex < sortedFixtures.length - 1 ? newFixtureIndex + 1 : 0;
-                } while (sortedFixtures[newFixtureIndex] === null && newFixtureIndex !== currentFixtureIndex);
-            }
-
-            // Prevent infinite loop if all fixtures are null
-            if (sortedFixtures[newFixtureIndex] === null) return;
-
-            const newFixture = sortedFixtures[newFixtureIndex];
-            if (event.shiftKey) {
-                // Track the first fixture selected in the shift range
-                if (!window.shiftSelectionStart) {
-                    window.shiftSelectionStart = currentHighlightedFixture;
-                }
-                const startIndex = sortedFixtures.findIndex(f => f && f.from === window.shiftSelectionStart);
-                const endIndex = newFixtureIndex;
-                selectedFixtures.clear();
-                const minIndex = Math.min(startIndex, endIndex);
-                const maxIndex = Math.max(startIndex, endIndex);
-                for (let i = minIndex; i <= maxIndex; i++) {
-                    if (sortedFixtures[i]) {
-                        selectedFixtures.add(sortedFixtures[i].from);
-                    }
-                }
-                currentHighlightedFixture = newFixture.from;
-                document.querySelectorAll('.fixture-group').forEach(group => {
-                    if (selectedFixtures.has(parseInt(group.dataset.fixture))) {
-                        group.classList.add('group-highlighted');
-                    } else {
-                        group.classList.remove('group-highlighted');
-                    }
-                });
-                document.querySelectorAll('.fixture-label').forEach(item => {
-                    if (selectedFixtures.has(parseInt(item.dataset.fixture))) {
-                        item.classList.add('group-highlighted');
-                    } else {
-                        item.classList.remove('group-highlighted');
-                    }
-                });
-            } else {
-                // Clear shift selection start when not holding shift
-                window.shiftSelectionStart = null;
-                selectedFixtures.clear();
-                selectFixture(newFixture.from);
-            }
-
-            const selectedItem = fixtureLabels.find(label => parseInt(label.dataset.fixture) === newFixture.from);
-            if (selectedItem) {
-                selectedItem.focus();
-                selectedItem.scrollIntoView({ block: 'nearest' });
-            }
-            setTimeout(updateFixtureGroupPositions, 100);
-        } else {
-            // Channel navigation
-            const pageStart = currentPage * FADERS_PER_PAGE + 1;
-            const pageEnd = pageStart + FADERS_PER_PAGE - 1;
-            const allContainers = Array.from(document.querySelectorAll('.fader-container'));
-
-            if (selectedChannels.size === 0 && currentIndex === -1) {
-                selectContainer(allContainers[0]);
-            } else {
-                let nextIndex;
                 if (event.key === 'ArrowLeft') {
                     nextIndex = currentIndex > 0 ? currentIndex - 1 : allContainers.length - 1;
                 } else {
                     nextIndex = currentIndex < allContainers.length - 1 ? currentIndex + 1 : 0;
                 }
+            }
 
-                if (event.shiftKey) {
-                    const nextChannel = parseInt(allContainers[nextIndex].dataset.channel);
-                    selectedChannels.add(nextChannel);
-                    lastSelectedChannel = nextChannel;
-                    allContainers.forEach(c => {
-                        const ch = parseInt(c.dataset.channel);
-                        if (selectedChannels.has(ch)) {
-                            c.classList.add('selected');
-                            updateFixtureTitle(c);
-                            highlightFixture(ch);
-                        } else {
-                            c.classList.remove('selected');
-                            c.classList.remove('highlighted');
-                        }
-                    });
-                    document.querySelectorAll('.fixture-group').forEach(group => {
-                        const channels = group.dataset.channels.split(',').map(Number);
-                        if (channels.some(ch => selectedChannels.has(ch))) {
-                            group.classList.add('active');
-                        } else {
-                            group.classList.remove('active');
-                        }
-                    });
-                    updateFixtureGroupPositions();
+            const nextChannel = parseInt(allContainers[nextIndex].dataset.channel);
+
+            if (event.shiftKey) {
+                // Shift+Arrow: Incrementally add/remove channel to/from selection
+                if (event.key === 'ArrowRight') {
+                    if (!selectedChannels.has(nextChannel)) {
+                        selectedChannels.add(nextChannel);
+                    } else {
+                        // Remove the previous channel if moving right and it's selected
+                        const prevIndex = nextIndex > 0 ? nextIndex - 1 : allContainers.length - 1;
+                        const prevChannel = parseInt(allContainers[prevIndex].dataset.channel);
+                        selectedChannels.delete(prevChannel);
+                    }
                 } else {
-                    selectContainer(allContainers[nextIndex]);
+                    if (!selectedChannels.has(nextChannel)) {
+                        selectedChannels.add(nextChannel);
+                    } else {
+                        // Remove the next channel if moving left and it's selected
+                        const nextNextIndex = nextIndex < allContainers.length - 1 ? nextIndex + 1 : 0;
+                        const nextNextChannel = parseInt(allContainers[nextNextIndex].dataset.channel);
+                        selectedChannels.delete(nextNextChannel);
+                    }
+                }
+                lastSelectedChannel = nextChannel;
+            } else {
+                // Arrow without Shift: Select single channel
+                selectedChannels.clear();
+                selectedChannels.add(nextChannel);
+                lastSelectedChannel = nextChannel;
+            }
+
+            allContainers.forEach(c => {
+                const ch = parseInt(c.dataset.channel);
+                if (selectedChannels.has(ch)) {
+                    c.classList.add('selected');
+                    updateFixtureTitle(c);
+                    highlightFixture(ch);
+                } else {
+                    c.classList.remove('selected');
+                    c.classList.remove('highlighted');
+                }
+            });
+
+            document.querySelectorAll('.fixture-group').forEach(group => {
+                const channels = group.dataset.channels.split(',').map(Number);
+                if (channels.some(ch => selectedChannels.has(ch))) {
+                    group.classList.add('active');
+                } else {
+                    group.classList.remove('active');
+                }
+            });
+
+            updateFixtureGroupPositions();
+        } else {
+            // Fixture navigation when no channels are selected
+            const sortedFixtures = getSortedFixtures();
+            const validFixtures = sortedFixtures.filter(f => f !== null);
+            const fixtureLabelGrid = document.getElementById('fixtureLabelGrid');
+            const fixtureLabels = Array.from(fixtureLabelGrid.querySelectorAll('.fixture-label:not(.empty)'));
+
+            if (currentHighlightedFixture === null && selectedFixtures.size === 0 && validFixtures.length > 0) {
+                if (event.key === 'ArrowRight') {
+                    const firstFixture = validFixtures[0];
+                    selectFixture(firstFixture.from);
+                    const selectedItem = fixtureLabels.find(label => parseInt(label.dataset.fixture) === firstFixture.from);
+                    if (selectedItem) {
+                        selectedItem.focus();
+                        selectedItem.scrollIntoView({ block: 'nearest' });
+                    }
+                    setTimeout(updateFixtureGroupPositions, 100);
+                }
+                return;
+            }
+
+            if (isFixtureLabelGrid || currentHighlightedFixture !== null) {
+                const currentFixtureIndex = sortedFixtures.findIndex(f => f && f.from === currentHighlightedFixture);
+                let newFixtureIndex = currentFixtureIndex;
+
+                if (event.key === 'ArrowLeft') {
+                    do {
+                        newFixtureIndex = newFixtureIndex > 0 ? newFixtureIndex - 1 : sortedFixtures.length - 1;
+                    } while (sortedFixtures[newFixtureIndex] === null && newFixtureIndex !== currentFixtureIndex);
+                } else {
+                    do {
+                        newFixtureIndex = newFixtureIndex < sortedFixtures.length - 1 ? newFixtureIndex + 1 : 0;
+                    } while (sortedFixtures[newFixtureIndex] === null && newFixtureIndex !== currentFixtureIndex);
+                }
+
+                if (sortedFixtures[newFixtureIndex] === null) return;
+
+                const newFixture = sortedFixtures[newFixtureIndex];
+                if (event.shiftKey) {
+                    // Shift+Arrow: Incrementally add/remove fixture to/from selection
+                    if (event.key === 'ArrowRight') {
+                        if (!selectedFixtures.has(newFixture.from)) {
+                            selectedFixtures.add(newFixture.from);
+                        } else {
+                            // Remove the previous fixture if moving right and it's selected
+                            let prevIndex = newFixtureIndex > 0 ? newFixtureIndex - 1 : sortedFixtures.length - 1;
+                            while (sortedFixtures[prevIndex] === null && prevIndex !== newFixtureIndex) {
+                                prevIndex = prevIndex > 0 ? prevIndex - 1 : sortedFixtures.length - 1;
+                            }
+                            if (sortedFixtures[prevIndex]) {
+                                selectedFixtures.delete(sortedFixtures[prevIndex].from);
+                            }
+                        }
+                    } else {
+                        if (!selectedFixtures.has(newFixture.from)) {
+                            selectedFixtures.add(newFixture.from);
+                        } else {
+                            // Remove the next fixture if moving left and it's selected
+                            let nextIndex = newFixtureIndex < sortedFixtures.length - 1 ? newFixtureIndex + 1 : 0;
+                            while (sortedFixtures[nextIndex] === null && nextIndex !== newFixtureIndex) {
+                                nextIndex = nextIndex < sortedFixtures.length - 1 ? nextIndex + 1 : 0;
+                            }
+                            if (sortedFixtures[nextIndex]) {
+                                selectedFixtures.delete(sortedFixtures[nextIndex].from);
+                            }
+                        }
+                    }
+                    currentHighlightedFixture = newFixture.from;
+                    document.querySelectorAll('.fixture-group').forEach(group => {
+                        if (selectedFixtures.has(parseInt(group.dataset.fixture))) {
+                            group.classList.add('group-highlighted');
+                        } else {
+                            group.classList.remove('group-highlighted');
+                        }
+                    });
+                    document.querySelectorAll('.fixture-label').forEach(item => {
+                        if (selectedFixtures.has(parseInt(item.dataset.fixture))) {
+                            item.classList.add('group-highlighted');
+                        } else {
+                            item.classList.remove('group-highlighted');
+                        }
+                    });
+                } else {
+                    // Arrow without Shift: Select single fixture
+                    window.shiftSelectionStart = null;
+                    selectedFixtures.clear();
+                    selectFixture(newFixture.from);
+                    currentHighlightedFixture = newFixture.from;
+                }
+
+                const selectedItem = fixtureLabels.find(label => parseInt(label.dataset.fixture) === newFixture.from);
+                if (selectedItem) {
+                    selectedItem.focus();
+                    selectedItem.scrollIntoView({ block: 'nearest' });
+                }
+                setTimeout(updateFixtureGroupPositions, 100);
+            } else {
+                // Fallback channel navigation (rare case when no channels or fixtures are selected)
+                if (selectedChannels.size === 0 && currentIndex === -1) {
+                    selectContainer(allContainers[0]);
+                } else {
+                    let nextIndex;
+                    if (event.key === 'ArrowLeft') {
+                        nextIndex = currentIndex > 0 ? currentIndex - 1 : allContainers.length - 1;
+                    } else {
+                        nextIndex = currentIndex < allContainers.length - 1 ? nextIndex + 1 : 0;
+                    }
+
+                    if (event.shiftKey) {
+                        const nextChannel = parseInt(allContainers[nextIndex].dataset.channel);
+                        selectedChannels.add(nextChannel);
+                        lastSelectedChannel = nextChannel;
+                        allContainers.forEach(c => {
+                            const ch = parseInt(c.dataset.channel);
+                            if (selectedChannels.has(ch)) {
+                                c.classList.add('selected');
+                                updateFixtureTitle(c);
+                                highlightFixture(ch);
+                            } else {
+                                c.classList.remove('selected');
+                                c.classList.remove('highlighted');
+                            }
+                        });
+                        document.querySelectorAll('.fixture-group').forEach(group => {
+                            const channels = group.dataset.channels.split(',').map(Number);
+                            if (channels.some(ch => selectedChannels.has(ch))) {
+                                group.classList.add('active');
+                            } else {
+                                group.classList.remove('active');
+                            }
+                        });
+                        updateFixtureGroupPositions();
+                    } else {
+                        selectContainer(allContainers[nextIndex]);
+                    }
                 }
             }
         }
@@ -682,8 +758,8 @@ document.addEventListener('keydown', function(event) {
         return;
     }
 
-        // Cmd+Arrow Left/Right or Ctrl+Arrow Left/Right: Change page
-        if ((event.metaKey || event.ctrlKey) && ['ArrowLeft', 'ArrowRight'].includes(event.key)) {
+    // Cmd+Arrow Left/Right or Ctrl+Arrow Left/Right: Change page
+    if ((event.metaKey || event.ctrlKey) && ['ArrowLeft', 'ArrowRight'].includes(event.key)) {
         event.preventDefault();
         if (event.key === 'ArrowLeft' && currentPage > 0) {
             changePage(currentPage - 1);
