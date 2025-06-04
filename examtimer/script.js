@@ -9,7 +9,7 @@ const titleMap = {
   const labelMap = {
     'A': 'Attendance', 'D': 'Distribution of Exam', 'B': 'BIBSC Section',
     'T': 'Exam Transition', 'C': 'Common Section', 'M': 'Multiple Choice',
-    'F': 'Free Response', 'E': 'Essay', 'R': 'Break', 'Z': 'End of Exam'
+    'F': 'Free Response', 'E': 'Essay', 'R': 'Break', 'Z': 'Custom'
   };
   
   const notesMap = {
@@ -30,6 +30,19 @@ const titleMap = {
     'K': { light: '#333333', dark: '#000000', class: 'charcoal-gradient', text: 'white' }
   };
   
+  const defaultColors = {
+    'A': 'G', // Attendance: Gray
+    'D': 'G', // Distribution of Exam: Gray
+    'B': 'B', // BIBSC Section: Blue
+    'T': 'G', // Exam Transition: Gray
+    'C': 'P', // Common Section: Purple
+    'M': 'B', // Multiple Choice: Blue
+    'F': 'P', // Free Response: Purple
+    'E': 'P', // Essay: Purple
+    'R': 'G', // Break: Gray
+    'Z': 'K'  // Custom or End of Exam: Black
+  };
+  
   const timeMap = new Map();
   for (let hour = 0; hour < 24; hour++) {
     for (let minute = 0; minute < 60; minute += 10) {
@@ -43,15 +56,16 @@ const titleMap = {
   let sections = [
     { id: 1, label: 'A', time: '08:00', notes: 'C', color: 'G' },
     { id: 2, label: 'D', time: '08:10', notes: 'D', color: 'G' },
-    { id: 3, label: 'B', time: '08:20', notes: 'N', color: 'G' },
+    { id: 3, label: 'B', time: '08:20', notes: 'N', color: 'B' },
     { id: 4, label: 'T', time: '09:20', notes: 'B', color: 'G' },
-    { id: 5, label: 'C', time: '09:30', notes: 'N', color: 'G' },
-    { id: 6, label: 'Z', time: '09:40', notes: 'P', color: 'G' }
+    { id: 5, label: 'C', time: '09:30', notes: 'N', color: 'P' },
+    { id: 6, label: 'Z', time: '09:40', notes: 'P', color: 'K' }
   ];
   let nextId = 7;
   let schedule = [];
   let timer;
   let title = 'B';
+  let customTitle = '';
   let hasPlayedSound = {};
   let milestoneSounds = {};
   let audioContext;
@@ -84,6 +98,7 @@ const titleMap = {
           grid.style.display = grid.style.display === 'grid' ? 'none' : 'grid';
         };
         grid.querySelectorAll('.color-option').forEach(option => {
+          option.style.backgroundColor = colorMap[option.dataset.value].light;
           option.onclick = (e) => {
             e.stopPropagation();
             section.color = option.dataset.value;
@@ -97,6 +112,38 @@ const titleMap = {
       if (!e.target.closest('.color-picker') && !e.target.closest('.color-grid')) {
         document.querySelectorAll('.color-grid').forEach(grid => {
           grid.style.display = 'none';
+        });
+      }
+    });
+  }
+  
+  function setupCustomInputs() {
+    const titleSelect = document.getElementById('title-input');
+    const customTitleInput = document.getElementById('custom-title-input');
+    titleSelect.addEventListener('change', () => {
+      customTitleInput.style.display = titleSelect.value === 'Z' ? 'block' : 'none';
+      if (titleSelect.value !== 'Z') customTitleInput.value = '';
+    });
+  
+    sections.forEach(section => {
+      const labelSelect = document.getElementById(`label-${section.id}`);
+      const notesSelect = document.getElementById(`notes-${section.id}`);
+      const customNotesInput = document.getElementById(`custom-notes-${section.id}`);
+      if (notesSelect && customNotesInput) {
+        notesSelect.addEventListener('change', () => {
+          customNotesInput.style.display = notesSelect.value === 'Z' ? 'block' : 'none';
+          if (notesSelect.value !== 'Z') customNotesInput.value = '';
+        });
+      }
+      if (labelSelect) {
+        labelSelect.addEventListener('change', () => {
+          const newLabel = labelSelect.value;
+          section.label = newLabel;
+          if (defaultColors[newLabel]) {
+            section.color = defaultColors[newLabel];
+            const picker = document.getElementById(`color-picker-${section.id}`);
+            if (picker) picker.style.backgroundColor = colorMap[section.color].light;
+          }
         });
       }
     });
@@ -148,15 +195,17 @@ const titleMap = {
   function addSection() {
     const endOfExam = sections.find(s => s.id === 6);
     sections = sections.filter(s => s.id !== 6);
-    sections.push({ id: nextId, label: 'A', time: '00:00', notes: 'X', color: 'G' });
+    const newSection = { id: nextId, label: 'A', time: '00:00', notes: 'X', color: 'G' };
+    sections.push(newSection);
     sections.push(endOfExam);
     const sectionsContainer = document.getElementById('sections-container');
     const endOfExamElement = sectionsContainer.querySelector(`.form-section[data-id="6"]`);
     sectionsContainer.removeChild(endOfExamElement);
-    const newSection = document.createElement('div');
-    newSection.className = 'form-section';
-    newSection.dataset.id = nextId;
-    newSection.innerHTML = `
+    const newSectionElement = document.createElement('div');
+    newSectionElement.className = 'form-section';
+    newSectionElement.dataset.id = nextId;
+    newSectionElement.innerHTML = `
+      <button class="delete-section" onclick="deleteSection(${nextId})">x</button>
       <div class="color-picker" id="color-picker-${nextId}" style="background-color: #ffffff;"></div>
       <div class="color-grid" id="color-grid-${nextId}">
         <div class="color-option G" data-value="G"></div>
@@ -166,9 +215,8 @@ const titleMap = {
         <div class="color-option P" data-value="P"></div>
         <div class="color-option K" data-value="K"></div>
       </div>
-      <button class="delete-section" onclick="deleteSection(${nextId})">x</button>
       <select id="label-${nextId}">
-        <option value="A" selected>Attendance</option>
+        <option value="A">Attendance</option>
         <option value="D">Distribution of Exam</option>
         <option value="B">BIBSC Section</option>
         <option value="T">Exam Transition</option>
@@ -177,6 +225,7 @@ const titleMap = {
         <option value="F">Free Response</option>
         <option value="E">Essay</option>
         <option value="R">Break</option>
+        <option value="Z">Custom</option>
       </select>
       <select id="time-${nextId}">
         ${Array.from(timeMap.entries())
@@ -186,31 +235,44 @@ const titleMap = {
           .join('')}
       </select>
       <select id="notes-${nextId}">
-        <option value="X" selected></option>
+        <option value="X"></option>
         <option value="C">Clear your desk...</option>
         <option value="D">Do not flip over...</option>
         <option value="N">Confirm that your...</option>
         <option value="B">During the break...</option>
         <option value="P">Pencils down...</option>
+        <option value="Z">Custom</option>
       </select>
+      <input type="text" id="custom-notes-${nextId}" style="display: none;" placeholder="Enter custom notes">
     `;
-    sectionsContainer.appendChild(newSection);
+    sectionsContainer.appendChild(newSectionElement);
     sectionsContainer.appendChild(endOfExamElement);
     populateTimeDropdowns();
     setupColorPickers();
+    setupCustomInputs();
     nextId++;
   }
   
   function generateShareUrl() {
     const titleCode = document.getElementById('title-input').value || 'B';
+    let config = titleCode;
+    if (titleCode === 'Z') {
+      const customTitleText = document.getElementById('custom-title-input').value || '';
+      config += `|${encodeURIComponent(customTitleText)}`;
+    }
     const sectionsData = sections.map(section => {
       const label = document.getElementById(`label-${section.id}`)?.value || 'A';
       const timeCode = document.getElementById(`time-${section.id}`)?.value || '00';
-      const notes = document.getElementById(`notes-${section.id}`)?.value || 'X';
+      let notes = document.getElementById(`notes-${section.id}`)?.value || 'X';
       const color = section.color || 'G';
-      return `${label}${timeCode}${notes}${color}`;
+      let sectionData = `${label}${timeCode}${notes}${color}`;
+      if (notes === 'Z') {
+        const customNotes = document.getElementById(`custom-notes-${section.id}`)?.value || '';
+        sectionData += `|${encodeURIComponent(customNotes)}`;
+      }
+      return sectionData;
     }).join('');
-    const config = `${titleCode}${sectionsData}`;
+    config += sectionsData;
     return `${window.location.origin}${window.location.pathname}?config=${encodeURIComponent(config)}`;
   }
   
@@ -219,6 +281,11 @@ const titleMap = {
   document.getElementById('preview-share-btn').addEventListener('click', () => {
     const currentDate = new Date().toISOString().split('T')[0];
     title = document.getElementById('title-input').value || 'B';
+    if (title === 'Z') {
+      customTitle = document.getElementById('custom-title-input').value || 'Custom Exam';
+    } else {
+      customTitle = '';
+    }
     schedule = [];
     hasPlayedSound = {};
     milestoneSounds = {};
@@ -226,11 +293,16 @@ const titleMap = {
       const label = document.getElementById(`label-${section.id}`)?.value || 'A';
       const timeCode = document.getElementById(`time-${section.id}`)?.value;
       const time = timeMap.get(timeCode) || '00:00';
-      const notes = document.getElementById(`notes-${section.id}`)?.value || 'X';
+      let notes = document.getElementById(`notes-${section.id}`)?.value || 'X';
       const color = section.color || 'G';
       if (!timeCode || !timeMap.has(timeCode)) {
-        alert(`Invalid time for ${labelMap[label]}. Select a valid time.`);
+        alert(`Invalid time for ${labelMap[label] || 'Custom Section'}. Select a valid time.`);
         return;
+      }
+      if (notes === 'Z') {
+        const customNotes = document.getElementById(`custom-notes-${section.id}`)?.value || '';
+        notesMap['Z' + section.id] = customNotes;
+        notes = 'Z' + section.id;
       }
       schedule.push({ id: section.id, label, time, notes, color });
       hasPlayedSound[section.id] = false;
@@ -253,59 +325,70 @@ const titleMap = {
   window.addEventListener('load', () => {
     populateTimeDropdowns();
     setupColorPickers();
+    setupCustomInputs();
     const urlParams = new URLSearchParams(window.location.search);
     const configParam = urlParams.get('config');
     if (configParam) {
       try {
         const config = decodeURIComponent(configParam);
-        if (config.length < 1) {
-          throw new Error('Config string too short');
+        if (config.length < 1) throw new Error('Config string too short');
+        
+        let index = 0;
+        const titleCode = config[index++];
+        let customTitleText = '';
+        if (titleCode === 'Z') {
+          if (config[index] !== '|') throw new Error('Expected | after custom title code');
+          index++;
+          const endOfTitle = config.slice(index).search(/[ADBTCMFERZ]/) + index;
+          if (endOfTitle === index - 1) throw new Error('No section data found after custom title');
+          customTitleText = decodeURIComponent(config.slice(index, endOfTitle));
+          titleMap['Z'] = customTitleText;
+          index = endOfTitle;
         }
-        const titleCode = config[0];
-        if (!titleMap[titleCode]) {
-          throw new Error('Invalid title code');
+        if (!titleMap[titleCode] && titleCode !== 'Z') {
+          throw new Error(`Invalid title code: ${titleCode}`);
         }
         title = titleCode;
+        customTitle = titleCode === 'Z' ? customTitleText : '';
         document.getElementById('title-input').value = titleCode;
+        if (titleCode === 'Z') {
+          document.getElementById('custom-title-input').value = customTitleText;
+          document.getElementById('custom-title-input').style.display = 'block';
+        }
+  
         sections = [];
         const sectionsContainer = document.getElementById('sections-container');
         sectionsContainer.innerHTML = '';
         nextId = 1;
-        const sectionLength = 5; // 1 label + 2 time code + 1 notes + 1 color
-        if ((config.length - 1) % sectionLength !== 0) {
-          throw new Error('Invalid config length');
-        }
-        const sectionsData = [];
-        for (let i = 1; i < config.length; i += sectionLength) {
-          sectionsData.push(config.slice(i, i + sectionLength));
-        }
-        sectionsData.forEach((sectionData, index) => {
-          if (sectionData.length !== 5) {
-            throw new Error(`Invalid section length for section ${index + 1}`);
+        while (index < config.length) {
+          if (index + 4 > config.length) throw new Error(`Incomplete section data at index ${index}`);
+          const label = config[index++];
+          const timeCode = config.slice(index, index + 2);
+          index += 2;
+          let notes = config[index++];
+          let color = config[index++];
+          let customNotes = '';
+          if (notes === 'Z' && index < config.length && config[index] === '|') {
+            index++;
+            const endOfNotes = config.slice(index).search(/[ADBTCMFERZ]/) + index;
+            customNotes = decodeURIComponent(config.slice(index, endOfNotes === index - 1 ? config.length : endOfNotes));
+            notesMap['Z' + nextId] = customNotes;
+            notes = 'Z' + nextId;
+            index = endOfNotes === index - 1 ? config.length : endOfNotes;
           }
-          const label = sectionData[0];
-          const timeCode = sectionData.slice(1, 3);
-          const notes = sectionData[3];
-          const color = sectionData[4];
           const time = timeMap.get(timeCode);
-          if (!labelMap[label]) {
-            throw new Error(`Invalid label code for section ${index + 1}`);
-          }
-          if (!time) {
-            throw new Error(`Invalid time code for section ${index + 1}`);
-          }
-          if (!notesMap[notes]) {
-            throw new Error(`Invalid notes code for section ${index + 1}`);
-          }
-          if (!colorMap[color]) {
-            throw new Error(`Invalid color code for section ${index + 1}`);
-          }
-          const sectionId = index + 1 === sectionsData.length ? 6 : nextId;
+          if (!labelMap[label] && label !== 'Z') throw new Error(`Invalid label code for section ${nextId}: ${label}`);
+          if (!time) throw new Error(`Invalid time code for section ${nextId}: ${timeCode}`);
+          if (!notesMap[notes] && !notes.startsWith('Z')) throw new Error(`Invalid notes code for section ${nextId}: ${notes}`);
+          if (!colorMap[color]) throw new Error(`Invalid color code for section ${nextId}: ${color}`);
+          
+          const sectionId = (label === 'Z' && index >= config.length) ? 6 : nextId;
           sections.push({ id: sectionId, label, time, notes, color });
           const newSection = document.createElement('div');
           newSection.className = 'form-section';
           newSection.dataset.id = sectionId;
           newSection.innerHTML = `
+            <button class="delete-section" onclick="deleteSection(${sectionId})" ${sectionId === 6 ? 'style="visibility: hidden;"' : ''}>x</button>
             <div class="color-picker" id="color-picker-${sectionId}" style="background-color: ${colorMap[color].light};"></div>
             <div class="color-grid" id="color-grid-${sectionId}">
               <div class="color-option G" data-value="G"></div>
@@ -315,7 +398,6 @@ const titleMap = {
               <div class="color-option P" data-value="P"></div>
               <div class="color-option K" data-value="K"></div>
             </div>
-            ${sectionId !== 6 ? `<button class="delete-section" onclick="deleteSection(${sectionId})">x</button>` : ''}
             <select id="label-${sectionId}">
               <option value="A" ${label === 'A' ? 'selected' : ''}>Attendance</option>
               <option value="D" ${label === 'D' ? 'selected' : ''}>Distribution of Exam</option>
@@ -326,7 +408,7 @@ const titleMap = {
               <option value="F" ${label === 'F' ? 'selected' : ''}>Free Response</option>
               <option value="E" ${label === 'E' ? 'selected' : ''}>Essay</option>
               <option value="R" ${label === 'R' ? 'selected' : ''}>Break</option>
-              <option value="Z" ${label === 'Z' ? 'selected' : ''}>End of Exam</option>
+              <option value="Z" ${label === 'Z' ? 'selected' : ''}>Custom</option>
             </select>
             <select id="time-${sectionId}">
               ${Array.from(timeMap.entries())
@@ -342,11 +424,13 @@ const titleMap = {
               <option value="N" ${notes === 'N' ? 'selected' : ''}>Confirm that your...</option>
               <option value="B" ${notes === 'B' ? 'selected' : ''}>During the break...</option>
               <option value="P" ${notes === 'P' ? 'selected' : ''}>Pencils down...</option>
+              <option value="Z${sectionId}" ${notes.startsWith('Z') ? 'selected' : ''}>Custom</option>
             </select>
+            <input type="text" id="custom-notes-${sectionId}" style="display: ${notes.startsWith('Z') ? 'block' : 'none'};" value="${customNotes}" placeholder="Enter custom notes">
           `;
           sectionsContainer.appendChild(newSection);
           if (sectionId !== 6) nextId++;
-        });
+        }
         schedule = sections.map(section => ({ ...section }));
         schedule.forEach(section => {
           hasPlayedSound[section.id] = false;
@@ -354,10 +438,11 @@ const titleMap = {
         });
         populateTimeDropdowns();
         setupColorPickers();
+        setupCustomInputs();
         document.getElementById('form-screen').style.display = 'none';
         document.getElementById('timer-screen').style.display = 'block';
         document.body.classList.add('timer-active');
-        document.getElementById('title-display').textContent = `${titleMap[title]} Exam`;
+        document.getElementById('title-display').textContent = `${title === 'Z' ? customTitle : titleMap[title]} Exam`;
         document.getElementById('date-display').textContent = formatDate(new Date());
         updateCountdown();
         timer = setInterval(updateCountdown, 1000);
@@ -366,6 +451,7 @@ const titleMap = {
         alert('Invalid configuration in URL. Showing default form.');
         populateTimeDropdowns();
         setupColorPickers();
+        setupCustomInputs();
       }
     }
   });
@@ -399,8 +485,8 @@ const titleMap = {
       document.body.className = `${colorMap[schedule[0].color].class} timer-active`;
       container.style.color = colorMap[schedule[0].color].text;
       logoImage.src = colorMap[schedule[0].color].text === 'white' ? 'whitelogo.png' : 'blacklogo.png';
-      statusText.innerHTML = `${labelMap[schedule[0].label]} starts in:`;
-      notesDisplay.textContent = notesMap[schedule[0].notes];
+      statusText.innerHTML = `${labelMap[schedule[0].label] || notesMap[schedule[0].notes] || 'Custom Section'} starts in:`;
+      notesDisplay.textContent = notesMap[schedule[0].notes] || '';
       const timeLeft = firstTime - now;
       updateTimerDisplay(timeLeft, countdownText);
       return;
@@ -419,15 +505,14 @@ const titleMap = {
         nextTime = endTime;
         nextSection = i + 1 < schedule.length ? schedule[i + 1] : null;
         break;
-      } else if (now >= endTime && schedule[i].label === 'Z') {
-        // Handle End of Exam
+      } else if (now >= endTime && schedule[i].label === 'Z' && !schedule[i].notes.startsWith('Z')) {
         document.body.className = `${colorMap[schedule[i].color].class} timer-active`;
         container.style.color = colorMap[schedule[i].color].text;
         logoImage.src = colorMap[schedule[i].color].text === 'white' ? 'whitelogo.png' : 'blacklogo.png';
         statusText.style.display = 'none';
         countdownText.className = 'message';
         countdownText.textContent = 'Pencils down. Prepare tests for collection.';
-        notesDisplay.textContent = notesMap[schedule[i].notes];
+        notesDisplay.textContent = notesMap[schedule[i].notes] || '';
         if (!hasPlayedSound[schedule[i].id]) {
           playEndSound();
           hasPlayedSound[schedule[i].id] = true;
@@ -438,15 +523,14 @@ const titleMap = {
     }
   
     if (currentSection) {
-      if (currentSection.label === 'Z') {
-        // Immediate end for End of Exam
+      if (currentSection.label === 'Z' && !currentSection.notes.startsWith('Z')) {
         document.body.className = `${colorMap[currentSection.color].class} timer-active`;
         container.style.color = colorMap[currentSection.color].text;
         logoImage.src = colorMap[currentSection.color].text === 'white' ? 'whitelogo.png' : 'blacklogo.png';
         statusText.style.display = 'none';
         countdownText.className = 'message';
         countdownText.textContent = 'Pencils down. Prepare tests for collection.';
-        notesDisplay.textContent = notesMap[currentSection.notes];
+        notesDisplay.textContent = notesMap[currentSection.notes] || '';
         if (!hasPlayedSound[currentSection.id]) {
           playEndSound();
           hasPlayedSound[currentSection.id] = true;
@@ -465,8 +549,8 @@ const titleMap = {
           document.body.className = `${colorMap[nextSection.color].class} timer-active`;
           container.style.color = colorMap[nextSection.color].text;
           logoImage.src = colorMap[nextSection.color].text === 'white' ? 'whitelogo.png' : 'blacklogo.png';
-          statusText.textContent = labelMap[nextSection.label];
-          notesDisplay.textContent = notesMap[nextSection.notes];
+          statusText.textContent = labelMap[nextSection.label] || notesMap[nextSection.notes] || 'Custom Section';
+          notesDisplay.textContent = notesMap[nextSection.notes] || '';
           milestoneSounds[nextSection.id] = { '15min': false, '10min': false, '5min': false, '1min': false };
           updateTimerDisplay(timeLeft, countdownText);
         }
@@ -476,8 +560,8 @@ const titleMap = {
       document.body.className = `${colorMap[currentSection.color].class} timer-active`;
       container.style.color = colorMap[currentSection.color].text;
       logoImage.src = colorMap[currentSection.color].text === 'white' ? 'whitelogo.png' : 'blacklogo.png';
-      statusText.textContent = labelMap[currentSection.label];
-      notesDisplay.textContent = notesMap[currentSection.notes];
+      statusText.textContent = labelMap[currentSection.label] || notesMap[currentSection.notes] || 'Custom Section';
+      notesDisplay.textContent = notesMap[currentSection.notes] || '';
   
       if (secondsLeft <= 15 * 60 && secondsLeft > 14 * 60 + 59 && !milestoneSounds[currentSection.id]['15min']) {
         playMilestoneBeep();
