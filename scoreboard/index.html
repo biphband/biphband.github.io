@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokeball Leaderboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    body {
+      background-color: #1f2937;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' opacity='0.1'%3E%3Ccircle cx='50' cy='50' r='45' fill='red'/%3E%3Cpath d='M5 50h90a45 45 0 0 1-90 0z' fill='white/%3E%3Ccircle cx='50' cy='50' r='10' fill='black'/%3E%3Ccircle cx='50' cy='50' r='45' fill='none' stroke='black' stroke-width='2'/%3E%3Cline x1='5' x2='95' y1='50' y2='50' stroke='black' stroke-width='2'/>%3C/svg%3E");
+      background-size: 100px;
+    }
+    .autocomplete-list {
+      z-index: 1000;
+    }
+    .player-btn {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 80px;
+      height: 80px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+  </style>
+</head>
+<body class="text-gray-200">
+  <div class="container mx-auto p-4">
+    <!-- Header -->
+    <div class="flex items-center justify-center mb-6">
+      <svg class="w-8 h-8 mr-2" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" fill="white"/>
+        <path d="M5 50h90a45 45 0 0 0-90 0z" fill="red"/>
+        <circle cx="50" cy="50" r="10" fill="black"/>
+        <circle cx="50" cy="50" r="45" fill="none" stroke="black" stroke-width="2"/>
+        <line x1="5" y1="50" x2="95" y2="50" stroke="black" stroke-width="3"/>
+      </svg>
+      <h1 class="text-3xl font-bold">Pokeball Leaderboard</h1>
+    </div>
+    
+    <!-- Leaderboards and Requirements -->
+    <div class="grid grid-cols-3 gap-4 mb-8">
+      <div>
+        <div id="single-player-btn" class="player-btn bg-blue-800 p-4 rounded-lg text-center mb-2 cursor-pointer hover:bg-blue-700" data-original-classes="player-btn bg-blue-800 hover:bg-blue-700">
+          <h2 class="text-lg font-semibold">Single Player</h2>
+          <p class="text-sm">12 Pokeballs to Pass</p>
+        </div>
+        <div class="bg-gray-800 shadow-md rounded-lg p-4">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-gray-700">
+                <th class="p-2 text-left">Rank</th>
+                <th class="p-2 text-left">Student</th>
+                <th class="p-2 text-left">Pokeballs</th>
+                <th class="p-2 text-left"></th>
+              </tr>
+            </thead>
+            <tbody id="single-leaderboard-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div id="two-player-btn" class="player-btn bg-green-800 p-4 rounded-lg text-center mb-2 cursor-pointer hover:bg-green-700" data-original-classes="player-btn bg-green-800 hover:bg-green-700">
+          <h2 class="text-lg font-semibold">Two Players</h2>
+          <p class="text-sm">15 Pokeballs to Pass</p>
+        </div>
+        <div class="bg-gray-800 shadow-md rounded-lg p-4">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-gray-700">
+                <th class="p-2 text-left">Rank</th>
+                <th class="p-2 text-left">Students</th>
+                <th class="p-2 text-left">Pokeballs</th>
+                <th class="p-2 text-left"></th>
+              </tr>
+            </thead>
+            <tbody id="two-leaderboard-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div id="three-player-btn" class="player-btn bg-yellow-800 p-4 rounded-lg text-center mb-2 cursor-pointer hover:bg-yellow-700" data-original-classes="player-btn bg-yellow-800 hover:bg-yellow-700">
+          <h2 class="text-lg font-semibold">Three Players</h2>
+          <p class="text-sm">20 Pokeballs to Pass</p>
+        </div>
+        <div class="bg-gray-800 shadow-md rounded-lg p-4">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-gray-700">
+                <th class="p-2 text-left">Rank</th>
+                <th class="p-2 text-left">Students</th>
+                <th class="p-2 text-left">Pokeballs</th>
+                <th class="p-2 text-left"></th>
+              </tr>
+            </thead>
+            <tbody id="three-leaderboard-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Up Next -->
+    <div class="flex justify-center">
+      <div class="w-1/2 bg-gray-800 shadow-md rounded-lg p-4">
+        <h2 class="text-xl font-semibold mb-2 text-center">Up Next!</h2>
+        <table class="w-full">
+          <tbody id="wait-list-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Player Modal -->
+    <div id="player-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div class="bg-gray-800 p-6 rounded-lg w-96">
+        <h2 id="player-modal-title" class="text-xl font-semibold mb-4 text-gray-200">Add Players</h2>
+        <div id="player-inputs"></div>
+        <div class="flex justify-end mt-4">
+          <button id="player-submit-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Submit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Score Modal -->
+    <div id="score-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div class="bg-gray-800 p-6 rounded-lg w-96">
+        <h2 id="score-modal-title" class="text-xl font-semibold mb-4 text-gray-200">Enter Score</h2>
+        <input id="pokeballs-input" type="number" placeholder="Pokeballs Collected" class="w-full p-2 border border-gray-600 rounded mb-4 bg-gray-700 text-gray-200">
+        <div class="flex justify-end">
+          <button id="score-submit-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Submit</button>
+        </div>
+      </div>
+    </div>
+
+  <script>
+    let singleLeaderboard = [];
+    let twoLeaderboard = [];
+    let threeLeaderboard = [];
+    let waitList = [];
+    let students = [];
+    let currentMode = '';
+    let currentWaitListEntry = null;
+
+    // Capitalize names
+    function capitalizeName(name) {
+      return name.trim().replace(/\b\w/g, char => char.toUpperCase());
+    }
+
+    // Load data from localStorage
+    function loadData() {
+      const savedSingle = localStorage.getItem('singleLeaderboard');
+      if (savedSingle) singleLeaderboard = JSON.parse(savedSingle);
+      const savedTwo = localStorage.getItem('twoLeaderboard');
+      if (savedTwo) twoLeaderboard = JSON.parse(savedTwo);
+      const savedThree = localStorage.getItem('threeLeaderboard');
+      if (savedThree) threeLeaderboard = JSON.parse(savedThree);
+      const savedWait = localStorage.getItem('waitList');
+      if (savedWait) waitList = JSON.parse(savedWait);
+      renderLeaderboards();
+      renderWaitList();
+    }
+
+    // Save data to localStorage
+    function saveData() {
+      localStorage.setItem('singleLeaderboard', JSON.stringify(singleLeaderboard));
+      localStorage.setItem('twoLeaderboard', JSON.stringify(twoLeaderboard));
+      localStorage.setItem('threeLeaderboard', JSON.stringify(threeLeaderboard));
+      localStorage.setItem('waitList', JSON.stringify(waitList));
+    }
+
+    // Render leaderboards
+    function renderLeaderboards() {
+      renderLeaderboard('single-leaderboard-body', singleLeaderboard);
+      renderLeaderboard('two-leaderboard-body', twoLeaderboard, true);
+      renderLeaderboard('three-leaderboard-body', threeLeaderboard, true);
+    }
+
+    function renderLeaderboard(tbodyId, leaderboard, isTeam = false) {
+      const tbody = document.getElementById(tbodyId);
+      tbody.innerHTML = '';
+      leaderboard.forEach((entry, index) => {
+        const tr = document.createElement('tr');
+        const names = isTeam ? entry.names.join(', ') : entry.name;
+        tr.innerHTML = `
+          <td class="p-2">${index + 1}</td>
+          <td class="p-2">${names}</td>
+          <td class="p-2">${entry.pokeballs}</td>
+          <td class="p-2">
+            <button class="remove-btn text-red-400 hover:text-red-600" data-id="${entry.id}">✕</button>
+          </td>
+        `;
+        tr.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+        tbody.appendChild(tr);
+        setTimeout(() => tr.classList.remove('opacity-0'), 100 * index);
+      });
+      document.querySelectorAll(`#${tbodyId} .remove-btn`).forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id');
+          if (tbodyId === 'single-leaderboard-body') {
+            singleLeaderboard = singleLeaderboard.filter(entry => entry.id !== id);
+          } else if (tbodyId === 'two-leaderboard-body') {
+            twoLeaderboard = twoLeaderboard.filter(entry => entry.id !== id);
+          } else {
+            threeLeaderboard = threeLeaderboard.filter(entry => entry.id !== id);
+          }
+          saveData();
+          renderLeaderboards();
+        });
+      });
+    }
+
+    // Render wait list
+    function renderWaitList() {
+      const tbody = document.getElementById('wait-list-body');
+      tbody.innerHTML = '';
+      waitList.forEach((entry, index) => {
+        const tr = document.createElement('tr');
+        const names = entry.names.join(', ');
+        tr.innerHTML = `
+          <td class="p-2">${names}</td>
+          <td class="p-2 text-right">
+            <button class="remove-wait-btn text-red-400 hover:text-red-600" data-id="${entry.id}">✕</button>
+          </td>
+        `;
+        tr.classList.add('cursor-pointer', 'hover:bg-gray-700', 'opacity-0', 'transition-opacity', 'duration-500');
+        tr.addEventListener('click', () => {
+          currentWaitListEntry = entry;
+          showScoreModal(entry);
+        });
+        tbody.appendChild(tr);
+        setTimeout(() => tr.classList.remove('opacity-0'), 100 * index);
+      });
+      document.querySelectorAll('.remove-wait-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = btn.getAttribute('data-id');
+          waitList = waitList.filter(entry => entry.id !== id);
+          saveData();
+          renderWaitList();
+        });
+      });
+    }
+
+    // Show player modal
+    function showPlayerModal(mode, numPlayers) {
+      currentMode = mode;
+      const modal = document.getElementById('player-modal');
+      const title = document.getElementById('player-modal-title');
+      const inputsDiv = document.getElementById('player-inputs');
+      title.textContent = `Add ${mode} (${numPlayers} ${numPlayers === 1 ? 'Player' : 'Players'})`;
+      inputsDiv.innerHTML = '';
+      for (let i = 0; i < numPlayers; i++) {
+        const inputDiv = document.createElement('div');
+        inputDiv.className = 'relative mb-2';
+        inputDiv.innerHTML = `
+          <input type="text" placeholder="Student Name or ID" class="player-input w-full p-2 border border-gray-600 rounded bg-gray-700 text-gray-200">
+          <ul class="autocomplete-list absolute w-full bg-gray-700 border border-gray-600 rounded max-h-40 overflow-y-auto hidden text-gray-200"></ul>
+        `;
+        inputsDiv.appendChild(inputDiv);
+      }
+      modal.classList.remove('hidden');
+      inputsDiv.querySelector('.player-input').focus();
+      setupAutocomplete();
+    }
+
+    // Hide player modal
+    function hidePlayerModal() {
+      document.getElementById('player-modal').classList.add('hidden');
+      document.getElementById('player-inputs').innerHTML = '';
+      currentMode = '';
+    }
+
+    // Show score modal
+    function showScoreModal(entry) {
+      const modal = document.getElementById('score-modal');
+      const title = document.getElementById('score-modal-title');
+      title.textContent = `Enter Score for ${entry.names.join(', ')}`;
+      document.getElementById('pokeballs-input').value = '';
+      modal.classList.remove('hidden');
+      document.getElementById('pokeballs-input').focus();
+    }
+
+    // Hide score modal
+    function hideScoreModal() {
+      document.getElementById('score-modal').classList.add('hidden');
+      document.getElementById('pokeballs-input').value = '';
+      currentWaitListEntry = null;
+    }
+
+    // Autocomplete functionality
+    function setupAutocomplete() {
+      const inputs = document.querySelectorAll('.player-input');
+      inputs.forEach(input => {
+        const list = input.nextElementSibling;
+        let selectedIndex = -1;
+
+        input.addEventListener('input', () => {
+          const query = input.value.toLowerCase();
+          list.innerHTML = '';
+          selectedIndex = -1;
+          if (query) {
+            const matches = students.filter(student => 
+              student.name.toLowerCase().includes(query) || student.id.toLowerCase().includes(query)
+            );
+            matches.forEach(student => {
+              const li = document.createElement('li');
+              li.classList.add('p-2', 'hover:bg-gray-600', 'cursor-pointer');
+              li.textContent = `${student.name} (${student.id})`;
+              li.addEventListener('click', () => {
+                input.value = student.name;
+                list.classList.add('hidden');
+                const nextInput = input.parentElement.nextElementSibling?.querySelector('.player-input');
+                if (nextInput) nextInput.focus();
+                else document.getElementById('player-submit-btn').focus();
+              });
+              list.appendChild(li);
+            });
+            list.classList.toggle('hidden', matches.length === 0);
+          } else {
+            list.classList.add('hidden');
+          }
+        });
+
+        input.addEventListener('keydown', (e) => {
+          const items = list.querySelectorAll('li');
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+            updateSelection(items, selectedIndex);
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = Math.max(selectedIndex - 1, -1);
+            updateSelection(items, selectedIndex);
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (items.length > 0) {
+              input.value = items[0].textContent.split(' (')[0];
+              list.classList.add('hidden');
+              const nextInput = input.parentElement.nextElementSibling?.querySelector('.player-input');
+              if (nextInput) nextInput.focus();
+              else document.getElementById('player-submit-btn').focus();
+            } else if (input.value.trim()) {
+              input.value = capitalizeName(input.value);
+              list.classList.add('hidden');
+              const nextInput = input.parentElement.nextElementSibling?.querySelector('.player-input');
+              if (nextInput) nextInput.focus();
+              else document.getElementById('player-submit-btn').focus();
+            }
+          }
+        });
+
+        function updateSelection(items, index) {
+          items.forEach((item, i) => {
+            item.classList.toggle('bg-gray-600', i === index);
+          });
+        }
+      });
+    }
+
+    // Add to wait list
+    function addToWaitList(names, mode) {
+      if (names.some(name => !name)) return;
+      const capitalizedNames = names.map(capitalizeName);
+      const id = Date.now().toString();
+      waitList.push({ id, names: capitalizedNames, mode });
+      saveData();
+      renderWaitList();
+    }
+
+    // Add or update score
+    function addScore(entry, pokeballs) {
+      pokeballs = parseInt(pokeballs);
+      if (isNaN(pokeballs) || pokeballs < 0) return;
+
+      const leaderboard = entry.mode === 'Single Player' ? singleLeaderboard :
+                         entry.mode === 'Two Players' ? twoLeaderboard : threeLeaderboard;
+      const button = document.getElementById(
+        entry.mode === 'Single Player' ? 'single-player-btn' :
+        entry.mode === 'Two Players' ? 'two-player-btn' : 'three-player-btn'
+      );
+      const isHighScore = leaderboard.length === 0 || pokeballs > leaderboard[0].pokeballs;
+      const id = Date.now().toString();
+      
+      if (entry.mode === 'Single Player') {
+        const existing = leaderboard.find(e => e.name === entry.names[0]);
+        if (existing) {
+          if (pokeballs > existing.pokeballs) {
+            existing.pokeballs = pokeballs;
+          }
+        } else {
+          leaderboard.push({ id, name: entry.names[0], pokeballs });
+        }
+      } else {
+        leaderboard.push({ id, names: entry.names, pokeballs });
+      }
+      
+      leaderboard.sort((a, b) => b.pokeballs - a.pokeballs);
+      waitList = waitList.filter(e => e.id !== entry.id);
+      saveData();
+      renderLeaderboards();
+      renderWaitList();
+
+      if (isHighScore) {
+        showHighScore(button);
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
+    }
+
+    // Show high score notification
+    function showHighScore(button) {
+      const originalClasses = button.getAttribute('data-original-classes');
+      const originalContent = button.innerHTML;
+      button.className = 'player-btn bg-yellow-600 p-4 rounded-lg text-center mb-2 text-black';
+      button.innerHTML = '<p class="text-xl font-bold">New High Score!</p>';
+      setTimeout(() => {
+        button.className = originalClasses + ' p-4 rounded-lg text-center mb-2 cursor-pointer';
+        button.innerHTML = originalContent;
+      }, 2000);
+    }
+
+    // Capitalize names
+    function capitalizeName(name) {
+      return name.trim().replace(/\b\w/g, char => char.toUpperCase());
+    }
+
+    // Event listeners
+    document.getElementById('single-player-btn').addEventListener('click', () => showPlayerModal('Single Player', 1));
+    document.getElementById('two-player-btn').addEventListener('click', () => showPlayerModal('Two Players', 2));
+    document.getElementById('three-player-btn').addEventListener('click', () => showPlayerModal('Three Players', 3));
+
+    document.getElementById('player-submit-btn').addEventListener('click', () => {
+      const inputs = document.querySelectorAll('.player-input');
+      const names = Array.from(inputs).map(input => input.value.trim());
+      addToWaitList(names, currentMode);
+      hidePlayerModal();
+    });
+
+    document.getElementById('player-modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('player-modal')) hidePlayerModal();
+    });
+
+    document.getElementById('score-submit-btn').addEventListener('click', () => {
+      const pokeballs = document.getElementById('pokeballs-input').value;
+      if (currentWaitListEntry && pokeballs) {
+        addScore(currentWaitListEntry, pokeballs);
+        hideScoreModal();
+      }
+    });
+
+    document.getElementById('score-modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('score-modal')) hideScoreModal();
+    });
+
+    document.getElementById('pokeballs-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const pokeballs = document.getElementById('pokeballs-input').value;
+        if (currentWaitListEntry && pokeballs) {
+          addScore(currentWaitListEntry, pokeballs);
+          hideScoreModal();
+        }
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        hidePlayerModal();
+        hideScoreModal();
+      }
+    });
+
+    // Initialize
+    loadData();
+
+    fetch('students.json')
+      .then(response => response.json())
+      .then(data => {
+        students = data;
+        setupAutocomplete();
+      })
+      .catch(() => {
+        students = [];
+        setupAutocomplete();
+      });
+  </script>
+</body>
+</html>
