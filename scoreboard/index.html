@@ -7,92 +7,199 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       background-color: #1f2937;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' opacity='0.1'%3E%3Ccircle cx='50' cy='50' r='45' fill='red'/%3E%3Cpath d='M5 50h90a45 45 0 0 1-90 0z' fill='white/%3E%3Ccircle cx='50' cy='50' r='10' fill='black'/%3E%3Ccircle cx='50' cy='50' r='45' fill='none' stroke='black' stroke-width='2'/%3E%3Cline x1='5' x2='95' y1='50' y2='50' stroke='black' stroke-width='2'/>%3C/svg%3E");
       background-size: 100px;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: clamp(12px, 2.5vw, 16px);
     }
-    .autocomplete-list {
-      z-index: 1000;
+    .container {
+      width: 96%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .header {
+      height: 10%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .header h1 {
+      font-size: clamp(20px, 4vw, 32px);
+    }
+    .leaderboards {
+      height: 57%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 1%;
+      padding: 0 2%;
+    }
+    .leaderboard-column {
+      flex-basis: 32%;
+      max-width: 32%;
+      display: flex;
+      flex-direction: column;
     }
     .player-btn {
+      flex: 0 0 auto;
+      width: 100%;
+      min-height: 80px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-height: 80px;
-      height: 80px;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      transition: background-color 0.3s ease;
+      border-radius: 0.5rem;
+      font-size: clamp(14px, 2vw, 18px);
+    }
+    .player-btn p {
+      font-size: clamp(10px, 1.5vw, 12px);
+    }
+    .leaderboard-table {
+      flex: 1;
+      width: 100%;
+      overflow-y: auto;
+      background-color: #1f2937;
+      border-radius: 0.5rem;
+      padding: 1rem 0;
+    }
+    .leaderboard-table table {
+      width: 100%;
+      font-size: clamp(12px, 1.8vw, 14px);
+    }
+    .leaderboard-table thead tr {
+      width: 100%;
+    }
+    .leaderboard-table th {
+      padding: 0.5rem 0.5rem;
+      text-align: left;
+    }
+    .leaderboard-table tbody tr {
+      transition: background-color 0.2s ease, border 0.2s ease;
+      border: 1px solid transparent;
+    }
+    .leaderboard-table tbody tr:hover {
+      background-color: rgba(255, 191, 0, 0.158);
+      border: 1px solid #eab20850;
+    }
+    .up-next {
+      height: 33%;
+      width: 100%;
+      padding: 2%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .up-next-container {
+      width: 100%;
+      background-color: #1f2937;
+      border-radius: 0.5rem;
+      padding: 1rem;
+    }
+    .up-next-container h2 {
+      font-size: clamp(16px, 2.5vw, 20px);
+    }
+    .up-next-container table {
+      font-size: clamp(12px, 1.8vw, 14px);
+    }
+    .autocomplete-list {
+      z-index: 1000;
+    }
+    .modal-content {
+      font-size: clamp(14px, 2vw, 16px);
+    }
+    .modal-content h2 {
+      font-size: clamp(16px, 2.5vw, 20px);
+    }
+    .modal-content input {
+      font-size: clamp(12px, 1.8vw, 14px);
+    }
+    .modal-content button {
+      font-size: clamp(12px, 1.8vw, 14px);
     }
   </style>
 </head>
 <body class="text-gray-200">
-  <div class="container mx-auto p-4">
+  <div class="container">
     <!-- Header -->
-    <div class="flex items-center justify-center mb-6">
-      <svg class="w-8 h-8 mr-2" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="45" fill="white"/>
-        <path d="M5 50h90a45 45 0 0 0-90 0z" fill="red"/>
-        <circle cx="50" cy="50" r="10" fill="black"/>
-        <circle cx="50" cy="50" r="45" fill="none" stroke="black" stroke-width="2"/>
-        <line x1="5" y1="50" x2="95" y2="50" stroke="black" stroke-width="3"/>
-      </svg>
-      <h1 class="text-3xl font-bold">Pokeball Leaderboard</h1>
+    <div class="header">
+      <div class="flex items-center justify-center">
+        <svg class="w-8 h-8 mr-2" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="45" fill="white"/>
+          <path d="M5 50h90a45 45 0 0 0-90 0z" fill="red"/>
+          <circle cx="50" cy="50" r="10" fill="black"/>
+          <circle cx="50" cy="50" r="45" fill="none" stroke="black" stroke-width="2"/>
+          <line x1="5" y1="50" x2="95" y2="50" stroke="black" stroke-width="3"/>
+        </svg>
+        <h1 class="font-bold">Pokeball Leaderboard</h1>
+      </div>
     </div>
     
-    <!-- Leaderboards and Requirements -->
-    <div class="grid grid-cols-3 gap-4 mb-8">
-      <div>
-        <div id="single-player-btn" class="player-btn bg-blue-800 p-4 rounded-lg text-center mb-2 cursor-pointer hover:bg-blue-700" data-original-classes="player-btn bg-blue-800 hover:bg-blue-700">
-          <h2 class="text-lg font-semibold">Single Player</h2>
-          <p class="text-sm">12 Pokeballs to Pass</p>
+    <!-- Leaderboards -->
+    <div class="leaderboards">
+      <div class="leaderboard-column">
+        <div id="single-player-btn" class="player-btn bg-blue-800 text-center cursor-pointer hover:bg-blue-700" data-original-classes="player-btn bg-blue-800 hover:bg-blue-700">
+          <h2 class="font-semibold">Single Player</h2>
+          <p>12 Pokeballs to Pass</p>
         </div>
-        <div class="bg-gray-800 shadow-md rounded-lg p-4">
-          <table class="w-full">
+        <div class="leaderboard-table shadow-md">
+          <table>
             <thead>
               <tr class="bg-gray-700">
-                <th class="p-2 text-left">Rank</th>
-                <th class="p-2 text-left">Student</th>
-                <th class="p-2 text-left">Pokeballs</th>
-                <th class="p-2 text-left"></th>
+                <th class="text-left">Rank</th>
+                <th class="text-left">Student</th>
+                <th class="text-left">Pokeballs</th>
+                <th class="text-left"></th>
               </tr>
             </thead>
             <tbody id="single-leaderboard-body"></tbody>
           </table>
         </div>
       </div>
-      <div>
-        <div id="two-player-btn" class="player-btn bg-green-800 p-4 rounded-lg text-center mb-2 cursor-pointer hover:bg-green-700" data-original-classes="player-btn bg-green-800 hover:bg-green-700">
-          <h2 class="text-lg font-semibold">Two Players</h2>
-          <p class="text-sm">15 Pokeballs to Pass</p>
+      <div class="leaderboard-column">
+        <div id="two-player-btn" class="player-btn bg-green-800 text-center cursor-pointer hover:bg-green-700" data-original-classes="player-btn bg-green-800 hover:bg-green-700">
+          <h2 class="font-semibold">Two Players</h2>
+          <p>15 Pokeballs to Pass</p>
         </div>
-        <div class="bg-gray-800 shadow-md rounded-lg p-4">
-          <table class="w-full">
+        <div class="leaderboard-table shadow-md">
+          <table>
             <thead>
               <tr class="bg-gray-700">
-                <th class="p-2 text-left">Rank</th>
-                <th class="p-2 text-left">Students</th>
-                <th class="p-2 text-left">Pokeballs</th>
-                <th class="p-2 text-left"></th>
+                <th class="text-left">Rank</th>
+                <th class="text-left">Students</th>
+                <th class="text-left">Pokeballs</th>
+                <th class="text-left"></th>
               </tr>
             </thead>
             <tbody id="two-leaderboard-body"></tbody>
           </table>
         </div>
       </div>
-      <div>
-        <div id="three-player-btn" class="player-btn bg-yellow-800 p-4 rounded-lg text-center mb-2 cursor-pointer hover:bg-yellow-700" data-original-classes="player-btn bg-yellow-800 hover:bg-yellow-700">
-          <h2 class="text-lg font-semibold">Three Players</h2>
-          <p class="text-sm">20 Pokeballs to Pass</p>
+      <div class="leaderboard-column">
+        <div id="three-player-btn" class="player-btn bg-yellow-800 text-center cursor-pointer hover:bg-yellow-700" data-original-classes="player-btn bg-yellow-800 hover:bg-yellow-700">
+          <h2 class="font-semibold">Three Players</h2>
+          <p>20 Pokeballs to Pass</p>
         </div>
-        <div class="bg-gray-800 shadow-md rounded-lg p-4">
-          <table class="w-full">
+        <div class="leaderboard-table shadow-md">
+          <table>
             <thead>
               <tr class="bg-gray-700">
-                <th class="p-2 text-left">Rank</th>
-                <th class="p-2 text-left">Students</th>
-                <th class="p-2 text-left">Pokeballs</th>
-                <th class="p-2 text-left"></th>
+                <th class="text-left">Rank</th>
+                <th class="text-left">Students</th>
+                <th class="text-left">Pokeballs</th>
+                <th class="text-left"></th>
               </tr>
             </thead>
             <tbody id="three-leaderboard-body"></tbody>
@@ -102,9 +209,9 @@
     </div>
 
     <!-- Up Next -->
-    <div class="flex justify-center">
-      <div class="w-1/2 bg-gray-800 shadow-md rounded-lg p-4">
-        <h2 class="text-xl font-semibold mb-2 text-center">Up Next!</h2>
+    <div class="up-next">
+      <div class="up-next-container shadow-md">
+        <h2 class="font-semibold mb-2 text-center">Up Next!</h2>
         <table class="w-full">
           <tbody id="wait-list-body"></tbody>
         </table>
@@ -113,8 +220,8 @@
 
     <!-- Player Modal -->
     <div id="player-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div class="bg-gray-800 p-6 rounded-lg w-96">
-        <h2 id="player-modal-title" class="text-xl font-semibold mb-4 text-gray-200">Add Players</h2>
+      <div class="modal-content bg-gray-800 p-6 rounded-lg w-96">
+        <h2 id="player-modal-title" class="font-semibold mb-4 text-gray-200">Add Players</h2>
         <div id="player-inputs"></div>
         <div class="flex justify-end mt-4">
           <button id="player-submit-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Submit</button>
@@ -124,14 +231,15 @@
 
     <!-- Score Modal -->
     <div id="score-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div class="bg-gray-800 p-6 rounded-lg w-96">
-        <h2 id="score-modal-title" class="text-xl font-semibold mb-4 text-gray-200">Enter Score</h2>
+      <div class="modal-content bg-gray-800 p-6 rounded-lg w-96">
+        <h2 id="score-modal-title" class="font-semibold mb-4 text-gray-200">Enter Score</h2>
         <input id="pokeballs-input" type="number" placeholder="Pokeballs Collected" class="w-full p-2 border border-gray-600 rounded mb-4 bg-gray-700 text-gray-200">
         <div class="flex justify-end">
           <button id="score-submit-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Submit</button>
         </div>
       </div>
     </div>
+  </div>
 
   <script>
     let singleLeaderboard = [];
@@ -142,12 +250,10 @@
     let currentMode = '';
     let currentWaitListEntry = null;
 
-    // Capitalize names
     function capitalizeName(name) {
       return name.trim().replace(/\b\w/g, char => char.toUpperCase());
     }
 
-    // Load data from localStorage
     function loadData() {
       const savedSingle = localStorage.getItem('singleLeaderboard');
       if (savedSingle) singleLeaderboard = JSON.parse(savedSingle);
@@ -161,7 +267,6 @@
       renderWaitList();
     }
 
-    // Save data to localStorage
     function saveData() {
       localStorage.setItem('singleLeaderboard', JSON.stringify(singleLeaderboard));
       localStorage.setItem('twoLeaderboard', JSON.stringify(twoLeaderboard));
@@ -169,7 +274,6 @@
       localStorage.setItem('waitList', JSON.stringify(waitList));
     }
 
-    // Render leaderboards
     function renderLeaderboards() {
       renderLeaderboard('single-leaderboard-body', singleLeaderboard);
       renderLeaderboard('two-leaderboard-body', twoLeaderboard, true);
@@ -187,7 +291,7 @@
           <td class="p-2">${names}</td>
           <td class="p-2">${entry.pokeballs}</td>
           <td class="p-2">
-            <button class="remove-btn text-red-400 hover:text-red-600" data-id="${entry.id}">✕</button>
+            <button class="remove-btn text-red-900 hover:text-red-600" data-id="${entry.id}">✕</button>
           </td>
         `;
         tr.classList.add('opacity-0', 'transition-opacity', 'duration-500');
@@ -210,7 +314,6 @@
       });
     }
 
-    // Render wait list
     function renderWaitList() {
       const tbody = document.getElementById('wait-list-body');
       tbody.innerHTML = '';
@@ -242,7 +345,6 @@
       });
     }
 
-    // Show player modal
     function showPlayerModal(mode, numPlayers) {
       currentMode = mode;
       const modal = document.getElementById('player-modal');
@@ -264,14 +366,12 @@
       setupAutocomplete();
     }
 
-    // Hide player modal
     function hidePlayerModal() {
       document.getElementById('player-modal').classList.add('hidden');
       document.getElementById('player-inputs').innerHTML = '';
       currentMode = '';
     }
 
-    // Show score modal
     function showScoreModal(entry) {
       const modal = document.getElementById('score-modal');
       const title = document.getElementById('score-modal-title');
@@ -281,14 +381,12 @@
       document.getElementById('pokeballs-input').focus();
     }
 
-    // Hide score modal
     function hideScoreModal() {
       document.getElementById('score-modal').classList.add('hidden');
       document.getElementById('pokeballs-input').value = '';
       currentWaitListEntry = null;
     }
 
-    // Autocomplete functionality
     function setupAutocomplete() {
       const inputs = document.querySelectorAll('.player-input');
       inputs.forEach(input => {
@@ -358,7 +456,6 @@
       });
     }
 
-    // Add to wait list
     function addToWaitList(names, mode) {
       if (names.some(name => !name)) return;
       const capitalizedNames = names.map(capitalizeName);
@@ -368,7 +465,6 @@
       renderWaitList();
     }
 
-    // Add or update score
     function addScore(entry, pokeballs) {
       pokeballs = parseInt(pokeballs);
       if (isNaN(pokeballs) || pokeballs < 0) return;
@@ -411,24 +507,17 @@
       }
     }
 
-    // Show high score notification
     function showHighScore(button) {
       const originalClasses = button.getAttribute('data-original-classes');
       const originalContent = button.innerHTML;
-      button.className = 'player-btn bg-yellow-600 p-4 rounded-lg text-center mb-2 text-black';
-      button.innerHTML = '<p class="text-xl font-bold">New High Score!</p>';
+      button.className = 'player-btn bg-yellow-600 text-center cursor-pointer text-black';
+      button.innerHTML = '<p class="font-bold">New High Score!</p>';
       setTimeout(() => {
-        button.className = originalClasses + ' p-4 rounded-lg text-center mb-2 cursor-pointer';
+        button.className = originalClasses + ' text-center cursor-pointer';
         button.innerHTML = originalContent;
       }, 2000);
     }
 
-    // Capitalize names
-    function capitalizeName(name) {
-      return name.trim().replace(/\b\w/g, char => char.toUpperCase());
-    }
-
-    // Event listeners
     document.getElementById('single-player-btn').addEventListener('click', () => showPlayerModal('Single Player', 1));
     document.getElementById('two-player-btn').addEventListener('click', () => showPlayerModal('Two Players', 2));
     document.getElementById('three-player-btn').addEventListener('click', () => showPlayerModal('Three Players', 3));
@@ -473,7 +562,6 @@
       }
     });
 
-    // Initialize
     loadData();
 
     fetch('students.json')
