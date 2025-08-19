@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIPH Winter Concert 2024</title>
+    <link rel="icon" href="images/conductor.png">
+    <style>
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: rgb(26, 33, 42);
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+.wrapper {
+    height: 100%;
+    margin: 0 auto;
+    background: url('images/Song for a Winters Night Poster.png') no-repeat center center;
+    background-size: cover; 
+}
+
+@media (orientation: landscape) {
+    .wrapper {
+        background-size: contain; /* Use contain for horizontal screens */
+    }
+}
+
+#landing, #viewer {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: transform 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+        #landing {
+            background-color: rgba(240, 240, 240, 0.46);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #viewer {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(100%);
+        }
+
+        #viewer.active { transform: translateX(0); }
+
+        #pdf-container {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #pdf-viewer {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #hamburger {
+            position: fixed;
+            top: 1%;
+            left: 10%;
+            color: black;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f9f9f9;
+            min-width: 200px;
+            max-width: 80vw;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-height: 0;
+            overflow-y: auto;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            opacity: 0;
+            scrollbar-width: thin;
+            scrollbar-color: #888 #f1f1f1;
+        }
+
+        .dropdown-content button {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .dropdown-content button:hover {
+            background-color: #f1f1f1;
+        }
+
+        .show {
+            max-height: 80vh;
+            opacity: 1;
+            transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
+        }
+
+        #select-part {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            background-color: #f0f0f0;
+            border: 2px solid #9b9b9b;
+            border-radius: 4px;
+            margin-top: 100px; /* Move down by 100px */
+        }
+
+        #page-indicator {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle, rgba(132, 112, 81, 0.366), rgba(47, 61, 98, 0.82), rgb(34, 45, 68));
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .popup img {
+            margin-top: -100px;
+            width: 75%;
+            max-height: none;
+            object-fit: contain;
+            transition: transform 0.2s;
+        }
+
+        .close-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        #imageContainer {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-button {
+            padding: 10px 30px;
+            width: 270px;
+            font-size: 16px;
+            cursor: pointer;
+            position: absolute; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            bottom: 40px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+</head>
+<body>
+    <div class="wrapper"></div>
+    <div id="landing">
+        <div class="dropdown">
+            <button id="select-part">Select your part</button>
+            <div id="instrument-families" class="dropdown-content"></div>
+        </div>
+        <div id="instruments" class="dropdown-content"></div>
+        <div id="or-divider"></div>
+        <button class="popup-button" id="openPopup">View Concert Seating Layout</button>
+    </div>
+
+    <div class="popup" id="imagePopup">
+        <button class="close-btn" id="closePopup">&times;</button>
+        <div id="imageContainer">
+            <img src="images/Winter Concert Layout.png" alt="Popup Image" id="popupImage" />
+        </div>
+    </div>
+
+    <div id="viewer">
+        <div id="hamburger">⇦</div>
+        <div id="pdf-container">
+            <canvas id="pdf-viewer"></canvas>
+        </div>
+        <div id="page-indicator"></div>
+    </div>
+
+    <script src="instrumentData.js"></script> 
+    <script>
+        const landing = document.getElementById('landing');
+        const viewer = document.getElementById('viewer');
+        const selectPart = document.getElementById('select-part');
+        const instrumentFamilies = document.getElementById('instrument-families');
+        const instruments = document.getElementById('instruments');
+        const pdfContainer = document.getElementById('pdf-container');
+        const hamburger = document.getElementById('hamburger');
+        const pdfViewer = document.getElementById('pdf-viewer');
+        const pageIndicator = document.getElementById('page-indicator');
+
+        let currentInstrument = '';
+        let currentPage = 1;
+        let pdfDoc = null;
+
+        async function loadPDF() {
+            if (currentInstrument && pdfData[currentInstrument]) {
+                const url = pdfData[currentInstrument][0];
+                try {
+                    pdfDoc = await pdfjsLib.getDocument(url).promise;
+                    currentPage = 1;
+                    renderPage(currentPage);
+                } catch (error) {
+                    console.error('Error loading PDF:', error);
+                }
+            }
+        }
+
+        async function renderPage(num) {
+            const page = await pdfDoc.getPage(num);
+            const viewport = page.getViewport({ scale: 1 });
+            const canvas = document.getElementById('pdf-viewer');
+            const context = canvas.getContext('2d');
+
+            const containerWidth = pdfContainer.clientWidth;
+            const containerHeight = pdfContainer.clientHeight;
+            const widthScale = containerWidth / viewport.width;
+            const heightScale = containerHeight / viewport.height;
+            const scale = Math.min(widthScale, heightScale);
+
+            const outputScale = window.devicePixelRatio || 1;
+            const scaledViewport = page.getViewport({ scale: scale * outputScale });
+
+            canvas.width = Math.floor(scaledViewport.width);
+            canvas.height = Math.floor(scaledViewport.height);
+            canvas.style.width = Math.floor(scaledViewport.width / outputScale) + 'px';
+            canvas.style.height = Math.floor(scaledViewport.height / outputScale) + 'px';
+
+            const renderContext = {
+                canvasContext: context,
+                viewport: scaledViewport,
+                enableWebGL: true,
+                renderInteractiveForms: false
+            };
+
+            await page.render(renderContext);
+            updatePageIndicator();
+        }
+
+        function changePage(direction) {
+            if (pdfDoc === null) return;
+
+            const newPage = Math.max(1, Math.min(pdfDoc.numPages, currentPage + direction));
+            if (newPage !== currentPage) {
+                currentPage = newPage;
+                renderPage(currentPage);
+            }
+        }
+
+        function updatePageIndicator() {
+            pageIndicator.textContent = `Page ${currentPage} of ${pdfDoc.numPages}`;
+        }
+
+        function showInstruments(family) {
+            instruments.innerHTML = '';
+            instrumentData[family].forEach(instrument => {
+                const button = document.createElement('button');
+                button.textContent = instrument;
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    selectInstrument(instrument);
+                };
+                instruments.appendChild(button);
+            });
+            instrumentFamilies.classList.remove('show');
+            instruments.classList.add('show');
+        }
+
+        function selectInstrument(instrument) {
+            selectPart.textContent = instrument;
+            instruments.classList.remove('show');
+            currentInstrument = instrument.toLowerCase().replace(/ /g, '_').replace(/[()]/g, '');
+            if (currentInstrument && pdfData[currentInstrument]) {
+                viewer.classList.add('active');
+                loadPDF();
+            } else {
+                console.log('No PDF data available for:', currentInstrument);
+            }
+        }
+
+        function populateInstrumentFamilies() {
+            instrumentFamilies.innerHTML = '';
+            for (let family in instrumentData) {
+                const button = document.createElement('button');
+                button.textContent = family;
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    showInstruments(family);
+                };
+                instrumentFamilies.appendChild(button);
+            }
+        }
+
+        selectPart.onclick = (e) => {
+            e.stopPropagation();
+            instrumentFamilies.classList.toggle('show');
+            instruments.classList.remove('show');
+        };
+
+        document.addEventListener('click', () => {
+            instrumentFamilies.classList.remove('show');
+            instruments.classList.remove('show');
+        });
+
+        const openPopup = document.getElementById('openPopup');
+        const closePopup = document.getElementById('closePopup');
+        const imagePopup = document.getElementById('imagePopup');
+        const imageContainer = document.getElementById('imageContainer');
+        const popupImage = document.getElementById('popupImage');
+
+        let isDragging = false;
+        let startX, startY, scrollLeft, scrollTop;
+
+        openPopup.addEventListener('click', () => {
+            imagePopup.style.display = 'flex';
+        });
+
+        closePopup.addEventListener('click', () => {
+            imagePopup.style.display = 'none';
+        });
+
+        imagePopup.addEventListener('click', (e) => {
+            if (e.target === imagePopup) {
+                imagePopup.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                imagePopup.style.display = 'none';
+            }
+        });
+
+        imageContainer.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const scale = e.deltaY > 0 ? 0.9 : 1.1;
+            const img = popupImage;
+            img.style.width = `${img.offsetWidth * scale}px`;
+            img.style.height = `${img.offsetHeight * scale}px`;
+        });
+
+        imageContainer.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.pageX - imageContainer.offsetLeft;
+            startY = e.pageY - imageContainer.offsetTop;
+            scrollLeft = imageContainer.scrollLeft;
+            scrollTop = imageContainer.scrollTop;
+        });
+
+        imageContainer.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+
+        imageContainer.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        imageContainer.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const x = e.pageX - imageContainer.offsetLeft;
+            const y = e.pageY - imageContainer.offsetTop;
+            const walkX = (x - startX) * 2;
+            const walkY = (y - startY) * 2;
+            imageContainer.scrollLeft = scrollLeft - walkX;
+            imageContainer.scrollTop = scrollTop - walkY;
+        });
+
+        hamburger.addEventListener('click', () => {
+            viewer.classList.remove('active');
+            selectPart.textContent = 'Select your part';
+            pdfDoc = null;
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                viewer.classList.remove('active');
+                selectPart.textContent = 'Select your part';
+                pdfDoc = null;
+            }
+        });
+
+        pdfContainer.addEventListener('click', (e) => {
+            const clickX = e.clientX;
+            const containerWidth = pdfContainer.clientWidth;
+            if (clickX < containerWidth * 0.2) {
+                changePage(-1);
+            } else if (clickX > containerWidth * 0.8) {
+                changePage(1);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                changePage(1);
+            } else if (e.key === 'ArrowLeft') {
+                changePage(-1);
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            if (pdfDoc) {
+                renderPage(currentPage);
+            }
+        });
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js';
+
+        populateInstrumentFamilies();
+    </script>
+</body>
+</html>
