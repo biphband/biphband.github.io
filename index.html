@@ -1,263 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Music Review - The Nutcracker</title>
-  <link href="/tailwind.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <style>
-    body {
-      background: linear-gradient(to bottom, #e6e6fa, #f0f8ff);
-      font-family: 'Roboto', sans-serif;
-      min-height: 100vh;
-    }
-    #pdf-viewer { width: 100%; height: 80vh; border: 1px solid #d1d5db; border-radius: 8px; }
-    #jpg-viewer { width: 100%; height: 80vh; overflow-x: auto; white-space: nowrap; }
-    .jpg-page { display: inline-block; max-width: 100%; height: auto; border: 1px solid #d1d5db; border-radius: 4px; margin-right: 8px; }
-    .hidden { display: none; }
-    .btn { 
-      transition: all 0.2s ease; 
-      background-color: #2563eb; 
-      color: white; 
-      border: 1px solid #1e40af; 
-      border-radius: 6px; 
-      padding: 10px 16px; 
-    }
-    .btn:hover { 
-      background-color: #1e40af; 
-      transform: translateY(-1px); 
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-    }
-    .dropdown { 
-      transition: all 0.2s ease; 
-      border: 1px solid #d1d5db; 
-      border-radius: 6px; 
-      padding: 10px; 
-      background-color: white; 
-    }
-    .dropdown:focus { 
-      border-color: #2563eb; 
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); 
-    }
-    .family-section { background: white; border-radius: 8px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .family-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; color: #1f2937; }
-  </style>
-</head>
-<body>
-  <div class="container mx-auto p-6 max-w-7xl">
-    <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">Music Review - The Nutcracker</h1>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Vocabulary Review</title>
+        <link rel="icon" href="/icons/BGicon.png">
+        <link href="style.css" rel="stylesheet" type="text/css">
+    </head>
 
-    <!-- Mode Selection -->
-    <div class="mb-8 flex justify-center">
-      <div class="w-full max-w-md">
-        <label for="mode-select" class="block text-lg font-medium mb-2 text-gray-700">Select Viewing Mode:</label>
-        <select id="mode-select" class="w-full dropdown">
-          <option value="pdf">Native PDF Viewer</option>
-          <option value="jpg">JPEG Page Swiper</option>
-          <option value="download">Download & Open</option>
-        </select>
-      </div>
-    </div>
+    <body onload="getRandomWord()">
+        <h1 class="Title">BIPH Middle School Band</h1>
+        <h1 class="Subtitle">Vocabulary Review</h1>
+ 
 
-    <!-- Home Button -->
-    <div class="mb-6 flex justify-center">
-      <button id="home-btn" class="btn hidden">Home</button>
-    </div>
+            <div class="dropdown">
+              <select name="vocab" onChange="getVocab()">
+                <option value="Cumulative" selected>Cumulative</option>
+                <option value="Unit1">Unit 1</option>
+                <option value="Unit2">Unit 2</option>
+              </select>
+            </div>
 
-    <!-- Song Selection -->
-    <div id="song-selection" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <button class="song-btn btn" data-song="WOTF">Waltz of the Flowers</button>
-      <button class="song-btn btn" data-song="DOTSPF">Dance of the Sugar Plum Fairy</button>
-      <button class="song-btn btn" data-song="Russian Dance">Russian Dance</button>
-    </div>
 
-    <!-- Instrument Selection -->
-    <div id="instrument-selection" class="hidden space-y-6 mb-8"></div>
+        <div>
+            <h3 class="english"></h3>
+        </div>
 
-    <!-- Viewer Area -->
-    <div id="viewer" class="mt-8">
-      <iframe id="pdf-viewer" class="hidden" frameborder="0"></iframe>
-      <div id="jpg-viewer" class="hidden"></div>
-      <a id="download-link" class="hidden btn text-center block" href="#" download>Download PDF</a>
-    </div>
-  </div>
+        <div>
+            <h3 class="pinyin"></h3>
+        </div>
 
-  <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        <div> <h3 class="term-container">A</h3></div>
+        <div>
+          <h3 class="term"></h3>
+        </div>
 
-    const pdfFiles = {
-      'WOTF': {
-        Strings: [
-          'WOTF - Violin 1.pdf', 'WOTF - Violin 2.pdf', 'WOTF - Violin 3.pdf', 'WOTF - Violoncello.pdf', 'WOTF - Contrabass.pdf', 'WOTF - Harp.pdf'
-        ],
-        Woodwind: [
-          'WOTF - Piccolo.pdf', 'WOTF - Flute 1.pdf', 'WOTF - Flute 2.pdf', 'WOTF - Flute 3.pdf', 'WOTF - Oboe.pdf', 
-          'WOTF - Clarinet 1.pdf', 'WOTF - Clarinet 2.pdf', 'WOTF - Clarinet 3.pdf', 'WOTF - Alto Sax 1.pdf', 
-          'WOTF - Alto Sax 2.pdf', 'WOTF - Alto Sax 3.pdf', 'WOTF - Tenor Saxophone.pdf', 'WOTF - Bass Clarinet.pdf', 'WOTF - Bassoon.pdf'
-        ],
-        Brass: [
-          'WOTF - Trumpet.pdf', 'WOTF - Horn in F.pdf', 'WOTF - Trombone.pdf', 'WOTF - Euphonium.pdf', 'WOTF - Tuba.pdf'
-        ],
-        Percussion: [
-          'WOTF - Glockenspiel.pdf', 'WOTF - Vibraphone.pdf', 'WOTF - Marimba.pdf', 'WOTF - Aux Perc 1.pdf', 'WOTF - Aux Perc 2.pdf'
-        ],
-        Other: ['WOTF - Conductor.pdf']
-      },
-      'DOTSPF': {
-        Strings: [
-          'DOTSPF - Violin 1.pdf', 'DOTSPF - Violin 2.pdf', 'DOTSPF - Violin 3.pdf', 'DOTSPF - Violoncello.pdf', 
-          'DOTSPF - Contrabass.pdf', 'DOTSPF - Contrabass 2.pdf'
-        ],
-        Woodwind: [
-          'DOTSPF - Flute I.pdf', 'DOTSPF - Flute II.pdf', 'DOTSPF - Flute III.pdf', 'DOTSPF - Clarinet 1.pdf', 
-          'DOTSPF - Clarinet 2.pdf', 'DOTSPF - Clarinet 3.pdf', 'DOTSPF - Alto Sax 1.pdf', 'DOTSPF - Alto Sax 2.pdf', 
-          'DOTSPF - Tenor Saxophone.pdf', 'DOTSPF - Bass Clarinet in Bb.pdf', 'DOTSPF - Bassoon.pdf'
-        ],
-        Brass: [
-          'DOTSPF - Trumpet 1.pdf', 'DOTSPF - Trumpet 2.pdf', 'DOTSPF - Horn II in F.pdf', 'DOTSPF - Horn III in F.pdf', 
-          'DOTSPF - Trombone.pdf', 'DOTSPF - Euphonium.pdf', 'DOTSPF - Tuba.pdf'
-        ],
-        Percussion: [
-          'DOTSPF - Glockenspiel.pdf', 'DOTSPF - Vibraphone.pdf', 'DOTSPF - Marimba.pdf', 'DOTSPF - Celesta.pdf'
-        ],
-        Other: ['DOTSPF - Conductor.pdf']
-      },
-      'Russian Dance': {
-        Strings: [
-          'Russian Dance - Violin 1.pdf', 'Russian Dance - Violin 2.pdf', 'Russian Dance - Violin 3.pdf', 
-          'Russian Dance - Violoncello.pdf', 'Russian Dance - Contrabass.pdf'
-        ],
-        Woodwind: [
-          'Russian Dance - Flute 1.pdf', 'Russian Dance - Flute 2.pdf', 'Russian Dance - Clarinet 1.pdf', 
-          'Russian Dance - Clarinet 2.pdf', 'Russian Dance - Alto Sax 1.pdf', 'Russian Dance - Alto Sax 2.pdf', 
-          'Russian Dance - Tenor Saxophone.pdf', 'Russian Dance - Bassoon.pdf'
-        ],
-        Brass: [
-          'Russian Dance - Trombone.pdf', 'Russian Dance - Tuba.pdf'
-        ],
-        Percussion: [
-          'Russian Dance - Tambourine.pdf', 'Russian Dance - Marimba.pdf', 'Russian Dance - Concert Bass Drum.pdf'
-        ],
-        Other: ['Russian Dance - Conductor.pdf', 'Russian Dance - Piano.pdf']
-      }
-    };
+        <div class="button-container">
+  
+          
+            <div class="definitionButton">
+              <button class="pinyinbutton"></button>
+              <button class="definitionButton">Click anywhere to Reveal the Definition</button>
+            </div>
+          
+            <div class="nextButton">
+              <button class="nextButton">Click anywhere to Go to the next word</button>
+            </div>
+          </div>
 
-    const modeSelect = document.getElementById('mode-select');
-    const songSelection = document.getElementById('song-selection');
-    const instrumentSelection = document.getElementById('instrument-selection');
-    const pdfViewer = document.getElementById('pdf-viewer');
-    const jpgViewer = document.getElementById('jpg-viewer');
-    const downloadLink = document.getElementById('download-link');
-    const homeBtn = document.getElementById('home-btn');
+<div class="BGLogo">
+    <img src="https://i.postimg.cc/FKjG7zKB/BG-5percent.png" alt="Background logo">
+</div>
 
-    let currentMode = 'pdf';
-    let currentSong = '';
+<div class="autoProgressContainer">
+    <button class="autoProgressButton">Auto-progress</button>
+    <input type="range" min="1000" max="3000" value="1500" class="slider" id="progressSpeed" style="display: none;">
+</div>
 
-    // Handle mode change
-    modeSelect.addEventListener('change', (e) => {
-      currentMode = e.target.value;
-      if (currentSong) {
-        showInstrumentSelection(currentSong);
-      } else {
-        resetViewer();
-      }
-    });
 
-    // Handle song selection
-    document.querySelectorAll('.song-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        currentSong = btn.dataset.song;
-        showInstrumentSelection(currentSong);
-      });
-    });
+<script src="app.js"></script>
 
-    // Handle home button
-    homeBtn.addEventListener('click', () => {
-      currentSong = '';
-      songSelection.classList.remove('hidden');
-      instrumentSelection.classList.add('hidden');
-      homeBtn.classList.add('hidden');
-      resetViewer();
-    });
 
-    // Show instrument selection for the selected song
-    function showInstrumentSelection(song) {
-      instrumentSelection.innerHTML = '';
-      const families = pdfFiles[song];
-      for (const [family, instruments] of Object.entries(families)) {
-        if (instruments.length === 0) continue;
-        const familyDiv = document.createElement('div');
-        familyDiv.className = 'family-section';
-        familyDiv.innerHTML = `<h3 class="family-title">${family}</h3>`;
-        const buttonGrid = document.createElement('div');
-        buttonGrid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4';
-        instruments.forEach(file => {
-          const instrument = file.replace(`${song} - `, '').replace('.pdf', '');
-          const btn = document.createElement('button');
-          btn.className = 'btn';
-          btn.textContent = instrument;
-          btn.addEventListener('click', () => displayContent(song, file));
-          buttonGrid.appendChild(btn);
-        });
-        familyDiv.appendChild(buttonGrid);
-        instrumentSelection.appendChild(familyDiv);
-      }
-      instrumentSelection.classList.remove('hidden');
-      songSelection.classList.add('hidden');
-      homeBtn.classList.remove('hidden');
-      resetViewer();
-    }
-
-    // Display content based on mode
-    async function displayContent(song, file) {
-      const filePath = `scores/${file}`;
-      resetViewer();
-      
-      if (currentMode === 'pdf') {
-        pdfViewer.src = filePath;
-        pdfViewer.classList.remove('hidden');
-      } else if (currentMode === 'jpg') {
-        try {
-          const pdf = await pdfjsLib.getDocument(filePath).promise;
-          const numPages = pdf.numPages;
-          for (let i = 1; i <= numPages; i++) {
-            const page = await pdf.getPage(i);
-            const viewport = page.getViewport({ scale: 1.5 });
-            const canvas = document.createElement('canvas');
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-            const context = canvas.getContext('2d');
-            await page.render({ canvasContext: context, viewport }).promise;
-            const img = document.createElement('img');
-            img.src = canvas.toDataURL('image/jpeg');
-            img.className = 'jpg-page';
-            img.alt = `Page ${i}`;
-            jpgViewer.appendChild(img);
-          }
-          jpgViewer.classList.remove('hidden');
-        } catch (error) {
-          console.error('Error rendering PDF as JPEG:', error);
-          jpgViewer.innerHTML = '<p class="text-red-500">Error loading PDF pages.</p>';
-          jpgViewer.classList.remove('hidden');
-        }
-      } else if (currentMode === 'download') {
-        downloadLink.href = filePath;
-        downloadLink.textContent = `Download ${file}`;
-        downloadLink.classList.remove('hidden');
-        window.open(filePath, '_blank');
-      }
-    }
-
-    // Reset viewer
-    function resetViewer() {
-      pdfViewer.classList.add('hidden');
-      jpgViewer.classList.add('hidden');
-      downloadLink.classList.add('hidden');
-      jpgViewer.innerHTML = '';
-      pdfViewer.src = '';
-    }
-  </script>
 </body>
 </html>
