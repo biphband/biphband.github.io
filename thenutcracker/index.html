@@ -53,11 +53,6 @@
 
     <!-- Instrument Selection -->
     <div id="instrument-selection" class="hidden space-y-6 mb-8"></div>
-
-    <!-- Viewer Area -->
-    <div id="viewer" class="mt-8">
-      <a id="download-link" class="hidden btn text-center block" href="#" download>Download PDF</a>
-    </div>
   </div>
 
   <script>
@@ -120,7 +115,6 @@
 
     const songSelection = document.getElementById('song-selection');
     const instrumentSelection = document.getElementById('instrument-selection');
-    const downloadLink = document.getElementById('download-link');
     const homeBtn = document.getElementById('home-btn');
 
     let currentSong = '';
@@ -144,7 +138,6 @@
         songSelection.classList.remove('hidden');
         instrumentSelection.classList.add('hidden');
         homeBtn.classList.add('hidden');
-        resetViewer();
       });
     });
 
@@ -178,30 +171,18 @@
       instrumentSelection.classList.remove('hidden');
       songSelection.classList.add('hidden');
       homeBtn.classList.remove('hidden');
-      resetViewer();
     }
 
-    // Display content (Download & Open)
+    // Display content (Open PDF in current window)
     function displayContent(song, file) {
       const filePath = `scores/${file}`;
-      resetViewer();
-      downloadLink.href = filePath;
-      downloadLink.textContent = `Download ${file}`;
-      downloadLink.classList.remove('hidden');
-      downloadLink.click(); // Trigger the link to open/download the PDF
-      // Return to homepage
+      // Reset to homepage
       currentSong = '';
       songSelection.classList.remove('hidden');
       instrumentSelection.classList.add('hidden');
       homeBtn.classList.add('hidden');
-      resetViewer();
-    }
-
-    // Reset viewer
-    function resetViewer() {
-      downloadLink.classList.add('hidden');
-      downloadLink.href = '';
-      downloadLink.textContent = '';
+      // Open PDF in current window
+      window.location.href = filePath;
     }
   </script>
 </body>
