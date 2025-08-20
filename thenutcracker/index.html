@@ -188,7 +188,7 @@
       downloadLink.href = filePath;
       downloadLink.textContent = `Download ${file}`;
       downloadLink.classList.remove('hidden');
-      window.open(filePath, '_blank');
+      downloadLink.click(); // Trigger the link to open/download the PDF
       // Return to homepage
       currentSong = '';
       songSelection.classList.remove('hidden');
