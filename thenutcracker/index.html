@@ -7,91 +7,70 @@
   <link href="/tailwind.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      background: linear-gradient(to bottom, #e6e6fa, #f0f8ff);
-      font-family: 'Roboto', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .hidden { display: none; }
-    .btn { 
-      transition: all 0.2s ease; 
-      background-color: #2563eb; 
+body {
+  background: linear-gradient(to bottom, #e6e6fa, #f0f8ff);
+  background-image: url('background.jpeg');
+  background-attachment: fixed;
+  background-size: cover; 
+  background-position: center;
+  font-family: 'Roboto', sans-serif;
+  min-height: 100vh; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+h1 {
       color: white; 
-      border: 1px solid #1e40af; 
-      border-radius: 6px; 
-      padding: 12px 20px; 
-      font-size: 1.1rem;
-      touch-action: manipulation;
+      font-family: 'Zapfino', cursive; 
+      font-size: 2rem; 
+      text-align: center;
+      margin-bottom: 0px;
     }
-    .btn:hover { 
-      background-color: #1e40af; 
-      transform: translateY(-1px); 
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-    }
-    .family-section { background: white; border-radius: 8px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .family-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; color: #1f2937; }
+.container {
+  width: 80%;
+  background-color: rgba(255, 255, 255, 0.2); 
+  border-radius: 8px;
+  padding: 26px;
+}
+
+.btn { 
+  transition: all 0.2s ease; 
+  background-color: #2563eb; 
+  color: rgb(255, 255, 255); 
+  border: 1px solid #1e40af; 
+  border-radius: 6px; 
+  padding: 12px 20px; 
+  font-size: 1.1rem;
+  margin: 2px;
+  touch-action: manipulation;
+}
+
+.btn:hover { 
+  background-color: #1e40af; 
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+}
+    .family-section { background: rgba(255, 255, 255, 0.5); border-radius: 8px; margin-bottom: 32px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .family-title { font-size: 1.25rem; font-weight: 700; margin-top: 2px; margin-bottom: 12px; color: #1f2937; }
   </style>
 </head>
 <body>
-  <div class="container mx-auto p-6 max-w-4xl flex flex-col justify-center min-h-screen">
-    <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">Music Review - The Nutcracker</h1>
+  <div class="container mx-auto flex flex-col justify-center min-h-screen">
+    <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">The Nutcracker</h1>
 
-    <!-- Home Button -->
-    <div class="mb-8 flex justify-center">
-      <button id="home-btn" class="btn hidden">Home</button>
-    </div>
-
-    <!-- Song Selection -->
-    <div id="song-selection" class="grid grid-cols-1 md:grid-cols-3 gap-8 my-4">
-      <button class="song-btn btn" data-song="WOTF">Waltz of the Flowers</button>
-      <button class="song-btn btn" data-song="DOTSPF">Dance of the Sugar Plum Fairy</button>
-      <button class="song-btn btn" data-song="Russian Dance">Russian Dance</button>
-      <button class="song-btn btn" data-song="Overture">Overture</button>
-      <button class="song-btn btn" data-song="Chinese Dance">Chinese Dance</button>
-    </div>
-
-    <!-- Instrument Selection -->
-    <div id="instrument-selection" class="hidden space-y-6 mb-8"></div>
+    <div id="instrument-selection" class="space-y-6 mb-8"></div>
   </div>
+</body>
+</html>
 
   <script src="pdffiles.js"></script>
   <script>
-    const songSelection = document.getElementById('song-selection');
     const instrumentSelection = document.getElementById('instrument-selection');
-    const homeBtn = document.getElementById('home-btn');
 
-    let currentSong = '';
-
-    // Handle song selection
-    document.querySelectorAll('.song-btn').forEach(btn => {
-      ['click', 'touchstart'].forEach(eventType => {
-        btn.addEventListener(eventType, (e) => {
-          e.preventDefault();
-          currentSong = btn.dataset.song;
-          showInstrumentSelection(currentSong);
-        });
-      });
-    });
-
-    // Handle home button
-    ['click', 'touchstart'].forEach(eventType => {
-      homeBtn.addEventListener(eventType, (e) => {
-        e.preventDefault();
-        currentSong = '';
-        songSelection.classList.remove('hidden');
-        instrumentSelection.classList.add('hidden');
-        homeBtn.classList.add('hidden');
-      });
-    });
-
-    // Show instrument selection for the selected song
-    function showInstrumentSelection(song) {
+    // Display instrument selection
+    function showInstrumentSelection() {
       instrumentSelection.innerHTML = '';
-      const families = pdfFiles[song];
-      for (const [family, instruments] of Object.entries(families)) {
+      for (const [family, instruments] of Object.entries(pdfFiles)) {
         if (instruments.length === 0) continue;
         const familyDiv = document.createElement('div');
         familyDiv.className = 'family-section';
@@ -99,14 +78,14 @@
         const buttonGrid = document.createElement('div');
         buttonGrid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4';
         instruments.forEach(file => {
-          const instrument = file.replace(`${song} - `, '').replace('.pdf', '');
+          const instrument = file.replace('_Parts.pdf', '').replace(/_/g, ' ');
           const btn = document.createElement('button');
           btn.className = 'btn';
           btn.textContent = instrument;
           ['click', 'touchstart'].forEach(eventType => {
             btn.addEventListener(eventType, (e) => {
               e.preventDefault();
-              displayContent(song, file);
+              displayContent(file);
             });
           });
           buttonGrid.appendChild(btn);
@@ -114,22 +93,16 @@
         familyDiv.appendChild(buttonGrid);
         instrumentSelection.appendChild(familyDiv);
       }
-      instrumentSelection.classList.remove('hidden');
-      songSelection.classList.add('hidden');
-      homeBtn.classList.remove('hidden');
     }
 
     // Display content (Open PDF in current window)
-    function displayContent(song, file) {
-      const filePath = `../thenutcracker/scores/${song}/${file}`;
-      // Reset to homepage
-      currentSong = '';
-      songSelection.classList.remove('hidden');
-      instrumentSelection.classList.add('hidden');
-      homeBtn.classList.add('hidden');
-      // Open PDF in current window
+    function displayContent(file) {
+      const filePath = `scores/${file}`;
       window.location.href = filePath;
     }
+
+    // Initialize instrument selection
+    showInstrumentSelection();
   </script>
 </body>
 </html>
