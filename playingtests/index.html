@@ -88,6 +88,13 @@
            margin-top: 0;
            margin-bottom: 15px;
        }
+       #studentView .button-container {
+           display: flex;
+           justify-content: space-evenly;
+           margin-top: 20px;
+           width: 500px;
+           margin: 0 auto;
+       }
        .bar-chart {
            width: 100%;
            height: 400px;
@@ -205,6 +212,9 @@
        #compile {
            margin-top: 0px;
        }
+       .shared-view #backToEdit, .shared-view #generateURL {
+           display: none;
+       }
     </style>
 </head>
 <body>
@@ -246,7 +256,7 @@
             <button id="compile">Compile</button>
         </div>
         
-        <div id="studentView" style="display:none;">
+        <div id="studentView" style="display: none;">
             <div id="studentNameDisplay"></div>
             <div id="songTitleDisplay"></div>
             
@@ -276,8 +286,11 @@
             
             <div id="overallCommentsDisplay"></div>
             
-            <button id="backToEdit">Back to Edit</button>
-            <button id="exportPDF">Export as PDF</button>
+            <div class="button-container">
+                <button id="backToEdit">Back to Edit</button>
+                <button id="exportPDF">Export as PDF</button>
+                <button id="generateURL">Generate URL</button>
+            </div>
         </div>
     </div>
 
@@ -292,10 +305,13 @@
         const studentView = document.getElementById('studentView');
         const backToEditBtn = document.getElementById('backToEdit');
         const exportPDFBtn = document.getElementById('exportPDF');
+        const generateURLBtn = document.getElementById('generateURL');
         const testDateInput = document.getElementById('testDate');
         const testDateDisplay = document.getElementById('testDateDisplay');
         const overallComments = document.getElementById('overallComments');
         const overallCommentsDisplay = document.getElementById('overallCommentsDisplay');
+        let shortenedUrl = '';
+        let currentData = {};
 
         const categories = {
             rhythm: { name: 'Rhythm', color: 'rgba(255, 107, 107, 0.5)', points: 25 },
@@ -400,71 +416,102 @@
             compositeScoreSpan.textContent = total + '%';
         }
 
-        function compileStudentView() {
-            const studentName = document.getElementById('studentName').value;
-            const songTitle = document.getElementById('songTitle').value;
-            if (!studentName.trim()) {
-                alert("Please enter a student name before compiling.");
-                return;
-            }
-            if (!songTitle.trim()) {
-                alert("Please enter a song title before compiling.");
-                return;
+        function compileStudentView(data = null) {
+            let studentName, songTitle, testDate, overallCommentsText, feedbackData = {};
+
+            if (data) {
+                // Data from URL query string
+                studentName = data.studentName || '';
+                songTitle = data.songTitle || '';
+                testDate = data.testDate || '';
+                overallCommentsText = data.overallComments || '';
+                feedbackData = data.feedback || {};
+                studentView.classList.add('shared-view');
+                teacherView.style.display = 'none';
+                studentView.style.display = 'block';
+            } else {
+                // Data from teacher view
+                studentName = document.getElementById('studentName')?.value || '';
+                songTitle = document.getElementById('songTitle')?.value || '';
+                if (!studentName.trim()) {
+                    alert("Please enter a student name before compiling.");
+                    return;
+                }
+                if (!songTitle.trim()) {
+                    alert("Please enter a song title before compiling.");
+                    return;
+                }
+                testDate = document.getElementById('testDate')?.value || '';
+                overallCommentsText = document.getElementById('overallComments')?.value.trim() || '';
+
+                // Collect feedback from teacher view
+                categoryTables.querySelectorAll('.category-table').forEach(table => {
+                    const category = table.className.split(' ')[1];
+                    feedbackData[category] = {
+                        points: categories[category].points,
+                        feedback: []
+                    };
+                    table.querySelectorAll('tr:not(:first-child)').forEach(row => {
+                        const measures = row.cells[1].querySelector('input').value.trim();
+                        const feedback = row.querySelector('.feedback').value.trim();
+                        feedbackData[category].feedback.push({ measures, feedback });
+                    });
+                });
+                teacherView.style.display = 'none';
+                studentView.style.display = 'block';
             }
 
-            const testDate = document.getElementById('testDate').value;
+            // Store data for PDF export and URL generation
+            currentData = { studentName, songTitle, testDate, overallComments: overallCommentsText, feedback: feedbackData };
+
             document.getElementById('studentNameDisplay').textContent = studentName;
             document.getElementById('songTitleDisplay').textContent = songTitle;
-            document.getElementById('testDateDisplay').textContent = formatDate(new Date(testDate));
+            document.getElementById('testDateDisplay').textContent = testDate ? formatDate(new Date(testDate)) : '';
 
             const categoryContainer = document.getElementById('categoryContainer');
             categoryContainer.innerHTML = '';
 
             for (let category in categories) {
-                categories[category].points = 25;
-        }
-
-        categoryTables.querySelectorAll('.category-table').forEach(table => {
-        const category = table.className.split(' ')[1];
-        const categoryDiv = document.createElement('div');
-        categoryDiv.className = `category ${category}`;
-        categoryDiv.innerHTML = `
-            <h2 class="category-title">${categories[category].name}</h2>
-            <p class="category-points">Points: <span>${categories[category].points}</span>/25</p>
-        `;
-
-        table.querySelectorAll('tr:not(:first-child)').forEach(row => {
-            const deduction = parseInt(row.querySelector('.deduction').textContent) || 0;
-            const measures = row.cells[1].querySelector('input').value.trim();
-            const feedback = row.querySelector('.feedback').value.trim();
-
-            categories[category].points -= deduction;
-
-            if (feedback) {
-                const feedbackP = document.createElement('p');
-                let feedbackText = '';
-
-                if (measures) {
-                    if (/^\d+$/.test(measures)) {
-                        feedbackText = `Measure ${measures}: `;
-                    } else if (/^\d+-\d+$/.test(measures)) {
-                        feedbackText = `Measures ${measures}: `;
-                    } else {
-                        // Capitalize the text if it's not a number
-                        feedbackText = `${measures.charAt(0).toUpperCase() + measures.slice(1)}: `;
-                    }
-                }
-
-                feedbackText += feedback.charAt(0).toUpperCase() + feedback.slice(1);
-                feedbackP.textContent = feedbackText;
-                categoryDiv.appendChild(feedbackP);
+                categories[category].points = 25; // Reset points
             }
-        });
 
-        categoryDiv.querySelector('.category-points span').textContent = categories[category].points;
-        categoryContainer.appendChild(categoryDiv);
-    });
+            // Ensure all categories are displayed
+            for (let category in categories) {
+                const categoryPoints = feedbackData[category]?.points ?? 25;
+                const categoryFeedback = feedbackData[category]?.feedback ?? [];
 
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = `category ${category}`;
+                categoryDiv.innerHTML = `
+                    <h2 class="category-title">${categories[category].name}</h2>
+                    <p class="category-points">Points: <span>${categoryPoints}</span>/25</p>
+                `;
+
+                categoryFeedback.forEach(item => {
+                    if (item.feedback) {
+                        const feedbackP = document.createElement('p');
+                        let feedbackText = '';
+                        if (item.measures) {
+                            if (/^\d+$/.test(item.measures)) {
+                                feedbackText = `Measure ${item.measures}: `;
+                            } else if (/^\d+-\d+$/.test(item.measures)) {
+                                feedbackText = `Measures ${item.measures}: `;
+                            } else {
+                                feedbackText = `${item.measures.charAt(0).toUpperCase() + item.measures.slice(1)}: `;
+                            }
+                        }
+                        feedbackText += item.feedback.charAt(0).toUpperCase() + item.feedback.slice(1);
+                        feedbackP.textContent = feedbackText;
+                        categoryDiv.appendChild(feedbackP);
+                    }
+                });
+
+                categoryDiv.querySelector('.category-points span').textContent = categoryPoints;
+                categoryContainer.appendChild(categoryDiv);
+                categories[category].points = categoryPoints;
+            }
+
+            // Update bar chart
             for (let category in categories) {
                 const bar = document.getElementById(`${category}Bar`);
                 bar.style.height = `${(categories[category].points / 25) * 80}%`;
@@ -476,130 +523,158 @@
             const totalPoints = Object.values(categories).reduce((sum, category) => sum + category.points, 0);
             document.getElementById('overallScore').textContent = `${totalPoints}%`;
 
-            const overallCommentsText = overallComments.value.trim();
             if (overallCommentsText) {
                 overallCommentsDisplay.innerHTML = `<h3>Overall Comments:</h3><p>${overallCommentsText}</p>`;
             } else {
                 overallCommentsDisplay.innerHTML = '';
             }
 
-            teacherView.style.display = 'none';
-            studentView.style.display = 'block';
+            // Generate shortened URL
+            const jsonString = JSON.stringify(currentData);
+            const base64Data = btoa(encodeURIComponent(jsonString).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+                return String.fromCharCode('0x' + p1);
+            }));
+            const longUrl = `${window.location.href.split('?')[0]}?data=${encodeURIComponent(base64Data)}`;
+            fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`)
+                .then(response => response.text())
+                .then(shortUrl => {
+                    shortenedUrl = shortUrl;
+                })
+                .catch(error => {
+                    shortenedUrl = longUrl;
+                });
         }
 
-        compileBtn.addEventListener('click', compileStudentView);
+        compileBtn.addEventListener('click', () => {
+            compileStudentView();
+        });
+
         backToEditBtn.addEventListener('click', () => {
             teacherView.style.display = 'block';
             studentView.style.display = 'none';
+            studentView.classList.remove('shared-view');
         });
 
-        exportPDFBtn.addEventListener('click', () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const studentViewElement = document.getElementById('studentView');
-
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-
-    // Set font styles
-    doc.setFont('helvetica');
-    doc.setFontSize(16);
-    doc.setTextColor(0, 0, 0);
-
-    // Add title and metadata
-    doc.text('Playing Test', pageWidth / 2, 15, { align: 'center' });
-    doc.setFontSize(12);
-    doc.text(`${formatDate(new Date(testDateInput.value))}`, pageWidth / 2, 22, { align: 'center' });
-    doc.text(`${document.getElementById('studentName').value}`, pageWidth / 2, 29, { align: 'center' });
-    doc.text(`${document.getElementById('songTitle').value}`, pageWidth / 2, 36, { align: 'center' });
-
-    // Add category information
-    let yOffset = 50;
-    for (let category in categories) {
-        const categoryDiv = studentViewElement.querySelector(`.category.${category}`);
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text(categoryDiv.querySelector('.category-title').textContent, 20, yOffset);
-        yOffset += 5;
-        
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(categoryDiv.querySelector('.category-points').textContent, 20, yOffset);
-        yOffset += 7;
-
-        doc.setFontSize(10);
-        categoryDiv.querySelectorAll('p:not(.category-points)').forEach(feedbackP => {
-            let feedbackText = feedbackP.textContent;
-            const colonIndex = feedbackText.indexOf(':');
-            if (colonIndex !== -1) {
-                const measuresPart = feedbackText.substring(0, colonIndex).trim();
-                const feedbackPart = feedbackText.substring(colonIndex + 1).trim();
-                
-                if (/^\d+(-\d+)?$/.test(measuresPart)) {
-                    // If measuresPart is numeric (including ranges), use "Measure(s) "
-                    feedbackText = `Measure${measuresPart.includes('-') ? 's' : ''} ${measuresPart}: ${feedbackPart}`;
-                } else {
-                    // If measuresPart is text, capitalize it and keep the colon
-                    feedbackText = `${measuresPart.charAt(0).toUpperCase() + measuresPart.slice(1)}: ${feedbackPart}`;
-                }
-            }
-            
-            const lines = doc.splitTextToSize(feedbackText, pageWidth - 40);
-            doc.text(lines, 20, yOffset);
-            yOffset += 4 * lines.length;
-        });
-
-        yOffset += 7;
-    }
-
-    // Add bar chart as an image
-    html2canvas(document.querySelector('.bar-chart')).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const imgWidth = 160;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        doc.addImage(imgData, 'PNG', (pageWidth - imgWidth) / 2, yOffset, imgWidth, imgHeight);
-        yOffset += imgHeight + 10;
-
-        // Add composite score
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text(`Composite Score: ${document.getElementById('overallScore').textContent}`, 20, yOffset);
-        yOffset += 10;
-
-        // Add overall comments
-        const overallCommentsText = overallComments.value.trim();
-        if (overallCommentsText) {
-            doc.setFontSize(14);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Overall Comments:', 20, yOffset);
-            yOffset += 7;
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
-            const commentLines = doc.splitTextToSize(overallCommentsText, pageWidth - 40);
-            doc.text(commentLines, 20, yOffset);
+        function cleanText(text) {
+            // Remove all emojis for PDF export
+            return text
+                .replace(/[\u{1F300}-\u{1F6FF}\u{1F900}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+                .normalize('NFC');
         }
 
-        // Save the PDF
-        const studentName = document.getElementById('studentName').value;
-        const testDate = document.getElementById('testDate').value;
-        const songTitle = document.getElementById('songTitle').value;
-        
-        const formattedDate = formatDate(new Date(testDate)).replace(/\//g, '-');
+        exportPDFBtn.addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const studentViewElement = document.getElementById('studentView');
 
-        const filename = `${studentName} - ${songTitle} - Playing Test - ${formattedDate}.pdf`;
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
 
-        doc.save(filename);
-    });
-});
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(16);
+            doc.setTextColor(0, 0, 0);
+
+            doc.text('Playing Test', pageWidth / 2, 15, { align: 'center' });
+            doc.setFontSize(12);
+            doc.text(`${formatDate(new Date(currentData.testDate))}`, pageWidth / 2, 22, { align: 'center' });
+            doc.text(`${cleanText(currentData.studentName)}`, pageWidth / 2, 29, { align: 'center' });
+            doc.text(`${cleanText(currentData.songTitle)}`, pageWidth / 2, 36, { align: 'center' });
+
+            let yOffset = 50;
+            for (let category in categories) {
+                const categoryPoints = currentData.feedback[category]?.points ?? 25;
+                const categoryFeedback = currentData.feedback[category]?.feedback ?? [];
+
+                doc.setFontSize(14);
+                doc.setFont('helvetica', 'bold');
+                doc.text(categories[category].name, 20, yOffset);
+                yOffset += 5;
+
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Points: ${categoryPoints}/25`, 20, yOffset);
+                yOffset += 7;
+
+                categoryFeedback.forEach(item => {
+                    if (item.feedback) {
+                        let feedbackText = '';
+                        if (item.measures) {
+                            if (/^\d+$/.test(item.measures)) {
+                                feedbackText = `Measure ${item.measures}: `;
+                            } else if (/^\d+-\d+$/.test(item.measures)) {
+                                feedbackText = `Measures ${item.measures}: `;
+                            } else {
+                                feedbackText = `${item.measures.charAt(0).toUpperCase() + item.measures.slice(1)}: `;
+                            }
+                        }
+                        feedbackText += item.feedback.charAt(0).toUpperCase() + item.feedback.slice(1);
+                        feedbackText = cleanText(feedbackText);
+                        const lines = doc.splitTextToSize(feedbackText, pageWidth - 40);
+                        doc.text(lines, 20, yOffset);
+                        yOffset += 4 * lines.length;
+                    }
+                });
+
+                yOffset += 7;
+            }
+
+            html2canvas(document.querySelector('.bar-chart')).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const maxImgHeight = pageHeight * 0.3;
+                let imgWidth = pageWidth - 40;
+                let imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                if (imgHeight > maxImgHeight) {
+                    imgHeight = maxImgHeight;
+                    imgWidth = (canvas.width * imgHeight) / canvas.height;
+                }
+
+                const imgX = (pageWidth - imgWidth) / 2;
+                doc.addImage(imgData, 'PNG', imgX, yOffset, imgWidth, imgHeight);
+                yOffset += imgHeight + 10;
+
+                doc.setFontSize(14);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`Composite Score: ${document.getElementById('overallScore').textContent}`, 20, yOffset);
+                yOffset += 10;
+
+                const overallCommentsText = currentData.overallComments || '';
+                if (overallCommentsText) {
+                    doc.setFontSize(14);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('Overall Comments:', 20, yOffset);
+                    yOffset += 7;
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'normal');
+                    const commentLines = doc.splitTextToSize(cleanText(overallCommentsText), pageWidth - 40);
+                    doc.text(commentLines, 20, yOffset);
+                }
+
+                const studentName = cleanText(currentData.studentName);
+                const testDate = currentData.testDate;
+                const songTitle = cleanText(currentData.songTitle);
+                const formattedDate = formatDate(new Date(testDate)).replace(/\//g, '-');
+                const filename = `${studentName} - ${songTitle} - Playing Test - ${formattedDate}.pdf`;
+                doc.save(filename);
+            });
+        });
+
+        generateURLBtn.addEventListener('click', () => {
+            if (shortenedUrl) {
+                prompt('Copy this shortened URL:', shortenedUrl);
+            } else {
+                alert('URL is still being generated. Please try again in a moment.');
+            }
+        });
 
         testDateInput.addEventListener('change', (e) => {
             testDateDisplay.textContent = formatDate(new Date(e.target.value));
         });
 
         function formatDate(date) {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString('en-US', options);
-}
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
 
         // Initialize with one table per category
         for (let category in categories) {
@@ -610,6 +685,25 @@
         const currentDate = new Date();
         testDateInput.valueAsDate = currentDate;
         testDateDisplay.textContent = formatDate(currentDate);
+
+        // Check for query string data on page load
+        const urlParams = new URLSearchParams(window.location.search);
+        const dataParam = urlParams.get('data');
+        if (dataParam) {
+            try {
+                const jsonString = decodeURIComponent(atob(dataParam).split('')
+                    .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                    .join(''));
+                const data = JSON.parse(jsonString);
+                compileStudentView(data);
+            } catch (error) {
+                teacherView.style.display = 'block';
+                studentView.style.display = 'none';
+            }
+        } else {
+            teacherView.style.display = 'block';
+            studentView.style.display = 'none';
+        }
     </script>
 </body>
 </html>
