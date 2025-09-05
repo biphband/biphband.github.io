@@ -43,8 +43,16 @@ function sortFixtureLabels(sortBy) {
                 'Uplighting', 'Uplighting', 'Uplighting', 'Uplighting', 'Uplighting', 'Uplighting'
             ];
             sortedFixtures = customOrder.map(name => name ? fixtures.find(f => f.name === name) : null);
+        } else if (currentMode === 'Auditorium') {
+            const customOrder = [
+                'Row 1 Floods', 'Row 2 Floods', null, null, null, null,
+                'LED 1', 'LED 2', 'LED 3', 'LED 4', null, null,
+                'LED 5', 'LED 6', 'LED 7', 'LED 8', null, null,
+                'LED Row 2', null, null, null, null, null
+            ];
+            sortedFixtures = customOrder.map(name => name ? fixtures.find(f => f.name === name) : null);
         } else {
-            // Default type sorting for other modes (e.g., Auditorium)
+            // Default type sorting for other modes
             sortedFixtures = [...fixtures].sort((a, b) => a.type.localeCompare(b.type) || a.from - b.from);
         }
     } else {
