@@ -22,57 +22,6 @@ document.addEventListener('keydown', function(event) {
         return;
     }
 
-    // Helper function to get sorted fixtures
-    function getSortedFixtures() {
-        const fixtures = currentMode === 'Black Box' ? blackBoxFixtures :
-                        currentMode === 'Auditorium' ? auditoriumFixtures :
-                        currentMode === 'Mobile' ? mobileFixtures : [];
-        const sortBy = localStorage.getItem('sortMode') || 'Type';
-        let sortedFixtures;
-
-        if (sortBy === 'Type') {
-            if (currentMode === 'Black Box') {
-                const customOrder = [
-                    'LED - 1.1', 'LED - 1.2', 'LED - 1.3', 'LED - 1.4', 'LED - 1.5', 'LED - 1.6',
-                    'LED - 2.1', 'LED - 2.2', 'LED - 2.3', 'LED - 2.4', 'LED - 2.5', 'LED - 2.6',
-                    'LED - 3.1', 'LED - 3.2', 'LED - 3.3', 'LED - 3.4', 'LED - 3.5', 'LED - 3.6',
-                    'LED - L.1', 'LED - L.2', 'LED - L.3', null, null, null,
-                    'LED - R.1', 'LED - R.2', 'LED - R.3', null, null, null,
-                    'Par - 1.1', 'Par - 1.2', 'Par - 1.3', 'Par - 1.4', null, null,
-                    'Par - 3.1', 'Par - 3.2', 'Par - 3.3', 'Par - 3.4', null, null,
-                    'Par - L.1', 'Par - L.2', 'Par - L.3', 'Par - L.4', null, null,
-                    'Par - R.1', 'Par - R.2', 'Par - R.3', 'Par - R.4', null, null,
-                    'Gobo - 1.1', 'Gobo - 1.2', 'Gobo - 1.3', 'Gobo - 1.4', null, null,
-                    'Gobo - 2.1', 'Gobo - 2.2', 'Gobo - 2.3', 'Gobo - 2.4', null, null,
-                    'Box Lights row 3', 'Box Lights row 2', 'Box Lights row 1', null, null, null,
-                    'LED Tree', null, null, null, null, null
-                ];
-                sortedFixtures = customOrder.map(name => name ? fixtures.find(f => f.name === name) : null);
-            } else if (currentMode === 'Mobile') {
-                const customOrder = [
-                    'Flood', null, null, null, null, null,
-                    'BandLED', 'BandLED', 'BandLED', 'BandLED', 'BandLED', 'BandLED',
-                    'DramaLED', 'DramaLED', 'DramaLED', 'DramaLED', 'DramaLED', 'DramaLED',
-                    'Tree 1', 'Tree 1', 'Tree 1', 'Tree 1', 'Tree 1', null,
-                    'Tree 1', 'Tree 1', 'Tree 1', 'Tree 1', 'Tree 1', null,
-                    'Tree 2', 'Tree 2', 'Tree 2', 'Tree 2', 'Tree 2', null,
-                    'Tree 2', 'Tree 2', 'Tree 2', 'Tree 2', null, null,
-                    'Tube Light 1', 'Tube Light 2', 'Tube Light 3', 'Tube Light 4', null, null,
-                    'Tube Light 5', 'Tube Light 6', 'Tube Light 7', 'Tube Light 8', null, null,
-                    'Uplighting', 'Uplighting', 'Uplighting', 'Uplighting', 'Uplighting', 'Uplighting',
-                    'Uplighting', 'Uplighting', 'Uplighting', 'Uplighting', 'Uplighting', 'Uplighting'
-                ];
-                sortedFixtures = customOrder.map(name => name ? fixtures.find(f => f.name === name) : null);
-            } else {
-                sortedFixtures = [...fixtures].sort((a, b) => a.type.localeCompare(b.type) || a.from - b.from);
-            }
-        } else {
-            sortedFixtures = [...fixtures].sort((a, b) => a.from - b.from);
-        }
-
-        return sortedFixtures;
-    }
-
     // Handle modals (color or search)
     if (isColorMenu || isSearchMenu) {
         if (event.key === 'Escape') {
@@ -137,6 +86,20 @@ document.addEventListener('keydown', function(event) {
             (isSearchMenu && activeElement.classList.contains('search-input'))) {
             return;
         }
+    }
+
+    // Cmd+Z or Ctrl+Z: Undo
+    if ((event.metaKey || event.ctrlKey) && event.key === 'z' && !event.shiftKey && !isValueInput && !isSlider && !isColorMenu && !isSearchMenu) {
+        event.preventDefault();
+        undo();
+        return;
+    }
+
+    // Cmd+Shift+Z or Ctrl+Shift+Z: Redo
+    if ((event.metaKey || event.ctrlKey) && event.key === 'z' && event.shiftKey && !isValueInput && !isSlider && !isColorMenu && !isSearchMenu) {
+        event.preventDefault();
+        redo();
+        return;
     }
 
     // 'm': Toggle hamburger menu
@@ -212,6 +175,12 @@ document.addEventListener('keydown', function(event) {
             const fixturesToUpdate = [];
             const labelChanges = new Map();
             const channelChanges = new Map();
+            const historyEntry = {
+                type: 'paste',
+                fixtures: [],
+                channelChanges: new Map(),
+                labelChanges: new Map()
+            };
 
             if (selectedFixtures.size > 0) {
                 selectedFixtures.forEach(fixtureStart => {
@@ -229,15 +198,27 @@ document.addEventListener('keydown', function(event) {
                                         initialValue: faderValues[idx],
                                         targetValue: value
                                     });
+                                    historyEntry.channelChanges.set(idx, {
+                                        initialValue: faderValues[idx],
+                                        targetValue: value
+                                    });
                                 }
                             }
                         });
                         fixturesToUpdate.push(fixture);
+                        historyEntry.fixtures.push(fixture.from);
                         const labelState = copiedFixtureData.labels.get(fixtureStart) || copiedFixtureData.labels.values().next().value;
                         if (labelState) {
+                            const currentState = labelBackgroundStates.get(`label-${fixtureStart}`);
                             labelChanges.set(fixtureStart, {
                                 hex: labelState.hex,
                                 opacity: labelState.opacity
+                            });
+                            historyEntry.labelChanges.set(fixtureStart, {
+                                initialHex: currentState?.hex || '#333333',
+                                initialOpacity: currentState?.currentOpacity || 0,
+                                targetHex: labelState.hex,
+                                targetOpacity: labelState.opacity
                             });
                         }
                     }
@@ -257,12 +238,21 @@ document.addEventListener('keydown', function(event) {
                                 initialValue: faderValues[idx],
                                 targetValue: copiedChannel.value
                             });
+                            historyEntry.channelChanges.set(idx, {
+                                initialValue: faderValues[idx],
+                                targetValue: copiedChannel.value
+                            });
+                            if (!historyEntry.fixtures.includes(fixture.from)) {
+                                historyEntry.fixtures.push(fixture.from);
+                            }
                         }
                     }
                 });
             }
 
-            fadeChannelsAndLabels(channelChanges, labelChanges, fixturesToUpdate);
+            fadeChannelsAndLabels(channelChanges, labelChanges, fixturesToUpdate, () => {
+                saveToHistory(historyEntry);
+            });
             createFaders();
             updateFixtureLabelGrid();
             if (!animationFrameId) {
@@ -689,7 +679,7 @@ document.addEventListener('keydown', function(event) {
             step = 32;
         } else if (event.altKey) {
             step = 13;
-        } else {
+        } else { 
             step = 6;
         }
 
@@ -713,6 +703,12 @@ document.addEventListener('keydown', function(event) {
         }
 
         if (targetChannels.length === 0) return;
+
+        const historyEntry = {
+            type: 'slider',
+            channels: [],
+            fixtures: []
+        };
 
         targetChannels.forEach(ch => {
             const idx = ch - 1;

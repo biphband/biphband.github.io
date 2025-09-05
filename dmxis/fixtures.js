@@ -100,6 +100,32 @@ const fixtureParameters = {
         { name: '-', abbr: '-' },
         { name: '-', abbr: '-' },
         { name: '-', abbr: '-' }
+    ],
+    'Auditorium Flood': [
+        { name: 'Shutter', abbr: '(💡)' },
+        { name: 'White', abbr: '⚪️' },
+        { name: 'Warm', abbr: '🟡' },
+        { name: 'Strobe', abbr: '⚡' },
+    ],
+    'AuditoriumLED': [
+        { name: 'Shutter', abbr: '(💡)' },
+        { name: 'Strobe', abbr: '⚡' },
+        { name: 'Macros', abbr: '▶️' },
+        { name: 'Macro Speed', abbr: '⏩' },
+        { name: 'Red', abbr: '🔴' },
+        { name: 'Green', abbr: '🟢' },
+        { name: 'Blue', abbr: '🔵' },
+        { name: 'White', abbr: '⚪️' }
+    ],
+    'AuditoriumLEDrow2': [
+        { name: 'Shutter', abbr: '(💡)' },
+        { name: 'Strobe', abbr: '⚡' },
+        { name: 'Macros', abbr: '▶️' },
+        { name: 'Macro Speed', abbr: '⏩' },
+        { name: 'Red', abbr: '🔴' },
+        { name: 'Green', abbr: '🟢' },
+        { name: 'Blue', abbr: '🔵' },
+        { name: 'White', abbr: '⚪️' }
     ]
 };
 
@@ -159,8 +185,17 @@ const blackBoxFixtures = [
 ];
 
 const auditoriumFixtures = [
-    { name: "New lights were installed in the auditorium.", type: 'LED', from: 1, to: 16 },
-    { name: "They have yet to be configured / mapped.", type: 'LED', from: 17, to: 32 }
+    { name: "Row 1 Floods", type: 'Auditorium Flood', from: 9, to: 12 },
+    { name: "Row 2 Floods", type: 'Auditorium Flood', from: 20, to: 23 },
+    { name: "LED 1", type: 'AuditoriumLED', from: 101, to: 108 },
+    { name: "LED 2", type: 'AuditoriumLED', from: 109, to: 116 },
+    { name: "LED 3", type: 'AuditoriumLED', from: 117, to: 124 },
+    { name: "LED 4", type: 'AuditoriumLED', from: 125, to: 132 },
+    { name: "LED 5", type: 'AuditoriumLED', from: 133, to: 140 },
+    { name: "LED 6", type: 'AuditoriumLED', from: 141, to: 148 },
+    { name: "LED 7", type: 'AuditoriumLED', from: 149, to: 156 },
+    { name: "LED 8", type: 'AuditoriumLED', from: 157, to: 164 },
+    { name: "LED Row 2", type: 'AuditoriumLEDrow2', from: 1, to: 8 }
 ];
 
 const mobileFixtures = [
