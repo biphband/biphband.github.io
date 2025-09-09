@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basic Chromatic Tuner</title>
+    <title>Tuner</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Courier New', monospace;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -15,139 +15,543 @@
             background-color: #f0f0f0;
         }
         .tuner {
-            text-align: center;
-            padding: 20px;
-            background-color: white;
+            width: 400px;
+            height: 250px;
+            background-color: #333;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .lcd-screen {
+            flex-grow: 1;
+            background-color: #152a13;
+            border: 2px solid #0f1e0d;
+            border-radius: 5px;
+            padding: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .lcd-screen.on {
+            background-color: #1d3b1a;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+        #note, #frequency {
+            color: #4CAF50;
+            text-shadow: 0 0 5px #4CAF50;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .lcd-screen.on #note, .lcd-screen.on #frequency {
+            opacity: 1;
         }
         #note {
             font-size: 48px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
         #frequency {
             font-size: 24px;
-            color: #666;
         }
-        #start-btn {
-            margin-top: 20px;
-            padding: 10px 20px;
+        .needle {
+            width: 4px;
+            height: 80px;
+            background-color: #4CAF50;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform-origin: bottom center;
+            transition: transform 0.1s ease-out;
+            opacity: 0;
+        }
+        .lcd-screen.on .needle {
+            opacity: 1;
+            box-shadow: 0 0 5px rgba(76,175,80,0.5);
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .leds {
+            display: flex;
+            justify-content: space-between;
+            width: 100px;
+        }
+        .led {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #222;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+        .led.active.left { background-color: #ff4136; box-shadow: 0 0 10px #ff4136; }
+        .led.active.center { background-color: #2ecc40; box-shadow: 0 0 10px #2ecc40; }
+        .led.active.right { background-color: #ff4136; box-shadow: 0 0 10px #ff4136; }
+        #power-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #222;
+            color: #666;
+            border: none;
+            cursor: pointer;
             font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+        #power-btn.on {
             background-color: #4CAF50;
             color: white;
+            box-shadow: 0 0 15px #4CAF50;
+        }
+        .tone-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .tone-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #222;
+            color: #666;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .tone-btn.active {
+            background-color: #4CAF50;
+            color: white;
+            box-shadow: 0 0 15px #4CAF50;
+        }
+        .speaker {
+            width: 60px;
+            height: 30px;
+            background-color: #222;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        .speaker::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            background: repeating-linear-gradient(
+                90deg,
+                #333,
+                #333 2px,
+                #222 2px,
+                #222 4px
+            );
+            border-radius: 10px;
+        }
+        .logo {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 50px; /* Adjust as needed */
+            height: auto;
+            opacity: 0;
+            transition: opacity 0.3s ease, filter 0.3s ease;
+        }
+        .lcd-screen.on .logo {
+            opacity: 1;
+            filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(250%) hue-rotate(86deg) brightness(90%) contrast(119%) drop-shadow(0 0 5px #4caf4f96);
+        }
+        .tuner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .graph-container {
+            width: 400px;
+            height: 100px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #pitch-graph {
+            width: 100%;
+            height: 100%;
+        }
+        .center-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            border-top: 2px dashed #4CAF50;
+            opacity: 0.5;
         }
     </style>
 </head>
 <body>
+  <div class="tuner-container">
+    <div class="key-selector">
+      <span>I play a</span>
+      <select id="key-selector">
+        <option value="C">C</option>
+        <option value="Bb">Bb</option>
+        <option value="Eb">Eb</option>
+        <option value="F">F</option>
+      </select>
+      <span> instrument.</span>
+    </div>
     <div class="tuner">
+      <div class="lcd-screen">
+        <img src="https://cdn.glitch.global/0982cfbf-0488-4e50-a4b7-558f05a7fa19/BG%20white%20on%20transparent.png?v=1726567296619" alt="Logo" class="logo">
         <div id="note">-</div>
         <div id="frequency">- Hz</div>
-        <button id="start-btn">Start Tuner</button>
+        <div class="needle"></div>
+      </div>
+      <div class="controls">
+        <div class="tone-buttons">
+          <button class="tone-btn" id="a-btn">A</button>
+          <button class="tone-btn" id="bb-btn">Bb</button>
+        </div>
+        <div class="leds">
+          <div class="led left"></div>
+          <div class="led center"></div>
+          <div class="led right"></div>
+        </div>
+        <div class="speaker"></div>
+        <button id="power-btn">⏻</button>
+      </div>
     </div>
+    <div class="graph-container">
+      <canvas id="pitch-graph"></canvas>
+    </div>
+  </div>
 
     <script>
         const noteElement = document.getElementById('note');
-        const frequencyElement = document.getElementById('frequency');
-        const startButton = document.getElementById('start-btn');
+    const frequencyElement = document.getElementById('frequency');
+    const powerButton = document.getElementById('power-btn');
+    const needle = document.querySelector('.needle');
+    const leds = document.querySelectorAll('.led');
+    const aBtn = document.getElementById('a-btn');
+    const bbBtn = document.getElementById('bb-btn');
+    const lcdScreen = document.querySelector('.lcd-screen');
+    const keySelector = document.getElementById('key-selector');
+    const instrumentSentence = document.getElementById('instrument-sentence');
 
-        const A4 = 440;
-        const SEMITONE = Math.pow(2, 1/12);
-        const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    let audioContext;
+    let analyser;
+    let isOn = false;
+    let oscillator;
 
-        let audioContext;
-        let analyser;
+    const graphCanvas = document.getElementById('pitch-graph');
+    const graphCtx = graphCanvas.getContext('2d');
+    graphCanvas.width = 400;
+    graphCanvas.height = 100;
+    const graphWidth = graphCanvas.width;
+    const graphHeight = graphCanvas.height;
+    const pitchHistory = [];
+    const maxHistoryLength = 100;
 
-        startButton.addEventListener('click', async () => {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                analyser = audioContext.createAnalyser();
-                analyser.fftSize = 2048;
+    let lastCents = 0;
+    let lastDisplayedCents = 0;
 
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    const source = audioContext.createMediaStreamSource(stream);
-                    source.connect(analyser);
-                    updatePitch();
-                } catch (error) {
-                    console.error('Error accessing microphone:', error);
-                    noteElement.textContent = 'Error';
-                    frequencyElement.textContent = 'Microphone access denied';
-                }
-            }
-        });
+    // Smoothing parameters
+    const smoothingBuffer = [];
+    const smoothingBufferSize = 15; // Increased buffer size for more smoothing
+    let emaCents = 0; // Exponential Moving Average (EMA) for cents
+    const emaAlpha = 0.1; // Smoothing factor for EMA (lower = smoother)
 
-        function updatePitch() {
-            const bufferLength = analyser.fftSize;
-            const buffer = new Float32Array(bufferLength);
-            analyser.getFloatTimeDomainData(buffer);
+    // Key adjustments
+    const keyAdjustments = {
+      C: 0,
+      Bb: 2,
+      Eb: -9,
+      F: -5,
+    };
 
-            const ac = autoCorrelate(buffer, audioContext.sampleRate);
+    function updateInstrumentSentence() {
+    const keySelector = document.getElementById('key-selector');
+    const selectedKey = keySelector.value;
+    const article = ['A', 'E', 'I', 'O', 'U'].includes(selectedKey[0]) ? 'an' : 'a';
+    keySelector.previousElementSibling.textContent = `I play ${article} `;
+}
 
-            if (ac !== -1) {
-                const note = frequencyToNote(ac);
-                noteElement.textContent = note;
-                frequencyElement.textContent = `${ac.toFixed(1)} Hz`;
-            } else {
-                noteElement.textContent = '-';
-                frequencyElement.textContent = '- Hz';
-            }
+    keySelector.addEventListener('change', () => {
+      updateInstrumentSentence();
+    });
 
-            requestAnimationFrame(updatePitch);
+    powerButton.addEventListener('click', async () => {
+      if (!isOn) {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          analyser = audioContext.createAnalyser();
+          analyser.fftSize = 2048;
+
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const source = audioContext.createMediaStreamSource(stream);
+            source.connect(analyser);
+          } catch (error) {
+            console.error('Error accessing microphone:', error);
+            noteElement.textContent = 'Error';
+            frequencyElement.textContent = 'Microphone access denied';
+            return;
+          }
+        }
+        isOn = true;
+        powerButton.classList.add('on');
+        lcdScreen.classList.add('on');
+        document.querySelector('.logo').style.opacity = '1';
+        updatePitch();
+      } else {
+        isOn = false;
+        powerButton.classList.remove('on');
+        lcdScreen.classList.remove('on');
+        document.querySelector('.logo').style.opacity = '0';
+        noteElement.textContent = '-';
+        frequencyElement.textContent = '- Hz';
+        updateNeedle(0);
+        updateLEDs(0);
+        stopTone();
+      }
+    });
+
+    function updatePitch() {
+      if (!isOn) return;
+
+      const bufferLength = analyser.fftSize;
+      const buffer = new Float32Array(bufferLength);
+      analyser.getFloatTimeDomainData(buffer);
+
+      const ac = autoCorrelate(buffer, audioContext.sampleRate);
+
+      if (ac !== -1 && !isNaN(ac)) {
+        const adjustedFrequency = adjustFrequencyBySelectedKey(ac);
+        const note = frequencyToNote(adjustedFrequency);
+        const cents = getCents(adjustedFrequency, note);
+
+        // Apply smoothing to the pitch data
+        smoothingBuffer.push(cents);
+        if (smoothingBuffer.length > smoothingBufferSize) {
+          smoothingBuffer.shift();
+        }
+        const smoothedCents = smoothingBuffer.reduce((a, b) => a + b, 0) / smoothingBuffer.length;
+
+        // Apply Exponential Moving Average (EMA) for additional smoothing
+        emaCents = emaAlpha * smoothedCents + (1 - emaAlpha) * (emaCents || smoothedCents);
+
+        // Update display only if the change is significant
+        if (Math.abs(emaCents - lastDisplayedCents) > 5) {
+          noteElement.textContent = note;
+          frequencyElement.textContent = `${adjustedFrequency.toFixed(1)} Hz`;
+          updateNeedle(emaCents);
+          updateLEDs(emaCents);
+          lastDisplayedCents = emaCents;
         }
 
-        function autoCorrelate(buffer, sampleRate) {
-            const SIZE = buffer.length;
-            const MAX_SAMPLES = Math.floor(SIZE/2);
-            let bestOffset = -1;
-            let bestCorrelation = 0;
-            let rms = 0;
-            let foundGoodCorrelation = false;
+        // Always update the graph
+        updateGraph(emaCents);
+      } else {
+        noteElement.textContent = '-';
+        frequencyElement.textContent = '- Hz';
+        updateNeedle(0);
+        updateLEDs(0);
+        updateGraph(null);
+      }
 
-            for (let i = 0; i < SIZE; i++) {
-                const val = buffer[i];
-                rms += val * val;
-            }
-            rms = Math.sqrt(rms / SIZE);
+      requestAnimationFrame(updatePitch);
+    }
 
-            if (rms < 0.01) return -1;
+    function adjustFrequencyBySelectedKey(frequency) {
+      const selectedKey = keySelector.value;
+      const adjustment = keyAdjustments[selectedKey];
+      const adjustedFrequency = frequency * Math.pow(2, adjustment / 12);
+      return adjustedFrequency;
+    }
 
-            for (let offset = 0; offset < MAX_SAMPLES; offset++) {
-                let correlation = 0;
+    function updateNeedle(cents) {
+      const angle = Math.max(-45, Math.min(45, cents / 2));
+      needle.style.transform = `rotate(${angle}deg)`;
+    }
 
-                for (let i = 0; i < MAX_SAMPLES; i++) {
-                    correlation += Math.abs((buffer[i]) - (buffer[i + offset]));
-                }
-
-                correlation = 1 - (correlation / MAX_SAMPLES);
-
-                if (correlation > bestCorrelation) {
-                    bestCorrelation = correlation;
-                    bestOffset = offset;
-                }
-
-                if (correlation > 0.9) {
-                    foundGoodCorrelation = true;
-                } else if (foundGoodCorrelation) {
-                    break;
-                }
-            }
-
-            if (bestCorrelation > 0.01) {
-                return sampleRate / bestOffset;
-            }
-            return -1;
+    function updateLEDs(cents) {
+      leds.forEach(led => led.classList.remove('active'));
+      if (isOn) {
+        if (Math.abs(cents) < 2) {
+          leds[1].classList.add('active');
+        } else if (cents < 0) {
+          leds[0].classList.add('active');
+        } else {
+          leds[2].classList.add('active');
         }
+      }
+    }
 
-        function frequencyToNote(frequency) {
-            const halfStepsBelowA4 = Math.round(12 * Math.log2(frequency / A4));
-            const octave = Math.floor((halfStepsBelowA4 + 57) / 12);
-            const noteIndex = (halfStepsBelowA4 + 57) % 12;
-            return NOTES[noteIndex] + octave;
+    function playTone(frequency) {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (oscillator) {
+        oscillator.stop();
+      }
+      oscillator = audioContext.createOscillator();
+      oscillator.type = 'square';
+      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      oscillator.connect(audioContext.destination);
+      oscillator.start();
+    }
+
+    function stopTone() {
+      if (oscillator) {
+        oscillator.stop();
+        oscillator = null;
+      }
+    }
+
+    aBtn.addEventListener('click', () => {
+      if (aBtn.classList.contains('active')) {
+        aBtn.classList.remove('active');
+        stopTone();
+      } else {
+        aBtn.classList.add('active');
+        bbBtn.classList.remove('active');
+        playTone(440);
+      }
+    });
+
+    bbBtn.addEventListener('click', () => {
+      if (bbBtn.classList.contains('active')) {
+        bbBtn.classList.remove('active');
+        stopTone();
+      } else {
+        bbBtn.classList.add('active');
+        aBtn.classList.remove('active');
+        playTone(466.16); // Bb4 frequency
+      }
+    });
+
+    function autoCorrelate(buffer, sampleRate) {
+      const SIZE = buffer.length;
+      const MAX_SAMPLES = Math.floor(SIZE / 2);
+      let best_offset = -1;
+      let best_correlation = 0;
+      let rms = 0;
+      let foundGoodCorrelation = false;
+      let correlations = new Array(MAX_SAMPLES);
+
+      for (let i = 0; i < SIZE; i++) {
+        let val = buffer[i];
+        rms += val * val;
+      }
+      rms = Math.sqrt(rms / SIZE);
+      if (rms < 0.01) return -1;
+
+      let lastCorrelation = 1;
+      for (let offset = 0; offset < MAX_SAMPLES; offset++) {
+        let correlation = 0;
+
+        for (let i = 0; i < MAX_SAMPLES; i++) {
+          correlation += Math.abs((buffer[i]) - (buffer[i + offset]));
         }
+        correlation = 1 - (correlation / MAX_SAMPLES);
+        correlations[offset] = correlation;
+
+        if ((correlation > 0.9) && (correlation > lastCorrelation)) {
+          foundGoodCorrelation = true;
+          if (correlation > best_correlation) {
+            best_correlation = correlation;
+            best_offset = offset;
+          }
+        } else if (foundGoodCorrelation) {
+          let shift = (correlations[best_offset + 1] - correlations[best_offset - 1]) / correlations[best_offset];
+          return sampleRate / (best_offset + (8 * shift));
+        }
+        lastCorrelation = correlation;
+      }
+      if (best_correlation > 0.01) {
+        return sampleRate / best_offset;
+      }
+      return -1;
+    }
+
+    function frequencyToNote(frequency) {
+      const noteNames = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+      const c0 = 16.35;
+      const halfSteps = Math.round(12 * Math.log2(frequency / c0));
+      const octave = Math.floor(halfSteps / 12);
+      const noteIndex = halfSteps % 12;
+      return noteNames[noteIndex] + octave;
+    }
+
+    function getCents(frequency, note) {
+      const expectedFrequency = getFrequencyFromNote(note);
+      return 1200 * Math.log2(frequency / expectedFrequency);
+    }
+
+    function getFrequencyFromNote(note) {
+      const noteNames = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+      const octave = parseInt(note.slice(-1));
+      const noteName = note.slice(0, -1);
+      const semitones = noteNames.indexOf(noteName);
+      const A4 = 440;
+      return A4 * Math.pow(2, (semitones - 9) / 12 + (octave - 4));
+    }
+
+    function updateGraph(cents) {
+      pitchHistory.push(cents);
+      if (pitchHistory.length > maxHistoryLength) {
+        pitchHistory.shift();
+      }
+
+      graphCtx.clearRect(0, 0, graphWidth, graphHeight);
+
+      // Draw center line
+      graphCtx.beginPath();
+      graphCtx.strokeStyle = '#4CAF50';
+      graphCtx.setLineDash([5, 5]);
+      graphCtx.moveTo(0, graphHeight / 2);
+      graphCtx.lineTo(graphWidth, graphHeight / 2);
+      graphCtx.stroke();
+      graphCtx.setLineDash([]);
+
+      // Draw pitch history
+      graphCtx.beginPath();
+      graphCtx.strokeStyle = '#2196F3';
+      graphCtx.lineWidth = 2;
+
+      for (let i = 0; i < pitchHistory.length; i++) {
+        const x = (i / maxHistoryLength) * graphWidth;
+        const y = pitchHistory[i] === null ? graphHeight / 2 : graphHeight / 2 - (pitchHistory[i] / 100) * (graphHeight / 2);
+        if (i === 0) {
+          graphCtx.moveTo(x, y);
+        } else {
+          graphCtx.lineTo(x, y);
+        }
+      }
+
+      graphCtx.stroke();
+
+      // Add gradient
+      const gradient = graphCtx.createLinearGradient(0, 0, 0, graphHeight);
+      gradient.addColorStop(0, 'rgba(33, 150, 243, 0.2)');
+      gradient.addColorStop(1, 'rgba(33, 150, 243, 0)');
+
+      graphCtx.fillStyle = gradient;
+      graphCtx.lineTo(graphWidth, graphHeight);
+      graphCtx.lineTo(0, graphHeight);
+      graphCtx.closePath();
+      graphCtx.fill();
+    }
+
+    // Initialize the instrument sentence on page load
+    updateInstrumentSentence();
     </script>
 </body>
 </html>
