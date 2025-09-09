@@ -64,7 +64,7 @@
       border-radius: 6px; 
       padding: 12px 20px; 
       font-size: 1.1rem;
-      margin: 2px;
+      margin-right: 10px;
       touch-action: manipulation;
     }
 
@@ -75,7 +75,7 @@
     }
 
     :root {
-      --logo-size: 150px; /* Adjust this value to change logo size */
+      --logo-size: 150px;
     }
 
     .logo {
@@ -85,6 +85,10 @@
       top: -0px;
       right: 16px;
       object-fit: contain;
+    }
+
+    .instrument-group {
+      margin-bottom: 16px;
     }
   </style>
 </head>
@@ -98,107 +102,81 @@
   <script>
     const pdfFiles = {
       Strings: [
-        'Violin_1_Parts.pdf',
-        'Violin_2_Parts.pdf',
-        'Violin_3_Parts.pdf',
-        'Cello_1_Parts.pdf',
-        'Cello_2_Parts.pdf',
-        'Contrabass_1_Parts.pdf',
-        'Contrabass_2_Parts.pdf'
+        ['Violin_1_Parts.pdf', 'Violin_2_Parts.pdf', 'Violin_3_Parts.pdf'],
+        ['Cello_1_Parts.pdf', 'Cello_2_Parts.pdf'],
+        ['Contrabass_1_Parts.pdf', 'Contrabass_2_Parts.pdf']
       ],
       Woodwind: [
-        'Piccolo_Parts.pdf',
-        'Flute_1_Parts.pdf',
-        'Flute_2_Parts.pdf',
-        'Flute_3_Parts.pdf',
-        'Oboe_Parts.pdf',
-        'Clarinet_1_Parts.pdf',
-        'Clarinet_2_Parts.pdf',
-        'Clarinet_3_Parts.pdf',
-        'Alto_sax_1_Parts.pdf',
-        'Alto_sax_2_Parts.pdf',
-        'Alto_sax_3_Parts.pdf',
-        'Tenor_Saxophone_Parts.pdf',
-        'Bass_clarinet_Parts.pdf',
-        'Bassoon_Parts.pdf'
+        ['Piccolo_Parts.pdf', 'Flute_1_Parts.pdf', 'Flute_2_Parts.pdf', 'Flute_3_Parts.pdf'],
+        ['Oboe_Parts.pdf'],
+        ['Clarinet_1_Parts.pdf', 'Clarinet_2_Parts.pdf', 'Clarinet_3_Parts.pdf'],
+        ['Bass_clarinet_Parts.pdf', 'Bassoon_Parts.pdf'],
+        ['Alto_sax_1_Parts.pdf', 'Alto_sax_2_Parts.pdf', 'Tenor_Saxophone_Parts.pdf']
       ],
       Brass: [
-        'Trumpet_Parts.pdf',
-        'Trumpet_1_Parts.pdf',
-        'Trumpet_2_Parts.pdf',
-        'Trumpet_3_Parts.pdf',
-        'Horn_1_Parts.pdf',
-        'Horn_2_Parts.pdf',
-        'Trombone_Parts.pdf',
-        'Trombone_1_Parts.pdf',
-        'Trombone_2_Parts.pdf',
-        'Euphonium_Parts.pdf',
-        'Tuba_Parts.pdf'
+        ['Trumpet_1_Parts.pdf', 'Trumpet_2_Parts.pdf'],
+        ['Horn_1_Parts.pdf', 'Horn_2_Parts.pdf'],
+        ['Trombone_Parts.pdf', 'Euphonium_Parts.pdf'],
+        ['Tuba_Parts.pdf']
       ],
       Percussion: [
-        'Glockenspiel_Parts.pdf',
-        'Vibraphone_Parts.pdf',
-        'Marimba_Parts.pdf',
-        'Timpani_Parts.pdf',
-        'Triangle_Parts.pdf',
-        'Tambourine_Parts.pdf',
-        'Bass_drum_Parts.pdf',
-        'Cymbal_Parts.pdf',
-        'Aux_perc_1_Parts.pdf',
-        'Aux_perc_2_Parts.pdf',
-        'Sleigh_bells_Parts.pdf',
-        'Piano_Parts.pdf'
+        ['Glockenspiel_Parts.pdf', 'Vibraphone_Parts.pdf', 'Marimba_Parts.pdf'],
+        ['Aux_perc_1_Parts.pdf', 'Aux_perc_2_Parts.pdf'],
+        ['Timpani_Parts.pdf', 'Piano_Parts.pdf']
       ],
       Other: [
-        'Conductor_Parts.pdf',
-        'Seating_Chart.pdf'
+        ['Conductor_Parts.pdf', 'Seating_Chart.pdf']
       ]
     };
 
     const instrumentSelection = document.getElementById('instrument-selection');
 
-    // Display instrument selection
     function showInstrumentSelection() {
       instrumentSelection.innerHTML = '';
-      for (const [family, instruments] of Object.entries(pdfFiles)) {
-        if (instruments.length === 0) continue;
+      for (const [family, groups] of Object.entries(pdfFiles)) {
+        if (groups.flat().length === 0) continue;
         const familyDiv = document.createElement('div');
         familyDiv.className = 'family-section';
         familyDiv.innerHTML = `<h3 class="family-title">${family}</h3>`;
-        const buttonGrid = document.createElement('div');
-        buttonGrid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4';
-        instruments.forEach(file => {
-          const instrument = file.replace('_Parts.pdf', '').replace(/_/g, ' ').replace('.pdf', '');
-          const btn = document.createElement('button');
-          btn.className = 'btn';
-          btn.textContent = instrument;
-          ['click', 'touchstart'].forEach(eventType => {
-            btn.addEventListener(eventType, (e) => {
-              e.preventDefault();
-              displayContent(file);
+        groups.forEach((instruments) => {
+          const groupDiv = document.createElement('div');
+          groupDiv.className = 'instrument-group grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4';
+          instruments.forEach(file => {
+            let instrument = file.replace('_Parts.pdf', '').replace(/_/g, ' ').replace('.pdf', '');
+            if (instrument === 'Tenor Saxophone') {
+              instrument = 'Tenor Sax';
+            }
+            instrument = instrument.split(' ').map(word => 
+              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            ).join(' ');
+            const btn = document.createElement('button');
+            btn.className = 'btn';
+            btn.textContent = instrument;
+            ['click', 'touchstart'].forEach(eventType => {
+              btn.addEventListener(eventType, (e) => {
+                e.preventDefault();
+                displayContent(file);
+              });
             });
+            groupDiv.appendChild(btn);
           });
-          buttonGrid.appendChild(btn);
+          familyDiv.appendChild(groupDiv);
         });
-        // Add logo to the 'Other' family section
         if (family === 'Other') {
           const logo = document.createElement('img');
           logo.src = 'logo.png';
           logo.className = 'logo';
           familyDiv.appendChild(logo);
         }
-        familyDiv.appendChild(buttonGrid);
         instrumentSelection.appendChild(familyDiv);
       }
     }
 
-    // Display content (Open PDF in current window)
     function displayContent(file) {
       const filePath = `scores/${file}`;
       window.location.href = filePath;
     }
 
-    // Initialize instrument selection
     showInstrumentSelection();
   </script>
 </body>
