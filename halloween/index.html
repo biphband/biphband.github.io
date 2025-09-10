@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Halloween 2025</title>
+  <link href="/tailwind.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to bottom, #e6e6fa, #f0f8ff);
+      background-image: url('background.jpg');
+      background-attachment: fixed;
+      background-size: cover; 
+      background-position: center;
+      font-family: 'Roboto', sans-serif;
+      min-height: 100vh; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: 80%;
+      background-color: rgba(0, 0, 0, 0.2); 
+      border-radius: 8px;
+      padding: 26px;
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between; 
+    }
+
+    h1 {
+      color: white; 
+      font-family: 'Zapfino', cursive; 
+      font-size: clamp(2rem, 4vw, 3rem); 
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: -6vw;
+    }
+
+    .family-section { 
+      background: rgba(0, 0, 0, 0.5); 
+      border-radius: 8px; 
+      margin-top: 38px; 
+      padding: 16px; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+      position: relative; 
+    }
+
+    .family-title { 
+      font-size: 1.5rem; 
+      font-weight: 300; 
+      margin-top: 2px; 
+      margin-bottom: 12px; 
+      color: #ffffff; 
+    }
+
+    .btn { 
+      transition: all 0.2s ease; 
+      background-color: #c0750b; 
+      color: rgb(255, 255, 255); 
+      border: 1px solid #332404; 
+      border-radius: 6px; 
+      padding: 12px 20px; 
+      font-size: 1.1rem;
+      margin-right: 10px;
+      touch-action: manipulation;
+    }
+
+    .btn:hover { 
+      background-color: #cfa22f; 
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+    }
+
+    :root {
+      --logo-size: 150px;
+    }
+
+    .logo {
+      width: var(--logo-size);
+      height: var(--logo-size);
+      position: absolute;
+      top: -0px;
+      right: 16px;
+      object-fit: contain;
+    }
+
+    .instrument-group {
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mx-auto flex flex-col justify-center min-h-screen">
+    <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">Halloween 2025</h1>
+
+    <div id="instrument-selection" class="space-y-6 mb-8"></div>
+  </div>
+
+  <script>
+    const pdfFiles = {
+      Strings: [
+        ['Violin_1_Parts.pdf', 'Violin_2_Parts.pdf', 'Violin_3_Parts.pdf'],
+        ['Cello_1_Parts.pdf', 'Cello_2_Parts.pdf'],
+        ['Contrabass_1_Parts.pdf', 'Contrabass_2_Parts.pdf']
+      ],
+      Woodwind: [
+        ['Piccolo_Parts.pdf', 'Flute_1_Parts.pdf', 'Flute_2_Parts.pdf', 'Flute_3_Parts.pdf'],
+        ['Clarinet_1_Parts.pdf', 'Clarinet_2_Parts.pdf', 'Clarinet_3_Parts.pdf'],
+        ['Bass_clarinet_Parts.pdf', 'Bassoon_Parts.pdf'],
+        ['Alto_sax_1_Parts.pdf', 'Alto_sax_2_Parts.pdf', 'Tenor_Saxophone_Parts.pdf']
+      ],
+      Brass: [
+        ['Trumpet_1_Parts.pdf', 'Trumpet_2_Parts.pdf'],
+        ['Horn_1_Parts.pdf', 'Horn_2_Parts.pdf'],
+        ['Trombone_Parts.pdf', 'Euphonium_Parts.pdf'],
+        ['Tuba_Parts.pdf']
+      ],
+      Percussion: [
+        ['Glockenspiel_Parts.pdf', 'Vibraphone_Parts.pdf', 'Marimba_Parts.pdf'],
+        ['Aux_perc_1_Parts.pdf', 'Aux_perc_2_Parts.pdf'],
+        ['Timpani_Parts.pdf', 'Piano_Parts.pdf']
+      ],
+      Other: [
+        ['Conductor_Parts.pdf', 'Seating_Chart.pdf']
+      ]
+    };
+
+    const instrumentSelection = document.getElementById('instrument-selection');
+
+    function showInstrumentSelection() {
+      instrumentSelection.innerHTML = '';
+      for (const [family, groups] of Object.entries(pdfFiles)) {
+        if (groups.flat().length === 0) continue;
+        const familyDiv = document.createElement('div');
+        familyDiv.className = 'family-section';
+        familyDiv.innerHTML = `<h3 class="family-title">${family}</h3>`;
+        groups.forEach((instruments) => {
+          const groupDiv = document.createElement('div');
+          groupDiv.className = 'instrument-group grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4';
+          instruments.forEach(file => {
+            let instrument = file.replace('_Parts.pdf', '').replace(/_/g, ' ').replace('.pdf', '');
+            if (instrument === 'Tenor Saxophone') {
+              instrument = 'Tenor Sax';
+            }
+            instrument = instrument.split(' ').map(word => 
+              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            ).join(' ');
+            const btn = document.createElement('button');
+            btn.className = 'btn';
+            btn.textContent = instrument;
+            ['click', 'touchstart'].forEach(eventType => {
+              btn.addEventListener(eventType, (e) => {
+                e.preventDefault();
+                displayContent(file);
+              });
+            });
+            groupDiv.appendChild(btn);
+          });
+          familyDiv.appendChild(groupDiv);
+        });
+        if (family === 'Other') {
+          const logo = document.createElement('img');
+          logo.src = 'logo.png';
+          logo.className = 'logo';
+          familyDiv.appendChild(logo);
+        }
+        instrumentSelection.appendChild(familyDiv);
+      }
+    }
+
+    function displayContent(file) {
+      const filePath = `scores/${file}`;
+      window.location.href = filePath;
+    }
+
+    showInstrumentSelection();
+  </script>
+</body>
+</html>
