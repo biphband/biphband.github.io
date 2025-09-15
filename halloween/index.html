@@ -24,6 +24,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      overflow-x: hidden; /* Prevent horizontal scrolling */
+      overflow-y: auto; /* Allow vertical scrolling */
     }
 
     .container {
@@ -38,15 +40,17 @@
       padding-top: 0px; 
       padding-bottom: 100px;
       position: relative; 
+      overflow: hidden; /* Hide overflow within container */
     }
 
     h1 {
       color: white; 
       font-family: 'Zapfino', cursive; 
-      font-size: clamp(2rem, 4vw, 3rem); 
+      font-size: clamp(1.5rem, 3vw, 2.5rem); /* Smaller font on narrow viewports */
       text-align: center;
       margin-top: 20px; 
-      margin-bottom: -70px;
+      margin-bottom: -50px;
+      white-space: nowrap; /* Prevent line breaks */
     }
 
     .family-section { 
@@ -73,11 +77,14 @@
       border: 1px solid #332404; 
       border-radius: 6px; 
       padding: 12px 20px; 
-      font-size: 1.1rem;
+      font-size: clamp(0.9rem, 2.5vw, 1.1rem); /* Responsive button text size */
       touch-action: manipulation;
       flex: 1; 
       min-width: 80px; 
       text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .btn:hover { 
