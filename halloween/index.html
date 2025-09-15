@@ -8,6 +8,11 @@
   <link href="/tailwind.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    @font-face {
+      font-family: 'Zapfino';
+      src: url('../fonts/Zapfino.ttf') format('truetype');
+    }
+
     body {
       background: linear-gradient(to bottom, #e6e6fa, #f0f8ff);
       background-image: url('background.jpg'); 
@@ -107,14 +112,144 @@
       width: 100%;
       margin-right: 0; 
     }
+
+    .hamburger-menu {
+      position: absolute;
+      margin-left: 7px;
+      top: 20px;
+      left: 13px;
+      z-index: 1000;
+    }
+
+    .menu-toggle {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      width: 30px;
+      height: 25px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 20;
+      z-index: 1001;
+    }
+
+    .menu-toggle span {
+      width: 30px;
+      height: 3px;
+      background: white;
+      border-radius: 10px;
+      transition: all 0.3s linear;
+    }
+
+    .menu-toggle.open span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .menu-toggle.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-toggle.open span:nth-child(3) {
+      transform: rotate(-45deg) translate(7px, -7px);
+    }
+
+    .menu-items {
+      position: absolute;
+      top: 25px;
+      left: -250px;
+      background: linear-gradient(135deg, rgba(48, 67, 104, 0.8), rgba(20, 31, 53, 0.8));
+      width: 250px;
+      height: 90vh;
+      padding-top: 20px;
+      transition: all 0.3s ease-in-out;
+      opacity: 0;
+    }
+
+    .menu-items.show {
+      left: 0;
+      opacity: 1;
+    }
+
+    .menu-items a {
+      display: block;
+      padding: 10px 20px;
+      color: white;
+      text-decoration: none;
+      transition: background-color 0.2s;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    }
+
+    .menu-items.show a {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .menu-items a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .menu-items a:nth-child(1) { transition-delay: 0.1s; }
+    .menu-items a:nth-child(2) { transition-delay: 0.2s; }
+    .menu-items a:nth-child(3) { transition-delay: 0.3s; }
+    .menu-items a:nth-child(4) { transition-delay: 0.4s; }
+    .menu-items a:nth-child(5) { transition-delay: 0.5s; }
+    .menu-items a:nth-child(6) { transition-delay: 0.6s; }
+    .menu-items a:nth-child(7) { transition-delay: 0.7s; }
+    .menu-items a:nth-child(8) { transition-delay: 0.8s; }
+    .menu-items a:nth-child(9) { transition-delay: 0.9s; }
+    .menu-items a:nth-child(10) { transition-delay: 1.0s; }
+    .menu-items a:nth-child(11) { transition-delay: 1.1s; }
+
+    .menu-title {
+      text-align: center;
+      color: white;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .menu-footer {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 12px;
+    }
+
+    .qr-image {
+      display: block;
+      margin: 0 auto 5px;
+      width: 130px;
+      height: auto;
+    }
   </style>
 </head>
 <body>
+  <div class="hamburger-menu">
+    <menubutton class="menu-toggle" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </menubutton>
+    <div class="menu-items" id="menu-items">
+      <div class="menu-title">BIPH Music</div>
+      <a href="https://biphband.github.io/">Home</a>
+      <a href="https://biphband.github.io/halloween/">Halloween</a>
+      <a href="https://biphband.github.io/thenutcracker/">The Nutcracker</a>
+      <a href="https://biphband.github.io/tuner/">Tuner</a>
+      <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
+      <div class="menu-footer"><img src="../qr.png" alt="QR Code" class="qr-image">© Garrison Tubbs 2025</div>
+    </div>
+  </div>
+
   <div class="container mx-auto flex flex-col justify-center min-h-screen">
     <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">Halloween 2025</h1>
 
     <div id="instrument-selection" class="space-y-6 mb-8"></div>
-    <img src="logo.png" class="logo">
+    <img src="../logo.png" class="logo">
   </div>
 
   <script>
@@ -188,6 +323,23 @@
       const filePath = `Halloween_Parts/${file}`;
       window.location.href = filePath;
     }
+
+    // Hamburger menu functionality
+    const menuToggle = document.querySelector('.menu-toggle');
+    const menuItems = document.querySelector('.menu-items');
+    
+    menuToggle.addEventListener('click', () => {
+      menuToggle.classList.toggle('open');
+      menuItems.classList.toggle('show');
+    });
+    
+    // Close the menu when clicking outside
+    document.addEventListener('click', (event) => {
+      if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
+        menuToggle.classList.remove('open');
+        menuItems.classList.remove('show');
+      }
+    });
 
     showInstrumentSelection();
   </script>
