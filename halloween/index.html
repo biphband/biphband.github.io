@@ -9,7 +9,7 @@
   <style>
     body {
       background: linear-gradient(to bottom, #e6e6fa, #f0f8ff);
-      background-image: url('background.jpg');
+      background-image: url('background.jpg'); 
       background-attachment: fixed;
       background-size: cover; 
       background-position: center;
@@ -22,12 +22,16 @@
 
     .container {
       width: 80%;
-      background-color: rgba(0, 0, 0, 0.2); 
+      max-width: 800px; 
+      background-color: rgba(255, 255, 255, 0.2); 
       border-radius: 8px;
       padding: 26px;
       display: flex; 
       flex-direction: column; 
       justify-content: space-between; 
+      padding-top: 0px; 
+      padding-bottom: 100px;
+      position: relative; 
     }
 
     h1 {
@@ -35,12 +39,12 @@
       font-family: 'Zapfino', cursive; 
       font-size: clamp(2rem, 4vw, 3rem); 
       text-align: center;
-      margin-top: 0;
-      margin-bottom: -6vw;
+      margin-top: 20px; 
+      margin-bottom: -70px;
     }
 
     .family-section { 
-      background: rgba(0, 0, 0, 0.5); 
+      background: rgba(255, 255, 255, 0.5); 
       border-radius: 8px; 
       margin-top: 38px; 
       padding: 16px; 
@@ -49,11 +53,11 @@
     }
 
     .family-title { 
-      font-size: 1.5rem; 
-      font-weight: 300; 
+      font-size: 1.25rem; 
+      font-weight: 700; 
       margin-top: 2px; 
       margin-bottom: 12px; 
-      color: #ffffff; 
+      color: #1f2937; 
     }
 
     .btn { 
@@ -64,8 +68,10 @@
       border-radius: 6px; 
       padding: 12px 20px; 
       font-size: 1.1rem;
-      margin-right: 10px;
       touch-action: manipulation;
+      flex: 1; 
+      min-width: 80px; 
+      text-align: center;
     }
 
     .btn:hover { 
@@ -82,13 +88,23 @@
       width: var(--logo-size);
       height: var(--logo-size);
       position: absolute;
-      top: -0px;
-      right: 16px;
+      bottom: -30px; 
+      right: 25px; 
       object-fit: contain;
     }
 
     .instrument-group {
       margin-bottom: 16px;
+      display: flex;
+      flex-wrap: nowrap; 
+      gap: 16px; 
+      padding: 8px; 
+      overflow-x: auto; 
+    }
+
+    .instrument-group:has(:only-child) .btn {
+      width: 100%;
+      margin-right: 0; 
     }
   </style>
 </head>
@@ -97,34 +113,36 @@
     <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">Halloween 2025</h1>
 
     <div id="instrument-selection" class="space-y-6 mb-8"></div>
+    <img src="logo.png" class="logo">
   </div>
 
   <script>
     const pdfFiles = {
       Strings: [
-        ['Violin_1_Parts.pdf', 'Violin_2_Parts.pdf', 'Violin_3_Parts.pdf'],
-        ['Cello_1_Parts.pdf', 'Cello_2_Parts.pdf'],
-        ['Contrabass_1_Parts.pdf', 'Contrabass_2_Parts.pdf']
+        ['Halloween_Violin_1_Parts.pdf', 'Halloween_Violin_2_Parts.pdf', 'Halloween_Violin_3_Parts.pdf'],
+        ['Halloween_Cello_1_Parts.pdf', 'Halloween_Cello_2_Parts.pdf'],
+        ['Halloween_Contrabass_1_Parts.pdf', 'Halloween_Contrabass_2_Parts.pdf']
       ],
       Woodwind: [
-        ['Piccolo_Parts.pdf', 'Flute_1_Parts.pdf', 'Flute_2_Parts.pdf', 'Flute_3_Parts.pdf'],
-        ['Clarinet_1_Parts.pdf', 'Clarinet_2_Parts.pdf', 'Clarinet_3_Parts.pdf'],
-        ['Bass_clarinet_Parts.pdf', 'Bassoon_Parts.pdf'],
-        ['Alto_sax_1_Parts.pdf', 'Alto_sax_2_Parts.pdf', 'Tenor_Saxophone_Parts.pdf']
+        ['Halloween_Piccolo_Parts.pdf', 'Halloween_Flute_1_Parts.pdf'],
+        ['Halloween_Flute_2_Parts.pdf', 'Halloween_Flute_3_Parts.pdf'],
+        ['Halloween_Clarinet_1_Parts.pdf', 'Halloween_Clarinet_2_Parts.pdf', 'Halloween_Clarinet_3_Parts.pdf'],
+        ['Halloween_Bass_clarinet_Parts.pdf', 'Halloween_Bassoon_Parts.pdf'],
+        ['Halloween_Alto_sax_1_Parts.pdf', 'Halloween_Alto_sax_2_Parts.pdf', 'Halloween_Tenor_Saxophone_Parts.pdf']
       ],
       Brass: [
-        ['Trumpet_1_Parts.pdf', 'Trumpet_2_Parts.pdf'],
-        ['Horn_1_Parts.pdf', 'Horn_2_Parts.pdf'],
-        ['Trombone_Parts.pdf', 'Euphonium_Parts.pdf'],
-        ['Tuba_Parts.pdf']
+        ['Halloween_Trumpet_1_Parts.pdf', 'Halloween_Trumpet_2_Parts.pdf'],
+        ['Halloween_Horn_1_Parts.pdf', 'Halloween_Horn_2_Parts.pdf'],
+        ['Halloween_Trombone_Parts.pdf', 'Halloween_Euphonium_Parts.pdf'],
+        ['Halloween_Tuba_Parts.pdf']
       ],
       Percussion: [
-        ['Glockenspiel_Parts.pdf', 'Vibraphone_Parts.pdf'],
-        ['Aux_perc_1_Parts.pdf', 'Aux_perc_2_Parts.pdf'],
-        ['Timpani_Parts.pdf', 'Piano_Parts.pdf']
+        ['Halloween_Glockenspiel_Parts.pdf', 'Halloween_Vibraphone_Parts.pdf'],
+        ['Halloween_Aux_perc_1_Parts.pdf', 'Halloween_Aux_perc_2_Parts.pdf'],
+        ['Halloween_Timpani_Parts.pdf', 'Halloween_Piano_Parts.pdf']
       ],
       Other: [
-        ['Conductor_Parts.pdf', 'Seating_Chart.pdf']
+        ['Halloween_Conductor_Parts.pdf', 'Halloween_Seating_Chart.pdf']
       ]
     };
 
@@ -139,9 +157,9 @@
         familyDiv.innerHTML = `<h3 class="family-title">${family}</h3>`;
         groups.forEach((instruments) => {
           const groupDiv = document.createElement('div');
-          groupDiv.className = 'instrument-group grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4';
+          groupDiv.className = 'instrument-group';
           instruments.forEach(file => {
-            let instrument = file.replace('_Parts.pdf', '').replace(/_/g, ' ').replace('.pdf', '');
+            let instrument = file.replace('Halloween_', '').replace('_Parts.pdf', '').replace(/_/g, ' ').replace('.pdf', '');
             if (instrument === 'Tenor Saxophone') {
               instrument = 'Tenor Sax';
             }
@@ -161,18 +179,12 @@
           });
           familyDiv.appendChild(groupDiv);
         });
-        if (family === 'Other') {
-          const logo = document.createElement('img');
-          logo.src = 'logo.png';
-          logo.className = 'logo';
-          familyDiv.appendChild(logo);
-        }
         instrumentSelection.appendChild(familyDiv);
       }
     }
 
     function displayContent(file) {
-      const filePath = `scores/${file}`;
+      const filePath = `Halloween_Parts/${file}`;
       window.location.href = filePath;
     }
 
