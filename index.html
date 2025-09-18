@@ -23,18 +23,18 @@
         }
 
         .background {
-    position: fixed;
-    opacity: 0.05;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('backgroundimage.png');
-    background-size: 140% auto; 
-    background-position: center center; 
-    background-repeat: no-repeat;
-    z-index: -3;
-}
+            position: fixed;
+            opacity: 0.05;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('backgroundimage.png');
+            background-size: 140% auto; 
+            background-position: center center; 
+            background-repeat: no-repeat;
+            z-index: -3;
+        }
         .blue-overlay {
             position: fixed;
             top: 0;
@@ -108,9 +108,20 @@
         .Subtitle {
             font-family: 'Zapfino', sans-serif;
             color: white;
-            margin-top: -0.7em;
             font-size: 2.5rem;
             text-align: center;
+            margin-top: 0;
+            padding-top: 0.5em;
+        }
+
+        /* Ensure separation on wide screens */
+        @media screen and (min-width: 1200px) {
+            .Title {
+                margin-bottom: 20px;
+            }
+            .Subtitle {
+                padding-top: 0.8em;
+            }
         }
 
         .hamburger-menu {
@@ -236,6 +247,7 @@
             font-family: 'Andika', sans-serif;
             font-size: 1.5rem;
             color: white;
+            z-index: 10;
             text-decoration: none;
             background: linear-gradient(135deg, rgba(35, 102, 147, 0.8), rgba(48, 63, 108, 0.8));
             border: 2px solid #ffffff;
@@ -244,6 +256,7 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             min-width: 200px;
             text-align: center;
+            position: relative;
         }
 
         .button:hover {
@@ -255,6 +268,49 @@
         .button:active {
             transform: translateY(0);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            left: 10%; 
+            width: 80%; 
+            background: #2d4677; 
+            border: 1.5px solid #000000; 
+            border-radius: 0 0 25px 25px;
+            overflow: hidden;
+            z-index: 0;
+            opacity: 0;
+            transform: translateY(-100%); 
+            transition: opacity 1s ease, transform 1s ease; /* 1s duration for both */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .dropdown-content.show {
+            opacity: 1;
+            transform: translateY(-15px);
+        }
+
+        .dropdown-content a {
+            display: block;
+            padding: 10px 30px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-content a:not(:last-child) {
+            border-bottom: 1.5px solid #000000;
         }
     </style>
 </head>
@@ -286,7 +342,13 @@
 
     <div class="container">
         <a href="https://biphband.github.io/halloween/" class="button">Halloween Music</a>
-        <a href="https://biphband.github.io/thenutcracker/" class="button">The Nutcracker</a>
+        <div class="dropdown">
+            <a href="#" class="button" onclick="toggleDropdown()">The Nutcracker</a>
+            <div class="dropdown-content" id="nutcrackerDropdown">
+                <a href="https://biphband.github.io/thenutcracker/">Sheet Music</a>
+                <a href="https://biphband.github.io/practicetracks/">Practice Tracks</a>
+            </div>
+        </div>
     </div>
 
     <div class="logocontainer">        
@@ -308,6 +370,29 @@
             if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
                 menuToggle.classList.remove('open');
                 menuItems.classList.remove('show');
+            }
+        });
+
+        // Dropdown menu functionality for Nutcracker button
+        function toggleDropdown() {
+            const dropdown = document.getElementById('nutcrackerDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside or on the button
+        document.addEventListener('click', (event) => {
+            const dropdown = document.getElementById('nutcrackerDropdown');
+            const button = dropdown.previousElementSibling;
+            if (!dropdown.contains(event.target) && !button.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Close dropdown when pressing Escape
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                const dropdown = document.getElementById('nutcrackerDropdown');
+                dropdown.classList.remove('show');
             }
         });
     </script>
