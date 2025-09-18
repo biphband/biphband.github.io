@@ -544,66 +544,66 @@
   </div>
 
   <script>
-    const instruments = {
-      Strings: [
-        ['The Nutcracker_Violin_1_Parts.pdf', 'The Nutcracker_Violin_2_Parts.pdf', 'The Nutcracker_Violin_3_Parts.pdf'],
-        ['The Nutcracker_Cello_1_Parts.pdf', 'The Nutcracker_Cello_2_Parts.pdf'],
-        ['The Nutcracker_Contrabass_1_Parts.pdf', 'The Nutcracker_Contrabass_2_Parts.pdf']
-      ],
-      Woodwind: [
-        ['The Nutcracker_Piccolo_Parts.pdf', 'The Nutcracker_Flute_1_Parts.pdf'],
-        ['The Nutcracker_Flute_2_Parts.pdf', 'The Nutcracker_Flute_3_Parts.pdf'],
-        ['The Nutcracker_Clarinet_1_Parts.pdf', 'The Nutcracker_Clarinet_2_Parts.pdf', 'The Nutcracker_Clarinet_3_Parts.pdf'],
-        ['The Nutcracker_Bass_clarinet_Parts.pdf', 'The Nutcracker_Bassoon_Parts.pdf'],
-        ['The Nutcracker_Alto_sax_1_Parts.pdf', 'The Nutcracker_Alto_sax_2_Parts.pdf', 'The Nutcracker_Tenor_Saxophone_Parts.pdf']
-      ],
-      Brass: [
-        ['The Nutcracker_Trumpet_1_Parts.pdf', 'The Nutcracker_Trumpet_2_Parts.pdf'],
-        ['The Nutcracker_Horn_1_Parts.pdf', 'The Nutcracker_Horn_2_Parts.pdf'],
-        ['The Nutcracker_Trombone_Parts.pdf', 'The Nutcracker_Euphonium_Parts.pdf'],
-        ['The Nutcracker_Tuba_Parts.pdf']
-      ],
-      Percussion: [
-        ['The Nutcracker_Glockenspiel_Parts.pdf', 'The Nutcracker_Vibraphone_Parts.pdf'],
-        ['The Nutcracker_Aux_perc_1_Parts.pdf', 'The Nutcracker_Aux_perc_2_Parts.pdf'],
-        ['The Nutcracker_Timpani_Parts.pdf', 'The Nutcracker_Piano_Parts.pdf']
-      ],
-      Other: [
-        ['The Nutcracker_Conductor_Parts.pdf']
-      ]
-    };
+   const instruments = {
+  Strings: [
+    ['The Nutcracker_Violin_1_Parts.pdf', 'The Nutcracker_Violin_2_Parts.pdf', 'The Nutcracker_Violin_3_Parts.pdf'],
+    ['The Nutcracker_Cello_1_Parts.pdf', 'The Nutcracker_Cello_2_Parts.pdf'],
+    ['The Nutcracker_Contrabass_1_Parts.pdf', 'The Nutcracker_Contrabass_2_Parts.pdf']
+  ],
+  Woodwind: [
+    ['The Nutcracker_Piccolo_Parts.pdf', 'The Nutcracker_Flute_1_Parts.pdf'],
+    ['The Nutcracker_Flute_2_Parts.pdf', 'The Nutcracker_Flute_3_Parts.pdf'],
+    ['The Nutcracker_Clarinet_1_Parts.pdf', 'The Nutcracker_Clarinet_2_Parts.pdf', 'The Nutcracker_Clarinet_3_Parts.pdf'],
+    ['The Nutcracker_Bass_clarinet_Parts.pdf', 'The Nutcracker_Bassoon_Parts.pdf'],
+    ['The Nutcracker_Alto_sax_1_Parts.pdf', 'The Nutcracker_Alto_sax_2_Parts.pdf', 'The Nutcracker_Tenor_Saxophone_Parts.pdf']
+  ],
+  Brass: [
+    ['The Nutcracker_Trumpet_1_Parts.pdf', 'The Nutcracker_Trumpet_2_Parts.pdf'],
+    ['The Nutcracker_Horn_1_Parts.pdf', 'The Nutcracker_Horn_2_Parts.pdf'],
+    ['The Nutcracker_Trombone_Parts.pdf', 'The Nutcracker_Euphonium_Parts.pdf'],
+    ['The Nutcracker_Tuba_Parts.pdf']
+  ],
+  Percussion: [
+    ['The Nutcracker_Glockenspiel_Parts.pdf', 'The Nutcracker_Vibraphone_Parts.pdf'],
+    ['The Nutcracker_Aux_perc_1_Parts.pdf', 'The Nutcracker_Aux_perc_2_Parts.pdf'],
+    ['The Nutcracker_Timpani_Parts.pdf', 'The Nutcracker_Piano_Parts.pdf']
+  ],
+  Other: [
+    ['The Nutcracker_Conductor_Parts.pdf']
+  ]
+};
 
-    const songList = [
-      '[ACT 1]',
-      'Overture',
-      'Scene 1',
-      'March',
-      "Children's Gallop",
-      'Arrival of Drosselmeyer',
-      'Grandfather Waltz',
-      'Clara and the Nutcracker',
-      'The Battle',
-      'A Pine Forest in Winter',
-      'Waltz of the Snowflakes',
-      '[ACT 2]',
-      'The Enchanted Palace',
-      'Arrival of Clara and Prince',
-      'Spanish Dance',
-      'Arabian Dance',
-      'Chinese Dance',
-      'Russian Dance',
-      'Dance of the Reed Flutes',
-      'Mother Ginger',
-      'Waltz of the Flowers',
-      'Intrada',
-      'Tarantella',
-      'Dance of the Sugar Plum Fairy',
-      'Coda',
-      'Final Waltz'
-    ];
+const songList = [
+  '[ACT 1]',
+  'Overture',
+  'Scene 1',
+  'March',
+  "Children's Gallop",
+  'Arrival of Drosselmeyer',
+  'Grandfather Waltz',
+  'Clara and the Nutcracker',
+  'The Battle',
+  'A Pine Forest in Winter',
+  'Waltz of the Snowflakes',
+  '[ACT 2]',
+  'The Enchanted Palace',
+  'Arrival of Clara and Prince',
+  'Spanish Dance',
+  'Arabian Dance',
+  'Chinese Dance',
+  'Russian Dance',
+  'Dance of the Reed Flutes',
+  'Mother Ginger',
+  'Waltz of the Flowers',
+  'Intrada',
+  'Tarantella',
+  'Dance of the Sugar Plum Fairy',
+  'Coda',
+  'Final Waltz'
+];
 
-    const availableSongs = [
-  'Overture', 
+const availableSongs = [
+  'Overture',
   'Scene 1',
   'March',
   'Arabian Dance',
@@ -614,160 +614,209 @@
   'Dance of the Sugar Plum Fairy'
 ];
 
-    const songs = {
-      'Overture': [{ name: 'm1', time: 0 }],
-      'Scene 1': [{ name: 'm1', time: 0 }],
-      'March': [{ name: 'm1', time: 0 }, { name: 'm10', time: 20 }],
-      "Children's Gallop": [{ name: 'm1', time: 0 }],
-      'Arrival of Drosselmeyer': [{ name: 'm1', time: 0 }],
-      'Grandfather Waltz': [{ name: 'm1', time: 0 }],
-      'Clara and the Nutcracker': [{ name: 'm1', time: 0 }],
-      'The Battle': [{ name: 'm1', time: 0 }],
-      'A Pine Forest in Winter': [{ name: 'm1', time: 0 }],
-      'Waltz of the Snowflakes': [{ name: 'm1', time: 0 }],
-      'The Enchanted Palace': [{ name: 'm1', time: 0 }],
-      'Arrival of Clara and Prince': [{ name: 'm1', time: 0 }],
-      'Spanish Dance': [{ name: 'm1', time: 0 }],
-      'Arabian Dance': [{ name: 'm1', time: 0 }],
-      'Chinese Dance': [{ name: 'm1', time: 0 }],
-      'Russian Dance': [{ name: 'm1', time: 0 }],
-      'Dance of the Reed Flutes': [{ name: 'm1', time: 0 }],
-      'Mother Ginger': [{ name: 'm1', time: 0 }],
-      'Waltz of the Flowers': [{ name: 'm1', time: 0 }],
-      'Intrada': [{ name: 'm1', time: 0 }],
-      'Tarantella': [{ name: 'm1', time: 0 }],
-      'Dance of the Sugar Plum Fairy': [{ name: 'm1', time: 0 }, { name: 'm15', time: 30 }],
-      'Coda': [{ name: 'm1', time: 0 }],
-      'Final Waltz': [{ name: 'm1', time: 0 }]
-    };
+const songs = {
+  'Overture': [{ name: 'm1', time: 0 }],
+  'Scene 1': [{ name: 'm1', time: 0 }],
+  'March': [{ name: 'm1', time: 0 }, { name: 'm10', time: 20 }],
+  "Children's Gallop": [{ name: 'm1', time: 0 }],
+  'Arrival of Drosselmeyer': [{ name: 'm1', time: 0 }],
+  'Grandfather Waltz': [{ name: 'm1', time: 0 }],
+  'Clara and the Nutcracker': [{ name: 'm1', time: 0 }],
+  'The Battle': [{ name: 'm1', time: 0 }],
+  'A Pine Forest in Winter': [{ name: 'm1', time: 0 }],
+  'Waltz of the Snowflakes': [{ name: 'm1', time: 0 }],
+  'The Enchanted Palace': [{ name: 'm1', time: 0 }],
+  'Arrival of Clara and Prince': [{ name: 'm1', time: 0 }],
+  'Spanish Dance': [{ name: 'm1', time: 0 }],
+  'Arabian Dance': [{ name: 'm1', time: 0 }],
+  'Chinese Dance': [{ name: 'm1', time: 0 }],
+  'Russian Dance': [{ name: 'm1', time: 0 }],
+  'Dance of the Reed Flutes': [{ name: 'm1', time: 0 }],
+  'Mother Ginger': [{ name: 'm1', time: 0 }],
+  'Waltz of the Flowers': [{ name: 'm1', time: 0 }],
+  'Intrada': [{ name: 'm1', time: 0 }],
+  'Tarantella': [{ name: 'm1', time: 0 }],
+  'Dance of the Sugar Plum Fairy': [{ name: 'm1', time: 0 }, { name: 'm15', time: 30 }],
+  'Coda': [{ name: 'm1', time: 0 }],
+  'Final Waltz': [{ name: 'm1', time: 0 }]
+};
 
-    const instrumentSelection = document.getElementById('instrument-selection');
-    const songSelection = document.getElementById('song-selection');
-    const playerSection = document.getElementById('player-section');
-    const playerTitle = document.getElementById('player-title');
-    const waveformContainer = document.getElementById('waveform');
-    const measureListContainer = document.getElementById('measure-list-container');
-    const playPauseBtn = document.getElementById('play-pause');
-    const speedSelect = document.getElementById('speed');
-    const currentTimeDisplay = document.getElementById('current-time');
-    const totalTimeDisplay = document.getElementById('total-time');
-    const zoomInBtn = document.getElementById('zoom-in');
-    const zoomOutBtn = document.getElementById('zoom-out');
-    const songBackBtn = document.getElementById('song-back-btn');
-    let zoomLevel = 1;
-    let selectedInstrument = '';
-    let selectedSong = '';
+const instrumentSelection = document.getElementById('instrument-selection');
+const songSelection = document.getElementById('song-selection');
+const playerSection = document.getElementById('player-section');
+const playerTitle = document.getElementById('player-title');
+const waveformContainer = document.getElementById('waveform');
+const measureListContainer = document.getElementById('measure-list-container');
+const playPauseBtn = document.getElementById('play-pause');
+const speedSelect = document.getElementById('speed');
+const currentTimeDisplay = document.getElementById('current-time');
+const totalTimeDisplay = document.getElementById('total-time');
+const zoomInBtn = document.getElementById('zoom-in');
+const zoomOutBtn = document.getElementById('zoom-out');
+const songBackBtn = document.getElementById('song-back-btn');
+let zoomLevel = 1;
+let selectedInstrument = '';
+let selectedSong = '';
 
-    const wavesurferPart = WaveSurfer.create({
-      container: '#waveform',
-      waveColor: '#6b8299',
-      progressColor: '#5e768e',
-      cursorColor: '#d0d0d0',
-      barWidth: 2,
-      height: 100,
-      responsive: true,
-      backgroundColor: '#2a3b4c',
-      normalize: true,
-      scrollParent: false
-    });
+// Initialize Web Audio API context
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let partCompressor, partGain, combinedCompressor, combinedGain;
 
-    const wavesurferCombined = WaveSurfer.create({
-      container: '#waveform',
-      waveColor: 'rgba(107, 130, 153, 0.5)',
-      progressColor: 'rgba(94, 118, 142, 0.5)',
-      cursorColor: '#d0d0d0',
-      barWidth: 2,
-      height: 100,
-      responsive: true,
-      backgroundColor: 'transparent',
-      normalize: true,
-      scrollParent: false
-    });
+const wavesurferPart = WaveSurfer.create({
+  container: '#waveform',
+  waveColor: '#6b8299',
+  progressColor: '#5e768e',
+  cursorColor: '#d0d0d0',
+  barWidth: 2,
+  height: 100,
+  responsive: true,
+  backgroundColor: '#2a3b4c',
+  normalize: true,
+  scrollParent: false,
+  audioContext: audioContext,
+  audioRate: 1
+});
 
-    const loadingOverlay = document.createElement('div');
-    loadingOverlay.className = 'loading-overlay';
-    loadingOverlay.textContent = 'Loading audio...';
-    waveformContainer.appendChild(loadingOverlay);
+const wavesurferCombined = WaveSurfer.create({
+  container: '#waveform',
+  waveColor: 'rgba(107, 130, 153, 0.5)',
+  progressColor: 'rgba(94, 118, 142, 0.5)',
+  cursorColor: '#d0d0d0',
+  barWidth: 2,
+  height: 100,
+  responsive: true,
+  backgroundColor: 'transparent',
+  normalize: true,
+  scrollParent: false,
+  audioContext: audioContext,
+  audioRate: 1
+});
 
-    /* Added to check if audio files exist */
-    async function checkFileExists(url) {
-      console.log(`Checking file existence: ${url}`);
-      try {
-        const response = await fetch(url, { method: 'HEAD' });
-        console.log(`File ${url} exists: ${response.ok}`);
-        return response.ok;
-      } catch (error) {
-        console.error(`Error checking file ${url}:`, error);
-        return false;
-      }
-    }
+const loadingOverlay = document.createElement('div');
+loadingOverlay.className = 'loading-overlay';
+loadingOverlay.textContent = 'Loading audio...';
+waveformContainer.appendChild(loadingOverlay);
 
-    function showInstrumentSelection() {
-      instrumentSelection.style.display = 'block';
-      songSelection.style.display = 'none';
-      playerSection.style.display = 'none';
-      /* Added to clear URL when returning to instrument selection */
-      history.pushState({}, '', window.location.pathname);
-      instrumentSelection.innerHTML = '';
-      for (const [family, groups] of Object.entries(instruments)) {
-        if (groups.flat().length === 0) continue;
-        const familyDiv = document.createElement('div');
-        familyDiv.className = 'family-section';
-        familyDiv.innerHTML = `<h3 class="family-title">${family}</h3>`;
-        groups.forEach((instruments) => {
-          const groupDiv = document.createElement('div');
-          groupDiv.className = 'instrument-group';
-          instruments.forEach(file => {
-            let instrument = file.replace('The Nutcracker_', '').replace('_Parts.pdf', '').replace(/_/g, ' ');
-            if (instrument === 'Tenor Saxophone') {
-              instrument = 'Tenor Sax';
-            }
-            instrument = instrument.split(' ').map(word =>
-              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            ).join(' ');
-            const btn = document.createElement('button');
-            btn.className = 'btn';
-            btn.textContent = instrument;
-            ['click', 'touchstart'].forEach(eventType => {
-              btn.addEventListener(eventType, (e) => {
-                e.preventDefault();
-                selectedInstrument = file.replace('The Nutcracker_', '').replace('_Parts.pdf', '');
-                showSongSelection();
-              });
-            });
-            groupDiv.appendChild(btn);
-          });
-          familyDiv.appendChild(groupDiv);
-        });
-        if (family === 'Other') {
-          const seatingChartBtn = document.createElement('button');
-          seatingChartBtn.className = 'btn';
-          seatingChartBtn.textContent = 'Seating Chart';
-          ['click', 'touchstart'].forEach(eventType => {
-            seatingChartBtn.addEventListener(eventType, (e) => {
-              e.preventDefault();
-              alert('Seating Chart has not yet been finalized for this performance.');
-            });
-          });
-          const groupDiv = document.createElement('div');
-          groupDiv.className = 'instrument-group';
-          groupDiv.appendChild(seatingChartBtn);
-          familyDiv.appendChild(groupDiv);
+// Setup audio processing chain
+function setupAudioProcessing() {
+  // Compressor and gain for part audio
+  partCompressor = audioContext.createDynamicsCompressor();
+  partCompressor.threshold.setValueAtTime(-24, audioContext.currentTime); // Start compression at -24 dB
+  partCompressor.knee.setValueAtTime(10, audioContext.currentTime); // Soft knee
+  partCompressor.ratio.setValueAtTime(4, audioContext.currentTime); // 4:1 compression
+  partCompressor.attack.setValueAtTime(0.003, audioContext.currentTime); // 3ms attack
+  partCompressor.release.setValueAtTime(0.2, audioContext.currentTime); // 200ms release
+
+  partGain = audioContext.createGain();
+  partGain.gain.setValueAtTime(2, audioContext.currentTime); // +6 dB gain (2x linear)
+
+  // Compressor and gain for combined audio
+  combinedCompressor = audioContext.createDynamicsCompressor();
+  combinedCompressor.threshold.setValueAtTime(-24, audioContext.currentTime);
+  combinedCompressor.knee.setValueAtTime(10, audioContext.currentTime);
+  combinedCompressor.ratio.setValueAtTime(4, audioContext.currentTime);
+  combinedCompressor.attack.setValueAtTime(0.003, audioContext.currentTime);
+  combinedCompressor.release.setValueAtTime(0.2, audioContext.currentTime);
+
+  combinedGain = audioContext.createGain();
+  combinedGain.gain.setValueAtTime(0.08 * 2, audioContext.currentTime); // +6 dB on top of existing -20 dB (0.08)
+
+  // Connect WaveSurfer outputs to the processing chain
+  wavesurferPart.on('ready', () => {
+    const partSource = wavesurferPart.backend.getAudioNode();
+    partSource.disconnect();
+    partSource.connect(partCompressor);
+    partCompressor.connect(partGain);
+    partGain.connect(audioContext.destination);
+  });
+
+  wavesurferCombined.on('ready', () => {
+    const combinedSource = wavesurferCombined.backend.getAudioNode();
+    combinedSource.disconnect();
+    combinedSource.connect(combinedCompressor);
+    combinedCompressor.connect(combinedGain);
+    combinedGain.connect(audioContext.destination);
+  });
+}
+
+// Initialize audio processing
+setupAudioProcessing();
+
+async function checkFileExists(url) {
+  console.log(`Checking file existence: ${url}`);
+  try {
+    const response = await fetch(url, { method: 'HEAD' });
+    console.log(`File ${url} exists: ${response.ok}`);
+    return response.ok;
+  } catch (error) {
+    console.error(`Error checking file ${url}:`, error);
+    return false;
+  }
+}
+
+function showInstrumentSelection() {
+  instrumentSelection.style.display = 'block';
+  songSelection.style.display = 'none';
+  playerSection.style.display = 'none';
+  history.pushState({}, '', window.location.pathname);
+  instrumentSelection.innerHTML = '';
+  for (const [family, groups] of Object.entries(instruments)) {
+    if (groups.flat().length === 0) continue;
+    const familyDiv = document.createElement('div');
+    familyDiv.className = 'family-section';
+    familyDiv.innerHTML = `<h3 class="family-title">${family}</h3>`;
+    groups.forEach((instruments) => {
+      const groupDiv = document.createElement('div');
+      groupDiv.className = 'instrument-group';
+      instruments.forEach(file => {
+        let instrument = file.replace('The Nutcracker_', '').replace('_Parts.pdf', '').replace(/_/g, ' ');
+        if (instrument === 'Tenor Saxophone') {
+          instrument = 'Tenor Sax';
         }
-        instrumentSelection.appendChild(familyDiv);
-      }
+        instrument = instrument.split(' ').map(word =>
+          word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ');
+        const btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.textContent = instrument;
+        ['click', 'touchstart'].forEach(eventType => {
+          btn.addEventListener(eventType, (e) => {
+            e.preventDefault();
+            selectedInstrument = file.replace('The Nutcracker_', '').replace('_Parts.pdf', '');
+            showSongSelection();
+          });
+        });
+        groupDiv.appendChild(btn);
+      });
+      familyDiv.appendChild(groupDiv);
+    });
+    if (family === 'Other') {
+      const seatingChartBtn = document.createElement('button');
+      seatingChartBtn.className = 'btn';
+      seatingChartBtn.textContent = 'Seating Chart';
+      ['click', 'touchstart'].forEach(eventType => {
+        seatingChartBtn.addEventListener(eventType, (e) => {
+          e.preventDefault();
+          alert('Seating Chart has not yet been finalized for this performance.');
+        });
+      });
+      const groupDiv = document.createElement('div');
+      groupDiv.className = 'instrument-group';
+      groupDiv.appendChild(seatingChartBtn);
+      familyDiv.appendChild(groupDiv);
     }
+    instrumentSelection.appendChild(familyDiv);
+  }
+}
 
-    async function showSongSelection() {
+async function showSongSelection() {
   instrumentSelection.style.display = 'none';
   songSelection.style.display = 'block';
   playerSection.style.display = 'none';
-  /* Added to update URL with selected instrument */
   history.pushState({}, '', `?instrument=${encodeURIComponent(selectedInstrument)}`);
   songSelection.innerHTML = '';
   const familyDiv = document.createElement('div');
   familyDiv.className = 'family-section';
-  /* Added back button to replace Select Song title */
   const backBtn = document.createElement('button');
   backBtn.id = 'instrument-back-btn';
   backBtn.className = 'btn back-btn';
@@ -801,10 +850,9 @@
       const btn = document.createElement('button');
       btn.className = 'btn';
       btn.textContent = song;
-      /* Added to disable buttons for songs without audio files; WOTF is Waltz of the Flowers, DOTSPF is Dance of the Sugar Plum Fairy */
       const songFileName = song === 'Waltz of the Flowers' ? 'WOTF' : 
                           song === 'Dance of the Sugar Plum Fairy' ? 'DOTSPF' : 
-                          song === 'Nutcracker Overture' ? 'Nutcracker Overture' : 
+                          song === 'Overture' ? 'Nutcracker Overture' : 
                           song;
       const partFile = `practicetracks/${songFileName}-${selectedInstrument}.mp3`;
       const combinedFile = `practicetracks/${songFileName}.mp3`;
@@ -846,13 +894,9 @@ async function showPlayer() {
     liEl.textContent = marker.name;
     liEl.addEventListener('click', () => {
       const time = parseFloat(marker.time);
-      wavesurferPart.setTime(time);
-      wavesurferCombined.setTime(time);
+      syncSetTime(time);
       updateTimeDisplay();
-      wavesurferPart.play();
-      wavesurferCombined.play();
-      playPauseBtn.classList.add('playing');
-      playPauseBtn.textContent = 'Pause';
+      syncPlay();
     });
     ulEl.appendChild(liEl);
   });
@@ -875,7 +919,6 @@ async function showPlayer() {
   if (combinedExists) {
     console.log(`Loading combined audio: ${combinedFile}`);
     wavesurferCombined.load(combinedFile);
-    wavesurferCombined.setVolume(0.08);
   }
   if (!partExists && !combinedExists) {
     loadingOverlay.style.display = 'flex';
@@ -899,239 +942,251 @@ async function showPlayer() {
   }, 0);
 }
 
-    wavesurferPart.on('ready', () => {
-      console.log('Part waveform ready');
-      const duration = wavesurferPart.getDuration();
-      const containerWidth = waveformContainer.clientWidth;
-      const initialPxPerSec = containerWidth / duration;
-      wavesurferPart.zoom(initialPxPerSec);
-      wavesurferCombined.zoom(initialPxPerSec);
-      zoomLevel = 1;
-      loadingOverlay.style.display = 'none';
-      totalTimeDisplay.textContent = formatTime(duration);
-      updateTimeDisplay();
-    });
+function syncSetTime(time) {
+  wavesurferPart.setTime(time);
+  wavesurferCombined.setTime(time);
+}
 
-    wavesurferCombined.on('ready', () => {
-      console.log('Combined waveform ready');
-      loadingOverlay.style.display = 'none';
-    });
+function syncPlay() {
+  wavesurferPart.play();
+  wavesurferCombined.play();
+  playPauseBtn.classList.add('playing');
+  playPauseBtn.textContent = 'Pause';
+}
 
-    /* Updated to prevent persistent error messages */
-    wavesurferPart.on('error', (err) => {
-      console.error('WaveSurfer Part Error:', err);
-      if (!wavesurferCombined.isReady()) {
-        loadingOverlay.textContent = 'Part audio not available';
-      }
-    });
+function syncPause() {
+  wavesurferPart.pause();
+  wavesurferCombined.pause();
+  playPauseBtn.classList.remove('playing');
+  playPauseBtn.textContent = 'Play';
+}
 
-    wavesurferCombined.on('error', (err) => {
-      console.error('WaveSurfer Combined Error:', err);
-      if (!wavesurferPart.isReady()) {
-        loadingOverlay.textContent = 'Combined audio not available';
-      }
-    });
+wavesurferPart.on('ready', () => {
+  console.log('Part waveform ready');
+  const duration = wavesurferPart.getDuration();
+  const containerWidth = waveformContainer.clientWidth;
+  const initialPxPerSec = containerWidth / duration;
+  wavesurferPart.zoom(initialPxPerSec);
+  wavesurferCombined.zoom(initialPxPerSec);
+  zoomLevel = 1;
+  loadingOverlay.style.display = 'none';
+  totalTimeDisplay.textContent = formatTime(duration);
+  updateTimeDisplay();
+});
 
-    function updateTimeDisplay() {
-      currentTimeDisplay.textContent = formatTime(wavesurferPart.getCurrentTime());
-    }
+wavesurferCombined.on('ready', () => {
+  console.log('Combined waveform ready');
+  loadingOverlay.style.display = 'none';
+});
 
-    function calculateScrollOffset(currentTime, duration, containerWidth, pixelsPerSecond) {
-      const waveformWidth = duration * pixelsPerSecond;
-      const playheadPosition = currentTime * pixelsPerSecond;
-      if (currentTime < containerWidth / (2 * pixelsPerSecond)) {
-        return 0;
-      } else if (currentTime > duration - (containerWidth / (2 * pixelsPerSecond))) {
-        return waveformWidth - containerWidth;
-      } else {
-        return playheadPosition - (containerWidth / 2);
-      }
-    }
+wavesurferPart.on('error', (err) => {
+  console.error('WaveSurfer Part Error:', err);
+  if (!wavesurferCombined.isReady()) {
+    loadingOverlay.textContent = 'Part audio not available';
+  }
+});
 
-    function centerPlayhead() {
-      if (!wavesurferPart.drawer || !wavesurferCombined.drawer) return;
-      const currentTime = wavesurferPart.getCurrentTime();
-      const duration = wavesurferPart.getDuration();
-      const containerWidth = waveformContainer.clientWidth;
-      const pixelsPerSecond = (containerWidth / duration) * zoomLevel;
-      const scrollOffset = calculateScrollOffset(currentTime, duration, containerWidth, pixelsPerSecond);
-      wavesurferPart.drawer.wrapper.scrollLeft = scrollOffset;
-      wavesurferCombined.drawer.wrapper.scrollLeft = scrollOffset;
-    }
+wavesurferCombined.on('error', (err) => {
+  console.error('WaveSurfer Combined Error:', err);
+  if (!wavesurferPart.isReady()) {
+    loadingOverlay.textContent = 'Combined audio not available';
+  }
+});
 
-    function formatTime(seconds) {
-      const minutes = Math.floor(seconds / 60);
-      const secs = Math.floor(seconds % 60);
-      return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
-    }
+function updateTimeDisplay() {
+  currentTimeDisplay.textContent = formatTime(wavesurferPart.getCurrentTime());
+}
 
-    playPauseBtn.addEventListener('click', () => {
-      wavesurferPart.playPause();
-      wavesurferCombined.playPause();
-      if (wavesurferPart.isPlaying()) {
-        playPauseBtn.classList.add('playing');
-        playPauseBtn.textContent = 'Pause';
-      } else {
-        playPauseBtn.classList.remove('playing');
-        playPauseBtn.textContent = 'Play';
-      }
-      updateTimeDisplay();
-    });
+function calculateScrollOffset(currentTime, duration, containerWidth, pixelsPerSecond) {
+  const waveformWidth = duration * pixelsPerSecond;
+  const playheadPosition = currentTime * pixelsPerSecond;
+  if (currentTime < containerWidth / (2 * pixelsPerSecond)) {
+    return 0;
+  } else if (currentTime > duration - (containerWidth / (2 * pixelsPerSecond))) {
+    return waveformWidth - containerWidth;
+  } else {
+    return playheadPosition - (containerWidth / 2);
+  }
+}
 
-    speedSelect.addEventListener('change', () => {
-      const speed = parseFloat(speedSelect.value);
-      wavesurferPart.setPlaybackRate(speed);
-      wavesurferCombined.setPlaybackRate(speed);
-    });
+function centerPlayhead() {
+  if (!wavesurferPart.drawer || !wavesurferCombined.drawer) return;
+  const currentTime = wavesurferPart.getCurrentTime();
+  const duration = wavesurferPart.getDuration();
+  const containerWidth = waveformContainer.clientWidth;
+  const pixelsPerSecond = (containerWidth / duration) * zoomLevel;
+  const scrollOffset = calculateScrollOffset(currentTime, duration, containerWidth, pixelsPerSecond);
+  wavesurferPart.drawer.wrapper.scrollLeft = scrollOffset;
+  wavesurferCombined.drawer.wrapper.scrollLeft = scrollOffset;
+}
 
-    wavesurferPart.on('timeupdate', () => {
-      updateTimeDisplay();
-      centerPlayhead();
-    });
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+}
 
-    wavesurferPart.on('seek', () => {
-      updateTimeDisplay();
-      centerPlayhead();
-      const time = wavesurferPart.getCurrentTime();
-      wavesurferCombined.setTime(time);
-    });
+playPauseBtn.addEventListener('click', () => {
+  if (wavesurferPart.isPlaying()) {
+    syncPause();
+  } else {
+    syncPlay();
+  }
+  updateTimeDisplay();
+});
 
-    let isScrubbing = false;
-    waveformContainer.addEventListener('mousedown', (e) => {
-      isScrubbing = true;
-      updatePlayheadPosition(e);
-    });
+speedSelect.addEventListener('change', () => {
+  const speed = parseFloat(speedSelect.value);
+  wavesurferPart.setPlaybackRate(speed);
+  wavesurferCombined.setPlaybackRate(speed);
+});
 
-    document.addEventListener('mousemove', (e) => {
-      if (isScrubbing) updatePlayheadPosition(e);
-    });
+wavesurferPart.on('timeupdate', () => {
+  updateTimeDisplay();
+  centerPlayhead();
+  const currentTime = wavesurferPart.getCurrentTime();
+  if (Math.abs(wavesurferCombined.getCurrentTime() - currentTime) > 0.01) {
+    wavesurferCombined.setTime(currentTime);
+  }
+});
 
-    document.addEventListener('mouseup', () => {
-      isScrubbing = false;
-    });
+wavesurferPart.on('seek', () => {
+  const currentTime = wavesurferPart.getCurrentTime();
+  syncSetTime(currentTime);
+  updateTimeDisplay();
+  centerPlayhead();
+});
 
-    waveformContainer.addEventListener('touchstart', (e) => {
-      isScrubbing = true;
-      updatePlayheadPosition(e.touches[0]);
-    });
+let isScrubbing = false;
+waveformContainer.addEventListener('mousedown', (e) => {
+  isScrubbing = true;
+  updatePlayheadPosition(e);
+});
 
-    waveformContainer.addEventListener('touchmove', (e) => {
-      if (isScrubbing) updatePlayheadPosition(e.touches[0]);
-    });
+document.addEventListener('mousemove', (e) => {
+  if (isScrubbing) updatePlayheadPosition(e);
+});
 
-    waveformContainer.addEventListener('touchend', () => {
-      isScrubbing = false;
-    });
+document.addEventListener('mouseup', () => {
+  isScrubbing = false;
+});
 
-    function updatePlayheadPosition(e) {
-      if (!wavesurferPart.drawer) return;
-      const rect = waveformContainer.getBoundingClientRect();
-      const containerWidth = rect.width;
-      const duration = wavesurferPart.getDuration();
-      const pixelsPerSecond = (containerWidth / duration) * zoomLevel;
-      const clickX = e.clientX - rect.left;
-      const time = clickX / pixelsPerSecond;
-      wavesurferPart.setTime(time);
-      wavesurferCombined.setTime(time);
-      updateTimeDisplay();
-      centerPlayhead();
-    }
+waveformContainer.addEventListener('touchstart', (e) => {
+  isScrubbing = true;
+  updatePlayheadPosition(e.touches[0]);
+});
 
-    zoomInBtn.addEventListener('click', () => {
-      zoomLevel *= 1.5;
-      const containerWidth = waveformContainer.clientWidth;
-      const duration = wavesurferPart.getDuration();
-      const pixelsPerSecond = (containerWidth / duration) * zoomLevel;
-      wavesurferPart.zoom(pixelsPerSecond);
-      wavesurferCombined.zoom(pixelsPerSecond);
-      centerPlayhead();
-    });
+waveformContainer.addEventListener('touchmove', (e) => {
+  if (isScrubbing) updatePlayheadPosition(e.touches[0]);
+});
 
-    zoomOutBtn.addEventListener('click', () => {
-      zoomLevel /= 1.5;
-      if (zoomLevel < 1) zoomLevel = 1;
-      const containerWidth = waveformContainer.clientWidth;
-      const duration = wavesurferPart.getDuration();
-      const pixelsPerSecond = (containerWidth / duration) * zoomLevel;
-      wavesurferPart.zoom(pixelsPerSecond);
-      wavesurferCombined.zoom(pixelsPerSecond);
-      centerPlayhead();
-    });
+waveformContainer.addEventListener('touchend', () => {
+  isScrubbing = false;
+});
 
-    /* Added event listener for instrument back button */
-    songBackBtn.addEventListener('click', () => {
+function updatePlayheadPosition(e) {
+  if (!wavesurferPart.drawer) return;
+  const rect = waveformContainer.getBoundingClientRect();
+  const containerWidth = rect.width;
+  const duration = wavesurferPart.getDuration();
+  const pixelsPerSecond = (containerWidth / duration) * zoomLevel;
+  const clickX = e.clientX - rect.left;
+  const time = clickX / pixelsPerSecond;
+  syncSetTime(time);
+  updateTimeDisplay();
+  centerPlayhead();
+}
+
+zoomInBtn.addEventListener('click', () => {
+  zoomLevel *= 1.5;
+  const containerWidth = waveformContainer.clientWidth;
+  const duration = wavesurferPart.getDuration();
+  const pixelsPerSecond = (containerWidth / duration) * zoomLevel;
+  wavesurferPart.zoom(pixelsPerSecond);
+  wavesurferCombined.zoom(pixelsPerSecond);
+  centerPlayhead();
+});
+
+zoomOutBtn.addEventListener('click', () => {
+  zoomLevel /= 1.5;
+  if (zoomLevel < 1) zoomLevel = 1;
+  const containerWidth = waveformContainer.clientWidth;
+  const duration = wavesurferPart.getDuration();
+  const pixelsPerSecond = (containerWidth / duration) * zoomLevel;
+  wavesurferPart.zoom(pixelsPerSecond);
+  wavesurferCombined.zoom(pixelsPerSecond);
+  centerPlayhead();
+});
+
+songBackBtn.addEventListener('click', () => {
+  wavesurferPart.stop();
+  wavesurferCombined.stop();
+  playPauseBtn.classList.remove('playing');
+  playPauseBtn.textContent = 'Play';
+  showSongSelection();
+});
+
+const menuToggle = document.querySelector('.menu-toggle');
+const menuItems = document.querySelector('.menu-items');
+
+menuToggle.addEventListener('click', () => {
+  menuToggle.classList.toggle('open');
+  menuItems.classList.toggle('show');
+});
+
+document.addEventListener('click', (event) => {
+  if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
+    menuToggle.classList.remove('open');
+    menuItems.classList.remove('show');
+  }
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.metaKey && event.key === '[') {
+    event.preventDefault();
+    const songSelectionDisplay = window.getComputedStyle(songSelection).display;
+    const playerSectionDisplay = window.getComputedStyle(playerSection).display;
+    if (playerSectionDisplay !== 'none') {
       wavesurferPart.stop();
       wavesurferCombined.stop();
       playPauseBtn.classList.remove('playing');
       playPauseBtn.textContent = 'Play';
       showSongSelection();
-    });
-
-    const menuToggle = document.querySelector('.menu-toggle');
-    const menuItems = document.querySelector('.menu-items');
-
-    menuToggle.addEventListener('click', () => {
-      menuToggle.classList.toggle('open');
-      menuItems.classList.toggle('show');
-    });
-
-    document.addEventListener('click', (event) => {
-      if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
-        menuToggle.classList.remove('open');
-        menuItems.classList.remove('show');
-      }
-    });
-
-    // Hotkeys for navigation
-    document.addEventListener('keydown', (event) => {
-      if (event.metaKey && event.key === '[') {
-        event.preventDefault();
-        const songSelectionDisplay = window.getComputedStyle(songSelection).display;
-        const playerSectionDisplay = window.getComputedStyle(playerSection).display;
-        if (playerSectionDisplay !== 'none') {
-          wavesurferPart.stop();
-          wavesurferCombined.stop();
-          playPauseBtn.classList.remove('playing');
-          playPauseBtn.textContent = 'Play';
-          showSongSelection();
-        } else if (songSelectionDisplay !== 'none') {
-          showInstrumentSelection();
-        }
-      } else if (event.metaKey && event.key === ']') {
-        /* Added Command + ] for forward navigation */
-        event.preventDefault();
-        const instrumentSelectionDisplay = window.getComputedStyle(instrumentSelection).display;
-        const songSelectionDisplay = window.getComputedStyle(songSelection).display;
-        if (instrumentSelectionDisplay !== 'none') {
-          if (selectedInstrument) {
-            showSongSelection();
-          }
-        } else if (songSelectionDisplay !== 'none') {
-          if (selectedSong) {
-            showPlayer();
-          }
-        }
-      }
-    });
-
-    /* Added to load instrument from URL on page load */
-    const urlParams = new URLSearchParams(window.location.search);
-    const instrumentFromUrl = urlParams.get('instrument');
-    if (instrumentFromUrl) {
-      selectedInstrument = decodeURIComponent(instrumentFromUrl);
-      // Validate instrument exists in instruments object
-      const allInstruments = Object.values(instruments).flat(2).map(file => 
-        file.replace('The Nutcracker_', '').replace('_Parts.pdf', '')
-      );
-      if (allInstruments.includes(selectedInstrument)) {
-        showSongSelection();
-      } else {
-        selectedInstrument = '';
-        showInstrumentSelection();
-      }
-    } else {
+    } else if (songSelectionDisplay !== 'none') {
       showInstrumentSelection();
     }
+  } else if (event.metaKey && event.key === ']') {
+    event.preventDefault();
+    const instrumentSelectionDisplay = window.getComputedStyle(instrumentSelection).display;
+    const songSelectionDisplay = window.getComputedStyle(songSelection).display;
+    if (instrumentSelectionDisplay !== 'none') {
+      if (selectedInstrument) {
+        showSongSelection();
+      }
+    } else if (songSelectionDisplay !== 'none') {
+      if (selectedSong) {
+        showPlayer();
+      }
+    }
+  }
+});
+
+const urlParams = new URLSearchParams(window.location.search);
+const instrumentFromUrl = urlParams.get('instrument');
+if (instrumentFromUrl) {
+  selectedInstrument = decodeURIComponent(instrumentFromUrl);
+  const allInstruments = Object.values(instruments).flat(2).map(file => 
+    file.replace('The Nutcracker_', '').replace('_Parts.pdf', '')
+  );
+  if (allInstruments.includes(selectedInstrument)) {
+    showSongSelection();
+  } else {
+    selectedInstrument = '';
+    showInstrumentSelection();
+  }
+} else {
+  showInstrumentSelection();
+}
   </script>
 </body>
 </html>
