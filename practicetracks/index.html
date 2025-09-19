@@ -529,7 +529,7 @@
   </div>
 
   <script>
-    const instruments = {
+const instruments = {
   Strings: [
     ['The Nutcracker_Violin_1_Parts.pdf', 'The Nutcracker_Violin_2_Parts.pdf', 'The Nutcracker_Violin_3_Parts.pdf'],
     ['The Nutcracker_Cello_1_Parts.pdf', 'The Nutcracker_Cello_2_Parts.pdf'],
@@ -600,7 +600,18 @@ const availableSongs = [
 ];
 
 const songs = {
-  'Overture': [{ name: 'm1', time: 0 }],
+  'Overture': [
+    { name: 'm1', time: 0 },
+    { name: 'm9', time: 17 },
+    { name: 'm17', time: 34 },
+    { name: 'm21', time: 43 },
+    { name: 'm29', time: 61 },
+    { name: 'm39', time: 82 },
+    { name: 'm46', time: 97 },
+    { name: 'm54', time: 114 },
+    { name: 'm66', time: 140 },
+    { name: 'm80', time: 171 }
+  ],
   'Scene 1': [{ name: 'm1', time: 0 }],
   'March': [{ name: 'm1', time: 0 }, { name: 'm10', time: 20 }],
   "Children's Gallop": [{ name: 'm1', time: 0 }],
@@ -643,15 +654,24 @@ let zoomLevel = 1;
 let selectedInstrument = '';
 let selectedSong = '';
 
-// Audio context and nodes
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-let sourcePart, sourceCombined, gainNodePart, gainNodeCombined;
-let audioBufferPart, audioBufferCombined;
 let isPlaying = false;
 let pauseTime = 0;
+let startTime = 0;
 
-// Initialize WaveSurfer for visualization
-const wavesurfer = WaveSurfer.create({
+// Throttle function to limit rapid volume changes
+function throttle(func, wait) {
+  let lastCall = 0;
+  return function (...args) {
+    const now = Date.now();
+    if (now - lastCall >= wait) {
+      func(...args);
+      lastCall = now;
+    }
+  };
+}
+
+const wavesurferPart = WaveSurfer.create({
   container: '#waveform',
   waveColor: '#6b8299',
   progressColor: '#5e768e',
@@ -665,27 +685,24 @@ const wavesurfer = WaveSurfer.create({
   audioContext: audioContext
 });
 
+const wavesurferCombined = WaveSurfer.create({
+  container: '#waveform',
+  waveColor: 'rgba(107, 130, 153, 0.5)',
+  progressColor: 'rgba(94, 118, 142, 0.5)',
+  cursorColor: '#d0d0d0',
+  barWidth: 2,
+  height: 100,
+  responsive: true,
+  backgroundColor: 'transparent',
+  normalize: true,
+  scrollParent: false,
+  audioContext: audioContext
+});
+
 const loadingOverlay = document.createElement('div');
 loadingOverlay.className = 'loading-overlay';
 loadingOverlay.textContent = 'Loading audio...';
 waveformContainer.appendChild(loadingOverlay);
-
-function setupAudioNodes() {
-  if (!audioBufferPart && !audioBufferCombined) return;
-  sourcePart = audioContext.createBufferSource();
-  sourceCombined = audioContext.createBufferSource();
-  sourcePart.buffer = audioBufferPart;
-  sourceCombined.buffer = audioBufferCombined;
-
-  gainNodePart = audioContext.createGain();
-  gainNodeCombined = audioContext.createGain();
-  sourcePart.connect(gainNodePart).connect(audioContext.destination);
-  sourceCombined.connect(gainNodeCombined).connect(audioContext.destination);
-
-  // Set initial volume
-  gainNodePart.gain.setValueAtTime(0.8, audioContext.currentTime);
-  gainNodeCombined.gain.setValueAtTime(0.2, audioContext.currentTime);
-}
 
 function formatTime(seconds) {
   const minutes = Math.floor(seconds / 60);
@@ -693,55 +710,50 @@ function formatTime(seconds) {
   return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
-function playAudio(offset = 0) {
+function syncPlay(offset = 0) {
   if (isPlaying) return;
   isPlaying = true;
   playPauseBtn.textContent = 'Pause';
   playPauseBtn.classList.add('playing');
   playPauseBtn.disabled = false;
 
-  // Create new sources for each play
-  sourcePart = audioContext.createBufferSource();
-  sourceCombined = audioContext.createBufferSource();
-  sourcePart.buffer = audioBufferPart;
-  sourceCombined.buffer = audioBufferCombined;
-  sourcePart.connect(gainNodePart).connect(audioContext.destination);
-  sourceCombined.connect(gainNodeCombined).connect(audioContext.destination);
-
   const speed = parseFloat(speedSelect.value);
-  sourcePart.playbackRate.setValueAtTime(speed, audioContext.currentTime);
-  sourceCombined.playbackRate.setValueAtTime(speed, audioContext.currentTime);
+  wavesurferPart.setPlaybackRate(speed);
+  wavesurferCombined.setPlaybackRate(speed);
 
-  sourcePart.start(0, offset);
-  sourceCombined.start(0, offset);
-  wavesurfer.play(offset);
+  startTime = audioContext.currentTime;
+  if (wavesurferPart.getVolume() > 0) {
+    wavesurferPart.play(offset);
+  }
+  if (wavesurferCombined.getVolume() > 0) {
+    wavesurferCombined.play(offset);
+  }
 }
 
-function pauseAudio() {
+function syncPause() {
   if (!isPlaying) return;
   isPlaying = false;
-  pauseTime = wavesurfer.getCurrentTime();
-  sourcePart.stop();
-  sourceCombined.stop();
-  wavesurfer.pause();
+  pauseTime = wavesurferPart.getCurrentTime();
+  wavesurferPart.pause();
+  wavesurferCombined.pause();
   playPauseBtn.textContent = 'Play';
   playPauseBtn.classList.remove('playing');
   playPauseBtn.disabled = false;
 }
 
-function seekTo(time) {
+function syncSetTime(time) {
   const wasPlaying = isPlaying;
   if (isPlaying) {
-    sourcePart.stop();
-    sourceCombined.stop();
-    wavesurfer.stop();
+    wavesurferPart.pause();
+    wavesurferCombined.pause();
     isPlaying = false;
   }
   pauseTime = time;
-  wavesurfer.setTime(time);
+  wavesurferPart.setTime(time);
+  wavesurferCombined.setTime(time);
   currentTimeDisplay.textContent = formatTime(time);
   if (wasPlaying) {
-    playAudio(time);
+    syncPlay(time);
   }
 }
 
@@ -893,13 +905,12 @@ async function showPlayer() {
     liEl.dataset.time = marker.time;
     liEl.textContent = marker.name;
     liEl.addEventListener('click', () => {
-      seekTo(parseFloat(marker.time));
+      syncSetTime(parseFloat(marker.time));
     });
     ulEl.appendChild(liEl);
   });
   measureListContainer.appendChild(ulEl);
 
-  // Reset controls without redefining elements
   playPauseBtn.textContent = 'Play';
   playPauseBtn.classList.remove('playing');
   playPauseBtn.disabled = true;
@@ -909,7 +920,6 @@ async function showPlayer() {
   partVolumeSlider.value = '0.8';
   combinedVolumeSlider.value = '0.2';
 
-  // Remove existing event listeners
   const oldPlayPauseBtn = playPauseBtn;
   playPauseBtn = oldPlayPauseBtn.cloneNode(true);
   oldPlayPauseBtn.parentNode.replaceChild(playPauseBtn, oldPlayPauseBtn);
@@ -920,28 +930,53 @@ async function showPlayer() {
 
   playPauseBtn.addEventListener('click', () => {
     if (isPlaying) {
-      pauseAudio();
+      syncPause();
     } else {
-      playAudio(pauseTime);
+      syncPlay(pauseTime);
     }
   });
 
   speedSelect.addEventListener('change', () => {
     const speed = parseFloat(speedSelect.value);
+    wavesurferPart.setPlaybackRate(speed);
+    wavesurferCombined.setPlaybackRate(speed);
     if (isPlaying) {
-      sourcePart.stop();
-      sourceCombined.stop();
-      wavesurfer.stop();
-      playAudio(pauseTime);
+      const currentTime = wavesurferPart.getCurrentTime();
+      wavesurferPart.pause();
+      wavesurferCombined.pause();
+      isPlaying = false;
+      syncPlay(currentTime);
     }
   });
 
+  // Throttled volume handler for part track
+  const handlePartVolume = throttle((value) => {
+    if (isPlaying && parseFloat(value) === 0) {
+      wavesurferPart.pause();
+    } else if (isPlaying && parseFloat(value) > 0 && wavesurferPart.getVolume() === 0) {
+      const currentTime = wavesurferCombined.getCurrentTime() || pauseTime;
+      wavesurferPart.play(currentTime);
+    }
+    wavesurferPart.setVolume(value);
+  }, 100);
+
   partVolumeSlider.addEventListener('input', (e) => {
-    gainNodePart.gain.setValueAtTime(e.target.value, audioContext.currentTime);
+    handlePartVolume(e.target.value);
   });
 
+  // Throttled volume handler for combined track
+  const handleCombinedVolume = throttle((value) => {
+    if (isPlaying && parseFloat(value) === 0) {
+      wavesurferCombined.pause();
+    } else if (isPlaying && parseFloat(value) > 0 && wavesurferCombined.getVolume() === 0) {
+      const currentTime = wavesurferPart.getCurrentTime() || pauseTime;
+      wavesurferCombined.play(currentTime);
+    }
+    wavesurferCombined.setVolume(value);
+  }, 100);
+
   combinedVolumeSlider.addEventListener('input', (e) => {
-    gainNodeCombined.gain.setValueAtTime(e.target.value, audioContext.currentTime);
+    handleCombinedVolume(e.target.value);
   });
 
   const songFileName = selectedSong === 'Waltz of the Flowers' ? 'WOTF' : 
@@ -953,24 +988,19 @@ async function showPlayer() {
 
   loadingOverlay.style.display = 'flex';
   loadingOverlay.textContent = 'Loading audio...';
-  audioBufferPart = null;
-  audioBufferCombined = null;
 
   try {
     const [partResponse, combinedResponse] = await Promise.all([
-      fetch(partFile, { method: 'GET' }),
-      fetch(combinedFile, { method: 'GET' })
+      fetch(partFile, { method: 'HEAD' }),
+      fetch(combinedFile, { method: 'HEAD' })
     ]);
     let partExists = partResponse.ok;
     let combinedExists = combinedResponse.ok;
     if (partExists) {
-      const arrayBufferPart = await partResponse.arrayBuffer();
-      audioBufferPart = await audioContext.decodeAudioData(arrayBufferPart);
-      wavesurfer.load(partFile); // Load part audio for visualization
+      wavesurferPart.load(partFile);
     }
     if (combinedExists) {
-      const arrayBufferCombined = await combinedResponse.arrayBuffer();
-      audioBufferCombined = await audioContext.decodeAudioData(arrayBufferCombined);
+      wavesurferCombined.load(combinedFile);
     }
 
     if (!partExists && !combinedExists) {
@@ -985,35 +1015,57 @@ async function showPlayer() {
       loadingOverlay.style.display = 'none';
     }
 
-    setupAudioNodes();
     playPauseBtn.disabled = false;
 
-    wavesurfer.on('ready', () => {
-      const duration = wavesurfer.getDuration();
+    wavesurferPart.setVolume(0.8);
+    wavesurferCombined.setVolume(0.2);
+
+    let durationSet = false;
+    wavesurferPart.on('ready', () => {
+      const duration = wavesurferPart.getDuration();
       const containerWidth = waveformContainer.clientWidth;
       const initialPxPerSec = containerWidth / duration;
-      wavesurfer.zoom(initialPxPerSec);
+      wavesurferPart.zoom(initialPxPerSec);
+      if (combinedExists) {
+        wavesurferCombined.zoom(initialPxPerSec);
+      }
       zoomLevel = 1;
-      totalTimeDisplay.textContent = formatTime(duration);
+      if (!durationSet && duration > 0) {
+        totalTimeDisplay.textContent = formatTime(duration);
+        durationSet = true;
+      }
     });
 
-    wavesurfer.on('error', (err) => {
-      console.error('WaveSurfer Error:', err);
+    wavesurferCombined.on('ready', () => {
+      const duration = wavesurferCombined.getDuration();
+      if (!durationSet && duration > 0) {
+        totalTimeDisplay.textContent = formatTime(duration);
+        durationSet = true;
+      }
+    });
+
+    wavesurferPart.on('error', (err) => {
+      console.error('WaveSurfer Part Error:', err);
       loadingOverlay.textContent = 'Error loading waveform';
     });
 
-    wavesurfer.on('timeupdate', () => {
-      const currentTime = wavesurfer.getCurrentTime();
+    wavesurferPart.on('timeupdate', () => {
+      let currentTime = wavesurferPart.getCurrentTime();
       currentTimeDisplay.textContent = formatTime(currentTime);
       if (isPlaying) {
         pauseTime = currentTime;
+        const combinedTime = wavesurferCombined.getCurrentTime();
+        // Only sync if the time difference is greater than 50ms
+        if (Math.abs(combinedTime - currentTime) > 0.05 && wavesurferCombined.getVolume() > 0) {
+          wavesurferCombined.setTime(currentTime);
+        }
       }
       centerPlayhead();
     });
 
-    wavesurfer.on('interaction', () => {
-      const time = wavesurfer.getCurrentTime();
-      seekTo(time);
+    wavesurferPart.on('interaction', () => {
+      const time = wavesurferPart.getCurrentTime();
+      syncSetTime(time);
     });
   } catch (error) {
     console.error('Error loading audio files:', error);
@@ -1022,9 +1074,9 @@ async function showPlayer() {
 }
 
 function centerPlayhead() {
-  if (!wavesurfer.drawer) return;
-  const currentTime = wavesurfer.getCurrentTime();
-  const duration = wavesurfer.getDuration();
+  if (!wavesurferPart.drawer || !wavesurferCombined.drawer) return;
+  const currentTime = wavesurferPart.getCurrentTime();
+  const duration = wavesurferPart.getDuration() || wavesurferCombined.getDuration();
   const containerWidth = waveformContainer.clientWidth;
   const pixelsPerSecond = (containerWidth / duration) * zoomLevel;
   const playheadPosition = currentTime * pixelsPerSecond;
@@ -1032,15 +1084,17 @@ function centerPlayhead() {
   if (currentTime >= containerWidth / (2 * pixelsPerSecond)) {
     scrollOffset = playheadPosition - (containerWidth / 2);
   }
-  wavesurfer.drawer.wrapper.scrollLeft = scrollOffset;
+  wavesurferPart.drawer.wrapper.scrollLeft = scrollOffset;
+  wavesurferCombined.drawer.wrapper.scrollLeft = scrollOffset;
 }
 
 zoomInBtn.addEventListener('click', () => {
   zoomLevel *= 1.5;
   const containerWidth = waveformContainer.clientWidth;
-  const duration = wavesurfer.getDuration();
+  const duration = wavesurferPart.getDuration();
   const pixelsPerSecond = (containerWidth / duration) * zoomLevel;
-  wavesurfer.zoom(pixelsPerSecond);
+  wavesurferPart.zoom(pixelsPerSecond);
+  wavesurferCombined.zoom(pixelsPerSecond);
   centerPlayhead();
 });
 
@@ -1048,17 +1102,17 @@ zoomOutBtn.addEventListener('click', () => {
   zoomLevel /= 1.5;
   if (zoomLevel < 1) zoomLevel = 1;
   const containerWidth = waveformContainer.clientWidth;
-  const duration = wavesurfer.getDuration();
+  const duration = wavesurferPart.getDuration();
   const pixelsPerSecond = (containerWidth / duration) * zoomLevel;
-  wavesurfer.zoom(pixelsPerSecond);
+  wavesurferPart.zoom(pixelsPerSecond);
+  wavesurferCombined.zoom(pixelsPerSecond);
   centerPlayhead();
 });
 
 songBackBtn.addEventListener('click', () => {
   if (isPlaying) {
-    sourcePart.stop();
-    sourceCombined.stop();
-    wavesurfer.stop();
+    wavesurferPart.pause();
+    wavesurferCombined.pause();
     isPlaying = false;
   }
   playPauseBtn.textContent = 'Play';
@@ -1089,9 +1143,8 @@ document.addEventListener('keydown', (event) => {
     if (playerSectionDisplay !== 'none') {
       event.preventDefault();
       if (isPlaying) {
-        sourcePart.stop();
-        sourceCombined.stop();
-        wavesurfer.stop();
+        wavesurferPart.pause();
+        wavesurferCombined.pause();
         isPlaying = false;
       }
       playPauseBtn.textContent = 'Play';
