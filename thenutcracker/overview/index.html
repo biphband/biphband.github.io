@@ -110,24 +110,32 @@
             opacity: 0;
             max-height: 0;
             overflow: hidden;
-            transition: all 1s ease-in-out;
+            transition: opacity 1s ease-in-out, max-height 1s ease-in-out, transform 1s ease-in-out;
             margin-top: 8px;
             margin-left: 16px;
+            transform: translateY(-20px);
         }
 
         .scene-content.active {
             display: block;
             opacity: 1;
-            max-height: 1000px;
+            max-height: 2000px; /* Large enough to accommodate content */
+            transform: translateY(0);
+        }
+
+        .scene-content .p-4 > * {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+        }
+
+        .scene-content.active .p-4 > * {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .video-container {
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            animation: none; /* Remove fadeIn animation as it's now handled by scene-content */
         }
 
         .hamburger-menu {
@@ -319,7 +327,7 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Orchestra (No dancers)</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> The Overture sets the magical tone for Tchaikovsky’s ballet, introducing key themes with a light, festive orchestration.</p>
-                            <img src="images/overture.jpg" alt="Overture Scene" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/overture.jpg" alt="Overture Scene" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -346,9 +354,9 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Fritz, Party Guests, Parents</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> The Christmas party begins at the Stahlbaum household, with children and adults arriving in festive attire.</p>
-                            <img src="images/partyscene1.jpg" alt="Scene 1 Image" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/partyscene2.jpg" alt="Scene 1 Image" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/partyscene3.jpg" alt="Scene 1 Image" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/partyscene1.jpg" alt="Scene 1 Image" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/partyscene2.jpg" alt="Scene 1 Image" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/partyscene3.jpg" alt="Scene 1 Image" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -370,9 +378,9 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong>Parents, Party Guests, Children</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> The children march joyfully, mimicking toy soldiers in a lively and playful dance.</p>
-                            <img src="images/march.jpg" alt="March Scene" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/march2.jpg" alt="March Scene" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/march3.jpg" alt="March Scene" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/march.jpg" alt="March Scene" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/march2.jpg" alt="March Scene" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/march3.jpg" alt="March Scene" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -394,10 +402,10 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Drosselmeyer, Party Guests</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> A mysterious figure captivates the party with an air of intrigue, and then reveals that he is but Uncle Drosselmeyer in disguise, with magic tricks and gifts!</p>
-                            <img src="images/mysteriousstranger.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/mysteriousstranger2.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/mysteriousstranger3.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-xs">   
-                            <img src="images/mysteriousstranger4.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-xs">    
+                            <img src="images/mysteriousstranger.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/mysteriousstranger2.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/mysteriousstranger3.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-[100%] mx-auto">   
+                            <img src="images/mysteriousstranger4.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-[100%] mx-auto">    
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -419,9 +427,9 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Drosselmeyer, Dolls</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description: </strong>Drosselmeyer presents mechanical dolls that delight the children.</p>
-                            <img src="images/presentation of dolls 1.jpg" alt="Dolls Presentation" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/presentation of dolls 2.jpg" alt="Dolls Presentation" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/presentation of dolls 3.jpg" alt="Dolls Presentation" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/presentation of dolls 1.jpg" alt="Dolls Presentation" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/presentation of dolls 2.jpg" alt="Dolls Presentation" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/presentation of dolls 3.jpg" alt="Dolls Presentation" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -440,12 +448,12 @@
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/dance-of-the-dolls.mp3" type="audio/mpeg">
                         </audio>
-                        <p class="mb-3 text-sm"><strong>Cast:</strong> Mechanical Dolls</p>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Dolls</p>
                         <div class="mb-3">
-                            <p class="text-sm"><strong>Description: </strong>The mechanical dolls perform a charming, synchronized dance.</p>
-                            <img src="images/danceofthedolls1.jpg" alt="Dolls Dance" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/danceofthedolls2.jpg" alt="Dolls Dance" class="my-3 rounded w-full max-w-xs">  
-                            <img src="images/danceofthedolls3.jpg" alt="Dolls Dance" class="my-3 rounded w-full max-w-xs">  
+                            <p class="text-sm"><strong>Description: </strong>The life-size dolls perform a charming, synchronized dance.</p>
+                            <img src="images/danceofthedolls1.jpg" alt="Dolls Dance" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/danceofthedolls2.jpg" alt="Dolls Dance" class="my-3 rounded w-full max-w-[100%] mx-auto">  
+                            <img src="images/danceofthedolls3.jpg" alt="Dolls Dance" class="my-3 rounded w-full max-w-[100%] mx-auto">  
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -467,9 +475,9 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Drosselmeyer, Nutcracker</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description: </strong>Drosselmeyer presents Clara with the Nutcracker doll, who enjoys it very much until her brother Fritz breaks it.</p>
-                            <img src="images/drosselmeyer and nutcracker.jpg" alt="Nutcracker Intro" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/drosselmeyer and nutcracker2.jpg" alt="Nutcracker Intro" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/drosselmeyer and nutcracker3.jpg" alt="Nutcracker Intro" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/drosselmeyer and nutcracker.jpg" alt="Nutcracker Intro" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/drosselmeyer and nutcracker2.jpg" alt="Nutcracker Intro" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/drosselmeyer and nutcracker3.jpg" alt="Nutcracker Intro" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -491,9 +499,9 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Drosselmeyer</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description: </strong>Drosselmeyer fixes the Nutcracker and consoles Clara, but they are interrupted twice by Fritz and his friends.</p>
-                            <img src="images/consolation.jpg" alt="Consoles Clara" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/consolation2.jpg" alt="Consoles Clara" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/consolation3.jpg" alt="Consoles Clara" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/consolation.jpg" alt="Consoles Clara" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/consolation2.jpg" alt="Consoles Clara" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/consolation3.jpg" alt="Consoles Clara" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -515,9 +523,9 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Parents, Party Guests</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description: </strong>The party concludes with a stately waltz performed by the older guests.</p>
-                            <img src="images/grandfather waltz3.jpg" alt="Grandfather Waltz" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/grandfather waltz.jpg" alt="Grandfather Waltz" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/grandfather waltz 4.jpg" alt="Grandfather Waltz" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/grandfather waltz3.jpg" alt="Grandfather Waltz" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/grandfather waltz.jpg" alt="Grandfather Waltz" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/grandfather waltz 4.jpg" alt="Grandfather Waltz" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -539,10 +547,10 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Nutcracker</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description: </strong>After the guests leave, Clara falls asleep and dreams that as the clock strikes midnight, little mice scurry around as the Christmas tree grows to impossible sizes, finally she comes face to face with the dreaded Rat King!</p>
-                            <img src="images/clara-and-the-nutcracker1.jpg" alt="Clara Nutcracker" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/clara-and-the-nutcracker2.jpg" alt="Clara Nutcracker" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/clara-and-the-nutcracker3.jpg" alt="Clara Nutcracker" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/clara-and-the-nutcracker4.jpg" alt="Clara Nutcracker" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/clara-and-the-nutcracker1.jpg" alt="Clara Nutcracker" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/clara-and-the-nutcracker2.jpg" alt="Clara Nutcracker" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/clara-and-the-nutcracker3.jpg" alt="Clara Nutcracker" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/clara-and-the-nutcracker4.jpg" alt="Clara Nutcracker" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -564,10 +572,10 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Nutcracker, Mouse King, Soldiers, Mice</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> The Nutcracker leads toy soldiers in a battle against the Mouse King and his army.</p>
-                            <img src="images/battle1.jpg" alt="Battle Scene" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/battle2.jpg" alt="Battle Scene" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/battle3.jpg" alt="Battle Scene" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/battle4.jpg" alt="Battle Scene" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/battle1.jpg" alt="Battle Scene" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/battle2.jpg" alt="Battle Scene" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/battle3.jpg" alt="Battle Scene" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/battle4.jpg" alt="Battle Scene" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -589,9 +597,10 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Nutcracker Prince</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> Clara and the Nutcracker Prince journey through a snowy forest.</p>
-                            <img src="images/pine-forest-in-winter1.jpg" alt="Pine Forest" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/pine-forest-in-winter2.jpg" alt="Pine Forest" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/pine-forest-in-winter3.jpg" alt="Pine Forest" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/Pine+Forest" alt="Pine Forest" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/pine-forest-in-winter1.jpg" alt="Pine Forest" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/pine-forest-in-winter2.jpg" alt="Pine Forest" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/pine-forest-in-winter3.jpg" alt="Pine Forest" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -613,8 +622,9 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Snowflakes, Clara, Nutcracker Prince</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> Snowflakes dance gracefully, creating a magical winter scene.</p>
-                            <img src="images/waltz-of-snowflakes1.jpg" alt="Snowflakes" class="my-3 rounded w-full max-w-xs">
-                            <img src="images/waltz-of-snowflakes2.jpg" alt="Snowflakes" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/Snowflakes" alt="Snowflakes" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/waltz-of-snowflakes1.jpg" alt="Snowflakes" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/waltz-of-snowflakes2.jpg" alt="Snowflakes" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -641,7 +651,7 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Nutcracker Prince, Sugar Plum Fairy</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> Clara and the Prince arrive at the magical Land of Sweets.</p>
-                            <img src="images/Enchanted+Palace" alt="Enchanted Palace" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/Enchanted+Palace" alt="Enchanted Palace" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -663,7 +673,7 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Nutcracker Prince, Sugar Plum Fairy</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> Clara and the Prince are welcomed in the Land of Sweets.</p>
-                            <img src="images/Clara+Prince" alt="Clara Prince" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/Clara+Prince" alt="Clara Prince" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -685,7 +695,7 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Arabian Dancers</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> A sultry and exotic dance performed in the Land of Sweets.</p>
-                            <img src="images/Arabian+Dance" alt="Arabian Dance" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/Arabian+Dance" alt="Arabian Dance" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -707,7 +717,7 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Chinese Dancers</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> A lively and colorful dance with quick, precise movements.</p>
-                            <img src="images/Chinese+Dance" alt="Chinese Dance" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/Chinese+Dance" alt="Chinese Dance" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -729,7 +739,7 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Russian Dancers</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> An energetic Trepak dance with high leaps and spins.</p>
-                            <img src="images/Russian+Dance" alt="Russian Dance" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/Russian+Dance" alt="Russian Dance" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -751,7 +761,7 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Mirlitons</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> A light and playful dance featuring delicate flute melodies.</p>
-                            <img src="images/Reed+Flutes" alt="Reed Flutes" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/Reed+Flutes" alt="Reed Flutes" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -773,7 +783,7 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Mother Ginger, Polichinelles</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> Mother Ginger reveals her children, who perform a whimsical dance.</p>
-                            <img src="images/Mother+Ginger" alt="Mother Ginger" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/Mother+Ginger" alt="Mother Ginger" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -795,7 +805,7 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Flowers, Dewdrop</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> A grand waltz featuring elegant flower dancers led by the Dewdrop.</p>
-                            <img src="images/Flowers+Waltz" alt="Flowers Waltz" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/Flowers+Waltz" alt="Flowers Waltz" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -817,7 +827,7 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Sugar Plum Fairy, Cavalier</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> A majestic introduction to the Sugar Plum Fairy and her Cavalier.</p>
-                            <img src="images/Intrada" alt="Intrada" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/Intrada" alt="Intrada" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -839,7 +849,7 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Sugar Plum Fairy, Corps de Ballet</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> The Sugar Plum Fairy performs a delicate, ethereal dance, highlighted by the celesta’s iconic melody.</p>
-                            <img src="images/Sugar+Plum+Fairy" alt="Sugar Plum Fairy" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/Sugar+Plum+Fairy" alt="Sugar Plum Fairy" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -861,7 +871,7 @@
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Entire Cast</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> The ballet concludes with a grand waltz, celebrating Clara’s adventure.</p>
-                            <img src="images/Final+Waltz" alt="Final Waltz" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/Final+Waltz" alt="Final Waltz" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -878,31 +888,84 @@
     </div>
 
     <script>
-        function toggleScene(sceneId) {
+        function fadeOutAudio(audio, duration = 2000) {
+            return new Promise(resolve => {
+                const initialVolume = audio.volume;
+                const steps = 20; // Number of steps for fade-out
+                const interval = duration / steps;
+                let currentStep = 0;
+
+                const fadeInterval = setInterval(() => {
+                    currentStep++;
+                    audio.volume = initialVolume * (1 - currentStep / steps);
+                    if (currentStep >= steps) {
+                        clearInterval(fadeInterval);
+                        audio.pause();
+                        audio.volume = initialVolume; // Reset volume for next play
+                        audio.currentTime = 0; // Reset to start
+                        resolve();
+                    }
+                }, interval);
+            });
+        }
+
+        async function toggleScene(sceneId) {
             const scenes = document.querySelectorAll('.scene-content');
             const sceneTitles = document.querySelectorAll('.scene-title');
-            scenes.forEach(scene => {
+
+            for (const scene of scenes) {
                 if (scene.id === sceneId) {
+                    const isOpening = !scene.classList.contains('active');
                     scene.classList.toggle('active');
                     const correspondingTitle = document.querySelector(`.scene-title[onclick="toggleScene('${sceneId}')"]`);
                     if (scene.classList.contains('active')) {
                         correspondingTitle.classList.add('active');
-                        // Scroll the title to the top of the viewport
-                        correspondingTitle.scrollIntoView({ 
-                            behavior: 'smooth', 
-                            block: 'start' 
+                        // Smoothly scroll to the title from current position
+                        const titleRect = correspondingTitle.getBoundingClientRect();
+                        const offset = 15; // 15px offset from the top
+                        window.scrollTo({
+                            top: window.scrollY + titleRect.top - offset,
+                            behavior: 'smooth'
                         });
                     } else {
                         correspondingTitle.classList.remove('active');
+                        // Fade out and pause audio elements within the scene
+                        const audioElements = scene.querySelectorAll('audio');
+                        for (const audio of audioElements) {
+                            if (!audio.paused) {
+                                await fadeOutAudio(audio);
+                            }
+                        }
+                        // Pause video elements within the scene
+                        const videoElements = scene.querySelectorAll('iframe');
+                        videoElements.forEach(iframe => {
+                            const src = iframe.src;
+                            iframe.src = src; // Reset src to pause YouTube videos
+                        });
                     }
                 } else {
-                    scene.classList.remove('active');
-                    const otherTitle = document.querySelector(`.scene-title[onclick="toggleScene('${scene.id}')"]`);
-                    if (otherTitle) {
-                        otherTitle.classList.remove('active');
+                    if (scene.classList.contains('active')) {
+                        scene.classList.remove('active');
+                        const otherTitle = document.querySelector(`.scene-title[onclick="toggleScene('${scene.id}')"]`);
+                        if (otherTitle) {
+                            otherTitle.classList.remove('active');
+                            // Fade out and pause audio elements within other scenes
+                            const audioElements = scene.querySelectorAll('audio');
+                            for (const audio of audioElements) {
+                                if (!audio.paused) {
+                                    await fadeOutAudio(audio);
+                                }
+                            }
+                            // Pause video elements within other scenes
+                            const videoElements = scene.querySelectorAll('iframe');
+                            videoElements.forEach(iframe => {
+                                const src = iframe.src;
+                                iframe.src = src; // Reset src to pause YouTube videos
+                            });
+                        }
                     }
                 }
-            });
+            }
         }
 
         function toggleMenu() {
@@ -912,30 +975,60 @@
             menuToggle.classList.toggle('open');
         }
 
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', async function(event) {
             const scenes = document.querySelectorAll('.scene-content');
             const isSceneClick = event.target.closest('.scene-title');
             if (!isSceneClick) {
-                scenes.forEach(scene => {
-                    scene.classList.remove('active');
-                    const correspondingTitle = document.querySelector(`.scene-title[onclick="toggleScene('${scene.id}')"]`);
-                    if (correspondingTitle) {
-                        correspondingTitle.classList.remove('active');
+                for (const scene of scenes) {
+                    if (scene.classList.contains('active')) {
+                        scene.classList.remove('active');
+                        const correspondingTitle = document.querySelector(`.scene-title[onclick="toggleScene('${scene.id}')"]`);
+                        if (correspondingTitle) {
+                            correspondingTitle.classList.remove('active');
+                            // Fade out and pause audio elements within the scene
+                            const audioElements = scene.querySelectorAll('audio');
+                            for (const audio of audioElements) {
+                                if (!audio.paused) {
+                                    await fadeOutAudio(audio);
+                                }
+                            }
+                            // Pause video elements within the scene
+                            const videoElements = scene.querySelectorAll('iframe');
+                            videoElements.forEach(iframe => {
+                                const src = iframe.src;
+                                iframe.src = src; // Reset src to pause YouTube videos
+                            });
+                        }
                     }
-                });
+                }
             }
         });
 
-        document.addEventListener('keydown', function(event) {
+        document.addEventListener('keydown', async function(event) {
             if (event.key === 'Escape') {
                 const scenes = document.querySelectorAll('.scene-content');
-                scenes.forEach(scene => {
-                    scene.classList.remove('active');
-                    const correspondingTitle = document.querySelector(`.scene-title[onclick="toggleScene('${scene.id}')"]`);
-                    if (correspondingTitle) {
-                        correspondingTitle.classList.remove('active');
+                for (const scene of scenes) {
+                    if (scene.classList.contains('active')) {
+                        scene.classList.remove('active');
+                        const correspondingTitle = document.querySelector(`.scene-title[onclick="toggleScene('${scene.id}')"]`);
+                        if (correspondingTitle) {
+                            correspondingTitle.classList.remove('active');
+                            // Fade out and pause audio elements within the scene
+                            const audioElements = scene.querySelectorAll('audio');
+                            for (const audio of audioElements) {
+                                if (!audio.paused) {
+                                    await fadeOutAudio(audio);
+                                }
+                            }
+                            // Pause video elements within the scene
+                            const videoElements = scene.querySelectorAll('iframe');
+                            videoElements.forEach(iframe => {
+                                const src = iframe.src;
+                                iframe.src = src; // Reset src to pause YouTube videos
+                            });
+                        }
                     }
-                });
+                }
             }
         });
 
