@@ -330,7 +330,8 @@
           ['click', 'touchstart'].forEach(eventType => {
             seatingChartBtn.addEventListener(eventType, (e) => {
               e.preventDefault();
-              alert('Seating Chart has not yet been finalized for this performance.');
+              const url = new URL('Nutcracker Seating Layout.pdf', window.location.href);
+              window.open(url, '_blank');
             });
           });
           const groupDiv = document.createElement('div');
