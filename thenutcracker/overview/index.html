@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Nutcracker: An Overview</title>
+    <link rel="icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+    background: linear-gradient(to bottom, #e6e6fa, #f0f8ff);
+    background-image: url('../background.jpeg');
+    background-color: #e6e6fa; 
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    font-family: 'Roboto', sans-serif;
+    min-height: 100vh;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    display: block !important;
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-size: 0.9rem;
+}
+
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.container {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 16px;
+    padding-bottom: 100px;
+    position: relative;
+    overflow: hidden;
+    max-width: 600px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    box-sizing: border-box;
+}
+
+        .container h1 {
+            color: white !important;
+            font-family: 'Dancing Script', 'Times New Roman', serif !important;
+            font-size: clamp(2.5rem, 4vw, 1.5rem) !important;
+            text-align: center;
+            margin-top: 60px !important;
+            margin-bottom: 0 !important;
+            white-space: nowrap;
+            line-height: 1.2;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        h3 {
+            color: #1e40af;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .scene-section {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            margin-top: 20px;
+            padding: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .scene-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: black;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 4px 0;
+        }
+
+        .scene-title:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+        .scene-title.highlighted {
+            background-color: rgba(255, 255, 0, 0.25);
+        }
+
+        .scene-title.active {
+    background-color: rgba(59, 130, 246, 0.7);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+        .scene-content {
+            display: none;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s ease-in-out;
+            margin-top: 8px;
+            margin-left: 16px;
+        }
+
+        .scene-content.active {
+            display: block;
+            opacity: 1;
+            max-height: 1000px;
+        }
+
+        .video-container {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hamburger-menu {
+            position: absolute;
+            margin-left: 7px;
+            top: 20px;
+            left: 13px;
+            z-index: 1000;
+        }
+
+        .menu-toggle {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 25px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+        }
+
+        .menu-toggle span {
+            width: 30px;
+            height: 3px;
+            background: white;
+            border-radius: 10px;
+            transition: all 0.3s linear;
+        }
+
+        .menu-toggle.open span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-toggle.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        .menu-items {
+            position: absolute;
+            top: 25px;
+            left: -250px;
+            background: linear-gradient(135deg, rgba(48, 67, 104, 0.8), rgba(20, 31, 53, 0.8));
+            width: 250px;
+            height: 90vh;
+            padding-top: 20px;
+            transition: all 0.3s ease-in-out;
+            opacity: 0;
+            overflow-y: auto;
+        }
+
+        .menu-items.show {
+            left: 0;
+            opacity: 1;
+        }
+
+        .menu-items a {
+            display: block;
+            padding: 10px 20px;
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            opacity: 0;
+            transform: translateX(-20px);
+            font-size: 0.9rem;
+        }
+
+        .menu-items.show a {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .menu-items a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-items a:nth-child(1) { transition-delay: 0.1s; }
+        .menu-items a:nth-child(2) { transition-delay: 0.15s; }
+        .menu-items a:nth-child(3) { transition-delay: 0.2s; }
+        .menu-items a:nth-child(4) { transition-delay: 0.25s; }
+        .menu-items a:nth-child(5) { transition-delay: 0.3s; }
+        .menu-items a:nth-child(6) { transition-delay: 0.35s; }
+        .menu-items a:nth-child(7) { transition-delay: 0.4s; }
+        .menu-items a:nth-child(8) { transition-delay: 0.45s; }
+        .menu-items a:nth-child(9) { transition-delay: 0.5s; }
+        .menu-items a:nth-child(10) { transition-delay: 0.55s; }
+        .menu-items a:nth-child(11) { transition-delay: 0.6s; }
+        .menu-items a:nth-child(12) { transition-delay: 0.65s; }
+        .menu-items a:nth-child(13) { transition-delay: 0.7s; }
+        .menu-items a:nth-child(14) { transition-delay: 0.75s; }
+        .menu-items a:nth-child(15) { transition-delay: 0.8s; }
+        .menu-items a:nth-child(16) { transition-delay: 0.85s; }
+        .menu-items a:nth-child(17) { transition-delay: 0.9s; }
+        .menu-items a:nth-child(18) { transition-delay: 0.95s; }
+        .menu-items a:nth-child(19) { transition-delay: 1s; }
+
+        .menu-title {
+            text-align: center;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        :root {
+            --logo-size: 120px;
+        }
+
+        .logo {
+            width: var(--logo-size);
+            height: var(--logo-size);
+            position: absolute;
+            bottom: -30px;
+            right: 25px;
+            object-fit: contain;
+        }
+
+        .selected-filter {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            color: white;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            z-index: 1000;
+        }
+
+        .clear-filter {
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="hamburger-menu">
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="menu-items">
+            <div class="menu-title">View As</div>
+            <a href="#" onclick="applyFilter('Any')">Any</a>
+            <a href="#" onclick="applyFilter('G3')">G3</a>
+            <a href="#" onclick="applyFilter('G4')">G4</a>
+            <a href="#" onclick="applyFilter('G5')">G5</a>
+            <a href="#" onclick="applyFilter('Middle School')">Middle School</a>
+            <a href="#" onclick="applyFilter('High School')">High School</a>
+            <a href="#" onclick="applyFilter('Clara')">Clara</a>
+            <a href="#" onclick="applyFilter('Fritz')">Fritz</a>
+            <a href="#" onclick="applyFilter('Drosselmeyer')">Drosselmeyer</a>
+            <a href="#" onclick="applyFilter('Dolls')">Dolls</a>
+            <a href="#" onclick="applyFilter('Small Mice')">Small Mice</a>
+            <a href="#" onclick="applyFilter('Big Rats')">Big Rats</a>
+            <a href="#" onclick="applyFilter('Rat King')">Rat King</a>
+            <a href="#" onclick="applyFilter('Toy Soldiers')">Toy Soldiers</a>
+            <a href="#" onclick="applyFilter('Nutcracker')">Nutcracker</a>
+            <a href="#" onclick="applyFilter('Bonbons')">Bonbons</a>
+            <a href="#" onclick="applyFilter('Dewdrop Fairy')">Dewdrop Fairy</a>
+            <a href="#" onclick="applyFilter('Sugarplum Fairy')">Sugarplum Fairy</a>
+            <a href="#" onclick="applyFilter('Cavalier')">Cavalier</a>
+        </div>
+    </div>
+    <div id="selected-filter" class="selected-filter" style="display: none;">
+        <span id="filter-text"></span>
+        <span class="clear-filter" onclick="clearFilter()">x</span>
+    </div>
+    <div class="container">
+        <h1>The Nutcracker: An Overview</h1>
+        <img src="../../logo.png" alt="Logo" class="logo" onerror="this.src='../../fallback_logo.png'; this.onerror='this.src=https://placehold.co/120x120?text=Logo'">
+        <div class="space-y-4">
+            <!-- Overture -->
+            <div id="overture" class="scene-section">
+                <h3 class="text-blue-800">Overture</h3>
+                <div class="scene-title" data-roles="" onclick="toggleScene('overture-content')">Overture</div>
+                <div id="overture-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~3 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/overture.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Orchestra (No dancers)</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> The Overture sets the magical tone for Tchaikovsky’s ballet, introducing key themes with a light, festive orchestration.</p>
+                            <img src="images/overture.jpg" alt="Overture Scene" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE1" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE2" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Act I -->
+            <div id="act1" class="scene-section">
+                <h3 class="text-blue-800">Act I</h3>
+                <div class="scene-title" data-roles="High School,Clara,Fritz" onclick="toggleScene('scene1-content')">Scene 1</div>
+                <div id="scene1-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~4 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/scene 1.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Fritz, Party Guests, Parents</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> The Christmas party begins at the Stahlbaum household, with children and adults arriving in festive attire.</p>
+                            <img src="images/partyscene1.jpg" alt="Scene 1 Image" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/partyscene2.jpg" alt="Scene 1 Image" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/partyscene3.jpg" alt="Scene 1 Image" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE3" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE4" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="G4,High School,Clara,Fritz,Drosselmeyer" onclick="toggleScene('march-content')">March</div>
+                <div id="march-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/march.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong>Parents, Party Guests, Children</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> The children march joyfully, mimicking toy soldiers in a lively and playful dance.</p>
+                            <img src="images/march.jpg" alt="March Scene" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/march2.jpg" alt="March Scene" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/march3.jpg" alt="March Scene" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE5" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE6" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="G4,High School,Clara,Fritz,Drosselmeyer" onclick="toggleScene('mysterious-stranger-content')">Mysterious Stranger</div>
+                <div id="mysterious-stranger-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~1 minute</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/mysterious-stranger.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Drosselmeyer, Party Guests</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> A mysterious figure captivates the party with an air of intrigue, and then reveals that he is but Uncle Drosselmeyer in disguise, with magic tricks and gifts!</p>
+                            <img src="images/mysteriousstranger.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/mysteriousstranger2.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/mysteriousstranger3.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-xs">   
+                            <img src="images/mysteriousstranger4.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-xs">    
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE9" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE10" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="G4,High School,Clara,Fritz,Drosselmeyer,Dolls" onclick="toggleScene('dolls-presentation-content')">Presentation of Dolls</div>
+                <div id="dolls-presentation-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~1 minute</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/presentation-of-the-dolls.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Drosselmeyer, Dolls</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description: </strong>Drosselmeyer presents mechanical dolls that delight the children.</p>
+                            <img src="images/presentation of dolls 1.jpg" alt="Dolls Presentation" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/presentation of dolls 2.jpg" alt="Dolls Presentation" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/presentation of dolls 3.jpg" alt="Dolls Presentation" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE11" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE12" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="G4,High School,Clara,Fritz,Drosselmeyer,Dolls" onclick="toggleScene('dolls-dance-content')">Dance of the Dolls</div>
+                <div id="dolls-dance-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~1 minute</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/dance-of-the-dolls.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Mechanical Dolls</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description: </strong>The mechanical dolls perform a charming, synchronized dance.</p>
+                            <img src="images/danceofthedolls1.jpg" alt="Dolls Dance" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/danceofthedolls2.jpg" alt="Dolls Dance" class="my-3 rounded w-full max-w-xs">  
+                            <img src="images/danceofthedolls3.jpg" alt="Dolls Dance" class="my-3 rounded w-full max-w-xs">  
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE13" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE14" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="G4,High School,Clara,Fritz,Drosselmeyer" onclick="toggleScene('nutcracker-intro-content')">Introduction of Nutcracker</div>
+                <div id="nutcracker-intro-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/introduction-of-the-nutcracker.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Drosselmeyer, Nutcracker</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description: </strong>Drosselmeyer presents Clara with the Nutcracker doll, who enjoys it very much until her brother Fritz breaks it.</p>
+                            <img src="images/drosselmeyer and nutcracker.jpg" alt="Nutcracker Intro" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/drosselmeyer and nutcracker2.jpg" alt="Nutcracker Intro" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/drosselmeyer and nutcracker3.jpg" alt="Nutcracker Intro" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE15" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE16" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="G4,High School,Clara,Fritz,Drosselmeyer" onclick="toggleScene('consoles-clara-content')">Drosselmeyer Consoles Clara</div>
+                <div id="consoles-clara-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/consolation.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Drosselmeyer</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description: </strong>Drosselmeyer fixes the Nutcracker and consoles Clara, but they are interrupted twice by Fritz and his friends.</p>
+                            <img src="images/consolation.jpg" alt="Consoles Clara" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/consolation2.jpg" alt="Consoles Clara" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/consolation3.jpg" alt="Consoles Clara" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE17" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE18" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="High School,Drosselmeyer" onclick="toggleScene('grandfather-waltz-content')">Grandfather Waltz</div>
+                <div id="grandfather-waltz-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/grandfather-waltz.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Parents, Party Guests</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description: </strong>The party concludes with a stately waltz performed by the older guests.</p>
+                            <img src="images/grandfather waltz3.jpg" alt="Grandfather Waltz" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/grandfather waltz.jpg" alt="Grandfather Waltz" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/grandfather waltz 4.jpg" alt="Grandfather Waltz" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE19" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE20" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="G3,Clara,Small Mice,Rat King,Drosselmeyer" onclick="toggleScene('clara-nutcracker-content')">Clara and the Nutcracker</div>
+                <div id="clara-nutcracker-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~7 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/clara-and-the-nutcracker.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Nutcracker</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description: </strong>After the guests leave, Clara falls asleep and dreams that as the clock strikes midnight, little mice scurry around as the Christmas tree grows to impossible sizes, finally she comes face to face with the dreaded Rat King!</p>
+                            <img src="images/clara-and-the-nutcracker1.jpg" alt="Clara Nutcracker" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/clara-and-the-nutcracker2.jpg" alt="Clara Nutcracker" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/clara-and-the-nutcracker3.jpg" alt="Clara Nutcracker" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/clara-and-the-nutcracker4.jpg" alt="Clara Nutcracker" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE21" frameborder="0" allowfullscreen></iframe>-->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE22" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="Middle School,Clara,Big Rats,Rat King,Toy Soldiers,Nutcracker" onclick="toggleScene('battle-content')">The Battle</div>
+                <div id="battle-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~3.5 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/the-battle.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Nutcracker, Mouse King, Soldiers, Mice</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> The Nutcracker leads toy soldiers in a battle against the Mouse King and his army.</p>
+                            <img src="images/battle1.jpg" alt="Battle Scene" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/battle2.jpg" alt="Battle Scene" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/battle3.jpg" alt="Battle Scene" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/battle4.jpg" alt="Battle Scene" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE23" frameborder="0" allowfullscreen></iframe>-->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE24" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="Clara" onclick="toggleScene('pine-forest-content')">A Pine Forest in Winter</div>
+                <div id="pine-forest-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~3 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/pine-forest.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Nutcracker Prince</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> Clara and the Nutcracker Prince journey through a snowy forest.</p>
+                            <img src="images/Pine+Forest" alt="Pine Forest" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE25" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE26" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="G5,Clara" onclick="toggleScene('snowflakes-content')">Waltz of the Snowflakes</div>
+                <div id="snowflakes-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~6 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/snowflakes.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Snowflakes, Clara, Nutcracker Prince</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> Snowflakes dance gracefully, creating a magical winter scene.</p>
+                            <img src="images/Snowflakes" alt="Snowflakes" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE27" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE28" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Act II -->
+            <div id="act2" class="scene-section">
+                <h3 class="text-blue-800">Act II</h3>
+                <div class="scene-title" data-roles="Clara" onclick="toggleScene('enchanted-palace-content')">The Enchanted Palace</div>
+                <div id="enchanted-palace-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~3 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/enchanted-palace.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Nutcracker Prince, Sugar Plum Fairy</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> Clara and the Prince arrive at the magical Land of Sweets.</p>
+                            <img src="images/Enchanted+Palace" alt="Enchanted Palace" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE29" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE30" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="Clara,Dewdrop Fairy,Sugarplum Fairy,Cavalier" onclick="toggleScene('clara-prince-content')">Arrival of Clara and Prince</div>
+                <div id="clara-prince-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/clara-prince.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Nutcracker Prince, Sugar Plum Fairy</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> Clara and the Prince are welcomed in the Land of Sweets.</p>
+                            <img src="images/Clara+Prince" alt="Clara Prince" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE31" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE32" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="Clara" onclick="toggleScene('arabian-content')">Arabian Dance</div>
+                <div id="arabian-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~3 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/arabian.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Arabian Dancers</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> A sultry and exotic dance performed in the Land of Sweets.</p>
+                            <img src="images/Arabian+Dance" alt="Arabian Dance" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE33" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE34" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="Clara" onclick="toggleScene('chinese-content')">Chinese Dance</div>
+                <div id="chinese-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~1 minute</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/chinese.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Chinese Dancers</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> A lively and colorful dance with quick, precise movements.</p>
+                            <img src="images/Chinese+Dance" alt="Chinese Dance" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/JHhNj_KixAo?si=szLwKFzktwaKPSyh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> -->
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/VIDEO_ID" title="Nutcracker Chinese Dance" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="Clara" onclick="toggleScene('russian-content')">Russian Dance</div>
+                <div id="russian-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~1 minute</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/russian.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Russian Dancers</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> An energetic Trepak dance with high leaps and spins.</p>
+                            <img src="images/Russian+Dance" alt="Russian Dance" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE37" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE38" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="Clara" onclick="toggleScene('reed-flutes-content')">Dance of the Reed Flutes</div>
+                <div id="reed-flutes-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/reed-flutes.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Mirlitons</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> A light and playful dance featuring delicate flute melodies.</p>
+                            <img src="images/Reed+Flutes" alt="Reed Flutes" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE39" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE40" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="G3,Clara,Bonbons" onclick="toggleScene('mother-ginger-content')">Mother Ginger</div>
+                <div id="mother-ginger-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/mother-ginger.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Mother Ginger, Polichinelles</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> Mother Ginger reveals her children, who perform a whimsical dance.</p>
+                            <img src="images/Mother+Ginger" alt="Mother Ginger" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE41" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE42" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="Clara,Dewdrop Fairy" onclick="toggleScene('flowers-content')">Waltz of the Flowers</div>
+                <div id="flowers-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~6 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/flowers.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Flowers, Dewdrop</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> A grand waltz featuring elegant flower dancers led by the Dewdrop.</p>
+                            <img src="images/Flowers+Waltz" alt="Flowers Waltz" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE43" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE44" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="Clara,Sugarplum Fairy,Cavalier" onclick="toggleScene('intrada-content')">Intrada</div>
+                <div id="intrada-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/intrada.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Sugar Plum Fairy, Cavalier</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> A majestic introduction to the Sugar Plum Fairy and her Cavalier.</p>
+                            <img src="images/Intrada" alt="Intrada" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE45" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE46" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="Clara,Sugarplum Fairy" onclick="toggleScene('sugarplum-content')">Dance of the Sugar Plum Fairy</div>
+                <div id="sugarplum-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/sugarplum.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Sugar Plum Fairy, Corps de Ballet</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> The Sugar Plum Fairy performs a delicate, ethereal dance, highlighted by the celesta’s iconic melody.</p>
+                            <img src="images/Sugar+Plum+Fairy" alt="Sugar Plum Fairy" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE47" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE48" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="scene-title" data-roles="Clara,Bonbons,Sugarplum Fairy,Cavalier" onclick="toggleScene('final-waltz-content')">Final Waltz</div>
+                <div id="final-waltz-content" class="scene-content">
+                    <div class="p-4">
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~5 minutes</p>
+                        <audio controls class="mb-3 w-full">
+                            <source src="recordings/final-waltz.mp3" type="audio/mpeg">
+                            </audio>
+                        <p class="mb-3 text-sm"><strong>Cast:</strong> Entire Cast</p>
+                        <div class="mb-3">
+                            <p class="text-sm"><strong>Description:</strong> The ballet concludes with a grand waltz, celebrating Clara’s adventure.</p>
+                            <img src="images/Final+Waltz" alt="Final Waltz" class="my-3 rounded w-full max-w-xs">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE49" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                            <div>
+                                <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE50" frameborder="0" allowfullscreen></iframe> -->
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleScene(sceneId) {
+            const scenes = document.querySelectorAll('.scene-content');
+            const sceneTitles = document.querySelectorAll('.scene-title');
+            scenes.forEach(scene => {
+                if (scene.id === sceneId) {
+                    scene.classList.toggle('active');
+                    const correspondingTitle = document.querySelector(`.scene-title[onclick="toggleScene('${sceneId}')"]`);
+                    if (scene.classList.contains('active')) {
+                        correspondingTitle.classList.add('active');
+                    } else {
+                        correspondingTitle.classList.remove('active');
+                    }
+                } else {
+                    scene.classList.remove('active');
+                    const otherTitle = document.querySelector(`.scene-title[onclick="toggleScene('${scene.id}')"]`);
+                    if (otherTitle) {
+                        otherTitle.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        function toggleMenu() {
+            const menu = document.querySelector('.menu-items');
+            const menuToggle = document.querySelector('.menu-toggle');
+            menu.classList.toggle('show');
+            menuToggle.classList.toggle('open');
+        }
+
+        document.addEventListener('click', function(event) {
+            const scenes = document.querySelectorAll('.scene-content');
+            const isSceneClick = event.target.closest('.scene-title');
+            if (!isSceneClick) {
+                scenes.forEach(scene => {
+                    scene.classList.remove('active');
+                    const correspondingTitle = document.querySelector(`.scene-title[onclick="toggleScene('${scene.id}')"]`);
+                    if (correspondingTitle) {
+                        correspondingTitle.classList.remove('active');
+                    }
+                });
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const scenes = document.querySelectorAll('.scene-content');
+                scenes.forEach(scene => {
+                    scene.classList.remove('active');
+                    const correspondingTitle = document.querySelector(`.scene-title[onclick="toggleScene('${scene.id}')"]`);
+                    if (correspondingTitle) {
+                        correspondingTitle.classList.remove('active');
+                    }
+                });
+            }
+        });
+
+        function applyFilter(role) {
+            const sceneTitles = document.querySelectorAll('.scene-title');
+            const selectedFilterDiv = document.getElementById('selected-filter');
+            const filterText = document.getElementById('filter-text');
+
+            // Clear previous highlights
+            sceneTitles.forEach(title => title.classList.remove('highlighted'));
+
+            // Apply highlights based on role
+            if (role && role !== 'Any') {
+                sceneTitles.forEach(title => {
+                    const roles = title.getAttribute('data-roles').split(',');
+                    if (roles.includes(role)) {
+                        title.classList.add('highlighted');
+                    }
+                });
+                // Show selected filter
+                filterText.textContent = role;
+                selectedFilterDiv.style.display = 'flex';
+            } else {
+                // Hide selected filter if 'Any' or no role is selected
+                selectedFilterDiv.style.display = 'none';
+            }
+
+            // Close menu after selection
+            toggleMenu();
+        }
+
+        function clearFilter() {
+            const sceneTitles = document.querySelectorAll('.scene-title');
+            const selectedFilterDiv = document.getElementById('selected-filter');
+
+            // Clear highlights
+            sceneTitles.forEach(title => title.classList.remove('highlighted'));
+            // Hide selected filter
+            selectedFilterDiv.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
