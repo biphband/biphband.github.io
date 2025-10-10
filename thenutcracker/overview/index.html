@@ -13,43 +13,43 @@
         }
 
         body {
-    background: linear-gradient(to bottom, #e6e6fa, #f0f8ff);
-    background-image: url('../background.jpeg');
-    background-color: #e6e6fa; 
-    background-attachment: fixed;
-    background-size: cover;
-    background-position: center;
-    font-family: 'Roboto', sans-serif;
-    min-height: 100vh;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    display: block !important;
-    overflow-x: hidden;
-    overflow-y: auto;
-    font-size: 0.9rem;
-}
+            background: linear-gradient(to bottom, #e6e6fa, #f0f8ff);
+            background-image: url('../background.jpeg');
+            background-color: #e6e6fa; 
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            display: block !important;
+            overflow-x: hidden;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
 
-.wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    width: 100%;
-}
+        .wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            width: 100%;
+        }
 
-.container {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    padding: 16px;
-    padding-bottom: 100px;
-    position: relative;
-    overflow: hidden;
-    max-width: 600px !important;
-    width: 100% !important;
-    margin: 0 auto !important;
-    box-sizing: border-box;
-}
+        .container {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            padding-bottom: 100px;
+            position: relative;
+            overflow: hidden;
+            max-width: 600px !important;
+            width: 100% !important;
+            margin: 0 auto !important;
+            box-sizing: border-box;
+        }
 
         .container h1 {
             color: white !important;
@@ -92,25 +92,25 @@
         }
 
         .scene-title:hover {
-    background-color: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+            background-color: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
 
         .scene-title.highlighted {
             background-color: rgba(255, 255, 0, 0.25);
         }
 
         .scene-title.active {
-    background-color: rgba(59, 130, 246, 0.7);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+            background-color: rgba(59, 130, 246, 0.7);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
 
         .scene-content {
             display: none;
             opacity: 0;
             max-height: 0;
             overflow: hidden;
-            transition: all 0.5s ease-in-out;
+            transition: all 1s ease-in-out;
             margin-top: 8px;
             margin-left: 16px;
         }
@@ -266,7 +266,6 @@
             color: white;
             font-weight: bold;
         }
-
     </style>
 </head>
 <body>
@@ -316,7 +315,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~3 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/overture.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Orchestra (No dancers)</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> The Overture sets the magical tone for Tchaikovsky’s ballet, introducing key themes with a light, festive orchestration.</p>
@@ -325,11 +324,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE1" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE2" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -345,7 +342,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~4 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/scene 1.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Fritz, Party Guests, Parents</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> The Christmas party begins at the Stahlbaum household, with children and adults arriving in festive attire.</p>
@@ -356,11 +353,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE3" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE4" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -368,10 +363,10 @@
                 <div class="scene-title" data-roles="G4,High School,Clara,Fritz,Drosselmeyer" onclick="toggleScene('march-content')">March</div>
                 <div id="march-content" class="scene-content">
                     <div class="p-4">
-                        <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~2.5 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/march.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong>Parents, Party Guests, Children</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> The children march joyfully, mimicking toy soldiers in a lively and playful dance.</p>
@@ -382,11 +377,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE5" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE6" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -397,7 +390,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~1 minute</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/mysterious-stranger.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Drosselmeyer, Party Guests</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> A mysterious figure captivates the party with an air of intrigue, and then reveals that he is but Uncle Drosselmeyer in disguise, with magic tricks and gifts!</p>
@@ -409,11 +402,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE9" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE10" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -424,7 +415,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~1 minute</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/presentation-of-the-dolls.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Drosselmeyer, Dolls</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description: </strong>Drosselmeyer presents mechanical dolls that delight the children.</p>
@@ -435,11 +426,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE11" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE12" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -450,7 +439,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~1 minute</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/dance-of-the-dolls.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Mechanical Dolls</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description: </strong>The mechanical dolls perform a charming, synchronized dance.</p>
@@ -461,11 +450,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE13" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE14" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -473,10 +460,10 @@
                 <div class="scene-title" data-roles="G4,High School,Clara,Fritz,Drosselmeyer" onclick="toggleScene('nutcracker-intro-content')">Introduction of Nutcracker</div>
                 <div id="nutcracker-intro-content" class="scene-content">
                     <div class="p-4">
-                        <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
+                        <p class="text-sm mb-3"><strong>Length:</strong> ~1 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/introduction-of-the-nutcracker.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Drosselmeyer, Nutcracker</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description: </strong>Drosselmeyer presents Clara with the Nutcracker doll, who enjoys it very much until her brother Fritz breaks it.</p>
@@ -487,11 +474,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE15" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE16" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -502,7 +487,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/consolation.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Drosselmeyer</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description: </strong>Drosselmeyer fixes the Nutcracker and consoles Clara, but they are interrupted twice by Fritz and his friends.</p>
@@ -513,11 +498,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE17" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE18" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -528,7 +511,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/grandfather-waltz.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Parents, Party Guests</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description: </strong>The party concludes with a stately waltz performed by the older guests.</p>
@@ -539,11 +522,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE19" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE20" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -554,7 +535,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~7 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/clara-and-the-nutcracker.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Nutcracker</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description: </strong>After the guests leave, Clara falls asleep and dreams that as the clock strikes midnight, little mice scurry around as the Christmas tree grows to impossible sizes, finally she comes face to face with the dreaded Rat King!</p>
@@ -566,11 +547,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE21" frameborder="0" allowfullscreen></iframe>-->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE22" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -581,7 +560,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~3.5 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/the-battle.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Nutcracker, Mouse King, Soldiers, Mice</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> The Nutcracker leads toy soldiers in a battle against the Mouse King and his army.</p>
@@ -593,11 +572,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE23" frameborder="0" allowfullscreen></iframe>-->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE24" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -608,20 +585,20 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~3 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/pine-forest.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Nutcracker Prince</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> Clara and the Nutcracker Prince journey through a snowy forest.</p>
-                            <img src="images/Pine+Forest" alt="Pine Forest" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/pine-forest-in-winter1.jpg" alt="Pine Forest" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/pine-forest-in-winter2.jpg" alt="Pine Forest" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/pine-forest-in-winter3.jpg" alt="Pine Forest" class="my-3 rounded w-full max-w-xs">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE25" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE26" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -632,20 +609,19 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~6 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/snowflakes.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Snowflakes, Clara, Nutcracker Prince</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> Snowflakes dance gracefully, creating a magical winter scene.</p>
-                            <img src="images/Snowflakes" alt="Snowflakes" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/waltz-of-snowflakes1.jpg" alt="Snowflakes" class="my-3 rounded w-full max-w-xs">
+                            <img src="images/waltz-of-snowflakes2.jpg" alt="Snowflakes" class="my-3 rounded w-full max-w-xs">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE27" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE28" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -661,7 +637,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~3 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/enchanted-palace.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Nutcracker Prince, Sugar Plum Fairy</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> Clara and the Prince arrive at the magical Land of Sweets.</p>
@@ -670,11 +646,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE29" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE30" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -685,7 +659,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/clara-prince.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Clara, Nutcracker Prince, Sugar Plum Fairy</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> Clara and the Prince are welcomed in the Land of Sweets.</p>
@@ -694,11 +668,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE31" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE32" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -709,7 +681,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~3 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/arabian.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Arabian Dancers</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> A sultry and exotic dance performed in the Land of Sweets.</p>
@@ -718,11 +690,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE33" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE34" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -733,7 +703,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~1 minute</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/chinese.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Chinese Dancers</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> A lively and colorful dance with quick, precise movements.</p>
@@ -755,7 +725,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~1 minute</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/russian.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Russian Dancers</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> An energetic Trepak dance with high leaps and spins.</p>
@@ -764,11 +734,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE37" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE38" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -779,7 +747,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/reed-flutes.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Mirlitons</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> A light and playful dance featuring delicate flute melodies.</p>
@@ -788,11 +756,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE39" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE40" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -803,7 +769,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/mother-ginger.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Mother Ginger, Polichinelles</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> Mother Ginger reveals her children, who perform a whimsical dance.</p>
@@ -812,11 +778,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE41" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE42" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -827,7 +791,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~6 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/flowers.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Flowers, Dewdrop</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> A grand waltz featuring elegant flower dancers led by the Dewdrop.</p>
@@ -836,11 +800,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE43" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE44" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -851,7 +813,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/intrada.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Sugar Plum Fairy, Cavalier</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> A majestic introduction to the Sugar Plum Fairy and her Cavalier.</p>
@@ -860,11 +822,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE45" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE46" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -875,7 +835,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~2 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/sugarplum.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Sugar Plum Fairy, Corps de Ballet</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> The Sugar Plum Fairy performs a delicate, ethereal dance, highlighted by the celesta’s iconic melody.</p>
@@ -884,11 +844,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE47" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE48" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -899,7 +857,7 @@
                         <p class="text-sm mb-3"><strong>Length:</strong> ~5 minutes</p>
                         <audio controls class="mb-3 w-full">
                             <source src="recordings/final-waltz.mp3" type="audio/mpeg">
-                            </audio>
+                        </audio>
                         <p class="mb-3 text-sm"><strong>Cast:</strong> Entire Cast</p>
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description:</strong> The ballet concludes with a grand waltz, celebrating Clara’s adventure.</p>
@@ -908,11 +866,9 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE49" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                             <div>
                                 <!-- <iframe width="100%" height="200" src="https://www.youtube.com/embed/EXAMPLE50" frameborder="0" allowfullscreen></iframe> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -931,6 +887,11 @@
                     const correspondingTitle = document.querySelector(`.scene-title[onclick="toggleScene('${sceneId}')"]`);
                     if (scene.classList.contains('active')) {
                         correspondingTitle.classList.add('active');
+                        // Scroll the title to the top of the viewport
+                        correspondingTitle.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'start' 
+                        });
                     } else {
                         correspondingTitle.classList.remove('active');
                     }
