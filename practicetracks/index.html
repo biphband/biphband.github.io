@@ -516,9 +516,9 @@
             <option value="1" selected>1x</option>
           </select>
           <label for="part-volume" style="color: #b0b0b0; margin-left: 10px;">Your Part</label>
-          <input type="range" id="part-volume" min="0" max="1" step="0.01" value="0.8">
+          <input type="range" id="part-volume" min="0" max="1" step="0.01" value="1">
           <label for="combined-volume" style="color: #b0b0b0; margin-left: 10px;">Others</label>
-          <input type="range" id="combined-volume" min="0" max="1" step="0.01" value="0.2">
+          <input type="range" id="combined-volume" min="0" max="1" step="0.01" value="0.05">
         </div>
         <div class="song-list">
           <h2>Measures</h2>
@@ -564,7 +564,6 @@ const songList = [
   'Overture',
   'Scene 1',
   'March',
-  "Children's Gallop",
   'Arrival of Drosselmeyer',
   'Grandfather Waltz',
   'Clara and the Nutcracker',
@@ -573,18 +572,15 @@ const songList = [
   'Waltz of the Snowflakes',
   '[ACT 2]',
   'The Enchanted Palace',
+  'Dance of the Sugar Plum Fairy',
   'Arrival of Clara and Prince',
-  'Spanish Dance',
+  'Russian Dance',
   'Arabian Dance',
   'Chinese Dance',
-  'Russian Dance',
   'Dance of the Reed Flutes',
   'Mother Ginger',
   'Waltz of the Flowers',
   'Intrada',
-  'Tarantella',
-  'Dance of the Sugar Plum Fairy',
-  'Coda',
   'Final Waltz'
 ];
 
@@ -596,14 +592,18 @@ const availableSongs = [
   'Grandfather Waltz',
   'Clara and the Nutcracker',
   'The Battle',
+  // 'A Pine Forest in Winter',
   'Waltz of the Snowflakes',
+  // 'The Enchanted Palace',
+  'Dance of the Sugar Plum Fairy',
+  // 'Arrival of Clara and Prince',
+  'Russian Dance',
   'Arabian Dance',
   'Chinese Dance',
-  'Russian Dance',
   'Dance of the Reed Flutes',
   'Mother Ginger',
   'Waltz of the Flowers',
-  'Dance of the Sugar Plum Fairy',
+  // 'Intrada',
   'Final Waltz'
 ];
 
@@ -648,7 +648,6 @@ const songs = {
     { name: 'm65', time: 128 },
     { name: 'm81', time: 160 }
   ],
-  "Children's Gallop": [{ name: 'm1', time: 0 }],
   'Arrival of Drosselmeyer': [
     { name: 'Mysterious Stranger M1', time: 0 },
     { name: 'Mysterious Stranger M20', time: 33 },
@@ -669,74 +668,95 @@ const songs = {
     { name: 'Drosselmeyer Consoles Clara M26', time: 316 },
     { name: 'Drosselmeyer Consoles Clara M35', time: 328 },
     { name: 'Drosselmeyer Consoles Clara M51', time: 357 }
-],
+  ],
   'Grandfather Waltz': [
     { name: 'M1', time: 0 },
     { name: 'M16', time: 27 },
     { name: 'M33', time: 47 },
     { name: 'M48', time: 67 },
     { name: 'M53', time: 115 }
-],
+  ],
   'Clara and the Nutcracker': [
-  { name: 'm1', time: 0 },
-  { name: 'm17', time: 38 },
-  { name: 'm33', time: 76 },
-  { name: 'm36', time: 85 },
-  { name: 'm49', time: 117 },
-  { name: 'm71', time: 165 },
-  { name: 'm80', time: 200 },
-  { name: 'm101', time: 236 },
-  { name: 'm107', time: 246 },
-  { name: 'm127', time: 304 },
-  { name: 'm139', time: 339 },
-  { name: 'm151', time: 375 }
-],
+    { name: 'm1', time: 0 },
+    { name: 'm17', time: 38 },
+    { name: 'm33', time: 76 },
+    { name: 'm36', time: 85 },
+    { name: 'm49', time: 117 },
+    { name: 'm71', time: 165 },
+    { name: 'm80', time: 200 },
+    { name: 'm101', time: 236 },
+    { name: 'm107', time: 246 },
+    { name: 'm127', time: 304 },
+    { name: 'm139', time: 339 },
+    { name: 'm151', time: 375 }
+  ],
   'The Battle': [
-  { name: 'm1', time: 0 },
-  { name: 'm13', time: 20 },
-  { name: 'm25', time: 39 },
-  { name: 'm34', time: 53 },
-  { name: 'm42', time: 65 },
-  { name: 'm51', time: 79 },
-  { name: 'm63', time: 97 },
-  { name: 'm73', time: 113 },
-  { name: 'm82', time: 127 },
-  { name: 'm90', time: 139 },
-  { name: 'm107', time: 166 },
-  { name: 'm116', time: 182 }
-],
-  'A Pine Forest in Winter': [{ name: 'm1', time: 0 }],
+    { name: 'm1', time: 0 },
+    { name: 'm13', time: 20 },
+    { name: 'm25', time: 39 },
+    { name: 'm34', time: 53 },
+    { name: 'm42', time: 65 },
+    { name: 'm51', time: 79 },
+    { name: 'm63', time: 97 },
+    { name: 'm73', time: 113 },
+    { name: 'm82', time: 127 },
+    { name: 'm90', time: 139 },
+    { name: 'm107', time: 166 },
+    { name: 'm116', time: 182 }
+  ],
+  'A Pine Forest in Winter': [
+    { name: 'm1', time: 0 }
+  ],
   'Waltz of the Snowflakes': [
-  { name: 'm1', time: 0 },
-  { name: 'm25', time: 25 },
-  { name: 'm37', time: 38 },
-  { name: 'm53', time: 55 },
-  { name: 'm68', time: 70 },
-  { name: 'm85', time: 88 },
-  { name: 'm101', time: 105 },
-  { name: 'm117', time: 122 },
-  { name: 'm133', time: 139 },
-  { name: 'm148', time: 155 },
-  { name: 'm165', time: 155 },
-  { name: 'm181', time: 190 },
-  { name: 'm196', time: 206 },
-  { name: 'm213', time: 225 },
-  { name: 'm229', time: 241 },
-  { name: 'm245', time: 260 },
-  { name: 'm257', time: 271 },
-  { name: 'm265', time: 280 },
-  { name: 'm284', time: 294 },
-  { name: 'm299', time: 305 },
-  { name: 'm312', time: 315 },
-  { name: 'm323', time: 323 },
-  { name: 'm331', time: 329 },
-  { name: 'm343', time: 338 },
-  { name: 'm362', time: 354 },
-  { name: 'm389', time: 376 }
-],
-  'The Enchanted Palace': [{ name: 'm1', time: 0 }],
-  'Arrival of Clara and Prince': [{ name: 'm1', time: 0 }],
-  'Spanish Dance': [{ name: 'm1', time: 0 }],
+    { name: 'm1', time: 0 },
+    { name: 'm25', time: 25 },
+    { name: 'm37', time: 38 },
+    { name: 'm53', time: 55 },
+    { name: 'm68', time: 70 },
+    { name: 'm85', time: 88 },
+    { name: 'm101', time: 105 },
+    { name: 'm117', time: 122 },
+    { name: 'm133', time: 139 },
+    { name: 'm148', time: 155 },
+    { name: 'm165', time: 155 },
+    { name: 'm181', time: 190 },
+    { name: 'm196', time: 206 },
+    { name: 'm213', time: 225 },
+    { name: 'm229', time: 241 },
+    { name: 'm245', time: 260 },
+    { name: 'm257', time: 271 },
+    { name: 'm265', time: 280 },
+    { name: 'm284', time: 294 },
+    { name: 'm299', time: 305 },
+    { name: 'm312', time: 315 },
+    { name: 'm323', time: 323 },
+    { name: 'm331', time: 329 },
+    { name: 'm343', time: 338 },
+    { name: 'm362', time: 354 },
+    { name: 'm389', time: 376 }
+  ],
+  'The Enchanted Palace': [
+    { name: 'm1', time: 0 }
+  ],
+  'Dance of the Sugar Plum Fairy': [
+    { name: 'm1', time: 0 },
+    { name: 'm5', time: 10 },
+    { name: 'm17', time: 40 },
+    { name: 'm21', time: 50 },
+    { name: 'm32', time: 79 },
+    { name: 'm37', time: 90 },
+    { name: 'm49', time: 121 }
+  ],
+  'Arrival of Clara and Prince': [
+    { name: 'm1', time: 0 }
+  ],
+  'Russian Dance': [
+    { name: 'm1', time: 0 },
+    { name: 'm17', time: 13 },
+    { name: 'm33', time: 27 },
+    { name: 'm49', time: 40 },
+    { name: 'm65', time: 54 }
+  ],
   'Arabian Dance': [
     { name: 'm1', time: 0 },
     { name: 'm5', time: 8 },
@@ -755,13 +775,6 @@ const songs = {
     { name: 'm19', time: 40 },
     { name: 'm27', time: 57 }
   ],
-  'Russian Dance': [
-    { name: 'm1', time: 0 },
-    { name: 'm17', time: 13 },
-    { name: 'm33', time: 27 },
-    { name: 'm49', time: 40 },
-    { name: 'm65', time: 54 }
-  ],
   'Dance of the Reed Flutes': [
     { name: 'm1', time: 0 },
     { name: 'm19', time: 37 },
@@ -772,16 +785,16 @@ const songs = {
     { name: 'm62', time: 127 }
   ],
   'Mother Ginger': [
-  { name: 'm1', time: 0 },
-  { name: 'm11', time: 19 },
-  { name: 'm19', time: 34 },
-  { name: 'm27', time: 49 },
-  { name: 'm35', time: 65 },
-  { name: 'm43', time: 91 },
-  { name: 'm52', time: 118 },
-  { name: 'm64', time: 138 },
-  { name: 'm76', time: 154 }
-],
+    { name: 'm1', time: 0 },
+    { name: 'm11', time: 19 },
+    { name: 'm19', time: 34 },
+    { name: 'm27', time: 49 },
+    { name: 'm35', time: 65 },
+    { name: 'm43', time: 91 },
+    { name: 'm52', time: 118 },
+    { name: 'm64', time: 138 },
+    { name: 'm76', time: 154 }
+  ],
   'Waltz of the Flowers': [
     { name: 'm1', time: 0 },
     { name: 'm16', time: 21 },
@@ -813,18 +826,9 @@ const songs = {
     { name: 'm334', time: 448 },
     { name: 'm342', time: 457 }
   ],
-  'Intrada': [{ name: 'm1', time: 0 }],
-  'Tarantella': [{ name: 'm1', time: 0 }],
-  'Dance of the Sugar Plum Fairy': [
-    { name: 'm1', time: 0 },
-    { name: 'm5', time: 10 },
-    { name: 'm17', time: 40 },
-    { name: 'm21', time: 50 },
-    { name: 'm32', time: 79 },
-    { name: 'm37', time: 90 },
-    { name: 'm49', time: 121 }
+  'Intrada': [
+    { name: 'm1', time: 0 }
   ],
-  'Coda': [{ name: 'm1', time: 0 }],
   'Final Waltz': [
     { name: 'm1', time: 0 },
     { name: 'm32', time: 27 },
@@ -839,7 +843,7 @@ const songs = {
     { name: 'm178', time: 189 },
     { name: 'm192', time: 207 },
     { name: 'm208', time: 229 }
-]
+  ]
 };
 
 const instrumentSelection = document.getElementById('instrument-selection');
@@ -991,6 +995,9 @@ function showInstrumentSelection() {
         if (instrument === 'Tenor Saxophone') {
           instrument = 'Tenor Sax';
         }
+        if (instrument.includes('Trombone 1')) {
+          instrument = instrument.replace('Trombone 1', 'Trombone');
+        }
         instrument = instrument.split(' ').map(word =>
           word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
         ).join(' ');
@@ -1000,7 +1007,7 @@ function showInstrumentSelection() {
         ['click', 'touchstart'].forEach(eventType => {
           btn.addEventListener(eventType, (e) => {
             e.preventDefault();
-            selectedInstrument = file.replace('The Nutcracker_', '').replace('_Parts.pdf', '');
+            selectedInstrument = file.replace('The Nutcracker_', '').replace('_Parts.pdf', '').replace('Trombone_1', 'Trombone');
             showSongSelection();
           });
         });
@@ -1043,7 +1050,7 @@ async function showSongSelection() {
   familyDiv.appendChild(backBtn);
   const instrumentTitle = document.createElement('div');
   instrumentTitle.className = 'instrument-title';
-  instrumentTitle.textContent = selectedInstrument.replace(/_/g, ' ');
+  instrumentTitle.textContent = selectedInstrument.replace(/_/g, ' ').replace('Trombone 1', 'Trombone');
   familyDiv.appendChild(instrumentTitle);
   const columnsDiv = document.createElement('div');
   columnsDiv.className = 'song-columns';
@@ -1102,7 +1109,7 @@ async function showPlayer() {
   instrumentSelection.style.display = 'none';
   songSelection.style.display = 'none';
   playerSection.style.display = 'block';
-  playerTitle.textContent = `${selectedInstrument.replace(/_/g, ' ')} - ${selectedSong}`;
+  playerTitle.textContent = `${selectedInstrument.replace(/_/g, ' ').replace('Trombone 1', 'Trombone')} - ${selectedSong}`;
   measureListContainer.innerHTML = '';
   const ulEl = document.createElement('ul');
   songs[selectedSong].forEach(marker => {
@@ -1122,8 +1129,8 @@ async function showPlayer() {
   speedSelect.value = '1';
   const partVolumeSlider = document.getElementById('part-volume');
   const combinedVolumeSlider = document.getElementById('combined-volume');
-  partVolumeSlider.value = '0.8';
-  combinedVolumeSlider.value = '0.2';
+  partVolumeSlider.value = '1';
+  combinedVolumeSlider.value = '0.05';
 
   const oldPlayPauseBtn = playPauseBtn;
   playPauseBtn = oldPlayPauseBtn.cloneNode(true);
@@ -1188,7 +1195,7 @@ async function showPlayer() {
                       selectedSong === 'Dance of the Sugar Plum Fairy' ? 'DOTSPF' : 
                       selectedSong === 'Overture' ? 'Nutcracker Overture' : 
                       selectedSong;
-  const partFile = `practicetracks/${songFileName}-${selectedInstrument}.mp3`;
+  const partFile = `practicetracks/${songFileName}-${selectedInstrument.replace('Trombone 1', 'Trombone')}.mp3`;
   const combinedFile = `practicetracks/${songFileName}.mp3`;
 
   loadingOverlay.style.display = 'flex';
@@ -1222,8 +1229,8 @@ async function showPlayer() {
 
     playPauseBtn.disabled = false;
 
-    wavesurferPart.setVolume(0.8);
-    wavesurferCombined.setVolume(0.2);
+    wavesurferPart.setVolume(1);
+    wavesurferCombined.setVolume(0.05);
 
     let durationSet = false;
     wavesurferPart.on('ready', () => {
@@ -1372,9 +1379,9 @@ document.addEventListener('keydown', (event) => {
 const urlParams = new URLSearchParams(window.location.search);
 const instrumentFromUrl = urlParams.get('instrument');
 if (instrumentFromUrl) {
-  selectedInstrument = decodeURIComponent(instrumentFromUrl);
+  selectedInstrument = decodeURIComponent(instrumentFromUrl).replace('Trombone 1', 'Trombone');
   const allInstruments = Object.values(instruments).flat(2).map(file => 
-    file.replace('The Nutcracker_', '').replace('_Parts.pdf', '')
+    file.replace('The Nutcracker_', '').replace('_Parts.pdf', '').replace('Trombone_1', 'Trombone')
   );
   if (allInstruments.includes(selectedInstrument)) {
     showSongSelection();
