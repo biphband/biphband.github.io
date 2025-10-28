@@ -8,6 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/7.7.6/wavesurfer.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
   <style>
     @font-face {
       font-family: 'Zapfino';
@@ -22,10 +23,27 @@
       min-height:100vh;margin:0;display:flex;justify-content:center;align-items:center;
     }
     .container{max-width:800px;width:90%;margin:16px auto;background:rgba(255,255,255,0.2);border-radius:12px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,0.1);}
-    h1{color:#fff;font-family:'Zapfino',cursive;font-size:3rem;text-align:center;margin:0 0 30px;white-space:nowrap;}
-    .song-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:30px;}
-    .song-btn{background:#2563eb;color:#fff;padding:14px;border-radius:8px;font-size:1.1rem;text-align:center;cursor:pointer;transition:all .2s;border:1px solid #1e40af;}
+h1 {
+  font-size: 4.2rem !important;
+  font-family: 'Creepster', cursive !important;
+  text-shadow: 
+    0 0 10px rgba(58, 32, 0, 0.8),
+    0 0 20px rgba(143, 100, 28, 0.6),
+    0 0 30px rgba(200, 113, 0, 0.914);
+  color: #ff4400 !important;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center !important;           /* Ensures horizontal centering */
+  width: 100% !important;                  /* Full width for centering */
+  margin: 0 auto 30px auto !important;     /* Centers block-level element */
+  line-height: 1.2;
+}
+    
+    /* Vertical song list */
+    .song-list{display:flex;flex-direction:column;gap:16px;align-items:center;margin-bottom:30px;}
+    .song-btn{background:#2563eb;color:#fff;padding:14px 24px;border-radius:8px;font-size:1.1rem;text-align:center;cursor:pointer;transition:all .2s;border:1px solid #1e40af;width:100%;max-width:400px;}
     .song-btn:hover{background:#1e40af;transform:translateY(-2px);}
+
     .player{background:#2a2a2a;border-radius:15px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.3);display:none;position:relative;}
     #waveform{background:#1a1a1a;border-radius:8px;height:100px;margin-bottom:12px;border:2px solid #444;overflow:hidden;}
     .zoom-controls{position:absolute;top:-30px;right:0;display:flex;gap:5px;}
@@ -75,11 +93,11 @@
 <div class="container">
   <h1>Halloween Practice Tracks - Trombone</h1>
 
-  <!-- Song selection -->
-  <div id="song-selection" class="song-grid">
-    <div class="song-btn" data-song="Deduction Star">Deduction Star</div>
+  <!-- Song selection - VERTICAL LIST -->
+  <div id="song-selection" class="song-list">
     <div class="song-btn" data-song="Ghosts">Ghosts</div>
     <div class="song-btn" data-song="Just a Man">Just a Man</div>
+    <div class="song-btn" data-song="Deduction Star">Deduction Star</div>
   </div>
 
   <!-- Player -->
@@ -120,19 +138,6 @@
 <script>
 /* ---------- DATA ---------- */
 const songs = {
-  "Deduction Star": {
-    part: "practicetracks/Deduction Star-Trombone.mp3",
-    combined: "practicetracks/Deduction Star.mp3",
-    measures: [
-      {name:"M1",  time:0},
-      {name:"M10", time:10},
-      {name:"M20", time:22},
-      {name:"M28", time:32},
-      {name:"M32", time:37},
-      {name:"M42", time:49},
-      {name:"M48", time:56}
-    ]
-  },
   "Ghosts": {
     part: "practicetracks/Ghosts-Trombone.mp3",
     combined: "practicetracks/Ghosts.mp3",
@@ -153,6 +158,19 @@ const songs = {
       {name:"M30", time:87},
       {name:"M35", time:102},
       {name:"M39", time:114}
+    ]
+  },
+  "Deduction Star": {
+    part: "practicetracks/Deduction Star-Trombone.mp3",
+    combined: "practicetracks/Deduction Star.mp3",
+    measures: [
+      {name:"M1",  time:0},
+      {name:"M10", time:10},
+      {name:"M20", time:22},
+      {name:"M28", time:32},
+      {name:"M32", time:37},
+      {name:"M42", time:49},
+      {name:"M48", time:56}
     ]
   }
 };
@@ -203,7 +221,7 @@ function initWaveSurfer() {
 
   // Invisible combined track
   wavesurferCombined = WaveSurfer.create({
-    container: document.createElement('div'), // dummy
+    container: document.createElement('div'),
     waveColor: 'transparent',
     progressColor: 'transparent',
     height: 0,
@@ -371,7 +389,7 @@ document.getElementById('combined-volume').oninput = e => handleVol(wavesurferCo
 backBtn.onclick = () => {
   if (isPlaying) { wavesurferPart.pause(); wavesurferCombined.pause(); isPlaying = false; }
   document.getElementById('player').style.display = 'none';
-  document.getElementById('song-selection').style.display = 'grid';
+  document.getElementById('song-selection').style.display = 'flex';
 };
 
 zoomInBtn.onclick = () => {
