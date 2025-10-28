@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Halloween Practice Tracks - Trombone</title>
+  <link rel="icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/7.7.6/wavesurfer.min.js"></script>
+  <style>
+    @font-face {
+      font-family: 'Zapfino';
+      src: url('/BIPH/fonts/Zapfino.ttf') format('truetype');
+      font-display: swap;
+    }
+    body{
+      background:linear-gradient(to bottom,#e6e6fa,#f0f8ff);
+      background-image:url('background.jpeg');
+      background-attachment:fixed;background-size:cover;background-position:center;
+      font-family:'Roboto',sans-serif;
+      min-height:100vh;margin:0;display:flex;justify-content:center;align-items:center;
+    }
+    .container{max-width:800px;width:90%;margin:16px auto;background:rgba(255,255,255,0.2);border-radius:12px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+    h1{color:#fff;font-family:'Zapfino',cursive;font-size:3rem;text-align:center;margin:0 0 30px;white-space:nowrap;}
+    .song-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:30px;}
+    .song-btn{background:#2563eb;color:#fff;padding:14px;border-radius:8px;font-size:1.1rem;text-align:center;cursor:pointer;transition:all .2s;border:1px solid #1e40af;}
+    .song-btn:hover{background:#1e40af;transform:translateY(-2px);}
+    .player{background:#2a2a2a;border-radius:15px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.3);display:none;position:relative;}
+    #waveform{background:#1a1a1a;border-radius:8px;height:100px;margin-bottom:12px;border:2px solid #444;overflow:hidden;}
+    .zoom-controls{position:absolute;top:-30px;right:0;display:flex;gap:5px;}
+    .zoom-btn{background:#5e768e;color:#fff;width:25px;height:25px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;}
+    .zoom-btn:hover{background:#4a6075;}
+    .time{color:#b0b0b0;text-align:center;margin:10px 0;font-family:monospace;}
+    .controls{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:16px 0;}
+    button,select,input[type=range]{padding:8px 12px;border-radius:6px;font-size:14px;}
+    #play-pause{background:#5e768e;color:#fff;min-width:80px;}
+    #play-pause.playing{background:#e63946;}
+    select{background:#3a3a3a;color:#ddd;border:1px solid #555;}
+    input[type=range]{width:100px;}
+    .vol-lab{color:#ccc;font-size:.9rem;}
+    .measure-list{max-height:200px;overflow-y:auto;background:#333;border-radius:8px;padding:8px;}
+    .measure-list li{padding:6px 10px;color:#ddd;cursor:pointer;border-bottom:1px solid #444;}
+    .measure-list li:hover{background:#444;}
+    .back-btn{background:#5e768e;color:#fff;margin-bottom:16px;display:inline-block;}
+    .back-btn:hover{background:#4a6075;}
+    .hamburger{position:absolute;top:20px;left:16px;z-index:1000;}
+    .menu-toggle{display:flex;flex-direction:column;justify-content:space-around;width:30px;height:25px;background:transparent;border:none;cursor:pointer;}
+    .menu-toggle span{width:30px;height:3px;background:#fff;border-radius:10px;transition:all .3s;}
+    .menu-toggle.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
+    .menu-toggle.open span:nth-child(2){opacity:0;}
+    .menu-toggle.open span:nth-child(3){transform:rotate(-45deg) translate(7px,-7px);}
+    .menu-items{position:absolute;top:60px;left:-250px;width:250px;background:rgba(30,41,59,.95);padding:16px 0;border-radius:8px;transition:left .3s;}
+    .menu-items.show{left:16px;}
+    .menu-items a{display:block;padding:10px 20px;color:#fff;text-decoration:none;}
+    .menu-items a:hover{background:rgba(255,255,255,.1);}
+    .loading-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(42,59,76,0.9);color:#b0b0b0;display:flex;align-items:center;justify-content:center;z-index:20;border-radius:8px;font-size:1.1rem;}
+  </style>
+</head>
+<body>
+
+<div class="hamburger">
+  <button class="menu-toggle" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  <div class="menu-items" id="menu">
+    <div style="text-align:center;color:#fff;font-weight:bold;margin-bottom:8px;">BIPH Music</div>
+    <a href="https://biphband.github.io/">Home</a>
+    <a href="https://biphband.github.io/halloween/">Halloween</a>
+    <a href="https://biphband.github.io/thenutcracker/">The Nutcracker</a>
+    <a href="https://biphband.github.io/practicetracks/">Practice Tracks</a>
+    <a href="https://biphband.github.io/tuner/">Tuner</a>
+    <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
+  </div>
+</div>
+
+<div class="container">
+  <h1>Halloween Practice Tracks - Trombone</h1>
+
+  <!-- Song selection -->
+  <div id="song-selection" class="song-grid">
+    <div class="song-btn" data-song="Deduction Star">Deduction Star</div>
+    <div class="song-btn" data-song="Ghosts">Ghosts</div>
+    <div class="song-btn" data-song="Just a Man">Just a Man</div>
+  </div>
+
+  <!-- Player -->
+  <div id="player" class="player">
+    <button class="back-btn" id="back-btn">Back to Songs</button>
+    <h2 id="player-title" style="color:#fff;text-align:center;margin:10px 0;"></h2>
+
+    <div class="waveform-wrapper" style="position:relative;">
+      <div class="zoom-controls">
+        <button class="zoom-btn" id="zoom-out">-</button>
+        <button class="zoom-btn" id="zoom-in">+</button>
+      </div>
+      <div id="waveform"></div>
+    </div>
+
+    <div class="time">
+      <span id="current-time">0:00</span> / <span id="total-time">0:00</span>
+    </div>
+
+    <div class="controls">
+      <button id="play-pause" disabled>Play</button>
+      <select id="speed">
+        <option value="0.7">0.7x</option>
+        <option value="0.8">0.8x</option>
+        <option value="0.9">0.9x</option>
+        <option value="1" selected>1x</option>
+      </select>
+      <span class="vol-lab">Part</span>
+      <input type="range" id="part-volume" min="0" max="1" step="0.01" value="1">
+      <span class="vol-lab">Others</span>
+      <input type="range" id="combined-volume" min="0" max="1" step="0.01" value="0.05">
+    </div>
+
+    <div class="measure-list" id="measure-list"></div>
+  </div>
+</div>
+
+<script>
+/* ---------- DATA ---------- */
+const songs = {
+  "Deduction Star": {
+    part: "practicetracks/Deduction Star-Trombone.mp3",
+    combined: "practicetracks/Deduction Star.mp3",
+    measures: [
+      {name:"M1",  time:0},
+      {name:"M10", time:10},
+      {name:"M20", time:22},
+      {name:"M28", time:32},
+      {name:"M32", time:37},
+      {name:"M42", time:49},
+      {name:"M48", time:56}
+    ]
+  },
+  "Ghosts": {
+    part: "practicetracks/Ghosts-Trombone.mp3",
+    combined: "practicetracks/Ghosts.mp3",
+    measures: [
+      {name:"M1",  time:0},
+      {name:"M7",  time:10},
+      {name:"M11", time:16}
+    ]
+  },
+  "Just a Man": {
+    part: "practicetracks/Just a Man-Trombone.mp3",
+    combined: "practicetracks/Just a Man.mp3",
+    measures: [
+      {name:"M1",  time:0},
+      {name:"M5",  time:12},
+      {name:"M13", time:36},
+      {name:"M20", time:57},
+      {name:"M30", time:87},
+      {name:"M35", time:102},
+      {name:"M39", time:114}
+    ]
+  }
+};
+
+/* ---------- GLOBALS ---------- */
+let wavesurferPart, wavesurferCombined;
+let isPlaying = false, pauseTime = 0;
+let zoomLevel = 1;
+let currentSong = null;
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const waveform = document.getElementById('waveform');
+const loadingOverlay = document.createElement('div');
+loadingOverlay.className = 'loading-overlay';
+loadingOverlay.textContent = 'Loading audio...';
+waveform.appendChild(loadingOverlay);
+
+let playPauseBtn = document.getElementById('play-pause');
+let speedSelect = document.getElementById('speed');
+const currentTimeDisplay = document.getElementById('current-time');
+const totalTimeDisplay = document.getElementById('total-time');
+const zoomInBtn = document.getElementById('zoom-in');
+const zoomOutBtn = document.getElementById('zoom-out');
+const backBtn = document.getElementById('back-btn');
+
+/* ---------- THROTTLE ---------- */
+function throttle(func, wait) {
+  let last = 0;
+  return (...args) => {
+    const now = Date.now();
+    if (now - last >= wait) { func(...args); last = now; }
+  };
+}
+
+/* ---------- WAVESURFER ---------- */
+function initWaveSurfer() {
+  wavesurferPart = WaveSurfer.create({
+    container: '#waveform',
+    waveColor: '#6b8299',
+    progressColor: '#5e768e',
+    cursorColor: '#fff',
+    barWidth: 2,
+    height: 100,
+    responsive: true,
+    normalize: true,
+    backgroundColor: '#1a1a1a',
+    audioContext: audioCtx
+  });
+
+  // Invisible combined track
+  wavesurferCombined = WaveSurfer.create({
+    container: document.createElement('div'), // dummy
+    waveColor: 'transparent',
+    progressColor: 'transparent',
+    height: 0,
+    audioContext: audioCtx
+  });
+}
+
+/* ---------- SYNC FUNCTIONS ---------- */
+function formatTime(s) {
+  const m = Math.floor(s/60), sec = Math.floor(s%60);
+  return `${m}:${sec<10?'0':''}${sec}`;
+}
+
+function syncPlay(offset = 0) {
+  if (isPlaying) return;
+  isPlaying = true;
+  playPauseBtn.textContent = 'Pause';
+  playPauseBtn.classList.add('playing');
+  playPauseBtn.disabled = false;
+
+  const speed = +speedSelect.value;
+  wavesurferPart.setPlaybackRate(speed);
+  wavesurferCombined.setPlaybackRate(speed);
+
+  if (wavesurferPart.getVolume() > 0) wavesurferPart.play(offset);
+  if (wavesurferCombined.getVolume() > 0) wavesurferCombined.play(offset);
+}
+
+function syncPause() {
+  if (!isPlaying) return;
+  isPlaying = false;
+  pauseTime = wavesurferPart.getCurrentTime();
+  wavesurferPart.pause();
+  wavesurferCombined.pause();
+  playPauseBtn.textContent = 'Play';
+  playPauseBtn.classList.remove('playing');
+}
+
+function syncSetTime(t) {
+  const wasPlaying = isPlaying;
+  if (isPlaying) { wavesurferPart.pause(); wavesurferCombined.pause(); isPlaying = false; }
+  pauseTime = t;
+  wavesurferPart.setTime(t);
+  wavesurferCombined.setTime(t);
+  currentTimeDisplay.textContent = formatTime(t);
+  if (wasPlaying) syncPlay(t);
+}
+
+function centerPlayhead() {
+  const drawer = wavesurferPart.drawer;
+  if (!drawer) return;
+  const cur = wavesurferPart.getCurrentTime();
+  const dur = wavesurferPart.getDuration();
+  const w = drawer.wrapper.clientWidth;
+  const pxPerSec = (w / dur) * zoomLevel;
+  const pos = cur * pxPerSec;
+  let offset = 0;
+  if (cur > w / (2 * pxPerSec)) offset = pos - w/2;
+  drawer.wrapper.scrollLeft = offset;
+}
+
+/* ---------- LOAD SONG ---------- */
+async function loadSong(name) {
+  currentSong = name;
+  const s = songs[name];
+  document.getElementById('player-title').textContent = `${name} – Trombone`;
+  document.getElementById('player').style.display = 'block';
+  document.getElementById('song-selection').style.display = 'none';
+
+  // Reset
+  isPlaying = false; pauseTime = 0; zoomLevel = 1;
+  playPauseBtn.textContent = 'Play'; playPauseBtn.classList.remove('playing'); playPauseBtn.disabled = true;
+  speedSelect.value = '1';
+  document.getElementById('part-volume').value = 1;
+  document.getElementById('combined-volume').value = 0.05;
+
+  loadingOverlay.style.display = 'flex';
+
+  try {
+    const [pOk, cOk] = await Promise.all([
+      fetch(s.part, {method:'HEAD'}).then(r=>r.ok).catch(()=>false),
+      fetch(s.combined, {method:'HEAD'}).then(r=>r.ok).catch(()=>false)
+    ]);
+
+    if (pOk) wavesurferPart.load(s.part);
+    if (cOk) wavesurferCombined.load(s.combined);
+
+    if (!pOk && !cOk) { loadingOverlay.textContent = 'No audio'; return; }
+    if (!pOk) { loadingOverlay.textContent = 'Part missing'; return; }
+    if (!cOk) { loadingOverlay.textContent = 'Others missing'; }
+
+    loadingOverlay.style.display = 'none';
+    playPauseBtn.disabled = false;
+    wavesurferPart.setVolume(1);
+    wavesurferCombined.setVolume(0.05);
+
+    // Duration & zoom
+    let durSet = false;
+    wavesurferPart.on('ready', () => {
+      const dur = wavesurferPart.getDuration();
+      const w = waveform.clientWidth;
+      const px = w / dur;
+      wavesurferPart.zoom(px);
+      if (!durSet) { totalTimeDisplay.textContent = formatTime(dur); durSet = true; }
+    });
+
+    // Time update
+    wavesurferPart.on('timeupdate', () => {
+      const t = wavesurferPart.getCurrentTime();
+      currentTimeDisplay.textContent = formatTime(t);
+      if (isPlaying) {
+        pauseTime = t;
+        const ct = wavesurferCombined.getCurrentTime();
+        if (Math.abs(ct - t) > 0.05 && wavesurferCombined.getVolume() > 0) {
+          wavesurferCombined.setTime(t);
+        }
+      }
+      centerPlayhead();
+    });
+
+    wavesurferPart.on('interaction', () => syncSetTime(wavesurferPart.getCurrentTime()));
+
+    // Measures
+    const list = document.getElementById('measure-list');
+    list.innerHTML = '';
+    s.measures.forEach(m => {
+      const li = document.createElement('li');
+      li.textContent = `${m.name} – ${formatTime(m.time)}`;
+      li.onclick = () => syncSetTime(m.time);
+      list.appendChild(li);
+    });
+
+  } catch (e) {
+    loadingOverlay.textContent = 'Load error';
+    console.error(e);
+  }
+}
+
+/* ---------- CONTROLS ---------- */
+playPauseBtn.addEventListener('click', () => isPlaying ? syncPause() : syncPlay(pauseTime));
+
+speedSelect.addEventListener('change', () => {
+  const s = +speedSelect.value;
+  wavesurferPart.setPlaybackRate(s);
+  wavesurferCombined.setPlaybackRate(s);
+  if (isPlaying) {
+    const t = wavesurferPart.getCurrentTime();
+    wavesurferPart.pause(); wavesurferCombined.pause(); isPlaying = false;
+    syncPlay(t);
+  }
+});
+
+const handleVol = throttle((ws, v) => {
+  if (isPlaying && +v === 0) ws.pause();
+  else if (isPlaying && +v > 0 && ws.getVolume() === 0) {
+    const t = ws === wavesurferPart ? wavesurferCombined.getCurrentTime() : wavesurferPart.getCurrentTime();
+    ws.play(t || pauseTime);
+  }
+  ws.setVolume(v);
+}, 100);
+
+document.getElementById('part-volume').oninput = e => handleVol(wavesurferPart, e.target.value);
+document.getElementById('combined-volume').oninput = e => handleVol(wavesurferCombined, e.target.value);
+
+backBtn.onclick = () => {
+  if (isPlaying) { wavesurferPart.pause(); wavesurferCombined.pause(); isPlaying = false; }
+  document.getElementById('player').style.display = 'none';
+  document.getElementById('song-selection').style.display = 'grid';
+};
+
+zoomInBtn.onclick = () => {
+  zoomLevel *= 1.5;
+  const dur = wavesurferPart.getDuration();
+  const w = waveform.clientWidth;
+  const px = (w / dur) * zoomLevel;
+  wavesurferPart.zoom(px);
+  centerPlayhead();
+};
+
+zoomOutBtn.onclick = () => {
+  zoomLevel /= 1.5;
+  if (zoomLevel < 1) zoomLevel = 1;
+  const dur = wavesurferPart.getDuration();
+  const w = waveform.clientWidth;
+  const px = (w / dur) * zoomLevel;
+  wavesurferPart.zoom(px);
+  centerPlayhead();
+};
+
+/* ---------- SONG BUTTONS ---------- */
+document.querySelectorAll('.song-btn').forEach(b => b.onclick = () => loadSong(b.dataset.song));
+
+/* ---------- MENU ---------- */
+window.toggleMenu = () => {
+  document.querySelector('.menu-toggle').classList.toggle('open');
+  document.getElementById('menu').classList.toggle('show');
+};
+document.addEventListener('click', e => {
+  const menu = document.getElementById('menu');
+  const tog = document.querySelector('.menu-toggle');
+  if (!tog.contains(e.target) && !menu.contains(e.target)) {
+    tog.classList.remove('open');
+    menu.classList.remove('show');
+  }
+});
+
+/* ---------- INIT ---------- */
+initWaveSurfer();
+</script>
+</body>
+</html>
