@@ -62,13 +62,32 @@ h1 {
     .measure-list li:hover{background:#444;}
     .back-btn{background:#5e768e;color:#fff;margin-bottom:16px;display:inline-block;}
     .back-btn:hover{background:#4a6075;}
-    .hamburger{position:absolute;top:20px;left:16px;z-index:1000;}
+    .hamburger {
+  position: absolute;
+  top: 20px;
+  left: 16px;           /* Button stays visible */
+  z-index: 1000;
+}
     .menu-toggle{display:flex;flex-direction:column;justify-content:space-around;width:30px;height:25px;background:transparent;border:none;cursor:pointer;}
     .menu-toggle span{width:30px;height:3px;background:#fff;border-radius:10px;transition:all .3s;}
     .menu-toggle.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
     .menu-toggle.open span:nth-child(2){opacity:0;}
     .menu-toggle.open span:nth-child(3){transform:rotate(-45deg) translate(7px,-7px);}
-    .menu-items{position:absolute;top:60px;left:-250px;width:250px;background:rgba(30,41,59,.95);padding:16px 0;border-radius:8px;transition:left .3s;}
+    .menu-items {
+  position: absolute;
+  top: 60px;
+  left: -280px;         /* Fully off-screen to the left */
+  width: 250px;
+  background: rgba(30,41,59,.95);
+  padding: 16px 0;
+  border-radius: 8px;
+  transition: left 0.3s ease;   /* Smooth slide-in */
+  z-index: 999;
+}
+
+.menu-items.show {
+  left: 16px;           /* Slides in to match button */
+}
     .menu-items.show{left:16px;}
     .menu-items a{display:block;padding:10px 20px;color:#fff;text-decoration:none;}
     .menu-items a:hover{background:rgba(255,255,255,.1);}
