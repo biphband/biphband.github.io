@@ -262,94 +262,116 @@
 
   <script>
     const pdfFiles = {
-      Strings: [
-        ['Halloween_Violin_1_Parts.pdf', 'Halloween_Violin_2_Parts.pdf', 'Halloween_Violin_3_Parts.pdf'],
-        ['Halloween_Cello_1_Parts.pdf', 'Halloween_Cello_2_Parts.pdf'],
-        ['Halloween_Contrabass_1_Parts.pdf', 'Halloween_Contrabass_2_Parts.pdf']
-      ],
-      Woodwind: [
-        ['Halloween_Piccolo_Parts.pdf', 'Halloween_Flute_1_Parts.pdf'],
-        ['Halloween_Flute_2_Parts.pdf', 'Halloween_Flute_3_Parts.pdf'],
-        ['Halloween_Clarinet_1_Parts.pdf', 'Halloween_Clarinet_2_Parts.pdf', 'Halloween_Clarinet_3_Parts.pdf'],
-        ['Halloween_Bass_clarinet_Parts.pdf', 'Halloween_Bassoon_Parts.pdf'],
-        ['Halloween_Alto_sax_1_Parts.pdf', 'Halloween_Alto_sax_2_Parts.pdf', 'Halloween_Tenor_Saxophone_Parts.pdf']
-      ],
-      Brass: [
-        ['Halloween_Trumpet_1_Parts.pdf', 'Halloween_Trumpet_2_Parts.pdf'],
-        ['Halloween_Horn_1_Parts.pdf', 'Halloween_Horn_2_Parts.pdf'],
-        ['Halloween_Trombone_Parts.pdf', 'Halloween_Euphonium_Parts.pdf'],
-        ['Halloween_Tuba_Parts.pdf']
-      ],
-      Percussion: [
-        ['Halloween_Glockenspiel_Parts.pdf', 'Halloween_Vibraphone_Parts.pdf'],
-        ['Halloween_Aux_perc_1_Parts.pdf', 'Halloween_Aux_perc_2_Parts.pdf'],
-        ['Halloween_Timpani_Parts.pdf', 'Halloween_Piano_Parts.pdf']
-      ],
-      Other: [
-        ['Halloween_Conductor_Parts.pdf', 'Halloween_Seating_Chart.pdf']
-      ]
-    };
+    Strings: [
+      ['Halloween_Violin_1_Parts.pdf', 'Halloween_Violin_2_Parts.pdf', 'Halloween_Violin_3_Parts.pdf'],
+      ['Halloween_Cello_1_Parts.pdf', 'Halloween_Cello_2_Parts.pdf'],
+      ['Halloween_Contrabass_1_Parts.pdf', 'Halloween_Contrabass_2_Parts.pdf']
+    ],
+    Woodwind: [
+      ['Halloween_Piccolo_Parts.pdf', 'Halloween_Flute_1_Parts.pdf'],
+      ['Halloween_Flute_2_Parts.pdf', 'Halloween_Flute_3_Parts.pdf'],
+      ['Halloween_Clarinet_1_Parts.pdf', 'Halloween_Clarinet_2_Parts.pdf', 'Halloween_Clarinet_3_Parts.pdf'],
+      ['Halloween_Bass_clarinet_Parts.pdf', 'Halloween_Bassoon_Parts.pdf'],
+      ['Halloween_Alto_sax_1_Parts.pdf', 'Halloween_Alto_sax_2_Parts.pdf', 'Halloween_Tenor_Saxophone_Parts.pdf']
+    ],
+    Brass: [
+      ['Halloween_Trumpet_1_Parts.pdf', 'Halloween_Trumpet_2_Parts.pdf'],
+      ['Halloween_Horn_1_Parts.pdf', 'Halloween_Horn_2_Parts.pdf'],
+      ['Halloween_Trombone_Parts.pdf', 'Halloween_Euphonium_Parts.pdf'],
+      ['Halloween_Tuba_Parts.pdf']
+    ],
+    Percussion: [
+      ['Halloween_Glockenspiel_Parts.pdf', 'Halloween_Vibraphone_Parts.pdf'],
+      ['Halloween_Aux_perc_1_Parts.pdf', 'Halloween_Aux_perc_2_Parts.pdf'],
+      ['Halloween_Timpani_Parts.pdf', 'Halloween_Piano_Parts.pdf']
+    ],
+    Other: [
+      ['Halloween_Conductor_Parts.pdf', 'Seating_Chart.jpg']  // Now uses .jpg
+    ]
+  };
 
-    const instrumentSelection = document.getElementById('instrument-selection');
+  const instrumentSelection = document.getElementById('instrument-selection');
 
-    function showInstrumentSelection() {
-      instrumentSelection.innerHTML = '';
-      for (const [family, groups] of Object.entries(pdfFiles)) {
-        if (groups.flat().length === 0) continue;
-        const familyDiv = document.createElement('div');
-        familyDiv.className = 'family-section';
-        familyDiv.innerHTML = `<h3 class="family-title">${family}</h3>`;
-        groups.forEach((instruments) => {
-          const groupDiv = document.createElement('div');
-          groupDiv.className = 'instrument-group';
-          instruments.forEach(file => {
-            let instrument = file.replace('Halloween_', '').replace('_Parts.pdf', '').replace(/_/g, ' ').replace('.pdf', '');
-            if (instrument === 'Tenor Saxophone') {
-              instrument = 'Tenor Sax';
-            }
-            instrument = instrument.split(' ').map(word => 
-              word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            ).join(' ');
-            const btn = document.createElement('button');
-            btn.className = 'btn';
-            btn.textContent = instrument;
-            ['click', 'touchstart'].forEach(eventType => {
-              btn.addEventListener(eventType, (e) => {
-                e.preventDefault();
-                displayContent(file);
-              });
+  function showInstrumentSelection() {
+    instrumentSelection.innerHTML = '';
+    for (const [family, groups] of Object.entries(pdfFiles)) {
+      if (groups.flat().length === 0) continue;
+      const familyDiv = document.createElement('div');
+      familyDiv.className = 'family-section';
+      familyDiv.innerHTML = `<h3 class="family-title">${family}</h3>`;
+      groups.forEach((instruments) => {
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'instrument-group';
+        instruments.forEach(file => {
+          // Clean up filename to create display name
+          let instrument = file
+            .replace('Halloween_', '')
+            .replace('_Parts.pdf', '')
+            .replace(/\.pdf$/i, '')
+            .replace(/\.jpg$/i, '')
+            .replace(/_/g, ' ')
+            .trim();
+
+          // Special case
+          if (instrument === 'Tenor Saxophone') {
+            instrument = 'Tenor Sax';
+          }
+
+          // Capitalize each word
+          instrument = instrument
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+
+          const btn = document.createElement('button');
+          btn.className = 'btn';
+          btn.textContent = instrument;
+          ['click', 'touchstart'].forEach(eventType => {
+            btn.addEventListener(eventType, (e) => {
+              e.preventDefault();
+              displayContent(file);
             });
-            groupDiv.appendChild(btn);
           });
-          familyDiv.appendChild(groupDiv);
+          groupDiv.appendChild(btn);
         });
-        instrumentSelection.appendChild(familyDiv);
-      }
+        familyDiv.appendChild(groupDiv);
+      });
+      instrumentSelection.appendChild(familyDiv);
     }
+  }
 
-    function displayContent(file) {
+  function displayContent(file) {
+    const isImage = /\.(jpg|jpeg|png|gif)$/i.test(file);
+    
+    if (isImage) {
+      // Open image in new tab (same directory as index.html)
+      window.open(file, '_blank');
+    } else {
+      // Open PDF from Halloween_Parts folder
       const filePath = `Halloween_Parts/${file}`;
       window.location.href = filePath;
     }
+  }
 
-    // Hamburger menu functionality
-    const menuToggle = document.querySelector('.menu-toggle');
-    const menuItems = document.querySelector('.menu-items');
-    
-    menuToggle.addEventListener('click', () => {
-      menuToggle.classList.toggle('open');
-      menuItems.classList.toggle('show');
-    });
-    
-    // Close the menu when clicking outside
-    document.addEventListener('click', (event) => {
-      if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
-        menuToggle.classList.remove('open');
-        menuItems.classList.remove('show');
-      }
-    });
+  // Hamburger menu functionality
+  const menuToggle = document.querySelector('.menu-toggle');
+  const menuItems = document.querySelector('.menu-items');
+  
+  menuToggle.addEventListener('click', () => {
+    menuToggle.classList.toggle('open');
+    menuItems.classList.toggle('show');
+  });
+  
+  // Close the menu when clicking outside
+  document.addEventListener('click', (event) => {
+    if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
+      menuToggle.classList.remove('open');
+      menuItems.classList.remove('show');
+    }
+  });
 
-    showInstrumentSelection();
+  // Initialize
+  showInstrumentSelection();
   </script>
 </body>
 </html>
