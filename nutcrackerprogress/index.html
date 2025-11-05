@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Nutcracker Progress</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f9f9fb;
+        }
+
+        body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 0 10px;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .title {
+            font-family: 'American Typewriter', 'Courier New', monospace;
+            font-size: 2.5rem;
+            color: #333;
+            text-align: center;
+            flex: 1;
+            font-weight: normal;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 0;
+            white-space: nowrap;
+        }
+
+        .date-display {
+            font-size: 1rem;
+            color: #555;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .percentages {
+            font-size: 1rem;
+            color: #555;
+            line-height: 1.8;
+            white-space: nowrap;
+        }
+
+        .percentages span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-block {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            display: inline-block;
+        }
+
+        .legend-hs { background-color: #ff6384; }
+        .legend-ms { background-color: #36a2eb; }
+
+        .chart-container {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            padding: 0 20px 100px -20px;
+            min-height: 0;
+        }
+
+        #progressChart {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            color: #333;
+            line-height: 1.3;
+            font-family: 'Courier New', monospace;
+        }
+
+        .modal-song-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .modal-school {
+            font-size: 0.95rem;
+            color: #666;
+            font-weight: normal;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            font-size: 1.4rem;
+            text-align: center;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: #fff;
+            font-family: 'Courier New', monospace;
+            font-weight: normal;
+            transition: border 0.2s;
+        }
+
+        .modal-content input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .stepper {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .modal-content button {
+            padding: 4px 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+            color: #333;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-content button:hover {
+            background-color: #e0e0e0;
+            border-color: #999;
+        }
+
+        .modal-content button:active {
+            background-color: #d0d0d0;
+        }
+
+        .search-modal .modal-content input {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            padding: 10px;
+        }
+
+        .search-results {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fff;
+        }
+
+        .search-result-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+        }
+
+        .search-result-item:hover,
+        .search-result-item.highlighted {
+            background-color: #e6f7ff;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=American+Typewriter:wght@400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="header">
+        <div class="percentages" id="percentages">
+            <span><div class="legend-block legend-hs"></div> HS percent complete: 0%</span><br>
+            <span><div class="legend-block legend-ms"></div> MS percent complete: 0%</span>
+        </div>
+        <h1 class="title">Nutcracker Progress</h1>
+        <div class="date-display" id="date-display"></div>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="progressChart"></canvas>
+    </div>
+
+    <!-- Value Modal -->
+    <div class="modal" id="valueModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">
+                <div class="modal-song-title"></div>
+                <div class="modal-school"></div>
+            </h3>
+            <input type="number" id="valueInput" min="0" max="100" step="1" />
+            <div class="stepper">
+                <button id="decrementBtn">-</button>
+                <button id="incrementBtn">+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="modal" id="searchModal">
+        <div class="modal-content search-modal">
+            <input type="text" id="searchInput" placeholder="Search song + MS/HS..." autocomplete="off" />
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const songs = [
+            "Overture", "Scene 1", "March", "Mysterious Stranger", "Presentation of Dolls",
+            "Dance of the Dolls", "Introduction of Nutcracker", "Drosselmeyer Consoles Clara",
+            "Grandfather Waltz", "Clara and the Nutcracker", "The Battle", "A Pine Forest in Winter",
+            "Waltz of the Snowflakes", "The Enchanted Palace", "Dance of the Sugar Plum Fairy",
+            "Arrival of Clara and Prince", "Russian Dance", "Arabian Dance", "Chinese Dance",
+            "Dance of the Reed Flutes", "Mother Ginger", "Waltz of the Flowers", "Intrada", "Final Waltz"
+        ];
+
+        const STORAGE_KEY = 'nutcracker_progress';
+        const data = {
+            ms: Array(songs.length).fill(0),
+            hs: Array(songs.length).fill(0)
+        };
+
+        let currentIndex = -1;
+        let currentType = 'ms';
+        let chart;
+
+        // Load from localStorage
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                data.ms = parsed.ms || data.ms;
+                data.hs = parsed.hs || data.hs;
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            updatePercentages();
+        }
+
+        function updatePercentages() {
+            const msAvg = data.ms.reduce((a, b) => a + b, 0) / data.ms.length;
+            const hsAvg = data.hs.reduce((a, b) => a + b, 0) / data.hs.length;
+            document.querySelector('#percentages span:nth-child(1)').innerHTML = 
+                `<div class="legend-block legend-hs"></div> HS percent complete: ${hsAvg.toFixed(1)}%`;
+            document.querySelector('#percentages span:nth-child(3)').innerHTML = 
+                `<div class="legend-block legend-ms"></div> MS percent complete: ${msAvg.toFixed(1)}%`;
+        }
+
+        // Format label with line breaks
+        function formatLabel(label) {
+            const words = label.split(' ');
+            const lines = [];
+            let current = '';
+            words.forEach(word => {
+                if ((current + word).length > 18 && current) {
+                    lines.push(current);
+                    current = word;
+                } else {
+                    current += (current ? ' ' : '') + word;
+                }
+            });
+            if (current) lines.push(current);
+            return lines.join('\n');
+        }
+
+        // Chart.js setup
+        function initChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: songs.map(formatLabel),
+                    datasets: [
+                        {
+                            label: 'Middle School',
+                            data: data.ms,
+                            backgroundColor: ctx => {
+                                const chart = ctx.chart;
+                                const {ctx: canvasCtx, chartArea} = chart;
+                                if (!chartArea) return 'rgba(54, 162, 235, 0.8)';
+                                const gradient = canvasCtx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                                gradient.addColorStop(0, 'rgba(100, 180, 255, 0.9)');
+                                gradient.addColorStop(1, 'rgba(54, 162, 235, 0.7)');
+                                return gradient;
+                            },
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1,
+                            barThickness: 24,
+                            categoryPercentage: 0.8,
+                            borderRadius: 4,
+                            animation: { duration: 400, easing: 'easeOutQuart' }
+                        },
+                        {
+                            label: 'High School',
+                            data: data.hs,
+                            backgroundColor: ctx => {
+                                const chart = ctx.chart;
+                                const {ctx: canvasCtx, chartArea} = chart;
+                                if (!chartArea) return 'rgba(255, 99, 132, 0.8)';
+                                const gradient = canvasCtx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                                gradient.addColorStop(0, 'rgba(255, 140, 160, 0.9)');
+                                gradient.addColorStop(1, 'rgba(255, 99, 132, 0.7)');
+                                return gradient;
+                            },
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1,
+                            barThickness: 24,
+                            categoryPercentage: 0.8,
+                            borderRadius: 4,
+                            animation: { duration: 400, easing: 'easeOutQuart' }
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 400, easing: 'easeOutQuart' },
+                    scales: {
+                        x: {
+                            stacked: false,
+                            ticks: {
+                                maxRotation: 0,
+                                minRotation: 40,
+                                font: { 
+                                    size: 14, 
+                                    family: "'Courier New', monospace",
+                                    weight: 'bold'
+                                },
+                                autoSkip: false,
+                                padding: -5,
+                                align: 'center',
+                                color: '#333'
+                            },
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { stepSize: 20 },
+                            title: { display: true, text: 'Progress (%)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: context => `${context.dataset.label}: ${context.parsed.y}%`
+                            }
+                        }
+                    },
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const idx = elements[0].index;
+                            const datasetIdx = elements[0].datasetIndex;
+                            openValueModal(idx, datasetIdx === 0 ? 'ms' : 'hs');
+                        }
+                    }
+                }
+            });
+        }
+
+        // Modal handling
+        function openValueModal(index, type) {
+            currentIndex = index;
+            currentType = type;
+            const value = data[type][index];
+            const songName = songs[index];
+            const school = type === 'ms' ? 'Middle School' : 'High School';
+            document.querySelector('.modal-song-title').textContent = songName;
+            document.querySelector('.modal-school').textContent = school;
+            const input = document.getElementById('valueInput');
+            input.value = value;
+            input.focus();
+            input.select();
+            document.getElementById('valueModal').style.display = 'flex';
+        }
+
+        function closeValueModal() {
+            document.getElementById('valueModal').style.display = 'none';
+        }
+
+        function updateValueFromInput() {
+            let val = parseInt(document.getElementById('valueInput').value) || 0;
+            val = Math.max(0, Math.min(100, val));
+            document.getElementById('valueInput').value = val;
+            data[currentType][currentIndex] = val;
+            chart.data.datasets[currentType === 'ms' ? 0 : 1].data[currentIndex] = val;
+            saveData();
+            chart.update(400);
+        }
+
+        function selectBar(index, type) {
+            currentIndex = index;
+            currentType = type;
+            const datasetIndex = type === 'ms' ? 0 : 1;
+            chart.setActiveElements(currentIndex >= 0 ? [{ datasetIndex, index }] : []);
+            chart.update('none');
+        }
+
+        // Search modal
+        let searchResults = [];
+        let highlightedIndex = -1;
+
+        function openSearchModal() {
+            document.getElementById('searchModal').style.display = 'flex';
+            const input = document.getElementById('searchInput');
+            input.value = '';
+            input.focus();
+            updateSearchResults('');
+        }
+
+        function closeSearchModal() {
+            document.getElementById('searchModal').style.display = 'none';
+            highlightedIndex = -1;
+            searchResults = [];
+        }
+
+        function updateSearchResults(query) {
+            const resultsContainer = document.getElementById('searchResults');
+            resultsContainer.innerHTML = '';
+            searchResults = [];
+            highlightedIndex = -1;
+
+            if (!query.trim()) return;
+
+            const lowerQuery = query.toLowerCase().trim();
+            const matches = [];
+
+            songs.forEach((song, idx) => {
+                const songLower = song.toLowerCase();
+                const msText = `${songLower} ms`;
+                const hsText = `${songLower} hs`;
+                const msMatch = msText.includes(lowerQuery) || songLower.includes(lowerQuery);
+                const hsMatch = hsText.includes(lowerQuery) || songLower.includes(lowerQuery);
+
+                if (msMatch) {
+                    matches.push({ idx, type: 'ms', label: `${song} - Middle School`, priority: msText.includes(lowerQuery) ? 0 : 1 });
+                }
+                if (hsMatch) {
+                    matches.push({ idx, type: 'hs', label: `${song} - High School`, priority: hsText.includes(lowerQuery) ? 0 : 1 });
+                }
+            });
+
+            matches.sort((a, b) => a.priority - b.priority || a.label.localeCompare(b.label));
+
+            matches.forEach((match, i) => {
+                const div = document.createElement('div');
+                div.className = 'search-result-item';
+                div.textContent = match.label;
+                div.onclick = () => {
+                    openValueModal(match.idx, match.type);
+                    closeSearchModal();
+                };
+                resultsContainer.appendChild(div);
+                searchResults.push(div);
+                if (i === 0) {
+                    div.classList.add('highlighted');
+                    highlightedIndex = 0;
+                }
+            });
+        }
+
+        function highlightResult(index) {
+            if (searchResults.length === 0) return;
+            if (highlightedIndex >= 0) searchResults[highlightedIndex].classList.remove('highlighted');
+            highlightedIndex = (index + searchResults.length) % searchResults.length;
+            searchResults[highlightedIndex].classList.add('highlighted');
+            searchResults[highlightedIndex].scrollIntoView({ block: 'nearest' });
+        }
+
+        // Event Listeners
+        document.getElementById('incrementBtn').onclick = () => {
+            const input = document.getElementById('valueInput');
+            input.value = Math.min(100, (parseInt(input.value) || 0) + 1);
+            updateValueFromInput();
+        };
+
+        document.getElementById('decrementBtn').onclick = () => {
+            const input = document.getElementById('valueInput');
+            input.value = Math.max(0, (parseInt(input.value) || 0) - 1);
+            updateValueFromInput();
+        };
+
+        const valueInput = document.getElementById('valueInput');
+        valueInput.addEventListener('input', updateValueFromInput);
+
+        valueInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                updateValueFromInput();
+                closeValueModal();
+            } else if (e.key === 'Escape') {
+                closeValueModal();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                document.getElementById('incrementBtn').click();
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                document.getElementById('decrementBtn').click();
+            }
+        });
+
+        // Close modals on click outside or Escape
+        window.addEventListener('click', e => {
+            const valueModal = document.getElementById('valueModal');
+            const searchModal = document.getElementById('searchModal');
+            if (e.target === valueModal) closeValueModal();
+            if (e.target === searchModal) closeSearchModal();
+        });
+
+        document.addEventListener('keydown', e => {
+            const valueModalOpen = document.getElementById('valueModal').style.display === 'flex';
+            const searchModalOpen = document.getElementById('searchModal').style.display === 'flex';
+
+            if (e.key === 'Escape') {
+                if (valueModalOpen) closeValueModal();
+                if (searchModalOpen) closeSearchModal();
+                return;
+            }
+
+            if (e.key === 'ArrowLeft' && !searchModalOpen) {
+                e.preventDefault();
+                let newIndex;
+                if (currentIndex === -1) {
+                    newIndex = songs.length - 1;
+                } else {
+                    newIndex = (currentIndex - 1 + songs.length) % songs.length;
+                }
+                currentIndex = newIndex;
+                if (valueModalOpen) {
+                    openValueModal(currentIndex, currentType);
+                } else {
+                    selectBar(currentIndex, currentType);
+                    openValueModal(currentIndex, currentType);
+                }
+            } else if (e.key === 'ArrowRight' && !searchModalOpen) {
+                e.preventDefault();
+                let newIndex;
+                if (currentIndex === -1) {
+                    newIndex = 0;
+                } else {
+                    newIndex = (currentIndex + 1) % songs.length;
+                }
+                currentIndex = newIndex;
+                if (valueModalOpen) {
+                    openValueModal(currentIndex, currentType);
+                } else {
+                    selectBar(currentIndex, currentType);
+                    openValueModal(currentIndex, currentType);
+                }
+            } else if (e.key === 'ArrowUp' && !searchModalOpen) {
+                e.preventDefault();
+                if (currentIndex === -1) {
+                    currentIndex = 0;
+                    currentType = 'ms';
+                }
+                const dataset = currentType === 'ms' ? 0 : 1;
+                const newVal = Math.min(100, data[currentType][currentIndex] + 1);
+                data[currentType][currentIndex] = newVal;
+                chart.data.datasets[dataset].data[currentIndex] = newVal;
+                saveData();
+                chart.update(400);
+                if (valueModalOpen) {
+                    document.getElementById('valueInput').value = newVal;
+                }
+            } else if (e.key === 'ArrowDown' && !searchModalOpen) {
+                e.preventDefault();
+                if (currentIndex === -1) {
+                    currentIndex = 0;
+                    currentType = 'ms';
+                }
+                const dataset = currentType === 'ms' ? 0 : 1;
+                const newVal = Math.max(0, data[currentType][currentIndex] - 1);
+                data[currentType][currentIndex] = newVal;
+                chart.data.datasets[dataset].data[currentIndex] = newVal;
+                saveData();
+                chart.update(400);
+                if (valueModalOpen) {
+                    document.getElementById('valueInput').value = newVal;
+                }
+            } else if (e.key === ' ' && !searchModalOpen && !valueModalOpen) {
+                e.preventDefault();
+                if (currentIndex === -1) {
+                    currentIndex = 0;
+                    currentType = 'ms';
+                }
+                openValueModal(currentIndex, currentType);
+            } else if (e.key === '/' && !valueModalOpen && !searchModalOpen) {
+                e.preventDefault();
+                openSearchModal();
+            } else if ((e.key === 'm' || e.key === 'M') && !searchModalOpen) {
+                currentType = 'ms';
+                if (currentIndex === -1) currentIndex = 0;
+                selectBar(currentIndex, currentType);
+                if (valueModalOpen) {
+                    openValueModal(currentIndex, currentType);
+                }
+            } else if ((e.key === 'h' || e.key === 'H') && !searchModalOpen) {
+                currentType = 'hs';
+                if (currentIndex === -1) currentIndex = 0;
+                selectBar(currentIndex, currentType);
+                if (valueModalOpen) {
+                    openValueModal(currentIndex, currentType);
+                }
+            }
+        });
+
+        // Search input
+        document.getElementById('searchInput').addEventListener('input', e => {
+            updateSearchResults(e.target.value);
+        });
+
+        document.getElementById('searchInput').addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                closeSearchModal();
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                highlightResult(highlightedIndex + 1);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                highlightResult(highlightedIndex - 1);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (highlightedIndex >= 0 && searchResults[highlightedIndex]) {
+                    searchResults[highlightedIndex].click();
+                }
+            }
+        });
+
+        // Date display
+        function updateDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date-display').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Initialize
+        window.onload = () => {
+            loadData();
+            updateDate();
+            setInterval(updateDate, 60000);
+            initChart();
+            updatePercentages();
+            selectBar(-1, 'ms');
+        };
+    </script>
+</body>
+</html>
