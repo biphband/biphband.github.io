@@ -11,11 +11,10 @@
         * {
             box-sizing: border-box;
         }
-
         body {
             background: linear-gradient(to bottom, #e6e6fa, #f0f8ff);
             background-image: url('../background.jpeg');
-            background-color: #e6e6fa; 
+            background-color: #e6e6fa;
             background-attachment: fixed;
             background-size: cover;
             background-position: center;
@@ -29,7 +28,6 @@
             overflow-y: auto;
             font-size: 0.9rem;
         }
-
         .wrapper {
             display: flex;
             justify-content: center;
@@ -37,7 +35,6 @@
             min-height: 100vh;
             width: 100%;
         }
-
         .container {
             background-color: rgba(255, 255, 255, 0.2);
             border-radius: 8px;
@@ -50,7 +47,6 @@
             margin: 0 auto !important;
             box-sizing: border-box;
         }
-
         .container h1 {
             color: white !important;
             font-family: 'Dancing Script', 'Times New Roman', serif !important;
@@ -63,7 +59,6 @@
             font-weight: 700;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
-
         h3 {
             color: #1e40af;
             font-size: 1.5rem;
@@ -71,7 +66,6 @@
             margin-top: 2rem;
             margin-bottom: 1rem;
         }
-
         .scene-section {
             background: rgba(255, 255, 255, 0.5);
             border-radius: 8px;
@@ -79,7 +73,6 @@
             padding: 12px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
         .scene-title {
             font-size: 1rem;
             font-weight: 600;
@@ -90,21 +83,17 @@
             border-radius: 6px;
             margin: 4px 0;
         }
-
         .scene-title:hover {
             background-color: rgba(255, 255, 255, 0.7);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
         .scene-title.highlighted {
             background-color: rgba(255, 255, 0, 0.25);
         }
-
         .scene-title.active {
             background-color: rgba(59, 130, 246, 0.7);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
         .scene-content {
             display: none;
             opacity: 0;
@@ -115,29 +104,24 @@
             margin-left: 16px;
             transform: translateY(-20px);
         }
-
         .scene-content.active {
             display: block;
             opacity: 1;
-            max-height: 2000px; /* Large enough to accommodate content */
+            max-height: 2000px;
             transform: translateY(0);
         }
-
         .scene-content .p-4 > * {
             opacity: 0;
             transform: translateY(10px);
             transition: opacity 1s ease-in-out, transform 1s ease-in-out;
         }
-
         .scene-content.active .p-4 > * {
             opacity: 1;
             transform: translateY(0);
         }
-
         .video-container {
-            animation: none; /* Remove fadeIn animation as it's now handled by scene-content */
+            animation: none;
         }
-
         .hamburger-menu {
             position: absolute;
             margin-left: 7px;
@@ -145,7 +129,6 @@
             left: 13px;
             z-index: 1000;
         }
-
         .menu-toggle {
             display: flex;
             flex-direction: column;
@@ -158,7 +141,6 @@
             padding: 0;
             z-index: 1001;
         }
-
         .menu-toggle span {
             width: 30px;
             height: 3px;
@@ -166,19 +148,15 @@
             border-radius: 10px;
             transition: all 0.3s linear;
         }
-
         .menu-toggle.open span:nth-child(1) {
             transform: rotate(45deg) translate(5px, 5px);
         }
-
         .menu-toggle.open span:nth-child(2) {
             opacity: 0;
         }
-
         .menu-toggle.open span:nth-child(3) {
             transform: rotate(-45deg) translate(7px, -7px);
         }
-
         .menu-items {
             position: absolute;
             top: 25px;
@@ -191,12 +169,10 @@
             opacity: 0;
             overflow-y: auto;
         }
-
         .menu-items.show {
             left: 0;
             opacity: 1;
         }
-
         .menu-items a {
             display: block;
             padding: 10px 20px;
@@ -207,16 +183,13 @@
             transform: translateX(-20px);
             font-size: 0.9rem;
         }
-
         .menu-items.show a {
             opacity: 1;
             transform: translateX(0);
         }
-
         .menu-items a:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
-
         .menu-items a:nth-child(1) { transition-delay: 0.1s; }
         .menu-items a:nth-child(2) { transition-delay: 0.15s; }
         .menu-items a:nth-child(3) { transition-delay: 0.2s; }
@@ -236,18 +209,15 @@
         .menu-items a:nth-child(17) { transition-delay: 0.9s; }
         .menu-items a:nth-child(18) { transition-delay: 0.95s; }
         .menu-items a:nth-child(19) { transition-delay: 1s; }
-
         .menu-title {
             text-align: center;
             color: white;
             font-size: 16px;
             margin-bottom: 10px;
         }
-
         :root {
             --logo-size: 120px;
         }
-
         .logo {
             width: var(--logo-size);
             height: var(--logo-size);
@@ -256,7 +226,6 @@
             right: 25px;
             object-fit: contain;
         }
-
         .selected-filter {
             position: absolute;
             top: 60px;
@@ -268,7 +237,6 @@
             gap: 4px;
             z-index: 1000;
         }
-
         .clear-filter {
             cursor: pointer;
             color: white;
@@ -277,6 +245,9 @@
     </style>
 </head>
 <body>
+    <!-- PRELOADER (hidden) -->
+    <div id="media-preloader" style="display:none;"></div>
+
     <div class="hamburger-menu">
         <button class="menu-toggle" onclick="toggleMenu()">
             <span></span>
@@ -340,7 +311,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Act I -->
             <div id="act1" class="scene-section">
                 <h3 class="text-blue-800">Act I</h3>
@@ -404,8 +374,8 @@
                             <p class="text-sm"><strong>Description:</strong> A mysterious figure captivates the party with an air of intrigue, and then reveals that he is but Uncle Drosselmeyer in disguise, with magic tricks and gifts!</p>
                             <img src="images/mysteriousstranger.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-[100%] mx-auto">
                             <img src="images/mysteriousstranger2.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-[100%] mx-auto">
-                            <img src="images/mysteriousstranger3.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-[100%] mx-auto">   
-                            <img src="images/mysteriousstranger4.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-[100%] mx-auto">    
+                            <img src="images/mysteriousstranger3.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/mysteriousstranger4.jpg" alt="Mysterious Stranger" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -452,8 +422,8 @@
                         <div class="mb-3">
                             <p class="text-sm"><strong>Description: </strong>The life-size dolls perform a charming, synchronized dance.</p>
                             <img src="images/danceofthedolls1.jpg" alt="Dolls Dance" class="my-3 rounded w-full max-w-[100%] mx-auto">
-                            <img src="images/danceofthedolls2.jpg" alt="Dolls Dance" class="my-3 rounded w-full max-w-[100%] mx-auto">  
-                            <img src="images/danceofthedolls3.jpg" alt="Dolls Dance" class="my-3 rounded w-full max-w-[100%] mx-auto">  
+                            <img src="images/danceofthedolls2.jpg" alt="Dolls Dance" class="my-3 rounded w-full max-w-[100%] mx-auto">
+                            <img src="images/danceofthedolls3.jpg" alt="Dolls Dance" class="my-3 rounded w-full max-w-[100%] mx-auto">
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 video-container">
                             <div>
@@ -636,7 +606,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Act II -->
             <div id="act2" class="scene-section">
                 <h3 class="text-blue-800">Act II</h3>
@@ -914,21 +883,47 @@
     </div>
 
     <script>
+        // ====================== PRE-LOAD MEDIA ======================
+        document.addEventListener('DOMContentLoaded', function () {
+            const preloader = document.getElementById('media-preloader');
+
+            // 1. Force-load every image (browser caches them)
+            document.querySelectorAll('img[src]').forEach(img => {
+                const clone = new Image();
+                clone.src = img.src;
+            });
+
+            // 2. Pre-load every unique audio track
+            const audioPaths = new Set();
+            document.querySelectorAll('audio source[type="audio/mpeg"]').forEach(src => {
+                if (src.src) audioPaths.add(src.src);
+            });
+
+            audioPaths.forEach(path => {
+                const audio = document.createElement('audio');
+                audio.preload = 'auto';
+                audio.style.display = 'none';
+                audio.src = path;
+                preloader.appendChild(audio);
+                audio.load();   // start download immediately
+            });
+        });
+
+        // ====================== ORIGINAL SCRIPTS ======================
         function fadeOutAudio(audio, duration = 2000) {
             return new Promise(resolve => {
                 const initialVolume = audio.volume;
-                const steps = 20; // Number of steps for fade-out
+                const steps = 20;
                 const interval = duration / steps;
                 let currentStep = 0;
-
                 const fadeInterval = setInterval(() => {
                     currentStep++;
                     audio.volume = initialVolume * (1 - currentStep / steps);
                     if (currentStep >= steps) {
                         clearInterval(fadeInterval);
                         audio.pause();
-                        audio.volume = initialVolume; // Reset volume for next play
-                        audio.currentTime = 0; // Reset to start
+                        audio.volume = initialVolume;
+                        audio.currentTime = 0;
                         resolve();
                     }
                 }, interval);
@@ -938,7 +933,6 @@
         async function toggleScene(sceneId) {
             const scenes = document.querySelectorAll('.scene-content');
             const sceneTitles = document.querySelectorAll('.scene-title');
-
             for (const scene of scenes) {
                 if (scene.id === sceneId) {
                     const isOpening = !scene.classList.contains('active');
@@ -946,27 +940,24 @@
                     const correspondingTitle = document.querySelector(`.scene-title[onclick="toggleScene('${sceneId}')"]`);
                     if (scene.classList.contains('active')) {
                         correspondingTitle.classList.add('active');
-                        // Smoothly scroll to the title from current position
                         const titleRect = correspondingTitle.getBoundingClientRect();
-                        const offset = 15; // 15px offset from the top
+                        const offset = 15;
                         window.scrollTo({
                             top: window.scrollY + titleRect.top - offset,
                             behavior: 'smooth'
                         });
                     } else {
                         correspondingTitle.classList.remove('active');
-                        // Fade out and pause audio elements within the scene
                         const audioElements = scene.querySelectorAll('audio');
                         for (const audio of audioElements) {
                             if (!audio.paused) {
                                 await fadeOutAudio(audio);
                             }
                         }
-                        // Pause video elements within the scene
                         const videoElements = scene.querySelectorAll('iframe');
                         videoElements.forEach(iframe => {
                             const src = iframe.src;
-                            iframe.src = src; // Reset src to pause YouTube videos
+                            iframe.src = src;
                         });
                     }
                 } else {
@@ -975,18 +966,16 @@
                         const otherTitle = document.querySelector(`.scene-title[onclick="toggleScene('${scene.id}')"]`);
                         if (otherTitle) {
                             otherTitle.classList.remove('active');
-                            // Fade out and pause audio elements within other scenes
                             const audioElements = scene.querySelectorAll('audio');
                             for (const audio of audioElements) {
                                 if (!audio.paused) {
                                     await fadeOutAudio(audio);
                                 }
                             }
-                            // Pause video elements within other scenes
                             const videoElements = scene.querySelectorAll('iframe');
                             videoElements.forEach(iframe => {
                                 const src = iframe.src;
-                                iframe.src = src; // Reset src to pause YouTube videos
+                                iframe.src = src;
                             });
                         }
                     }
@@ -1011,18 +1000,16 @@
                         const correspondingTitle = document.querySelector(`.scene-title[onclick="toggleScene('${scene.id}')"]`);
                         if (correspondingTitle) {
                             correspondingTitle.classList.remove('active');
-                            // Fade out and pause audio elements within the scene
                             const audioElements = scene.querySelectorAll('audio');
                             for (const audio of audioElements) {
                                 if (!audio.paused) {
                                     await fadeOutAudio(audio);
                                 }
                             }
-                            // Pause video elements within the scene
                             const videoElements = scene.querySelectorAll('iframe');
                             videoElements.forEach(iframe => {
                                 const src = iframe.src;
-                                iframe.src = src; // Reset src to pause YouTube videos
+                                iframe.src = src;
                             });
                         }
                     }
@@ -1039,18 +1026,16 @@
                         const correspondingTitle = document.querySelector(`.scene-title[onclick="toggleScene('${scene.id}')"]`);
                         if (correspondingTitle) {
                             correspondingTitle.classList.remove('active');
-                            // Fade out and pause audio elements within the scene
                             const audioElements = scene.querySelectorAll('audio');
                             for (const audio of audioElements) {
                                 if (!audio.paused) {
                                     await fadeOutAudio(audio);
                                 }
                             }
-                            // Pause video elements within the scene
                             const videoElements = scene.querySelectorAll('iframe');
                             videoElements.forEach(iframe => {
                                 const src = iframe.src;
-                                iframe.src = src; // Reset src to pause YouTube videos
+                                iframe.src = src;
                             });
                         }
                     }
@@ -1062,11 +1047,7 @@
             const sceneTitles = document.querySelectorAll('.scene-title');
             const selectedFilterDiv = document.getElementById('selected-filter');
             const filterText = document.getElementById('filter-text');
-
-            // Clear previous highlights
             sceneTitles.forEach(title => title.classList.remove('highlighted'));
-
-            // Apply highlights based on role
             if (role && role !== 'Any') {
                 sceneTitles.forEach(title => {
                     const roles = title.getAttribute('data-roles').split(',');
@@ -1074,25 +1055,18 @@
                         title.classList.add('highlighted');
                     }
                 });
-                // Show selected filter
                 filterText.textContent = role;
                 selectedFilterDiv.style.display = 'flex';
             } else {
-                // Hide selected filter if 'Any' or no role is selected
                 selectedFilterDiv.style.display = 'none';
             }
-
-            // Close menu after selection
             toggleMenu();
         }
 
         function clearFilter() {
             const sceneTitles = document.querySelectorAll('.scene-title');
             const selectedFilterDiv = document.getElementById('selected-filter');
-
-            // Clear highlights
             sceneTitles.forEach(title => title.classList.remove('highlighted'));
-            // Hide selected filter
             selectedFilterDiv.style.display = 'none';
         }
     </script>
