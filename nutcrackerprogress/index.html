@@ -13,7 +13,7 @@
         body { padding:20px; display:flex; flex-direction:column; }
 
         .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; padding:0 10px; flex-shrink:0; position:relative; }
-        .title { font-family:'American Typewriter','Courier New',monospace; font-size:2.5rem; color:#333; text-align:center; flex:1; font-weight:normal; position:absolute; left:50%; transform:translateX(-50%); top:0; white-space:nowrap; }
+        .title { font-family:'American Typewriter','Courier New',monospace; font-size:2.5rem; color:#333; text-align:center; flex:1; font-weight:500; position:absolute; left:50%; transform:translateX(-50%); top:0; white-space:nowrap; }
         .date-display { font-size:1rem; color:#555; text-align:right; white-space:nowrap; }
         .percentages { font-size:1rem; color:#555; line-height:1.8; white-space:nowrap; }
         .percentages span { display:inline-flex; align-items:center; gap:6px; }
@@ -64,7 +64,7 @@
 .modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,.5); justify-content:center; align-items:center; }
         .modal-content { 
             background:#fff; 
-            padding:30px; 
+            padding: 40px 30px 30px;
             border-radius:12px; 
             width:500px; 
             max-width:90%; 
@@ -77,7 +77,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .modal-header h3 {
@@ -93,8 +93,8 @@
             cursor: pointer;
             transition: all 0.2s;
             position: absolute;
-            left: 20px;
-            top: 20px;
+            left: 12px;
+            top: 12px;
             user-select: none;
         }
         .lock-icon:hover { opacity: 0.8; }
@@ -104,6 +104,9 @@
         .modal-school { font-size:.95rem; color:#333; cursor:pointer; font-weight:normal; user-select:none; }
 
         .input-wrapper {
+            margin-left: 20px;
+            margin-bottom: -10px;
+            margin-top: -20px;
             position: relative;
             display: inline-block;
             width: 60%;
@@ -163,8 +166,8 @@
             border-radius:4px; 
             background:#f0f0f0; 
             color:#333; 
-            width:44px; 
-            height:44px; 
+            width:24px; 
+            height:24px; 
             display:flex; 
             align-items:center; 
             justify-content:center; 
@@ -218,6 +221,17 @@
         <canvas id="progressChart"></canvas>
         <div id="xLabels"></div>
     </div>
+
+<div id="pwdOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000; justify-content:center; align-items:center;">
+    <div style="background:#fff; padding:20px; border-radius:8px; width:280px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,.2);">
+        <p style="margin:0 0 12px; font-family:Courier New,monospace;">Enter password to edit:</p>
+        <input id="pwdInput" type="password" style="width:100%; padding:8px; font-size:1rem; border:1px solid #ccc; border-radius:4px; font-family:Courier New,monospace;" autocomplete="off">
+        <div style="margin-top:12px; display:flex; gap:8px; justify-content:center;">
+            <button id="pwdCancel" style="padding:6px 12px; cursor:pointer;">Cancel</button>
+            <button id="pwdOk" style="padding:6px 12px; cursor:pointer; background:#007bff; color:#fff; border:none; border-radius:4px;">OK</button>
+        </div>
+    </div>
+</div>
 
     <!-- Value Modal -->
     <div class="modal" id="valueModal">
@@ -563,16 +577,7 @@ if (isEditingUnlocked) {
             }
         }
 
-        function unlockEditing() {
-            const password = prompt('Enter password to edit:');
-            if (password === '6767') {
-                isEditingUnlocked = true;
-                updateLockState();
-                document.getElementById('valueInput').focus();
-            } else if (password !== null) {
-                alert('Incorrect password.');
-            }
-        }
+function unlockEditing(){const _0x1a2b=document['getElementById']('pwdOverlay'),_0x3c4d=document['getElementById']('pwdInput'),_0x5e6f=document['getElementById']('pwdOk'),_0x7g8h=document['getElementById']('pwdCancel');_0x3c4d['value']='';_0x1a2b['style']['display']='flex';setTimeout(()=>_0x3c4d['focus'](),100);const _0x9i0j=()=>{ _0x1a2b['style']['display']='none';_0x3c4d['value']='';};const _0xk1l2=()=>{const _0xm3n4=[54,55,54,55],_0xo5p6=_0x3c4d['value']['trim']();if(_0xo5p6['length']!==_0xm3n4['length']){alert('Incorrect password.');_0x9i0j();return;}_0xm3n4['every']((v,i)=>_0xo5p6['charCodeAt'](i)===v)? (isEditingUnlocked=true,updateLockState(),document['getElementById']('valueInput')['focus']()) : alert('Incorrect password.');_0x9i0j();};const _0xs9t0=()=>{ _0x9i0j();};_0x5e6f['onclick']=_0xk1l2;_0x7g8h['onclick']=_0xs9t0;_0x3c4d['onkeydown']=e=>{if(e['key']==='Enter'){e['preventDefault']();_0xk1l2();}if(e['key']==='Escape'){e['preventDefault']();_0xs9t0();}};}
 
         function updateValueFromInput() {
             if (!isEditingUnlocked) return;
