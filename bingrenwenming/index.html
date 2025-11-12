@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>冰人文明 （打泥泥）</title>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --accent-a: #00d1ff;
+            --accent-b: #ff2e63;
+            --text: #f0f0f0;
+            --transition: 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 1s ease-out;
+            position: relative;
+        }
+
+        /* Flash overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, var(--flash-color, transparent), transparent 85%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        body.flash-a::after { --flash-color: var(--accent-a); opacity: 0.2; }
+        body.flash-b::after { --flash-color: var(--accent-b); opacity: 0.2; }
+
+        .container {
+            text-align: center;
+            z-index: 10;
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            opacity: .9;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        /* Button with label */
+        .btn-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0.5rem;
+        }
+        button {
+            background: transparent;
+            border: 2px solid;
+            color: inherit;
+            font-size: 2rem;
+            padding: 1.5rem 3rem;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: transform 0.2s ease, border-color var(--transition), color var(--transition);
+            min-width: 180px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        button::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: currentColor; opacity: 0; transition: opacity var(--transition); z-index: -1;
+        }
+        button:hover::before { opacity: .15; }
+        button:active { transform: scale(.95); }
+        button.pressed { animation: buttonFlash 0.3s ease-out; }
+        @keyframes buttonFlash { 0%, 100% { background: transparent; } 50% { background: rgba(255,255,255,0.4); } }
+
+        #beginBtn { border-color: var(--text); color: var(--text); }
+
+        .choice-btn {
+            opacity: 0; transform: scale(0.8); pointer-events: none;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .choice-btn.active { opacity: 1; transform: scale(1); pointer-events: auto; }
+
+        .choice-a { border-color: var(--accent-a); color: var(--accent-a); }
+        .choice-b { border-color: var(--accent-b); color: var(--accent-b); }
+
+        .fade-in { animation: fadeInOnly 0.6s ease-out forwards; }
+        @keyframes fadeInOnly { from { opacity: 0; } to { opacity: 1; } }
+
+        .color-shift-a { background: linear-gradient(135deg, #001a2e, #00334d); }
+        .color-shift-b { background: linear-gradient(135deg, #2e0014, #4d0023); }
+
+        .btn-label {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #aaa;
+            font-weight: normal;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        /* Displays */
+        #noteDisplay, #endingDisplay {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 500;
+            text-align: center;
+            pointer-events: none;
+            z-index: 25;
+            white-space: pre-line;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+        #noteDisplay {
+            bottom: 3rem;
+            font-size: 1.8rem;
+            color: var(--text);
+        }
+        #endingDisplay {
+            bottom: 6rem;
+            font-size: 1.2rem;
+            max-width: 90%;
+            line-height: 1.5;
+            color: #ffcc00;
+        }
+        #noteDisplay.show, #endingDisplay.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="title">冰人文明 （打泥泥）</h1>
+        <button id="beginBtn">开始</button>
+        <div id="choices" style="margin-top:3rem; display:flex; gap:3rem;">
+            <div class="btn-wrapper">
+                <button id="btnA" class="choice-btn choice-a">A</button>
+                <div id="labelA" class="btn-label"></div>
+            </div>
+            <div class="btn-wrapper">
+                <button id="btnB" class="choice-btn choice-b">B</button>
+                <div id="labelB" class="btn-label"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="noteDisplay"></div>
+    <div id="endingDisplay"></div>
+
+    <script>
+        const CHANNEL   = 14;
+        const MAX_NOTE  = 127;
+        let output      = null;
+        let path        = [];
+        let isActive    = false;
+        let choicesOk   = false;
+        let midiReady   = false;
+
+        const titleEl       = document.getElementById('title');
+        const beginBtn      = document.getElementById('beginBtn');
+        const btnA          = document.getElementById('btnA');
+        const btnB          = document.getElementById('btnB');
+        const labelA        = document.getElementById('labelA');
+        const labelB        = document.getElementById('labelB');
+        const noteDisplay   = document.getElementById('noteDisplay');
+        const endingDisplay = document.getElementById('endingDisplay');
+
+        // === CHOICE TEXTS (Level → A, B) ===
+        const CHOICE_TEXTS = [
+            [], // Level 0
+            ["挑战", "毁灭"], // Level 1
+            ["继续跑", "陪着阿美一起跑"], // Level 2
+            ["回应 不影响剧情！", "不影响剧情！"], // Level 3
+            ["去救阿美", "不去"], // Level 4
+            ["不影响结局", "拒绝"], // Level 5
+            ["不影响结局", "答应"], // Level 6
+            ["一起走位爱私奔", "留下来 为了使命"], // Level 7
+            ["不影响结局 (说/不说)", "不影响结局 (说/不说)"] // Level 8
+        ];
+
+        // === MIDI NOTE MAPPING ===
+        const FIRST_NODE_OF_LEVEL = [0, 1, 3, 6, 10, 15, 21, 28];
+        function noteForPath(p) {
+            if (p.length === 0) return 0;
+            let note = FIRST_NODE_OF_LEVEL[p.length];
+            for (let i = 0; i < p.length; i++) {
+                if (p[i] === 1) {
+                    const remaining = p.length - i - 1;
+                    note += (1 << remaining);
+                }
+            }
+            return Math.min(note, MAX_NOTE);
+        }
+
+        // === CHINESE ENDING ===
+        function getChineseEnding(p) {
+            if (p.length === 0) return null;
+            const startsWith = (pat) => pat.every((v, i) => p[i] === v);
+            const matchesUpTo = (pat) => pat.length <= p.length && pat.every((v, i) => p[i] === v);
+
+            if (p[0] === 1) {
+                return "冰人文明 （打泥泥）\n结局 1: B (毁灭) 被毁灭";
+            }
+            if (matchesUpTo([0,0,0,1])) {
+                return "冰人文明 （打泥泥）\n结局 2: A(挑战) A(继续跑) A(“回应 不影响剧情！) B(不去) 阿美死了，无法在奔跑 然后冰球被毁灭";
+            }
+            if (matchesUpTo([0,1,1,1])) {
+                return "冰人文明 （打泥泥）\n结局 3/4: A(挑战) B(陪着阿美一起跑) B(不影响剧情！) B(拒绝) 最后阿美成为了明星 而冰球被毁";
+            }
+            if (matchesUpTo([0,1,0,0,1,1])) {
+                return "冰人文明 （打泥泥）\n结局 5: A(挑战) B(陪着阿美一起跑) A(不影响剧情！) A(答应) B(“你怎么知道有炸弹”) B(攻击) 和阿美一起死了";
+            }
+            if (matchesUpTo([0,1,0,0,0,0,1])) {
+                return "冰人文明 （打泥泥）\n结局 6: A(挑战) B(陪着阿美一起跑) A(不影响剧情！) A(答应) A(“你不会杀我们的”) A(犹豫) B(反抗) 死了殉情";
+            }
+            if (matchesUpTo([0,1,0,0,0,0,0])) {
+                return "冰人文明 （打泥泥）\n结局 7: A(挑战) B(陪着阿美一起跑) A(不影响剧情！) A(答应) A(“你不会杀我们的”) A(犹豫) A(顺从) 冰球最终被毁， 但自己在地球看着。";
+            }
+            if (matchesUpTo([0,0,0,0,0,0,0])) {
+                return "冰人文明 （打泥泥）\n结局 8: A(挑战) A(继续跑) A(回应 不影响剧情！) A(去救阿美) A(不影响结局) A(不影响结局) A(一起走位爱私奔) 最后一起死了";
+            }
+            if (p.length >= 8 && startsWith([0,0,0,0,0,0,1,1])) {
+                return "冰人文明 （打泥泥）\n最终结局：A(挑战)A(继续跑) A(回应 不影响剧情！) A(去救阿美) A(不影响结局) A(不影响结局) B(留下来 为了使命) B(不影响结局 (说/不说)) 完成使命";
+            }
+            return null;
+        }
+
+        // === UPDATE BUTTON LABELS ===
+        function updateChoiceLabels() {
+            const level = path.length + 1;
+            if (level < CHOICE_TEXTS.length) {
+                labelA.textContent = CHOICE_TEXTS[level][0] || '';
+                labelB.textContent = CHOICE_TEXTS[level][1] || '';
+            }
+        }
+
+        // === SEND & DISPLAY ===
+        function send(note, choiceText) {
+            if (!output || !midiReady || note > MAX_NOTE) return;
+            const on  = 0x90 + (CHANNEL - 1);
+            const off = 0x80 + (CHANNEL - 1);
+            output.send([on, note, 100]);
+            setTimeout(() => output.send([off, note, 0]), 100);
+
+            showNoteAndChoice(note, choiceText);
+            showChineseEnding(getChineseEnding(path));
+        }
+
+        function showNoteAndChoice(note, text) {
+            noteDisplay.textContent = `${note}\n${text}`;
+            noteDisplay.classList.remove('show');
+            void noteDisplay.offsetWidth;
+            noteDisplay.classList.add('show');
+            setTimeout(() => noteDisplay.classList.remove('show'), 1800);
+        }
+
+        function showChineseEnding(text) {
+            if (!text) {
+                endingDisplay.classList.remove('show');
+                return;
+            }
+            endingDisplay.textContent = text;
+            endingDisplay.classList.remove('show');
+            void endingDisplay.offsetWidth;
+            endingDisplay.classList.add('show');
+            setTimeout(() => endingDisplay.classList.remove('show'), 5000);
+        }
+
+        // === MIDI INIT ===
+        async function enableMIDI() {
+            if (midiReady) return;
+            try {
+                const access = await navigator.requestMIDIAccess({ sysex: false });
+                midiReady = true;
+                const outs = [...access.outputs.values()];
+                output = outs.find(o => o.name.includes('IAC Driver') && o.name.includes('Bus 1')) ||
+                         outs.find(o => o.name.includes('IAC')) ||
+                         outs[0];
+            } catch (e) {
+                console.warn('MIDI not available');
+            }
+        }
+
+        // === UI LOGIC ===
+        async function start() {
+            if (isActive || !midiReady) return;
+            isActive = true;
+            choicesOk = false;
+            path = [];
+            send(0, "开始");
+            beginBtn.style.display = 'none';
+            titleEl.textContent = 'Choice 1';
+            updateChoiceLabels();
+            showChoices();
+        }
+
+        function showChoices() {
+            btnA.classList.add('active', 'fade-in');
+            btnB.classList.add('active', 'fade-in');
+            choicesOk = true;
+        }
+
+        function flashButton(btn) {
+            btn.classList.remove('pressed');
+            void btn.offsetWidth;
+            btn.classList.add('pressed');
+            setTimeout(() => btn.classList.remove('pressed'), 300);
+        }
+
+        function choose(branch) {
+            if (!choicesOk) return;
+            choicesOk = false;
+
+            path.push(branch);
+            const note = noteForPath(path);
+            const level = path.length;
+            const choiceText = CHOICE_TEXTS[level][branch] || (branch === 0 ? 'A' : 'B');
+            send(note, choiceText);
+
+            const flashCls = branch === 0 ? 'flash-a' : 'flash-b';
+            const shiftCls = branch === 0 ? 'color-shift-a' : 'color-shift-b';
+            const btn = branch === 0 ? btnA : btnB;
+
+            document.body.classList.remove('flash-a', 'flash-b', 'color-shift-a', 'color-shift-b');
+            document.body.classList.add(shiftCls);
+            document.body.classList.add(flashCls);
+            setTimeout(() => document.body.classList.remove(flashCls), 200);
+            flashButton(btn);
+
+            setTimeout(() => {
+                if (note >= MAX_NOTE || path.length >= 8) {
+                    finish();
+                } else {
+                    titleEl.textContent = `Choice ${path.length + 1}`;
+                    updateChoiceLabels();
+                    choicesOk = true;
+                }
+            }, 600);
+        }
+
+        function finish() {
+            titleEl.textContent = '完结';
+            btnA.classList.remove('active');
+            btnB.classList.remove('active');
+            setTimeout(reset, 4000);
+        }
+
+        function reset() {
+            beginBtn.style.display = 'block';
+            titleEl.textContent = '冰人文明 （打泥泥）';
+            btnA.classList.remove('active', 'fade-in');
+            btnB.classList.remove('active', 'fade-in');
+            labelA.textContent = '';
+            labelB.textContent = '';
+            document.body.classList.remove('flash-a', 'flash-b', 'color-shift-a', 'color-shift-b');
+            noteDisplay.classList.remove('show');
+            endingDisplay.classList.remove('show');
+            isActive = false;
+            choicesOk = false;
+            path = [];
+        }
+
+        // === EVENTS ===
+        beginBtn.addEventListener('click', async () => {
+            await enableMIDI();
+            start();
+        });
+
+        btnA.addEventListener('click', () => choose(0));
+        btnB.addEventListener('click', () => choose(1));
+
+        document.addEventListener('keydown', e => {
+            if (!isActive && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                enableMIDI().then(start);
+                return;
+            }
+            if (choicesOk) {
+                if (e.key.toLowerCase() === 'a') { e.preventDefault(); choose(0); }
+                if (e.key.toLowerCase() === 'b') { e.preventDefault(); choose(1); }
+            }
+        });
+
+        // Initial
+        btnA.classList.remove('active');
+        btnB.classList.remove('active');
+        labelA.textContent = '';
+        labelB.textContent = '';
+    </script>
+</body>
+</html>
