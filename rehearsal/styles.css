@@ -519,7 +519,7 @@ select.attendance-dropdown-select.absent {
     }
     
     .bar-label {
-        font-size: clamp(12px, 1.4vw, 20px);
+        font-size: clamp(10px, 1vw, 18px);
         color: rgb(0, 0, 0);
         transform: rotate(180deg);
         writing-mode: vertical-rl;
@@ -560,7 +560,7 @@ select.attendance-dropdown-select.absent {
     }
     
     .value-label {
-        font-size: clamp(12px, 1.4vw, 20px);
+        font-size: clamp(8px, 1vw, 18px);
         transform: rotate(180deg);
         left: 2%;
         writing-mode: vertical-rl;
