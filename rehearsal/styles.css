@@ -507,7 +507,7 @@ select.attendance-dropdown-select.absent {
     margin: 5px 0;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 5000px) {
     .bar {
         margin: 0 2px; 
         margin-bottom: -10px;
@@ -562,7 +562,7 @@ select.attendance-dropdown-select.absent {
     .value-label {
         font-size: clamp(12px, 1.4vw, 20px);
         transform: rotate(180deg);
-        left: 28%;
+        left: 2%;
         writing-mode: vertical-rl;
         text-orientation: mixed;
         height: auto;
