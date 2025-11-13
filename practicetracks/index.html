@@ -492,7 +492,7 @@
       <div class="instrument-title"></div>
     </div>
     <div id="player-section" class="player-container" style="display: none;">
-      <button id="song-back-btn" class="btn back-btn">← Song Selection</button>
+      <button id="song-back-btn" class="btn back-btn">Song Selection</button>
       <h1 id="player-title"></h1>
       <div class="player">
         <div class="waveform-wrapper">
@@ -553,9 +553,6 @@ const instruments = {
     ['The Nutcracker_Glockenspiel_Parts.pdf', 'The Nutcracker_Vibraphone_Parts.pdf'],
     ['The Nutcracker_Aux_Perc_1_Parts.pdf', 'The Nutcracker_Aux_Perc_2_Parts.pdf'],
     ['The Nutcracker_Timpani_Parts.pdf', 'The Nutcracker_Piano_Parts.pdf']
-  ],
-  Other: [
-    ['The Nutcracker_Conductor_Parts.pdf']
   ]
 };
 
@@ -1014,21 +1011,6 @@ function showInstrumentSelection() {
       });
       familyDiv.appendChild(groupDiv);
     });
-    if (family === 'Other') {
-      const seatingChartBtn = document.createElement('button');
-      seatingChartBtn.className = 'btn';
-      seatingChartBtn.textContent = 'Seating Chart';
-      ['click', 'touchstart'].forEach(eventType => {
-        seatingChartBtn.addEventListener(eventType, (e) => {
-          e.preventDefault();
-          alert('Seating Chart has not yet been finalized for this performance.');
-        });
-      });
-      const groupDiv = document.createElement('div');
-      groupDiv.className = 'instrument-group';
-      groupDiv.appendChild(seatingChartBtn);
-      familyDiv.appendChild(groupDiv);
-    }
     instrumentSelection.appendChild(familyDiv);
   }
 }
@@ -1044,7 +1026,7 @@ async function showSongSelection() {
   const backBtn = document.createElement('button');
   backBtn.id = 'instrument-back-btn';
   backBtn.className = 'btn back-btn';
-  backBtn.textContent = '← Instrument Selection';
+  backBtn.textContent = 'Instrument Selection';
   backBtn.addEventListener('click', showInstrumentSelection);
   familyDiv.appendChild(backBtn);
   const instrumentTitle = document.createElement('div');
