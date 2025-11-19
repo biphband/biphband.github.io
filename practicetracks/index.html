@@ -541,7 +541,7 @@ const instruments = {
     ['The Nutcracker_Flute_2_Parts.pdf', 'The Nutcracker_Flute_3_Parts.pdf'],
     ['The Nutcracker_Clarinet_1_Parts.pdf', 'The Nutcracker_Clarinet_2_Parts.pdf', 'The Nutcracker_Clarinet_3_Parts.pdf'],
     ['The Nutcracker_Bass_Clarinet_Parts.pdf', 'The Nutcracker_Bassoon_Parts.pdf'],
-    ['The Nutcracker_Alto_Sax_1_Parts.pdf', 'The Nutcracker_Alto_Sax_2_Parts.pdf', 'The Nutcracker_Tenor_Sax_Parts.pdf']
+    ['The Nutcracker_Alto_Sax_1_Parts.pdf', 'The Nutcracker_Alto_Sax_2_Parts.pdf', 'The Nutcracker_Tenor_Saxophone_Parts.pdf']
   ],
   Brass: [
     ['The Nutcracker_Trumpet_1_Parts.pdf', 'The Nutcracker_Trumpet_2_Parts.pdf'],
@@ -841,21 +841,14 @@ const zoomOutBtn = document.getElementById('zoom-out');
 const songBackBtn = document.getElementById('song-back-btn');
 
 let zoomLevel = 1;
-let selectedInstrument = ''; 
+let selectedInstrument = '';
 let selectedSong = '';
-
-function getAudioInstrumentName(rawName) {
-  return rawName
-    .replace('Trombone 1', 'Trombone')
-    .replace('Tenor_Saxophone', 'Tenor_Sax') 
-    .replace('Alto_Sax_1', 'Alto_Sax_1')
-    .replace('Alto_Sax_2', 'Alto_Sax_2');
-}
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 let isPlaying = false;
 let pauseTime = 0;
 
+// WaveSurfer instances
 const wavesurferPart = WaveSurfer.create({
   container: '#waveform',
   waveColor: '#6b8299',
@@ -890,12 +883,62 @@ loadingOverlay.textContent = 'Loading audio...';
 waveformContainer.appendChild(loadingOverlay);
 
 function formatTime(seconds) {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s < 10 ? '0' : ''}${s}`;
+  const minutes = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
-// ——— INSTRUMENT SELECTION ———
+function throttle(func, wait) {
+  let lastCall = 0;
+  return function (...args) {
+    const now = Date.now();
+    if (now - lastCall >= wait) {
+      func(...args);
+      lastCall = now;
+    }
+  };
+}
+
+function syncPlay(offset = 0) {
+  if (isPlaying) return;
+  isPlaying = true;
+  playPauseBtn.textContent = 'Pause';
+  playPauseBtn.classList.add('playing');
+  playPauseBtn.disabled = false;
+
+  const speed = parseFloat(speedSelect.value);
+  wavesurferPart.setPlaybackRate(speed);
+  wavesurferCombined.setPlaybackRate(speed);
+
+  if (wavesurferPart.getVolume() > 0) wavesurferPart.play(offset);
+  if (wavesurferCombined.getVolume() > 0) wavesurferCombined.play(offset);
+}
+
+function syncPause() {
+  if (!isPlaying) return;
+  isPlaying = false;
+  pauseTime = wavesurferPart.getCurrentTime();
+  wavesurferPart.pause();
+  wavesurferCombined.pause();
+  playPauseBtn.textContent = 'Play';
+  playPauseBtn.classList.remove('playing');
+}
+
+function syncSetTime(time) {
+  const wasPlaying = isPlaying;
+  if (isPlaying) {
+    wavesurferPart.pause();
+    wavesurferCombined.pause();
+    isPlaying = false;
+  }
+  pauseTime = time;
+  wavesurferPart.setTime(time);
+  wavesurferCombined.setTime(time);
+  currentTimeDisplay.textContent = formatTime(time);
+  if (wasPlaying) syncPlay(time);
+}
+
+// ——— INSTRUMENT SELECTION (unchanged) ———
 function showInstrumentSelection() {
   instrumentSelection.style.display = 'block';
   songSelection.style.display = 'none';
@@ -904,6 +947,7 @@ function showInstrumentSelection() {
   instrumentSelection.innerHTML = '';
 
   for (const [family, groups] of Object.entries(instruments)) {
+    if (groups.flat().length === 0) continue;
     const familyDiv = document.createElement('div');
     familyDiv.className = 'family-section';
     familyDiv.innerHTML = `<h3 class="family-title">${family}</h3>`;
@@ -911,17 +955,14 @@ function showInstrumentSelection() {
     groups.forEach(group => {
       const groupDiv = document.createElement('div');
       groupDiv.className = 'instrument-group';
-
       group.forEach(file => {
-        let displayName = file
-          .replace('The Nutcracker_', '')
-          .replace('_Parts.pdf', '')
-          .replace(/_/g, ' ');
-        if (displayName === 'Tenor Saxophone') displayName = 'Tenor Sax';
+        let name = file.replace('The Nutcracker_', '').replace('_Parts.pdf', '').replace(/_/g, ' ');
+        if (name === 'Tenor Saxophone') name = 'Tenor Sax';
+        name = name.replace(/\b\w/g, l => l.toUpperCase());
 
         const btn = document.createElement('button');
         btn.className = 'btn';
-        btn.textContent = displayName;
+        btn.textContent = name;
         btn.addEventListener('click', () => {
           selectedInstrument = file.replace('The Nutcracker_', '').replace('_Parts.pdf', '');
           showSongSelection();
@@ -934,7 +975,7 @@ function showInstrumentSelection() {
   }
 }
 
-// ——— SONG SELECTION WITH PROPER DISABLED LOGIC ———
+// ——— SONG SELECTION — NOW DISABLES SONGS WITHOUT PART ———
 async function showSongSelection() {
   instrumentSelection.style.display = 'none';
   songSelection.style.display = 'block';
@@ -954,22 +995,31 @@ async function showSongSelection() {
 
   const title = document.createElement('div');
   title.className = 'instrument-title';
-  title.textContent = selectedInstrument.replace(/_/g, ' ').replace('Tenor Saxophone', 'Tenor Sax');
+  title.textContent = selectedInstrument.replace(/_/g, ' ');
   familyDiv.appendChild(title);
 
   const columnsDiv = document.createElement('div');
   columnsDiv.className = 'song-columns';
-  const act1 = document.createElement('div');
-  act1.className = 'song-column';
-  const act2 = document.createElement('div');
-  act2.className = 'song-column';
-  let col = act1;
+  const act1Col = document.createElement('div');
+  act1Col.className = 'song-column';
+  const act2Col = document.createElement('div');
+  act2Col.className = 'song-column';
+  let currentCol = act1Col;
 
-  const audioInst = getAudioInstrumentName(selectedInstrument);
+  const normInst = selectedInstrument
+    .replace('Trombone 1', 'Trombone')
+    .replace('Tenor_Saxophone', 'Tenor_Sax');
 
   for (const item of songList) {
-    if (item === '[ACT 1]') { act1.innerHTML += '<div class="song-header">Act 1</div>'; continue; }
-    if (item === '[ACT 2]') { act2.innerHTML += '<div class="song-header">Act 2</div>'; col = act2; continue; }
+    if (item === '[ACT 1]') {
+      act1Col.innerHTML += '<div class="song-header">Act 1</div>';
+      continue;
+    }
+    if (item === '[ACT 2]') {
+      act2Col.innerHTML += '<div class="song-header">Act 2</div>';
+      currentCol = act2Col;
+      continue;
+    }
 
     const wrapper = document.createElement('div');
     wrapper.className = 'instrument-group';
@@ -978,24 +1028,26 @@ async function showSongSelection() {
     btn.className = 'btn';
     btn.textContent = item;
 
-    let base = item;
-    if (item === 'Waltz of the Flowers') base = 'WOTF';
-    if (item === 'Dance of the Sugar Plum Fairy') base = 'DOTSPF';
-    if (item === 'Overture') base = 'Nutcracker Overture';
-    if (item === 'The Enchanted Palace') base = 'Enchanted Palace';
+    let baseName = item;
+    if (item === 'Waltz of the Flowers') baseName = 'WOTF';
+    if (item === 'Dance of the Sugar Plum Fairy') baseName = 'DOTSPF';
+    if (item === 'Overture') baseName = 'Nutcracker Overture';
+    if (item === 'The Enchanted Palace') baseName = 'Enchanted Palace';
 
-    const url = `practicetracks/${base}-${audioInst}.mp3`;
+    const partUrl = `practicetracks/${baseName}-${normInst}.mp3`;
 
-    let exists = false;
+    let hasPart = false;
     try {
-      const r = await fetch(url, { method: 'HEAD' });
-      exists = r.ok;
-    } catch (_) { exists = false; }
+      const res = await fetch(partUrl, { method: 'HEAD' });
+      hasPart = res.ok;
+    } catch (e) {
+      hasPart = false;
+    }
 
-    if (!exists) {
+    if (!hasPart) {
       btn.classList.add('disabled');
       btn.disabled = true;
-      btn.title = 'No part available';
+      btn.title = 'No part available for this instrument';
     } else {
       btn.addEventListener('click', () => {
         selectedSong = item;
@@ -1004,35 +1056,38 @@ async function showSongSelection() {
     }
 
     wrapper.appendChild(btn);
-    col.appendChild(wrapper);
+    currentCol.appendChild(wrapper);
   }
 
-  columnsDiv.appendChild(act1);
-  columnsDiv.appendChild(act2);
+  columnsDiv.appendChild(act1Col);
+  columnsDiv.appendChild(act2Col);
   familyDiv.appendChild(columnsDiv);
   songSelection.appendChild(familyDiv);
 }
 
-// ——— PLAYER — uses same getAudioInstrumentName() ———
+// ——— PLAYER — unchanged except tiny cleanup ———
 async function showPlayer() {
   if (!selectedSong || !selectedInstrument) return;
 
-  const audioInst = getAudioInstrumentName(selectedInstrument);
+  const normInst = selectedInstrument
+    .replace('Trombone 1', 'Trombone')
+    .replace('Tenor_Saxophone', 'Tenor_Sax');
 
-  let base = selectedSong;
-  if (selectedSong === 'Waltz of the Flowers') base = 'WOTF';
-  if (selectedSong === 'Dance of the Sugar Plum Fairy') base = 'DOTSPF';
-  if (selectedSong === 'Overture') base = 'Nutcracker Overture';
-  if (selectedSong === 'The Enchanted Palace') base = 'Enchanted Palace';
+  let baseSong = selectedSong;
+  if (selectedSong === 'Waltz of the Flowers') baseSong = 'WOTF';
+  if (selectedSong === 'Dance of the Sugar Plum Fairy') baseSong = 'DOTSPF';
+  if (selectedSong === 'Overture') baseSong = 'Nutcracker Overture';
+  if (selectedSong === 'The Enchanted Palace') baseSong = 'Enchanted Palace';
 
-  const partFile = `practicetracks/${base}-${audioInst}.mp3`;
-  const combinedFile = `practicetracks/${base}.mp3`;
+  const combinedFile = `practicetracks/${baseSong}.mp3`;
+  const partFile = `practicetracks/${baseSong}-${normInst}.mp3`;
 
   instrumentSelection.style.display = 'none';
   songSelection.style.display = 'none';
   playerSection.style.display = 'block';
-  playerTitle.textContent = `${selectedInstrument.replace(/_/g, ' ').replace('Tenor Saxophone', 'Tenor Sax')} - ${selectedSong}`;
+  playerTitle.textContent = `${selectedInstrument.replace(/_/g, ' ')} - ${selectedSong}`;
 
+  // Build measure list
   measureListContainer.innerHTML = '';
   const ul = document.createElement('ul');
   (songs[selectedSong] || []).forEach(m => {
@@ -1060,48 +1115,75 @@ async function showPlayer() {
       loadingOverlay.textContent = 'Part not available';
       return;
     }
+
     loadingOverlay.style.display = 'none';
     playPauseBtn.disabled = false;
 
     wavesurferPart.on('ready', () => {
-      const d = wavesurferPart.getDuration();
-      totalTimeDisplay.textContent = formatTime(d);
-      wavesurferPart.zoom(waveformContainer.clientWidth / d);
-      wavesurferCombined.zoom(waveformContainer.clientWidth / d);
+      const dur = wavesurferPart.getDuration();
+      totalTimeDisplay.textContent = formatTime(dur);
+      wavesurferPart.zoom(waveformContainer.clientWidth / dur);
+      wavesurferCombined.zoom(waveformContainer.clientWidth / dur);
+      zoomLevel = 1;
     });
 
     wavesurferPart.on('timeupdate', () => {
       const t = wavesurferPart.getCurrentTime();
       currentTimeDisplay.textContent = formatTime(t);
+      if (isPlaying && wavesurferCombined.getVolume() > 0) {
+        if (Math.abs(wavesurferCombined.getCurrentTime() - t) > 0.05) {
+          wavesurferCombined.setTime(t);
+        }
+      }
     });
 
     wavesurferPart.on('interaction', () => syncSetTime(wavesurferPart.getCurrentTime()));
+
   } catch (e) {
     loadingOverlay.textContent = 'Error loading audio';
   }
 }
 
-// Controls & menu (unchanged)
+// Controls
 playPauseBtn.addEventListener('click', () => isPlaying ? syncPause() : syncPlay(pauseTime));
 speedSelect.addEventListener('change', () => {
   const s = parseFloat(speedSelect.value);
   wavesurferPart.setPlaybackRate(s);
   wavesurferCombined.setPlaybackRate(s);
 });
+
 document.getElementById('part-volume').addEventListener('input', e => wavesurferPart.setVolume(e.target.value));
 document.getElementById('combined-volume').addEventListener('input', e => wavesurferCombined.setVolume(e.target.value));
-zoomInBtn.addEventListener('click', () => { zoomLevel *= 1.5; wavesurferPart.zoom(waveformContainer.clientWidth / wavesurferPart.getDuration() * zoomLevel); wavesurferCombined.zoom(waveformContainer.clientWidth / wavesurferCombined.getDuration() * zoomLevel); });
-zoomOutBtn.addEventListener('click', () => { zoomLevel = Math.max(1, zoomLevel / 1.5); wavesurferPart.zoom(waveformContainer.clientWidth / wavesurferPart.getDuration() * zoomLevel); wavesurferCombined.zoom(waveformContainer.clientWidth / wavesurferCombined.getDuration() * zoomLevel); });
-songBackBtn.addEventListener('click', () => { wavesurferPart.pause(); wavesurferCombined.pause(); isPlaying = false; showSongSelection(); });
 
+zoomInBtn.addEventListener('click', () => {
+  zoomLevel *= 1.5;
+  wavesurferPart.zoom(waveformContainer.clientWidth / wavesurferPart.getDuration() * zoomLevel);
+  wavesurferCombined.zoom(waveformContainer.clientWidth / wavesurferCombined.getDuration() * zoomLevel);
+});
+zoomOutBtn.addEventListener('click', () => {
+  zoomLevel = Math.max(1, zoomLevel / 1.5);
+  wavesurferPart.zoom(waveformContainer.clientWidth / wavesurferPart.getDuration() * zoomLevel);
+  wavesurferCombined.zoom(waveformContainer.clientWidth / wavesurferCombined.getDuration() * zoomLevel);
+});
+
+songBackBtn.addEventListener('click', () => {
+  wavesurferPart.pause();
+  wavesurferCombined.pause();
+  isPlaying = false;
+  showSongSelection();
+});
+
+// Menu toggle
 document.querySelector('.menu-toggle').addEventListener('click', () => {
   document.querySelector('.menu-toggle').classList.toggle('open');
   document.querySelector('.menu-items').classList.toggle('show');
 });
 
+// Load from URL or show instruments
 const params = new URLSearchParams(location.search);
-if (params.get('instrument')) {
-  selectedInstrument = decodeURIComponent(params.get('instrument'));
+const urlInst = params.get('instrument');
+if (urlInst) {
+  selectedInstrument = decodeURIComponent(urlInst);
   showSongSelection();
 } else {
   showInstrumentSelection();
