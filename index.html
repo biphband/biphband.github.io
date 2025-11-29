@@ -1,335 +1,1247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BIPH</title>
-    <link rel="icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
-    <style>
-        @font-face {
-            font-family: 'Zapfino';
-            src: url('../fonts/Zapfino.ttf') format('truetype');
-        }
-        
-        body {
-            background-color: rgba(45, 70, 119);
-            font-family: 'Andika', sans-serif;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
-            align-items: center; 
-            text-align: center; 
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>The Nutcracker Practice Tracks</title>
+  <link rel="icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/7.7.6/wavesurfer.min.js"></script>
+  <style>
+    @font-face {
+      font-family: 'Zapfino';
+      src: url('/BIPH/fonts/Zapfino.ttf') format('truetype');
+      font-display: swap;
+    }
 
-        .background {
-            position: fixed;
-            opacity: 0.05;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('backgroundimage.png');
-            background-size: 140% auto; 
-            background-position: center center; 
-            background-repeat: no-repeat;
-            z-index: -3;
-        }
-        .blue-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(45, 70, 119, 0.25), rgba(9, 32, 79, 0.25));
-            z-index: -2;
-        }
+    body {
+      background: linear-gradient(to bottom, #e6e6fa, #f0f8ff);
+      background-image: url('background.jpeg');
+      background-attachment: fixed;
+      background-size: cover;
+      background-position: center;
+      font-family: 'Roboto', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      overflow-y: auto;
+      margin: 0;
+      width: 100%;
+    }
 
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 30% 70%, #303f6c 0%, transparent 50%),
-                        radial-gradient(circle at 70% 30%, #236693 0%, transparent 50%);
-            mix-blend-mode: overlay;
-            opacity: 0.5;
-            z-index: -1;
-            animation: pulse 1.5s infinite alternate;
-        }
-        .overlay2 {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 70% 70%, #ffffff 0%, transparent 50%),
-                        radial-gradient(circle at 30% 30%, #b8b8b8 0%, transparent 50%);
-            mix-blend-mode: overlay;
-            opacity: 0.5;
-            z-index: -1;
-            animation: pulse 2s infinite alternate;
-        }
-        @keyframes pulse {
-            0% { opacity: 0.3; transform: scale(1); }
-            100% { opacity: 0.7; transform: scale(1.1); }
-        }
+    .container {
+      width: 800px !important;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 8px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-top: 20px;
+      padding-bottom: 100px;
+      position: relative;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
 
-        .logocontainer {
-            min-height: 10vh;
-            padding-bottom: 10px;
-        }
+    @media (max-width: 800px) {
+      .container {
+        width: 70vw !important;
+      }
+    }
 
-        .logo {
-            position: fixed;
-            right: 10px;
-            bottom: 10px;
-            width: 25vh;
-            height: auto;
-            z-index: 10; 
-        }
+    h1 {
+      color: white;
+      font-family: 'Zapfino', 'Roboto', cursive;
+      font-size: calc(1em + 1vw) !important;
+      padding: 40px 0px !important;
+      margin: 0;
+      text-align: center;
+      white-space: nowrap;
+    }
 
-        .Title {
-            font-family: 'Andika', sans-serif;
-            font-size: 3rem;
-            font-weight: 300;
-            text-align: center;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-        }
+    .instrument-title {
+      color: white;
+      font-family: 'Zapfino', 'Roboto', cursive;
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 16px;
+    }
 
-        .Subtitle {
-            font-family: 'Zapfino', sans-serif;
-            color: white;
-            font-size: 2.5rem;
-            text-align: center;
-            margin-top: -5px;
-            padding-top: 0.5em;
-        }
+    .family-section {
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 8px;
+      margin-top: -38px;
+      padding: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative;
+    }
 
-        @media screen and (min-width: 1200px) {
-            .Title { margin-bottom: 20px; }
-            .Subtitle { padding-top: 0.8em; }
-        }
+    .family-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-top: 2px;
+      margin-bottom: 12px;
+      color: #1f2937;
+    }
 
-        /* Hamburger Menu */
-        .hamburger-menu {
-            position: absolute;
-            margin-left: 7px;
-            top: 20px;
-            left: 13px;
-            z-index: 1000;
-        }
+    .btn {
+      transition: all 0.2s ease;
+      background-color: #2563eb;
+      color: rgb(255, 255, 255);
+      border: 1px solid #1e40af;
+      border-radius: 6px;
+      padding: 12px 20px;
+      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+      touch-action: manipulation;
+      flex: 1;
+      min-width: 80px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        .menu-toggle {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            width: 30px;
-            height: 25px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 20;
-            z-index: 1001;
-        }
+    .btn:hover:not(.disabled) {
+      background-color: #1e40af;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 
-        .menu-toggle span {
-            width: 30px;
-            height: 3px;
-            background: white;
-            border-radius: 10px;
-            transition: all 0.3s linear;
-        }
+    .btn.disabled {
+      background-color: #6b7280;
+      border-color: #4b5563;
+      color: #d1d5db;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
 
-        .menu-toggle.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
-        .menu-toggle.open span:nth-child(2) { opacity: 0; }
-        .menu-toggle.open span:nth-child(3) { transform: rotate(-45deg) translate(7px, -7px); }
+    .back-btn {
+      padding: 5px 16px;
+      margin: 10px 0;
+    }
 
-        .menu-items {
-            position: absolute;
-            top: 25px;
-            left: -250px;
-            background: linear-gradient(135deg, rgba(48, 67, 104, 0.8), rgba(20, 31, 53, 0.8));
-            width: 250px;
-            height: 90vh;
-            padding-top: 20px;
-            transition: all 0.3s ease-in-out;
-            opacity: 0;
-        }
+    :root {
+      --logo-size: 150px;
+    }
 
-        .menu-items.show {
-            left: 0;
-            opacity: 1;
-        }
+    .logo {
+      width: var(--logo-size);
+      height: var(--logo-size);
+      position: absolute;
+      bottom: -30px;
+      right: 25px;
+      object-fit: contain;
+    }
 
-        .menu-items a {
-            display: block;
-            padding: 10px 20px;
-            color: white;
-            text-decoration: none;
-            transition: background-color 0.2s;
-            opacity: 0;
-            transform: translateX(-20px);
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-        }
+    .instrument-group {
+      margin-bottom: 16px;
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 16px;
+      padding: 8px;
+      overflow-x: auto;
+    }
 
-        .menu-items.show a { opacity: 1; transform: translateX(0); }
-        .menu-items a:hover { background-color: rgba(255, 255, 255, 0.1); }
+    .instrument-group:has(:only-child) .btn {
+      width: 100%;
+      margin-right: 0;
+    }
 
-        /* Delays for smooth slide-in */
-        .menu-items a:nth-child(1) { transition-delay: 0.1s; }
-        .menu-items a:nth-child(2) { transition-delay: 0.2s; }
-        .menu-items a:nth-child(3) { transition-delay: 0.3s; }
-        .menu-items a:nth-child(4) { transition-delay: 0.4s; }
-        .menu-items a:nth-child(5) { transition-delay: 0.5s; }
-        .menu-items a:nth-child(6) { transition-delay: 0.6s; }
-        .menu-items a:nth-child(7) { transition-delay: 0.7s; }
+    .hamburger-menu {
+      position: absolute;
+      margin-left: 7px;
+      top: 20px;
+      left: 13px;
+      z-index: 1000;
+    }
 
-        .menu-title {
-            text-align: center;
-            color: white;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
+    .menu-toggle {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      width: 30px;
+      height: 25px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 1001;
+    }
 
-        .menu-footer {
-            position: absolute;
-            bottom: 10px;
-            width: 100%;
-            text-align: center;
-            color: white;
-            font-size: 12px;
-        }
+    .menu-toggle span {
+      width: 30px;
+      height: 3px;
+      background: white;
+      border-radius: 10px;
+      transition: all 0.3s linear;
+    }
 
-        /* Button Container */
-        .container {
-            max-width: 800px;
-            margin: -80px auto 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 60vh;
-            gap: 18px;
-        }
+    .menu-toggle.open span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
 
-        /* Button with Icon */
-        .button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            padding: 16px 32px;
-            font-family: 'Andika', sans-serif;
-            font-size: 1.5rem;
-            color: white;
-            text-decoration: none;
-            background: linear-gradient(135deg, rgba(35, 102, 147, 0.8), rgba(48, 63, 108, 0.8));
-            border: 2px solid #ffffff;
-            border-radius: 25px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            min-width: 340px;
-            position: relative;
-            overflow: hidden;
-        }
+    .menu-toggle.open span:nth-child(2) {
+      opacity: 0;
+    }
 
-        .button:hover {
-            background: linear-gradient(135deg, rgba(48, 63, 108, 1), rgba(35, 102, 147, 1));
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-        }
+    .menu-toggle.open span:nth-child(3) {
+      transform: rotate(-45deg) translate(7px, -7px);
+    }
 
-        .button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
+    .menu-items {
+      position: absolute;
+      top: 25px;
+      left: -250px;
+      background: linear-gradient(135deg, rgba(136, 104, 74, 0.6), rgba(46, 6, 21, 0.8));
+      width: 250px;
+      height: 90vh;
+      padding-top: 20px;
+      transition: all 0.3s ease-in-out;
+      opacity: 0;
+    }
 
-        /* PNG Icon Styling */
-        .button-icon {
-            width: 32px;
-            height: 32px;
-            object-fit: contain;
-            transition: all 0.3s ease;
-            filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));
-        }
+    .menu-items.show {
+      left: 0;
+      opacity: 1;
+    }
 
-        .button:hover .button-icon {
-            transform: scale(1.18);
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
-        }
-    </style>
+    .menu-items a {
+      display: block;
+      padding: 10px 20px;
+      color: white;
+      text-decoration: none;
+      transition: background-color 0.2s;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    }
+
+    .menu-items.show a {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .menu-items a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .menu-items a:nth-child(1) { transition-delay: 0.1s; }
+    .menu-items a:nth-child(2) { transition-delay: 0.2s; }
+    .menu-items a:nth-child(3) { transition-delay: 0.3s; }
+    .menu-items a:nth-child(4) { transition-delay: 0.4s; }
+    .menu-items a:nth-child(5) { transition-delay: 0.5s; }
+    .menu-items a:nth-child(6) { transition-delay: 0.6s; }
+    .menu-items a:nth-child(7) { transition-delay: 0.7s; }
+    .menu-items a:nth-child(8) { transition-delay: 0.8s; }
+    .menu-items a:nth-child(9) { transition-delay: 0.9s; }
+    .menu-items a:nth-child(10) { transition-delay: 1.0s; }
+    .menu-items a:nth-child(11) { transition-delay: 1.1s; }
+
+    .menu-title {
+      text-align: center;
+      color: white;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .menu-footer {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 12px;
+    }
+
+    .qr-image {
+      display: block;
+      margin: 0 auto 5px;
+      width: 130px;
+      height: auto;
+    }
+
+    .song-columns {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .song-column {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .song-header {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #1f2937;
+      text-align: center;
+    }
+
+    .player-container {
+      width: 800px !important;
+      max-width: 100%;
+      margin: 0 auto;
+      background: #3a3a3a;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      transition: transform 0.3s ease;
+      margin-top: 20px;
+      box-sizing: border-box;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 800px) {
+      .player-container {
+        width: 70vw !important;
+        max-width: 100%;
+      }
+    }
+
+    .waveform-wrapper {
+      position: relative;
+      margin-bottom: 10px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    #waveform {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      height: 100px;
+      background: #2a3b4c;
+      border: 2px solid #6b8299;
+      border-radius: 8px;
+      cursor: pointer;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .zoom-controls {
+      position: absolute;
+      top: -30px;
+      right: 0;
+      display: flex;
+      gap: 5px;
+    }
+
+    .zoom-btn {
+      background: #5e768e;
+      color: #fff;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      padding: 0;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .zoom-btn:hover {
+      background: #4a6075;
+    }
+
+    .time-display {
+      text-align: center;
+      margin: 10px 0;
+      color: #b0b0b0;
+      font-size: 14px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    button, select {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #play-pause {
+      background: #5e768e;
+      padding-inline: 15px;
+      padding-block: 6px;
+      color: #fff;
+    }
+
+    #play-pause.playing {
+      background: #ff4444;
+    }
+
+    #play-pause:hover {
+      background: #4a6075;
+    }
+
+    #play-pause.playing:hover {
+      background: #e03e3e;
+    }
+
+    select {
+      background: #3a3a3a;
+      border: 2px solid #5e768e;
+      color: #b0b0b0;
+    }
+
+    select:hover {
+      border-color: #6b8299;
+    }
+
+    .song-list {
+      margin-top: 20px;
+    }
+
+    .song-list h2 {
+      color: #b0b0b0;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+
+    .song-list li {
+      padding: 10px;
+      background: #454545;
+      margin-bottom: 5px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #b0b0b0;
+    }
+
+    .song-list li:hover {
+      background: #5e768e;
+      transform: translateX(2px);
+    }
+
+    .song-title {
+      font-weight: bold;
+      margin-top: 10px;
+      color: #d0d0d0;
+    }
+
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(42, 59, 76, 0.9);
+      color: #b0b0b0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    #instrument-back-btn, #song-back-btn {
+      background: #5e768e;
+      color: #fff;
+    }
+
+    #instrument-back-btn:hover, #song-back-btn:hover {
+      background: #4a6075;
+    }
+  </style>
 </head>
 <body>
-    <div class="background"></div>
-    <div class="blue-overlay"></div>
-    <div class="overlay"></div>
-    <div class="overlay2"></div>
-
-    <!-- Hamburger Menu -->
-    <div class="hamburger-menu">
-        <button class="menu-toggle" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <div class="menu-items" id="menu-items">
-            <div class="menu-title">BIPH Music</div>
-            <a href="https://biphband.github.io/">Home</a>
+  <div class="hamburger-menu">
+    <menubutton class="menu-toggle" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </menubutton>
+    <div class="menu-items" id="menu-items">
+      <div class="menu-title">BIPH Music</div>
+              <a href="https://biphband.github.io/">Home</a>
             <a href="https://biphband.github.io/thenutcracker/">Nutcracker - Sheet Music</a>
             <a href="https://biphband.github.io/practicetracks/">Nutcracker - Practice Tracks</a>
             <a href="https://biphband.github.io/thenutcracker/overview/">Show Overview</a>
             <a href="https://biphband.github.io/tuner/">Tuner</a>
             <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
-            <div class="menu-footer">© Garrison Tubbs 2025</div>
+      <div class="menu-footer"><img src="../../qr.png" alt="QR Code" class="qr-image">© Garrison Tubbs 2025</div>
+    </div>
+  </div>
+
+  <div class="container">
+    <h1 class="font-bold text-center mb-8">The Nutcracker Practice Tracks</h1>
+    <div id="instrument-selection" class="space-y-6 mb-8"></div>
+    <div id="song-selection" class="space-y-6 mb-8" style="display: none;">
+      <div class="instrument-title"></div>
+    </div>
+    <div id="player-section" class="player-container" style="display: none;">
+      <button id="song-back-btn" class="btn back-btn">Song Selection</button>
+      <h1 id="player-title"></h1>
+      <div class="player">
+        <div class="waveform-wrapper">
+          <div class="zoom-controls">
+            <button class="zoom-btn" id="zoom-out">-</button>
+            <button class="zoom-btn" id="zoom-in">+</button>
+          </div>
+          <div id="waveform"></div>
         </div>
+        <div class="time-display">
+          <span id="current-time">0:00</span> / <span id="total-time">0:00</span>
+        </div>
+        <div class="controls">
+          <button id="play-pause" disabled>Play</button>
+          <select id="speed">
+            <option value="0.5">0.5x</option>
+            <option value="0.6">0.6x</option>
+            <option value="0.7">0.7x</option>
+            <option value="0.8">0.8x</option>
+            <option value="0.9">0.9x</option>
+            <option value="1" selected>1x</option>
+          </select>
+          <label for="part-volume" style="color: #b0b0b0; margin-left: 10px;">Your Part</label>
+          <input type="range" id="part-volume" min="0" max="1" step="0.01" value="1">
+          <label for="combined-volume" style="color: #b0b0b0; margin-left: 10px;">Others</label>
+          <input type="range" id="combined-volume" min="0" max="1" step="0.01" value="0.05">
+        </div>
+        <div class="song-list">
+          <h2>Measures</h2>
+          <div id="measure-list-container"></div>
+        </div>
+      </div>
     </div>
+    <img src="../logo.png" class="logo">
+  </div>
 
-    <h1 class="Title">BIPH</h1>
-    <h1 class="Subtitle">Band and Orchestra</h1>
+  <script>
+const instruments = {
+  Strings: [
+    ['The Nutcracker_Violin_1_Parts.pdf', 'The Nutcracker_Violin_2_Parts.pdf', 'The Nutcracker_Violin_3_Parts.pdf'],
+    ['The Nutcracker_Cello_1_Parts.pdf', 'The Nutcracker_Cello_2_Parts.pdf', 'The Nutcracker_Cello_3_Parts.pdf'],
+    ['The Nutcracker_Contrabass_1_Parts.pdf', 'The Nutcracker_Contrabass_2_Parts.pdf']
+  ],
+  Woodwind: [
+    ['The Nutcracker_Piccolo_Parts.pdf', 'The Nutcracker_Flute_1_Parts.pdf'],
+    ['The Nutcracker_Flute_2_Parts.pdf', 'The Nutcracker_Flute_3_Parts.pdf'],
+    ['The Nutcracker_Clarinet_1_Parts.pdf', 'The Nutcracker_Clarinet_2_Parts.pdf', 'The Nutcracker_Clarinet_3_Parts.pdf'],
+    ['The Nutcracker_Bass_Clarinet_Parts.pdf', 'The Nutcracker_Bassoon_Parts.pdf'],
+    ['The Nutcracker_Alto_Sax_1_Parts.pdf', 'The Nutcracker_Alto_Sax_2_Parts.pdf', 'The Nutcracker_Tenor_Sax_Parts.pdf']
+  ],
+  Brass: [
+    ['The Nutcracker_Trumpet_1_Parts.pdf', 'The Nutcracker_Trumpet_2_Parts.pdf'],
+    ['The Nutcracker_Horn_1_Parts.pdf', 'The Nutcracker_Horn_2_Parts.pdf'],
+    ['The Nutcracker_Trombone_Parts.pdf', 'The Nutcracker_Euphonium_Parts.pdf'],
+    ['The Nutcracker_Tuba_Parts.pdf']
+  ],
+  Percussion: [
+    ['The Nutcracker_Glockenspiel_Parts.pdf', 'The Nutcracker_Vibraphone_Parts.pdf'],
+    ['The Nutcracker_Aux_Perc_1_Parts.pdf', 'The Nutcracker_Aux_Perc_2_Parts.pdf'],
+    ['The Nutcracker_Timpani_Parts.pdf', 'The Nutcracker_Piano_Parts.pdf']
+  ]
+};
 
-    <!-- Main Buttons with Correct Icons -->
-    <div class="container">
-        <a href="https://biphband.github.io/thenutcracker/" class="button">
-            <img src="sheetmusic.png" alt="Sheet Music" class="button-icon">
-            <span>Nutcracker - Sheet Music</span>
-        </a>
+const songList = [
+  '[ACT 1]', 'Overture', 'Scene 1', 'March', 'Arrival of Drosselmeyer',
+  'Grandfather Waltz', 'Clara and the Nutcracker', 'The Battle', 'Waltz of the Snowflakes',
+  '[ACT 2]', 'The Enchanted Palace', 'Dance of the Sugar Plum Fairy',
+  'Arrival of Clara and Prince', 'Russian Dance', 'Arabian Dance', 'Chinese Dance',
+  'Dance of the Reed Flutes', 'Mother Ginger', 'Waltz of the Flowers',
+  'Intrada', 'Final Waltz'
+];
 
-        <a href="https://biphband.github.io/practicetracks/" class="button">
-            <img src="metronome.png" alt="Metronome" class="button-icon">
-            <span>Nutcracker - Practice Tracks</span>
-        </a>
+const availableSongs = [
+  'Overture',
+  'Scene 1',
+  'March',
+  'Arrival of Drosselmeyer',
+  'Grandfather Waltz',
+  'Clara and the Nutcracker',
+  'The Battle',
+  'Waltz of the Snowflakes',
+  'The Enchanted Palace',
+  'Dance of the Sugar Plum Fairy',
+  'Arrival of Clara and Prince',
+  'Russian Dance',
+  'Arabian Dance',
+  'Chinese Dance',
+  'Dance of the Reed Flutes',
+  'Mother Ginger',
+  'Waltz of the Flowers',
+  'Intrada',
+  'Final Waltz'
+];
 
-        <a href="https://biphband.github.io/thenutcracker/overview/" class="button">
-            <img src="playbutton.png" alt="Play" class="button-icon">
-            <span>Show Overview</span>
-        </a>
-    </div>
+const songs = {
+  'Overture': [
+    { name: 'm1', time: 0 },
+    { name: 'm9', time: 17 },
+    { name: 'm17', time: 34 },
+    { name: 'm21', time: 43 },
+    { name: 'm29', time: 61 },
+    { name: 'm39', time: 82 },
+    { name: 'm46', time: 97 },
+    { name: 'm54', time: 114 },
+    { name: 'm66', time: 140 },
+    { name: 'm80', time: 171 }
+  ],
+  'Scene 1': [
+    { name: 'm1', time: 0 },
+    { name: 'm11', time: 20 },
+    { name: 'm19', time: 36 },
+    { name: 'm28', time: 54 },
+    { name: 'm31', time: 60 },
+    { name: 'm33', time: 64 },
+    { name: 'm41', time: 80 },
+    { name: 'm57', time: 118 },
+    { name: 'm65', time: 137 },
+    { name: 'm73', time: 152 },
+    { name: 'm79', time: 166 },
+    { name: 'm83', time: 174 },
+    { name: 'm88', time: 185 },
+    { name: 'm94', time: 198 },
+    { name: 'm100', time: 212 }
+  ],
+  'March': [
+    { name: 'm1', time: 0 },
+    { name: 'm17', time: 32 },
+    { name: 'm25', time: 48 },
+    { name: 'm33', time: 64 },
+    { name: 'm41', time: 80 },
+    { name: 'm49', time: 96 },
+    { name: 'm57', time: 112 },
+    { name: 'm65', time: 128 },
+    { name: 'm81', time: 160 }
+  ],
+  'Arrival of Drosselmeyer': [
+    { name: 'Mysterious Stranger M1', time: 0 },
+    { name: 'Mysterious Stranger M20', time: 33 },
+    { name: 'Mysterious Stranger M35', time: 59 },
+    { name: 'Presentation of Dolls M1', time: 79 },
+    { name: 'Presentation of Dolls M17', time: 97 },
+    { name: 'Presentation of Dolls M29', time: 111 },
+    { name: 'Dance of the Dolls M1', time: 119 },
+    { name: 'Dance of the Dolls M17', time: 136 },
+    { name: 'Dance of the Dolls M33', time: 152 },
+    { name: 'Dance of the Dolls M49', time: 169 },
+    { name: 'Introduction of Nutcracker M1', time: 180 },
+    { name: 'Introduction of Nutcracker M10', time: 208 },
+    { name: 'Introduction of Nutcracker M18', time: 230 },
+    { name: 'Introduction of Nutcracker M22', time: 243 },
+    { name: 'Drosselmeyer Consoles Clara M1', time: 258 },
+    { name: 'Drosselmeyer Consoles Clara M10', time: 287 },
+    { name: 'Drosselmeyer Consoles Clara M26', time: 316 },
+    { name: 'Drosselmeyer Consoles Clara M35', time: 328 },
+    { name: 'Drosselmeyer Consoles Clara M51', time: 357 }
+  ],
+  'Grandfather Waltz': [
+    { name: 'M1', time: 0 },
+    { name: 'M16', time: 27 },
+    { name: 'M33', time: 47 },
+    { name: 'M48', time: 67 },
+    { name: 'M53', time: 115 }
+  ],
+  'Clara and the Nutcracker': [
+    { name: 'm1', time: 0 },
+    { name: 'm17', time: 38 },
+    { name: 'm33', time: 76 },
+    { name: 'm36', time: 85 },
+    { name: 'm49', time: 117 },
+    { name: 'm71', time: 165 },
+    { name: 'm80', time: 200 },
+    { name: 'm101', time: 236 },
+    { name: 'm107', time: 246 },
+    { name: 'm127', time: 304 },
+    { name: 'm139', time: 339 },
+    { name: 'm151', time: 375 }
+  ],
+  'The Battle': [
+    { name: 'm1', time: 0 },
+    { name: 'm13', time: 20 },
+    { name: 'm25', time: 39 },
+    { name: 'm34', time: 53 },
+    { name: 'm42', time: 65 },
+    { name: 'm51', time: 79 },
+    { name: 'm63', time: 97 },
+    { name: 'm73', time: 113 },
+    { name: 'm82', time: 127 },
+    { name: 'm90', time: 139 },
+    { name: 'm107', time: 166 },
+    { name: 'm116', time: 182 }
+  ],
+  'Waltz of the Snowflakes': [
+    { name: 'm1', time: 0 },
+    { name: 'M25', time: 27 },
+    { name: 'M37', time: 40 },
+    { name: 'M53', time: 57 },
+    { name: 'M68', time: 73 },
+    { name: 'M85', time: 91 },
+    { name: 'M101', time: 108 },
+    { name: 'M117', time: 125 },
+    { name: 'M133', time: 142 },
+    { name: 'M148', time: 157 },
+    { name: 'M165', time: 175 },
+    { name: 'M182', time: 193 },
+    { name: 'M198', time: 210 }
+],
+'The Enchanted Palace': [
+  { name: 'M1', time: 0 },
+  { name: 'M5', time: 5 },
+  { name: 'M21', time: 43 },
+  { name: 'M43', time: 72 },
+  { name: 'M51', time: 82 },
+  { name: 'M67', time: 102 },
+  { name: 'M83', time: 123 }
+],
+  'Dance of the Sugar Plum Fairy': [
+    { name: 'm1', time: 0 },
+    { name: 'm5', time: 10 },
+    { name: 'm17', time: 40 },
+    { name: 'm21', time: 50 },
+    { name: 'm32', time: 79 },
+    { name: 'm37', time: 90 },
+    { name: 'm49', time: 121 }
+  ],
+'Arrival of Clara and Prince': [
+  { name: 'M1', time: 0 },
+  { name: 'M13', time: 40 },
+  { name: 'M21', time: 64 },
+  { name: 'M30', time: 90 }
+],
+  'Russian Dance': [
+    { name: 'm1', time: 0 },
+    { name: 'm17', time: 13 },
+    { name: 'm33', time: 27 },
+    { name: 'm49', time: 40 },
+    { name: 'm65', time: 54 }
+  ],
+  'Arabian Dance': [
+    { name: 'm1', time: 0 },
+    { name: 'm5', time: 8 },
+    { name: 'm14', time: 27 },
+    { name: 'm22', time: 44 },
+    { name: 'm33', time: 67 },
+    { name: 'm42', time: 86 },
+    { name: 'm50', time: 103 },
+    { name: 'm61', time: 127 },
+    { name: 'm70', time: 146 },
+    { name: 'm78', time: 163 },
+    { name: 'm86', time: 179 }
+  ],
+  'Chinese Dance': [
+    { name: 'm1', time: 0 },
+    { name: 'm19', time: 40 },
+    { name: 'm27', time: 57 }
+  ],
+  'Dance of the Reed Flutes': [
+    { name: 'm1', time: 0 },
+    { name: 'm19', time: 37 },
+    { name: 'm27', time: 54 },
+    { name: 'm43', time: 87 },
+    { name: 'm51', time: 104 },
+    { name: 'm60', time: 123 },
+    { name: 'm62', time: 127 }
+  ],
+  'Mother Ginger': [
+    { name: 'm1', time: 0 },
+    { name: 'm11', time: 19 },
+    { name: 'm19', time: 34 },
+    { name: 'm27', time: 49 },
+    { name: 'm35', time: 65 },
+    { name: 'm43', time: 91 },
+    { name: 'm52', time: 118 },
+    { name: 'm64', time: 138 },
+    { name: 'm76', time: 154 }
+  ],
+  'Waltz of the Flowers': [
+    { name: 'm1', time: 0 },
+    { name: 'm16', time: 21 },
+    { name: 'm34', time: 58 },
+    { name: 'm45', time: 70 },
+    { name: 'm54', time: 81 },
+    { name: 'm61', time: 89 },
+    { name: 'm70', time: 99 },
+    { name: 'm90', time: 137 },
+    { name: 'm106', time: 155 },
+    { name: 'm122', time: 174 },
+    { name: 'm142', time: 210 },
+    { name: 'm158', time: 349 },
+    { name: 'm172', time: 246 },
+    { name: 'm188', time: 264 },
+    { name: 'm204', time: 282 },
+    { name: 'm218', time: 299 },
+    { name: 'm226', time: 308 },
+    { name: 'm234', time: 318 },
+    { name: 'm242', time: 327 },
+    { name: 'm258', time: 346 },
+    { name: 'm278', time: 383 },
+    { name: 'm285', time: 391 },
+    { name: 'm294', time: 401 },
+    { name: 'm302', time: 411 },
+    { name: 'm310', time: 420 },
+    { name: 'm320', time: 432 },
+    { name: 'm326', time: 439 },
+    { name: 'm334', time: 448 },
+    { name: 'm342', time: 457 }
+  ],
+  'Intrada': [
+    { name: 'M1', time: 0 },
+    { name: 'M13', time: 48 },
+    { name: 'M24', time: 92 },
+    { name: 'M46', time: 161 },
+    { name: 'M50', time: 174 },
+    { name: 'M66', time: 228 },
+    { name: 'M70', time: 234 }
+  ],
+  'Final Waltz': [
+    { name: 'm1', time: 0 },
+    { name: 'm32', time: 27 },
+    { name: 'm59', time: 52 },
+    { name: 'm72', time: 63 },
+    { name: 'm80', time: 71 },
+    { name: 'm96', time: 85 },
+    { name: 'm121', time: 108 },
+    { name: 'm129', time: 115 },
+    { name: 'm137', time: 122 },
+    { name: 'm160', time: 143 },
+    { name: 'm178', time: 189 },
+    { name: 'm192', time: 207 },
+    { name: 'm208', time: 229 }
+  ]
+};
 
-    <div class="logocontainer">        
-        <img src="logo.png" alt="BASIS Logo" class="logo">
-    </div>
-    
-    <script>
-        // Hamburger menu toggle
-        function toggleMenu() {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const menuItems = document.querySelector('.menu-items');
-            menuToggle.classList.toggle('open');
-            menuItems.classList.toggle('show');
-        }
+const PARTS_MANIFEST = {
+  "Violin_1": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Russian Dance","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Violin_2": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Russian Dance","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Violin_3": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Russian Dance","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Cello_1": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Russian Dance","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Cello_2": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Russian Dance","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Cello_3": ["Overture","The Battle"],
+  "Contrabass_1": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Russian Dance","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Contrabass_2": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Russian Dance","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Piccolo": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Flute_1": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Russian Dance","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Flute_2": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Russian Dance","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Flute_3": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Russian Dance","Arabian Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Clarinet_1": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Russian Dance","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Clarinet_2": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Russian Dance","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Clarinet_3": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Russian Dance","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Bass_Clarinet": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Bassoon": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Alto_Sax_1": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Russian Dance","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Alto_Sax_2": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Russian Dance","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Tenor_Sax": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Trumpet_1": [
+    "Scene 1",
+    "Arrival of Drosselmeyer",
+    "Clara and the Nutcracker",
+    "Arrival of Clara and Prince",
+    "Dance of the Reed Flutes",
+    "Mother Ginger",
+    "Waltz of the Flowers",
+    "Intrada",
+    "Final Waltz",
+    "Grandfather Waltz",
+    "March",
+    "The Battle",
+    "Waltz of the Snowflakes",
+    "Soldier Doll Dance",
+    "Tarantella",
+    "DOTSPF",
+    "The Enchanted Palace",
+    "Dance of the Sugar Plum Fairy"
+  ],
+  "Trumpet_2": [
+    "Scene 1",
+    "Arrival of Drosselmeyer",
+    "Clara and the Nutcracker",
+    "Arrival of Clara and Prince",
+    "Dance of the Reed Flutes",
+    "Mother Ginger",
+    "Waltz of the Flowers",
+    "Intrada",
+    "Final Waltz",
+    "Grandfather Waltz",
+    "March",
+    "The Battle",
+    "Waltz of the Snowflakes",
+    "Soldier Doll Dance",
+    "Tarantella",
+    "DOTSPF",
+    "The Enchanted Palace",
+    "Dance of the Sugar Plum Fairy"
+  ],
+  "Horn_1": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Arabian Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Horn_2": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Arabian Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Trombone": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Euphonium": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Tuba": ["Overture","Scene 1","March","Arrival of Drosselmeyer","Grandfather Waltz","Clara and the Nutcracker","The Battle","Waltz of the Snowflakes","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Glockenspiel": ["Overture","Chinese Dance","Russian Dance","Waltz of the Snowflakes","Waltz of the Flowers"],
+  "Vibraphone": ["Overture","Arrival of Drosselmeyer","Clara and the Nutcracker","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Arabian Dance","Chinese Dance","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz"],
+  "Aux_Perc_1": ["Overture","Arrival of Drosselmeyer","Clara and the Nutcracker","Dance of the Reed Flutes","Mother Ginger","Russian Dance","Waltz of the Flowers","Intrada","Final Waltz","Grandfather Waltz"],
+  "Aux_Perc_2": ["Dance of the Reed Flutes","Mother Ginger","Russian Dance","Waltz of the Flowers","Final Waltz"],
+  "Timpani": ["Scene 1","Clara and the Nutcracker","Arrival of Clara and Prince","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz","Grandfather Waltz"],
+  "Piano": ["Scene 1","Arrival of Drosselmeyer","Clara and the Nutcracker","The Enchanted Palace","Dance of the Sugar Plum Fairy","Arrival of Clara and Prince","Dance of the Reed Flutes","Mother Ginger","Waltz of the Flowers","Intrada","Final Waltz","Grandfather Waltz","March","Russian Dance"]
+};
 
-        // Close menu when clicking outside
-        document.addEventListener('click', (event) => {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const menuItems = document.querySelector('.menu-items');
-            if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
-                menuToggle.classList.remove('open');
-                menuItems.classList.remove('show');
-            }
+const instrumentSelection = document.getElementById('instrument-selection');
+const songSelection = document.getElementById('song-selection');
+const playerSection = document.getElementById('player-section');
+const playerTitle = document.getElementById('player-title');
+const waveformContainer = document.getElementById('waveform');
+const measureListContainer = document.getElementById('measure-list-container');
+let playPauseBtn = document.getElementById('play-pause');
+let speedSelect = document.getElementById('speed');
+const currentTimeDisplay = document.getElementById('current-time');
+const totalTimeDisplay = document.getElementById('total-time');
+const zoomInBtn = document.getElementById('zoom-in');
+const zoomOutBtn = document.getElementById('zoom-out');
+const songBackBtn = document.getElementById('song-back-btn');
+
+let zoomLevel = 1;
+let selectedInstrument = '';
+let selectedSong = '';
+
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let isPlaying = false;
+let pauseTime = 0;
+
+// WaveSurfer instances
+const wavesurferPart = WaveSurfer.create({
+  container: '#waveform',
+  waveColor: '#6b8299',
+  progressColor: '#5e768e',
+  cursorColor: '#d0d0d0',
+  barWidth: 2,
+  height: 100,
+  responsive: true,
+  backgroundColor: '#2a3b4c',
+  normalize: true,
+  scrollParent: false,
+  audioContext: audioContext
+});
+
+const wavesurferCombined = WaveSurfer.create({
+  container: '#waveform',
+  waveColor: 'rgba(107, 130, 153, 0.5)',
+  progressColor: 'rgba(94, 118, 142, 0.5)',
+  cursorColor: '#d0d0d0',
+  barWidth: 2,
+  height: 100,
+  responsive: true,
+  backgroundColor: 'transparent',
+  normalize: true,
+  scrollParent: false,
+  audioContext: audioContext
+});
+
+const loadingOverlay = document.createElement('div');
+loadingOverlay.className = 'loading-overlay';
+loadingOverlay.textContent = 'Loading audio...';
+waveformContainer.appendChild(loadingOverlay);
+
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
+function throttle(func, wait) {
+  let lastCall = 0;
+  return function (...args) {
+    const now = Date.now();
+    if (now - lastCall >= wait) {
+      func(...args);
+      lastCall = now;
+    }
+  };
+}
+
+function syncPlay(offset = 0) {
+  if (isPlaying) return;
+  isPlaying = true;
+  playPauseBtn.textContent = 'Pause';
+  playPauseBtn.classList.add('playing');
+  playPauseBtn.disabled = false;
+
+  const speed = parseFloat(speedSelect.value);
+  wavesurferPart.setPlaybackRate(speed);
+  wavesurferCombined.setPlaybackRate(speed);
+
+  if (wavesurferPart.getVolume() > 0) wavesurferPart.play(offset);
+  if (wavesurferCombined.getVolume() > 0) wavesurferCombined.play(offset);
+}
+
+function syncPause() {
+  if (!isPlaying) return;
+  isPlaying = false;
+  pauseTime = wavesurferPart.getCurrentTime();
+  wavesurferPart.pause();
+  wavesurferCombined.pause();
+  playPauseBtn.textContent = 'Play';
+  playPauseBtn.classList.remove('playing');
+}
+
+function syncSetTime(time) {
+  const wasPlaying = isPlaying;
+  if (isPlaying) {
+    wavesurferPart.pause();
+    wavesurferCombined.pause();
+    isPlaying = false;
+  }
+  pauseTime = time;
+  wavesurferPart.setTime(time);
+  wavesurferCombined.setTime(time);
+  currentTimeDisplay.textContent = formatTime(time);
+  if (wasPlaying) syncPlay(time);
+}
+
+// ——— INSTRUMENT SELECTION (unchanged) ———
+function showInstrumentSelection() {
+  instrumentSelection.style.display = 'block';
+  songSelection.style.display = 'none';
+  playerSection.style.display = 'none';
+  history.pushState({}, '', window.location.pathname);
+  instrumentSelection.innerHTML = '';
+
+  for (const [family, groups] of Object.entries(instruments)) {
+    if (groups.flat().length === 0) continue;
+    const familyDiv = document.createElement('div');
+    familyDiv.className = 'family-section';
+    familyDiv.innerHTML = `<h3 class="family-title">${family}</h3>`;
+
+    groups.forEach(group => {
+      const groupDiv = document.createElement('div');
+      groupDiv.className = 'instrument-group';
+      group.forEach(file => {
+        let name = file.replace('The Nutcracker_', '').replace('_Parts.pdf', '').replace(/_/g, ' ');
+        if (name === 'Tenor Saxophone') name = 'Tenor Sax';
+        name = name.replace(/\b\w/g, l => l.toUpperCase());
+
+        const btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.textContent = name;
+        btn.addEventListener('click', () => {
+          selectedInstrument = file.replace('The Nutcracker_', '').replace('_Parts.pdf', '');
+          showSongSelection();
         });
-    </script>
+        groupDiv.appendChild(btn);
+      });
+      familyDiv.appendChild(groupDiv);
+    });
+    instrumentSelection.appendChild(familyDiv);
+  }
+}
+
+async function showSongSelection() {
+  instrumentSelection.style.display = 'none';
+  songSelection.style.display = 'block';
+  playerSection.style.display = 'none';
+  history.pushState({}, '', `?instrument=${encodeURIComponent(selectedInstrument)}`);
+  songSelection.innerHTML = '';
+
+  const familyDiv = document.createElement('div');
+  familyDiv.className = 'family-section';
+
+  // Back button
+  const backBtn = document.createElement('button');
+  backBtn.id = 'instrument-back-btn';
+  backBtn.className = 'btn back-btn';
+  backBtn.textContent = 'Instrument Selection';
+  backBtn.addEventListener('click', showInstrumentSelection);
+  familyDiv.appendChild(backBtn);
+
+  // Title
+  const title = document.createElement('div');
+  title.className = 'instrument-title';
+  title.textContent = selectedInstrument.replace(/_/g, ' ');
+  familyDiv.appendChild(title);
+
+  const columnsDiv = document.createElement('div');
+  columnsDiv.className = 'song-columns';
+  const act1Col = document.createElement('div');
+  act1Col.className = 'song-column';
+  const act2Col = document.createElement('div');
+  act2Col.className = 'song-column';
+  let currentCol = act1Col;
+
+  const availableSongs = PARTS_MANIFEST[selectedInstrument] || [];
+
+  for (const item of songList) {
+    if (item.startsWith('[ACT')) {
+      const h = document.createElement('div');
+      h.className = item === '[ACT 1]' ? 'Act 1' : 'Act 2';
+      h.className = 'song-header';
+      (item === '[ACT 1]' ? act1Col : act2Col).appendChild(h);
+      if (item === '[ACT 2]') currentCol = act2Col;
+      continue;
+    }
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'instrument-group';
+
+    const btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.textContent = item;
+
+    if (!availableSongs.includes(item)) {
+      btn.classList.add('disabled');
+      btn.disabled = true;
+    } else {
+      btn.addEventListener('click', () => {
+        selectedSong = item;
+        showPlayer();
+      });
+    }
+
+    wrapper.appendChild(btn);
+    currentCol.appendChild(wrapper);
+  }
+
+  columnsDiv.appendChild(act1Col);
+  columnsDiv.appendChild(act2Col);
+  familyDiv.appendChild(columnsDiv);
+  songSelection.appendChild(familyDiv);
+}
+
+// ——— PLAYER — unchanged except tiny cleanup ———
+async function showPlayer() {
+  if (!selectedSong || !selectedInstrument) return;
+
+  const normInst = selectedInstrument
+    .replace('Trombone 1', 'Trombone')
+    .replace('Tenor_Saxophone', 'Tenor_Sax');
+
+  let baseSong = selectedSong;
+  if (selectedSong === 'Waltz of the Flowers') baseSong = 'WOTF';
+  if (selectedSong === 'Dance of the Sugar Plum Fairy') baseSong = 'DOTSPF';
+  if (selectedSong === 'Overture') baseSong = 'Nutcracker Overture';
+  if (selectedSong === 'The Enchanted Palace') baseSong = 'Enchanted Palace';
+
+  const combinedFile = `practicetracks/${baseSong}.mp3`;
+  const partFile = `practicetracks/${baseSong}-${normInst}.mp3`;
+
+  instrumentSelection.style.display = 'none';
+  songSelection.style.display = 'none';
+  playerSection.style.display = 'block';
+  playerTitle.textContent = `${selectedInstrument.replace(/_/g, ' ')} - ${selectedSong}`;
+
+  // Build measure list
+  measureListContainer.innerHTML = '';
+  const ul = document.createElement('ul');
+  (songs[selectedSong] || []).forEach(m => {
+    const li = document.createElement('li');
+    li.textContent = m.name;
+    li.dataset.time = m.time;
+    li.addEventListener('click', () => syncSetTime(m.time));
+    ul.appendChild(li);
+  });
+  measureListContainer.appendChild(ul);
+
+  loadingOverlay.style.display = 'flex';
+  loadingOverlay.textContent = 'Loading audio...';
+
+  try {
+    const [partRes, combRes] = await Promise.all([
+      fetch(partFile, { method: 'HEAD' }).catch(() => ({ ok: false })),
+      fetch(combinedFile, { method: 'HEAD' }).catch(() => ({ ok: false }))
+    ]);
+
+    if (partRes.ok) wavesurferPart.load(partFile);
+    if (combRes.ok) wavesurferCombined.load(combinedFile);
+
+    if (!partRes.ok) {
+      loadingOverlay.textContent = 'Part not available';
+      return;
+    }
+
+    loadingOverlay.style.display = 'none';
+    playPauseBtn.disabled = false;
+
+    wavesurferPart.on('ready', () => {
+      const dur = wavesurferPart.getDuration();
+      totalTimeDisplay.textContent = formatTime(dur);
+      wavesurferPart.zoom(waveformContainer.clientWidth / dur);
+      wavesurferCombined.zoom(waveformContainer.clientWidth / dur);
+      zoomLevel = 1;
+    });
+
+    wavesurferPart.on('timeupdate', () => {
+      const t = wavesurferPart.getCurrentTime();
+      currentTimeDisplay.textContent = formatTime(t);
+      if (isPlaying && wavesurferCombined.getVolume() > 0) {
+        if (Math.abs(wavesurferCombined.getCurrentTime() - t) > 0.05) {
+          wavesurferCombined.setTime(t);
+        }
+      }
+    });
+
+    wavesurferPart.on('interaction', () => syncSetTime(wavesurferPart.getCurrentTime()));
+
+  } catch (e) {
+    loadingOverlay.textContent = 'Error loading audio';
+  }
+}
+
+// Controls
+playPauseBtn.addEventListener('click', () => isPlaying ? syncPause() : syncPlay(pauseTime));
+speedSelect.addEventListener('change', () => {
+  const s = parseFloat(speedSelect.value);
+  wavesurferPart.setPlaybackRate(s);
+  wavesurferCombined.setPlaybackRate(s);
+});
+
+document.getElementById('part-volume').addEventListener('input', e => wavesurferPart.setVolume(e.target.value));
+document.getElementById('combined-volume').addEventListener('input', e => wavesurferCombined.setVolume(e.target.value));
+
+zoomInBtn.addEventListener('click', () => {
+  zoomLevel *= 1.5;
+  wavesurferPart.zoom(waveformContainer.clientWidth / wavesurferPart.getDuration() * zoomLevel);
+  wavesurferCombined.zoom(waveformContainer.clientWidth / wavesurferCombined.getDuration() * zoomLevel);
+});
+zoomOutBtn.addEventListener('click', () => {
+  zoomLevel = Math.max(1, zoomLevel / 1.5);
+  wavesurferPart.zoom(waveformContainer.clientWidth / wavesurferPart.getDuration() * zoomLevel);
+  wavesurferCombined.zoom(waveformContainer.clientWidth / wavesurferCombined.getDuration() * zoomLevel);
+});
+
+songBackBtn.addEventListener('click', () => {
+  wavesurferPart.pause();
+  wavesurferCombined.pause();
+  isPlaying = false;
+  showSongSelection();
+});
+
+// Menu toggle
+document.querySelector('.menu-toggle').addEventListener('click', () => {
+  document.querySelector('.menu-toggle').classList.toggle('open');
+  document.querySelector('.menu-items').classList.toggle('show');
+});
+
+// Load from URL or show instruments
+const params = new URLSearchParams(location.search);
+const urlInst = params.get('instrument');
+if (urlInst) {
+  selectedInstrument = decodeURIComponent(urlInst);
+  showSongSelection();
+} else {
+  showInstrumentSelection();
+}
+  </script>
 </body>
 </html>
