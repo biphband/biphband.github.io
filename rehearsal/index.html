@@ -89,11 +89,18 @@ function playRandomSound(soundArray) {
 // SINGLE CLASS: Nutcracker Rehearsal #1
 const classes = [
     {
-        name: "Nutcracker Rehearsal #1",
-        timeRange: "7:15pm - 8:30pm",
+        name: "Marathon Rehearsal #1",
         days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], // Always active
-        startTime: { hours: 19, minutes: 15 },
-        endTime: { hours: 20, minutes: 30 },
+        
+        timeRange: "7:00pm - 9:00pm",
+        // timeRange: "7:15pm - 8:30pm",
+        
+        startTime: { hours: 19, minutes: 0 },
+        // startTime: { hours: 19, minutes: 15 },
+
+        endTime: { hours: 21, minutes: 0 },
+        // endTime: { hours: 20, minutes: 30 },
+
         students: masterList.map(s => ({
             name: s.name,
             birthdate: s.birthdate,
@@ -110,9 +117,9 @@ const classes = [
         teacherModeOrder: masterList.map(s => s.name),
         objectivesKey: "nutcrackerObjectives",
         defaultObjectives: [
-            '7:00-7:15 - Tune, Warm up, Independent review',
-            'Go through the pieces chronologically',
-            'Individually make notes of items to practice'
+            'Intrada, Final Waltz',
+            'Clara and the Nutcracker',
+            'Snowflakes, Drosselmeyer'
         ],
         sampleObjectives: [
             'Warm-up',

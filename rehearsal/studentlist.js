@@ -63,7 +63,6 @@ const masterList = [
     {"name": "Odelia", "liveschoolName": "Odelia Yunhan Xie", "house": "Green", "birthdate": "", "altName": "Odelia"},
     {"name": "Johnny", "liveschoolName": "Johnny Zhongjie Yi", "house": "Red", "birthdate": "2007-11-14", "altName": "Johnny"},
     {"name": "Alyssa", "liveschoolName": "Alyssa Peng", "house": "Blue", "birthdate": "2012-03-26", "altName": "Alyssa"},
-    {"name": "Tim", "liveschoolName": "Tim Yaheng Wang", "house": "Green", "birthdate": "", "altName": "Tim"},
     {"name": "Sebastian", "liveschoolName": "Sebastian Andresen", "house": "Yellow", "birthdate": "", "altName": "Sebastian"},
     {"name": "Esther", "liveschoolName": "Esther Sicong Chen", "house": "Green", "birthdate": "", "altName": "Esther"},
 ];
