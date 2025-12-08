@@ -86,24 +86,32 @@ function playRandomSound(soundArray) {
     audio.play();
 }
 
-// SINGLE CLASS: Marathon Rehearsal #1
+// SINGLE CLASS: Nutcracker Rehearsal #1
 const classes = [
     {
         name: "Marathon Rehearsal #1",
-        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], // Always active
+        
+        // timeRange: "7:00pm - 9:00pm",
         timeRange: "7:15pm - 8:30pm",
+        
+        // startTime: { hours: 19, minutes: 0 },
         startTime: { hours: 19, minutes: 15 },
-        endTime:   { hours: 20, minutes: 30 },
+
+        // endTime: { hours: 21, minutes: 0 },
+        endTime: { hours: 20, minutes: 30 },
+
         students: masterList.map(s => ({
             name: s.name,
             birthdate: s.birthdate,
             house: s.house,
-            attendance: 'Present',
-            stands: true,
-            intonation: true,
-            returned: true,
-            engagement: true,
-            score: 100,
+            attendance: 'Absent',      // ← Starts Absent
+            stands: false,
+            intonation: false,
+            intonation: false,
+            returned: false,
+            engagement: false,
+            score: 'EX',               // ← Starts EX
             housePoints: 0,
             manualAdjustment: 0
         })),
@@ -115,9 +123,17 @@ const classes = [
             'Snowflakes, Drosselmeyer'
         ],
         sampleObjectives: [
-            'Warm-up','Act I Run-through','Act II Run-through','Snow Scene',
-            'Waltz of the Flowers','Sugar Plum Fairy','Fight Scene',
-            'Costume Check','Props Check','Announcements','Housekeeping'
+            'Warm-up',
+            'Act I Run-through',
+            'Act II Run-through',
+            'Snow Scene',
+            'Waltz of the Flowers',
+            'Sugar Plum Fairy',
+            'Fight Scene',
+            'Costume Check',
+            'Props Check',
+            'Announcements',
+            'Housekeeping'
         ],
         criteria: ['stands', 'intonation', 'returned', 'engagement']
     }
@@ -127,48 +143,16 @@ let currentClassIndex = 0;
 let students = classes[0].students;
 let teacherModeOrder = classes[0].teacherModeOrder;
 let currentCriteria = classes[0].criteria;
+let isObjectiveInputFocused = false;
+let isAddingStudent = false;
 
-// ————————————————————————————————————————
-//  COUNTDOWN LOGIC – ONLY “starts in” + auto-export at end
-// ————————————————————————————————————————
-function updateCountdowns() {
-    const countdownContainer = document.getElementById('countdowns');
-    countdownContainer.innerHTML = '';
-
-    const now = new Date();
-    const currentClass = classes[currentClassIndex];
-
-    const startTime = new Date(now);
-    startTime.setHours(currentClass.startTime.hours, currentClass.startTime.minutes, 0, 0);
-
-    const endTime = new Date(now);
-    endTime.setHours(currentClass.endTime.hours, currentClass.endTime.minutes, 0, 0);
-
-    const startDiff = (startTime - now) / 1000;  // seconds until start
-    const endDiff   = (endTime   - now) / 1000;  // seconds until end
-
-    // Show “Rehearsal begins in …” (only in the last 30 minutes)
-    if (startDiff > 0 && startDiff <= 1800) {
-        const minutes = Math.floor(startDiff / 60);
-        const seconds = Math.floor(startDiff % 60);
-        const div = document.createElement('div');
-        div.className = 'start-countdown';
-        div.textContent = `Rehearsal begins in ${minutes}m ${seconds}s`;
-        countdownContainer.appendChild(div);
-    }
-
-    // Auto-export scores the moment rehearsal officially ends
-    if (endDiff < 0 && endDiff > -5) {  // tiny buffer in case of clock drift
-        exportScores();
-    }
+// Always use the single class
+function getCurrentClass() {
+    return 0;
 }
 
-// ————————————————————————————————————————
-//  REST OF YOUR ORIGINAL CODE (unchanged except tiny clean-ups)
-// ————————————————————————————————————————
-function getCurrentClass() { return 0; }
-
 function cycleClass() {
+    // No cycling needed — only one class
     updateClassDisplay();
     updateCountdowns();
 }
@@ -190,6 +174,37 @@ function updateClassDisplay() {
     loadStickyNotes();
 }
 
+function updateCountdowns() {
+    const container = document.getElementById('countdowns');
+    container.innerHTML = '';
+
+    const now = new Date();
+    const cls = classes[currentClassIndex];
+
+    const start = new Date(now);
+    start.setHours(cls.startTime.hours, cls.startTime.minutes, 0, 0);
+    const end = new Date(now);
+    end.setHours(cls.endTime.hours, cls.endTime.minutes, 0, 0);
+
+    const toStart = (start - now) / 1000;
+    const toEnd   = (end   - now) / 1000;
+
+    // Only show "Rehearsal begins in…" in the last 30 min
+    if (toStart > 0 && toStart <= 1800) {
+        const m = Math.floor(toStart / 60);
+        const s = Math.floor(toStart % 60);
+        const div = document.createElement('div');
+        div.className = 'start-countdown';
+        div.textContent = `Rehearsal begins in ${m}m ${s}s`;
+        container.appendChild(div);
+    }
+
+    // Auto-export the moment rehearsal ends
+    if (toEnd < 0 && toEnd > -5) {
+        exportScores();
+    }
+}
+
 function loadObjectives(key) {
     const cls = classes[0];
     const objectives = JSON.parse(localStorage.getItem(key)) || cls.defaultObjectives;
@@ -205,8 +220,6 @@ function updateObjectiveList(objectives) {
     const objectiveList = document.getElementById('objectiveList');
     objectiveList.innerHTML = objectives.map(obj => `<li class="editable" onclick="editObjective(this)">${obj}</li>`).join('');
 }
-
-/* … (all your existing functions below stay exactly the same) … */
 
 function editObjective(item) {
     const cls = classes[0];
@@ -231,44 +244,1122 @@ function editObjective(item) {
     dialog.style.width = '400px';
 
     const suggestions = cls.sampleObjectives.map(obj => `
-        <a href="#" style="font-size:0.85em;text-decoration:none;display:block;margin:2px 0;"
-           onclick="document.querySelector('#objectiveList li:nth-child(${index+1})').textContent='${obj}';
-                    saveObjectives('${cls.objectivesKey}');
-                    this.closest('div').remove();return false;">${obj}</a>
+        <a href="#" style="font-size: 0.85em; text-decoration: none; display: block; margin: 2px 0;"
+           onclick="
+               document.querySelector('#objectiveList li:nth-child(${index + 1})').textContent = '${obj}';
+               saveObjectives('${cls.objectivesKey}');
+               this.closest('div').remove();
+               window.isObjectiveInputFocused = false;
+               return false;">
+            ${obj}
+        </a>
     `).join('');
 
     dialog.innerHTML = `
         <h3>Edit Objective</h3>
-        <input type="text" id="objectiveInput" value="${currentItem}" style="width:80%;padding:5px;">
-        <p style="text-align:left;margin-left:33px;margin-top:10px;">${suggestions}</p>
-        <button onclick="const i=document.getElementById('objectiveInput');
-                 if(i.value.trim()) document.querySelector('#objectiveList li:nth-child(${index+1})').textContent=i.value.trim();
-                 saveObjectives('${cls.objectivesKey}');this.closest('div').remove();">Save</button>
-        <button onclick="this.closest('div').remove();">Cancel</button>
+        <input type="text" id="objectiveInput" value="${currentItem}" style="width: 80%; padding: 5px;" data-original-value="${currentItem}">
+        <p style="text-align: left; margin-left: 33px; margin-top: 10px;">${suggestions}</p>
+        <button onclick="
+            const input = document.getElementById('objectiveInput');
+            if (input.value.trim() !== '') {
+                document.querySelector('#objectiveList li:nth-child(${index + 1})').textContent = input.value.trim();
+                saveObjectives('${cls.objectivesKey}');
+            }
+            this.closest('div').remove();
+            window.isObjectiveInputFocused = false;">
+            Save
+        </button>
+        <button onclick="this.closest('div').remove(); window.isObjectiveInputFocused = false;">Cancel</button>
     `;
-
     document.body.appendChild(dialog);
-    const input = document.getElementById('objectiveInput');
-    setTimeout(() => { input.focus(); input.select(); }, 0);
-}
 
-/* (All the rest of your code – menu handling, bars, hotkeys, export, etc. – remains 100% unchanged) */
+    const input = document.getElementById('objectiveInput');
+    setTimeout(() => {
+        input.focus();
+        input.select();
+        window.isObjectiveInputFocused = true;
+    }, 0);
+
+    input.addEventListener('focus', () => window.isObjectiveInputFocused = true);
+    input.addEventListener('blur', () => window.isObjectiveInputFocused = false);
+
+    const handleKeydown = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            if (input.value.trim() !== '') {
+                document.querySelector(`#objectiveList li:nth-child(${index + 1})`).textContent = input.value.trim();
+                saveObjectives(cls.objectivesKey);
+            }
+            dialog.remove();
+            window.isObjectiveInputFocused = false;
+            document.removeEventListener('keydown', handleKeydown);
+        } else if (event.key === 'Escape') {
+            dialog.remove();
+            window.isObjectiveInputFocused = false;
+            document.removeEventListener('keydown', handleKeydown);
+        }
+    };
+    document.addEventListener('keydown', handleKeydown);
+
+    const handleOutsideClick = (event) => {
+        if (!dialog.contains(event.target)) {
+            dialog.remove();
+            window.isObjectiveInputFocused = false;
+            document.removeEventListener('click', handleOutsideClick);
+            document.removeEventListener('keydown', handleKeydown);
+        }
+    };
+    setTimeout(() => document.addEventListener('click', handleOutsideClick), 0);
+}
 
 let menuStack = [];
 let currentZIndex = 1000;
-const MODES = { GLOBAL: 'global', SEARCH: 'search', HOUSESHIELD: 'houseshield', STICKY_NOTE: 'sticky_note' };
+const MODES = {
+    GLOBAL: 'global',
+    SEARCH: 'search',
+    HOUSESHIELD: 'houseshield',
+    STICKY_NOTE: 'sticky_note' 
+};
 let currentMode = MODES.GLOBAL;
 let currentStudentIndex = -1;
 let searchBox = null;
 let searchResults = null;
 let selectedIndex = 0;
+let hasCopiedScores = false;
+let hasResetReturned = false;
+let isActive = false;
 let currentPoints = 0;
 
-/* … keep everything else exactly as you had it … */
+function globalKeydownHandler(event) {
+    if (event.key === '/' && currentMode === MODES.GLOBAL) {
+        event.preventDefault();
+        toggleSearchBox();
+        return;
+    }
+    if (event.key === 'Escape' && menuStack.length > 0) {
+        closeTopMenu();
+        return;
+    }
+    switch (currentMode) {
+        case MODES.GLOBAL:
+            handleGlobalHotkeys(event);
+            if (event.ctrlKey && event.key === 'n' && isStickyNoteAllowed()) {
+                event.preventDefault();
+                createStickyNote();
+            }
+            break;
+        case MODES.SEARCH:
+            handleSearchBoxKeys(event);
+            break;
+        case MODES.HOUSESHIELD:
+            handleActiveHouseshield(event);
+            break;
+        case MODES.STICKY_NOTE:
+            break;
+    }
+}
 
-/* Keep your exportScores(), resetAllStudents(), createBars(), showFloatingMenu(), etc. exactly the same */
+document.addEventListener('keydown', globalKeydownHandler);
 
-/* Final init */
+function openMenu(menuId) {
+    try {
+        if (menuId === 'houseshield') {
+            const floatingMenu = document.getElementById('floating-menu');
+            menuStack = floatingMenu && floatingMenu.style.display === 'block' ? [floatingMenu] : [];
+        } else {
+            while (menuStack.length > 0) {
+                closeTopMenu();
+            }
+        }
+        const menu = document.getElementById(menuId);
+        if (menu) {
+            currentZIndex++;
+            menu.style.zIndex = currentZIndex;
+            menu.style.display = 'block';
+            menuStack.push(menu);
+            if (menuId === 'search-box') {
+                currentMode = MODES.SEARCH;
+            } else if (menuId === 'houseshield') {
+                currentMode = MODES.HOUSESHIELD;
+            } else if (menuId === 'floating-menu') {
+                currentMode = MODES.GLOBAL;
+            } else {
+                currentMode = MODES.GLOBAL;
+            }
+        }
+    } catch (error) {
+    }
+}
+
+function closeTopMenu() {
+    if (menuStack.length > 0) {
+        const topMenu = menuStack.pop();
+        topMenu.style.display = 'none';
+        if (topMenu.id === 'search-box') {
+            currentMode = MODES.GLOBAL;
+            isAddingStudent = false;
+            document.removeEventListener('click', handleSearchOutsideClick);
+            if (searchBox) {
+                searchBox.remove();
+                searchBox = null;
+                searchResults = null;
+            }
+        } else if (topMenu.id === 'houseshield') {
+            deactivateHouseshield();
+        } else if (topMenu.id === 'floating-menu') {
+            resetBarHighlights();
+        }
+        if (menuStack.length === 0) {
+            currentMode = MODES.GLOBAL;
+        }
+        document.activeElement.blur();
+    }
+}
+
+function closeSpecificMenu(menuId) {
+    const menuIndex = menuStack.findIndex(menu => menu.id === menuId);
+    if (menuIndex !== -1) {
+        const menu = menuStack.splice(menuIndex, 1)[0];
+        menu.style.display = 'none';
+        if (menu.id === 'search-box') {
+            currentMode = MODES.GLOBAL;
+            isAddingStudent = false;
+        } else if (menu.id === 'houseshield') {
+            deactivateHouseshield();
+        } else if (menu.id === 'floating-menu') {
+            resetBarHighlights();
+        }
+        if (menuStack.length === 0) {
+            currentMode = MODES.GLOBAL;
+        }
+    }
+}
+
+function populateStudents() {
+    const spreadsheet = document.querySelector('.spreadsheet');
+    const isProductionTech = classes[currentClassIndex].name === "Production Tech";
+    spreadsheet.innerHTML = `
+        <div class="spreadsheet-header"><strong>Student</strong></div>
+        <div class="spreadsheet-header"><strong onclick="cycleAttendance()">Attendance</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[0]}')">${isProductionTech ? 'Devices' : 'Stands'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[1]}')">${isProductionTech ? 'Engagement' : 'Intonation'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[2]}')">${isProductionTech ? 'Review' : 'Returned'}</strong></div>
+        <div class="spreadsheet-header"><strong onclick="toggleAllCheckboxes('${currentCriteria[3]}')">${isProductionTech ? 'Progress' : 'Engagement'}</strong></div>
+        <div class="spreadsheet-header"><strong>Participation</strong></div>
+        <div class="spreadsheet-header"><strong>House Points</strong></div>
+    `;
+    teacherModeOrder.forEach(name => {
+        const student = students.find(s => s.name === name);
+        const isAbsent = student.attendance === 'Absent';
+        const row = document.createElement('div');
+        row.className = 'spreadsheet-row';
+        row.dataset.studentName = student.name;
+        row.innerHTML = `
+            <div class="student-name">${student.name}</div>
+            <div class="attendance-dropdown">
+                <select class="attendance-dropdown-select ${student.attendance.toLowerCase()}" onchange="syncAttendance('${student.name}', this)">
+                    <option value="Absent" ${student.attendance === 'Absent' ? 'selected' : ''}>Absent</option>
+                    <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
+                    <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
+                </select>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" ${student[currentCriteria[0]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')">
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" ${student[currentCriteria[1]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')">
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" ${student[currentCriteria[2]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')">
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" ${student[currentCriteria[3]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')">
+            </div>
+            <div class="stepper">
+                <button onclick="updateScore('${student.name}', -10)">-</button>
+                <span class="score">${student.score === 'EX' ? 'EX' : student.score + '%'}</span>
+                <button onclick="updateScore('${student.name}', 10)">+</button>
+            </div>
+            <div class="stepper">
+                <button onclick="updateHousePoints('${student.name}', -10)">-</button>
+                <span>${student.housePoints}</span>
+                <button onclick="updateHousePoints('${student.name}', 10)">+</button>
+            </div>
+        `;
+        spreadsheet.appendChild(row);
+    });
+}
+
+function updateHousePoints(name, change) {
+    const student = students.find(s => s.name === name);
+    if (student) {
+        student.housePoints += change;
+        updateScoreDisplay(student);
+        const housePointsSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper:last-child span`);
+        if (housePointsSpan) {
+            housePointsSpan.textContent = student.housePoints;
+        }
+        updateFloatingMenu(student);
+        updateBarGraph(student);
+        const housePointsElement = document.querySelector(`#bar-${CSS.escape(student.name)} .house-points`);
+        if (housePointsElement) {
+            const houseInfo = masterList.find(s => s.name === student.name);
+            const houseColor = getHouseColor(houseInfo.house);
+            housePointsElement.style.transition = 'background-color 1.0s ease, backdrop-filter 1.0s ease';
+            housePointsElement.style.backgroundColor = `${houseColor}CC`;
+            setTimeout(() => {
+                housePointsElement.style.backgroundColor = `${houseColor}66`;
+            }, 500);
+        }
+    }
+}
+
+function getHouseColor(house) {
+    switch (house.toLowerCase()) {
+        case 'red': return '#FF3333';
+        case 'blue': return '#3366FF';
+        case 'green': return '#00A300';
+        case 'yellow': return '#FFCC00';
+        default: return '#808080';
+    }
+}
+
+function toggleTeacherMode() {
+    const teacherMode = document.getElementById('teacher-mode');
+    if (teacherMode.style.display === 'block') {
+        closeSpecificMenu('teacher-mode');
+    } else {
+        openMenu('teacher-mode');
+        populateStudents();
+    }
+}
+
+function enterTeacherMode() {
+    openMenu('teacher-mode');
+    populateStudents();
+}
+
+function exitTeacherMode() {
+    closeSpecificMenu('teacher-mode');
+}
+
+function syncAttendance(name, select) {
+    const student = students.find(s => s.name === name);
+    if (student) {
+        student.attendance = select.value;
+        calculateScore(student);
+        updateScoreDisplay(student);
+        updateTardyLabel(student);
+        updateBarGraph(student);
+        const teacherRow = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"]`);
+        if (teacherRow) {
+            const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
+            if (attendanceSelect) {
+                attendanceSelect.value = student.attendance;
+                attendanceSelect.classList.remove('present', 'tardy', 'absent');
+                attendanceSelect.classList.add(student.attendance.toLowerCase());
+            }
+            const checkboxes = teacherRow.querySelectorAll('.checkbox-container input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.disabled = student.attendance === 'Absent';
+            });
+        }
+        const floatingMenu = document.getElementById('floating-menu');
+        if (floatingMenu && floatingMenu.style.display === 'block' && floatingMenu.querySelector('h3').textContent === student.name) {
+            const floatingSelect = floatingMenu.querySelector('select');
+            if (floatingSelect) {
+                floatingSelect.value = student.attendance;
+                floatingSelect.classList.remove('present', 'tardy', 'absent');
+                floatingSelect.classList.add(student.attendance.toLowerCase());
+            }
+            const floatingCheckboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
+            floatingCheckboxes.forEach(checkbox => {
+                checkbox.disabled = student.attendance === 'Absent';
+            });
+            updateFloatingMenu(student);
+        }
+    }
+}
+
+function syncCheckbox(name, checkbox, type) {
+    const student = students.find(s => s.name === name);
+    if (student) {
+        student[type] = checkbox.checked;
+        calculateScore(student);
+        updateScoreDisplay(student);
+        updateBarGraph(student);
+        updateTeacherMenu(student);
+        updateFloatingMenu(student);
+    }
+}
+
+function updateScore(name, change) {
+    const student = students.find(s => s.name === name);
+    if (student && student.score !== 'EX') {
+        const newScore = Math.max(0, Math.min(100, student.score + change));
+        if (newScore !== student.score) {
+            student.manualAdjustment = (student.manualAdjustment || 0) + (newScore - student.score);
+            student.score = newScore;
+            const bar = document.getElementById(`bar-${name}`);
+            bar.style.height = `${student.score}%`;
+            bar.querySelector('.bar-label').innerHTML = `${name}<br>${student.score}%`;
+            bar.style.setProperty('--flash-color', change > 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)');
+            bar.classList.remove('flash-animation');
+            void bar.offsetWidth;
+            bar.classList.add('flash-animation');
+            updateScoreDisplay(student);
+            updateFloatingMenu(student);
+            if (change > 0) {
+                playRandomSound(positiveEffects);
+            } else {
+                if (newScore === 0) {
+                    const audio = new Audio(negativeEffect0);
+                    audio.play();
+                } else if (newScore >= 50) {
+                    playRandomSound(negativeEffects50Plus);
+                } else if (newScore >= 10) {
+                    playRandomSound(negativeEffects10to50);
+                }
+            }
+        }
+    }
+}
+
+function calculateScore(student) {
+    if (student.attendance === 'Absent') {
+        student.score = 'EX';
+    } else {
+        let baseScore = 60;
+        if (student.attendance === 'Tardy') baseScore -= 20;
+        if (student[currentCriteria[0]]) baseScore += 10;
+        if (student[currentCriteria[1]]) baseScore += 10;
+        if (student[currentCriteria[2]]) baseScore += 10;
+        if (student[currentCriteria[3]]) baseScore += 10;
+        let manualAdjustment = student.manualAdjustment || 0;
+        student.score = Math.max(0, Math.min(100, baseScore + manualAdjustment));
+    }
+}
+
+function updateScoreDisplay(student) {
+    const bar = document.getElementById(`bar-${student.name}`);
+    if (bar) {
+        const isStudentsBirthday = isBirthday(student.birthdate);
+        if (isStudentsBirthday) {
+            bar.classList.add('bdaycolorful');
+        } else {
+            bar.classList.remove('bdaycolorful');
+        }
+        bar.style.transition = 'height 0.3s ease-in-out, opacity 0.5s ease';
+        const houseInfo = masterList.find(s => s.name === student.name);
+        const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080';
+        if (student.score === 'EX') {
+            bar.classList.add('ex-score');
+            bar.style.height = '0%';
+            bar.innerHTML = `
+                <div class="bar-label">
+                    <div class="main-labels">
+                        <span>${student.name}</span>
+                        <span class="score">EX</span>
+                    </div>
+                    <div class="secondary-labels">
+                        ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                        ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        } else {
+            bar.classList.remove('ex-score');
+            bar.style.height = `${student.score}%`;
+            bar.innerHTML = `
+                <div class="value-label">${student.score}%</div>
+                <div class="bar-label">
+                    <div class="main-labels">
+                        <span>${student.name}</span>
+                        <span class="score">${student.score}%</span>
+                    </div>
+                    <div class="secondary-labels">
+                        ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                        ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        const scoreSpan = bar.querySelector('.score');
+        if (scoreSpan) {
+            scoreSpan.removeAttribute('style');
+        }
+        updateTeacherMenu(student);
+        updateFloatingMenu(student);
+        const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
+        if (participationSpan) {
+            participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
+        }
+    }
+}
+
+window.addEventListener('resize', () => {
+    students.forEach(student => updateScoreDisplay(student));
+});
+
+function updateTeacherMenu(student) {
+    const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
+    if (participationSpan) {
+        participationSpan.textContent = student.score === 'EX' ? 'EX' : `${student.score}%`;
+    }
+    const housePointsSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper:last-child span`);
+    if (housePointsSpan) {
+        housePointsSpan.textContent = student.housePoints;
+    }
+}
+
+function updateFloatingMenu(student) {
+    const floatingMenu = document.getElementById('floating-menu');
+    if (!floatingMenu || floatingMenu.style.display !== 'block') {
+        return;
+    }
+    if (floatingMenu.querySelector('h3').textContent !== student.name) {
+        return;
+    }
+
+    setTimeout(() => {
+        const isProductionTech = classes[currentClassIndex].name === "Production Tech";
+        const attendanceSelect = floatingMenu.querySelector('select');
+        if (attendanceSelect) {
+            attendanceSelect.value = student.attendance;
+        }
+        const checkboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            const property = checkbox.id.replace('checkbox-', '');
+            checkbox.checked = student[property];
+        });
+        
+        let participationSpan = floatingMenu.querySelector('.stepper:nth-child(7) .score');
+        if (!participationSpan) {
+            participationSpan = floatingMenu.querySelector('.stepper .score');
+        }
+        if (participationSpan) {
+            const displayText = student.score === 'EX' ? 'EX' : `${student.score}%`;
+            participationSpan.textContent = displayText;
+        }
+        
+        let housePointsSpan = floatingMenu.querySelector('.stepper:nth-child(8) span:nth-child(3)');
+        if (!housePointsSpan) {
+            housePointsSpan = floatingMenu.querySelector('.stepper:last-of-type span:nth-child(3)');
+        }
+        if (housePointsSpan) {
+            housePointsSpan.textContent = student.housePoints > 0 ? `+${student.housePoints}` : student.housePoints;
+        }
+    }, 100);
+}
+
+function updateTardyLabel(student) {
+    const bar = document.getElementById(`bar-${student.name}`);
+    if (bar) {
+        const secondaryLabels = bar.querySelector('.secondary-labels');
+        if (secondaryLabels) {
+            const tardyLabel = secondaryLabels.querySelector('.tardy-label');
+            if (student.attendance === 'Tardy') {
+                if (!tardyLabel) {
+                    const newTardyLabel = document.createElement('div');
+                    newTardyLabel.className = 'tardy-label';
+                    newTardyLabel.textContent = 'Tardy';
+                    secondaryLabels.appendChild(newTardyLabel);
+                }
+            } else {
+                if (tardyLabel) {
+                    tardyLabel.remove();
+                }
+            }
+        }
+    }
+}
+
+function createBars() {
+    const container = document.getElementById('graph-container');
+    container.innerHTML = '';
+    students.forEach(student => {
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        const isBday = isBirthday(student.birthdate);
+        if (isBday) {
+            bar.classList.add('bdaycolorful');
+        }
+        if (student.score === 'EX') {
+            bar.classList.add('ex-score');
+        }
+        bar.style.transition = 'height 0.3s ease-in-out, opacity 0.5s ease';
+        bar.style.height = student.score === 'EX' ? '0%' : `${student.score}%`;
+        bar.id = `bar-${student.name}`;
+        bar.dataset.studentName = student.name;
+        const houseInfo = masterList.find(s => s.name === student.name);
+        const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080';
+        bar.innerHTML = `
+            ${student.score !== 'EX' ? `<div class="value-label">${student.score}%</div>` : ''}
+            <div class="bar-label">
+                <div class="main-labels">
+                    <span ${isBday ? 'class="colorful"' : ''}>${student.name}</span>
+                    <span class="score">${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
+                </div>
+                <div class="secondary-labels">
+                    ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                    ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
+                </div>
+            </div>
+        `;
+        bar.addEventListener('mouseover', () => highlightBar(student.name));
+        bar.addEventListener('mouseout', () => resetBarHighlights());
+        bar.addEventListener('click', (event) => {
+            const nameSpan = event.target.closest('.main-labels span:first-child');
+            const scoreSpan = event.target.closest('.main-labels span.score');
+            const tardyLabel = event.target.closest('.secondary-labels .tardy-label');
+            const housePoints = event.target.closest('.secondary-labels .house-points');
+            const isNarrowView = window.matchMedia('(max-width: 1200px)').matches;
+            if (nameSpan || (!isNarrowView && scoreSpan)) {
+                cycleAttendanceForStudent(student);
+            } else if (isNarrowView && (scoreSpan || tardyLabel || housePoints)) {
+                showFloatingMenu(event, student.name);
+            } else if (!nameSpan && !scoreSpan && !tardyLabel && !housePoints) {
+                showFloatingMenu(event, student.name);
+            }
+        });
+        container.appendChild(bar);
+    });
+}
+
+function isBirthday(birthdate) {
+    if (!birthdate) return false;
+    const today = new Date();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const todayFormatted = `${month}-${day}`;
+    const [, birthMonth, birthDay] = birthdate.split('-');
+    return `${birthMonth}-${birthDay}` === todayFormatted;
+}
+
+function highlightBar(name) {
+    document.querySelectorAll('.bar, .bar-label').forEach(el => {
+        if (el.id === `bar-${name}` || el.parentElement.id === `bar-${name}`) {
+            el.style.opacity = '1';
+            const nameSpan = el.querySelector('.main-labels span:first-child');
+            if (nameSpan) {
+                nameSpan.style.fontWeight = 'bold';
+            }
+        } else {
+            el.style.opacity = '0.7';
+        }
+    });
+}
+
+function resetBarHighlights() {
+    document.querySelectorAll('.bar, .bar-label').forEach(el => {
+        el.style.opacity = '1';
+        const nameSpan = el.querySelector('.main-labels span:first-child');
+        if (nameSpan) {
+            nameSpan.style.fontWeight = 'normal';
+            nameSpan.style.textDecoration = 'none';
+        }
+    });
+}
+
+function updateBarGraph(student) {
+    const bar = document.getElementById(`bar-${student.name}`);
+    if (bar) {
+        const housePointsElement = bar.querySelector('.house-points');
+        const secondaryLabels = bar.querySelector('.secondary-labels');
+        if (housePointsElement) {
+            housePointsElement.remove();
+        }
+        if (student.housePoints !== 0 && secondaryLabels) {
+            const houseInfo = masterList.find(s => s.name === student.name);
+            const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080';
+            const newHousePointsElement = document.createElement('div');
+            newHousePointsElement.className = 'house-points';
+            newHousePointsElement.textContent = student.housePoints > 0 ? `+${student.housePoints}` : student.housePoints;
+            newHousePointsElement.style.backgroundColor = `${houseColor}66`;
+            secondaryLabels.appendChild(newHousePointsElement);
+            newHousePointsElement.style.transition = 'background-color 1.0s ease, backdrop-filter 1.0s ease';
+            newHousePointsElement.style.backgroundColor = `${houseColor}CC`;
+            setTimeout(() => {
+                newHousePointsElement.style.backgroundColor = `${houseColor}66`;
+            }, 500);
+        }
+        updateFloatingMenu(student);
+    }
+}
+
+function navigateStudentMenu(direction) {
+    if (currentStudentIndex === -1) {
+        currentStudentIndex = direction > 0 ? 0 : students.length - 1;
+    } else {
+        currentStudentIndex = (currentStudentIndex + direction + students.length) % students.length;
+    }
+    const newStudent = students[currentStudentIndex];
+    resetBarHighlights();
+    showFloatingMenu(null, newStudent.name);
+}
+
+function showFloatingMenu(event, studentName) {
+    const floatingMenu = document.getElementById('floating-menu');
+    const student = students.find(s => s.name === studentName);
+    const isProductionTech = classes[currentClassIndex].name === "Production Tech";
+    currentStudentIndex = students.findIndex(s => s.name === studentName);
+    if (currentStudentIndex === -1) {
+        return;
+    }
+    const isAbsent = student.attendance === 'Absent';
+    floatingMenu.innerHTML = `
+        <span class="close-button" onclick="closeTopMenu()">&times;</span>
+        <h3 onclick="cycleAttendanceForStudent(students[${currentStudentIndex}])">${student.name}</h3>
+        <div class="checkbox-row">
+            <select class="attendance-dropdown-select ${student.attendance.toLowerCase()}" onchange="syncAttendance('${student.name}', this)">
+                <option value="Absent" ${student.attendance === 'Absent' ? 'selected' : ''}>Absent</option>
+                <option value="Present" ${student.attendance === 'Present' ? 'selected' : ''}>Present</option>
+                <option value="Tardy" ${student.attendance === 'Tardy' ? 'selected' : ''}>Tardy</option>
+            </select>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[0]}" ${student[currentCriteria[0]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[0]}')"> ${isProductionTech ? 'Devices' : 'Stands'}</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[1]}" ${student[currentCriteria[1]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[1]}')"> ${isProductionTech ? 'Engagement' : 'Intonation'}</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[2]}" ${student[currentCriteria[2]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[2]}')"> ${isProductionTech ? 'Review' : 'Returned'}</label>
+            <label><input type="checkbox" id="checkbox-${currentCriteria[3]}" ${student[currentCriteria[3]] ? 'checked' : ''} ${isAbsent ? 'disabled' : ''} onchange="syncCheckbox('${student.name}', this, '${currentCriteria[3]}')"> ${isProductionTech ? 'Progress' : 'Engagement'}</label>
+        </div>
+        <div class="stepper">
+            <button onclick="updateScore('${student.name}', -10)">-</button>
+            <span class="score">${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
+            <button onclick="updateScore('${student.name}', 10)">+</button>
+        </div>
+        <div class="stepper">
+            <span>House Points</span>
+            <button onclick="updateHousePoints('${student.name}', -10)">-</button>
+            <span>${student.housePoints > 0 ? '+' : ''}${student.housePoints}</span>
+            <button onclick="updateHousePoints('${student.name}', 10)">+</button>
+        </div>
+        <button onclick="closeFloatingMenu()">Close</button>
+    `;
+    const menuWidth = floatingMenu.offsetWidth;
+    const menuHeight = floatingMenu.offsetHeight;
+    floatingMenu.style.left = `50%`;
+    floatingMenu.style.top = `50%`;
+    openMenu('floating-menu');
+    highlightBar(student.name);
+}
+
+function closeFloatingMenu() {
+    closeSpecificMenu('floating-menu');
+    resetBarHighlights();
+}
+
+function updateDateTime() {
+    const now = new Date();
+    document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('currentDay').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
+}
+
+function cycleAttendance() {
+    const attendanceOptions = ['Absent', 'Present', 'Tardy'];
+    const currentIndex = attendanceOptions.indexOf(students[0].attendance);
+    const nextIndex = (currentIndex + 1) % attendanceOptions.length;
+    const nextAttendance = attendanceOptions[nextIndex];
+    students.forEach(student => {
+        student.attendance = nextAttendance;
+        calculateScore(student);
+        updateScoreDisplay(student);
+        updateTardyLabel(student);
+        updateBarGraph(student);
+        const teacherRow = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"]`);
+        if (teacherRow) {
+            const attendanceSelect = teacherRow.querySelector('.attendance-dropdown select');
+            if (attendanceSelect) {
+                attendanceSelect.value = student.attendance;
+                attendanceSelect.classList.remove('present', 'tardy', 'absent');
+                attendanceSelect.classList.add(student.attendance.toLowerCase());
+            }
+            const checkboxes = teacherRow.querySelectorAll('.checkbox-container input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.disabled = student.attendance === 'Absent';
+            });
+        }
+        const floatingMenu = document.getElementById('floating-menu');
+        if (floatingMenu && floatingMenu.style.display === 'block' && floatingMenu.querySelector('h3').textContent === student.name) {
+            const floatingSelect = floatingMenu.querySelector('select');
+            if (floatingSelect) {
+                floatingSelect.value = student.attendance;
+                floatingSelect.classList.remove('present', 'tardy', 'absent');
+                floatingSelect.classList.add(student.attendance.toLowerCase());
+            }
+            const floatingCheckboxes = floatingMenu.querySelectorAll('input[type="checkbox"]');
+            floatingCheckboxes.forEach(checkbox => {
+                checkbox.disabled = student.attendance === 'Absent';
+            });
+            updateFloatingMenu(student);
+        }
+    });
+}
+
+function toggleAllCheckboxes(type) {
+    const checkboxes = document.querySelectorAll(`.spreadsheet-row .checkbox-container:nth-child(${currentCriteria.indexOf(type) + 3}) input[type="checkbox"]`);
+    const anyUnchecked = Array.from(checkboxes).some(cb => !cb.checked);
+    checkboxes.forEach((checkbox, index) => {
+        checkbox.checked = anyUnchecked;
+        const studentName = teacherModeOrder[index];
+        if (studentName) {
+            syncCheckbox(studentName, checkbox, type);
+        }
+    });
+}
+
+function addStudent(name) {
+    const masterStudent = masterList.find(s => s.name === name);
+    if (masterStudent && !students.some(s => s.name === name)) {
+        const newStudent = {
+            name: masterStudent.name,
+            birthdate: masterStudent.birthdate,
+            house: masterStudent.house,
+            attendance: 'Present',
+            [currentCriteria[0]]: true,
+            [currentCriteria[1]]: true,
+            [currentCriteria[2]]: true,
+            [currentCriteria[3]]: true,
+            score: 100,
+            housePoints: 10,
+            manualAdjustment: 0,
+            isAdditional: true
+        };
+        students.push(newStudent);
+        teacherModeOrder.push(name);
+        createBars();
+        const newBar = document.getElementById(`bar-${newStudent.name}`);
+        if (newBar) {
+            newBar.style.height = '0%';
+            setTimeout(() => {
+                newBar.style.transition = 'height 0.3s ease-in-out, opacity 0.5s ease';
+                newBar.style.height = `${newStudent.score}%`;
+                newBar.style.setProperty('--flash-color', 'rgba(46, 204, 113, 0.6)');
+                newBar.classList.remove('flash-animation');
+                void newBar.offsetWidth;
+                newBar.classList.add('flash-animation');
+            }, 10);
+        }
+        if (document.getElementById('teacher-mode').style.display === 'block') {
+            populateStudents();
+        }
+        closeSearchBox();
+    }
+}
+
+function createSearchBox() {
+    try {
+        while (menuStack.length > 0) {
+            closeTopMenu();
+        }
+        searchBox = document.createElement('div');
+        searchBox.id = 'search-box';
+        searchBox.style.position = 'fixed';
+        searchBox.style.top = '50%';
+        searchBox.style.left = '50%';
+        searchBox.style.transform = 'translate(-50%, -50%)';
+        searchBox.style.backgroundColor = 'white';
+        searchBox.style.padding = '20px';
+        searchBox.style.borderRadius = '5px';
+        searchBox.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
+        searchBox.style.zIndex = '1000';
+        searchBox.style.display = 'block';
+        searchBox.innerHTML = `
+            <span class="close-button" onclick="closeSearchBox()">&times;</span>
+            <input type="text" id="search-input" placeholder="${isAddingStudent ? 'Add student' : 'Type student name...'}" autocomplete="off">
+            <div id="search-results"></div>
+            ${!isAddingStudent ? '<div id="add-student-option" style="font-size: smaller; color: gray; cursor: pointer;" onmouseover="this.style.textDecoration=\'underline\';" onmouseout="this.style.textDecoration=\'none\';" onclick="toggleAddStudentMode()">Add student</div>' : ''}
+        `;
+        document.body.appendChild(searchBox);
+        
+        searchBox.style.display = 'none';
+        void searchBox.offsetWidth;
+        searchBox.style.display = 'block';
+        
+        searchResults = document.getElementById('search-results');
+        if (!searchResults) {
+            throw new Error('Search results element not found');
+        }
+        
+        const searchInput = document.getElementById('search-input');
+        if (!searchInput) {
+            throw new Error('Search input element not found');
+        }
+        
+        searchInput.value = '';
+        setTimeout(() => {
+            searchInput.focus();
+            searchInput.select();
+        }, 0);
+        
+        openMenu('search-box');
+        currentMode = MODES.SEARCH;
+
+        searchInput.addEventListener('input', () => {
+            try {
+                updateSearchResults(searchInput.value);
+            } catch (e) {
+            }
+        });
+
+        setTimeout(() => {
+            document.addEventListener('click', handleSearchOutsideClick);
+        }, 0);
+    } catch (error) {
+    }
+}
+
+function toggleAddStudentMode() {
+    closeSearchBox();
+    isAddingStudent = true;
+    createSearchBox();
+}
+
+function toggleSearchBox() {
+    const searchBox = document.getElementById('search-box');
+    if (searchBox) {
+        closeSearchBox();
+    } else {
+        isAddingStudent = false;
+        createSearchBox();
+    }
+}
+
+function handleSearchOutsideClick(event) {
+    const searchBox = document.getElementById('search-box');
+    if (searchBox && !searchBox.contains(event.target) && !event.target.closest('.search-button')) {
+        closeSearchBox();
+        document.removeEventListener('click', handleSearchOutsideClick);
+    }
+}
+
+function updateSearchResults(query) {
+    let matchingStudents;
+    searchResults.innerHTML = '';
+    selectedIndex = 0;
+    if (query.trim() === '') {
+        const addStudentOption = document.getElementById('add-student-option');
+        if (addStudentOption) {
+            addStudentOption.style.display = !isAddingStudent ? 'block' : 'none';
+        }
+        return;
+    }
+    if (isAddingStudent) {
+        const currentStudentNames = students.map(s => s.name);
+        matchingStudents = masterList
+            .filter(student => !currentStudentNames.includes(student.name))
+            .filter(student => student.name.toLowerCase().includes(query.toLowerCase()));
+    } else {
+        matchingStudents = students.filter(student => 
+            student.name.toLowerCase().includes(query.toLowerCase())
+        );
+    }
+    matchingStudents.forEach((student, index) => {
+        const result = document.createElement('div');
+        result.textContent = student.name;
+        result.className = index === 0 ? 'selected' : '';
+        result.onclick = () => {
+            if (isAddingStudent) {
+                addStudent(student.name);
+            } else {
+                showFloatingMenu(null, student.name);
+                closeSearchBox();
+            }
+        };
+        searchResults.appendChild(result);
+    });
+    const addStudentOption = document.getElementById('add-student-option');
+    if (addStudentOption) {
+        addStudentOption.style.display = 'none';
+    }
+}
+
+function closeSearchBox() {
+    try {
+        const searchBox = document.getElementById('search-box');
+        if (searchBox) {
+            document.body.removeChild(searchBox);
+            closeSpecificMenu('search-box');
+            document.removeEventListener('click', handleSearchOutsideClick);
+            isAddingStudent = false;
+            currentMode = MODES.GLOBAL;
+            selectedIndex = 0;
+            searchBox = null;
+            searchResults = null;
+        }
+    } catch (error) {
+    }
+}
+
+function toggleHouseShield() {
+    const houseshield = document.getElementById('houseshield');
+    if (houseshield.classList.contains('active')) {
+        deactivateHouseshield();
+    } else {
+        activateHouseshield();
+    }
+}
+
+function activateHouseshield() {
+    const houseshield = document.getElementById('houseshield');
+    const points = document.getElementById('points');
+    const studentName = document.getElementById('student-name');
+    currentZIndex++;
+    houseshield.style.zIndex = currentZIndex;
+    if (currentStudentIndex === -1) {
+        const floatingMenu = document.getElementById('floating-menu');
+        if (floatingMenu && floatingMenu.style.display === 'block') {
+            const currentStudentName = floatingMenu.querySelector('h3').textContent;
+            currentStudentIndex = students.findIndex(s => s.name === currentStudentName);
+        }
+    }
+    if (currentStudentIndex === -1 || currentStudentIndex >= students.length) {
+        return;
+    }
+    const student = students[currentStudentIndex];
+    const houseInfo = masterList.find(s => s.name === student.name);
+    if (!houseInfo) {
+        return;
+    }
+    if (houseshield) {
+        houseshield.style.backgroundImage = `url('https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/${houseInfo.house.toLowerCase()}.png')`;
+        houseshield.style.display = 'block';
+        void houseshield.offsetWidth;
+        houseshield.classList.add('active');
+    }
+    if (points) {
+        points.classList.add('active');
+    }
+    if (studentName) {
+        studentName.textContent = student.name;
+        studentName.classList.add('active');
+    }
+    currentPoints = student.housePoints;
+    updatePoints();
+    isActive = true;
+    currentMode = MODES.HOUSESHIELD;
+    openMenu('houseshield');
+}
+
+function updatePoints() {
+    const points = document.getElementById('points');
+    if (points) {
+        points.textContent = currentPoints > 0 ? `+${currentPoints}` : currentPoints;
+    }
+}
+
+function applyHousePointsChange() {
+    const student = students[currentStudentIndex];
+    const change = currentPoints - student.housePoints;
+    updateHousePoints(student.name, change);
+    closeFloatingMenu();
+    deactivateHouseshield();
+}
+
+function deactivateHouseshield() {
+    const houseshield = document.getElementById('houseshield');
+    const points = document.getElementById('points');
+    const studentName = document.getElementById('student-name');
+    if (houseshield) {
+        houseshield.style.display = 'block';
+        houseshield.classList.add('active');
+        void houseshield.offsetWidth;
+        houseshield.classList.remove('active');
+        const handler = (event) => {
+            if (event.propertyName === 'opacity' && !houseshield.classList.contains('active')) {
+                houseshield.style.display = 'none';
+                houseshield.removeEventListener('transitionend', handler);
+            }
+        };
+        houseshield.addEventListener('transitionend', handler);
+        setTimeout(() => {
+            if (!houseshield.classList.contains('active') && houseshield.style.display !== 'none') {
+                houseshield.style.display = 'none';
+                houseshield.removeEventListener('transitionend', handler);
+            }
+        }, 600);
+    }
+    if (points) {
+        points.classList.remove('active');
+    }
+    if (studentName) {
+        studentName.classList.remove('active');
+    }
+    isActive = false;
+    closeSpecificMenu('houseshield');
+    const floatingMenu = document.getElementById('floating-menu');
+    if (menuStack.length === 0 || (menuStack.length === 1 && menuStack[0] === floatingMenu)) {
+        currentMode = MODES.GLOBAL;
+    }
+}
+
+function cycleAttendanceForStudent(student) {
+    const attendanceOptions = ['Present', 'Tardy', 'Absent'];
+    const currentIndex = attendanceOptions.indexOf(student.attendance);
+    const nextIndex = (currentIndex + 1) % attendanceOptions.length;
+    student.attendance = attendanceOptions[nextIndex];
+    syncAttendance(student.name, { value: student.attendance });
+}
+
+function toggleCheckboxForStudent(student, property) {
+    student[property] = !student[property];
+    syncCheckbox(student.name, { checked: student[property] }, property);
+}
+
+function toggleOverlay() {
+    const overlay = document.getElementById('overlay');
+    if (overlay.style.display === 'block') {
+        closeTopMenu();
+    } else {
+        openMenu('overlay');
+    }
+}
+
+function preloadHouseImages() {
+    const houses = ['red', 'blue', 'green', 'yellow'];
+    houses.forEach(house => {
+        const img = new Image();
+        img.src = `https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/${house}.png`;
+    });
+}
+
+document.addEventListener('click', function(event) {
+    if (menuStack.length === 0) return;
+
+    const topMenu = menuStack[menuStack.length - 1];
+    const isClickOnMenuIcon = event.target.closest('.menu-icon');
+    const isClickOnBar = event.target.closest('.bar');
+
+    const exceptions = {
+        'teacher-mode': isClickOnMenuIcon,
+        'floating-menu': isClickOnBar || isClickOnMenuIcon,
+        'houseshield': isClickOnMenuIcon,
+        'search-box': isClickOnMenuIcon || event.target.closest('.search-button'),
+        'overlay': isClickOnMenuIcon
+    };
+
+    if (!topMenu.contains(event.target) && !exceptions[topMenu.id]) {
+        if (topMenu.id === 'houseshield') {
+            deactivateHouseshield();
+        } else if (topMenu.id === 'floating-menu') {
+            closeFloatingMenu();
+        } else {
+            closeTopMenu();
+        }
+    }
+});
+
+document.addEventListener('click', function(event) {
+    if (event.target.closest('.spreadsheet-row .student-name')) {
+        const studentName = event.target.closest('.student-name').textContent;
+        const student = students.find(s => s.name === studentName);
+        if (student) {
+            cycleAttendanceForStudent(student);
+        }
+    }
+});
+
+document.addEventListener('keydown', (event) => {
+}, true);
+
 window.onload = function() {
     preloadHouseImages();
     currentClassIndex = 0;
@@ -276,12 +1367,278 @@ window.onload = function() {
     updateDateTime();
     loadStickyNotes();
     setInterval(updateDateTime, 60000);
-    setInterval(updateCountdowns, 1000);   // only remaining timer
+    setInterval(updateCountdowns, 1000);
 };
 
 createBars();
 updateDateTime();
 setInterval(updateDateTime, 1000);
-</script>
+
+
+function exportScores() {
+    let studentsToExport = students;
+    const isMsBandThursday = classes[currentClassIndex].name === "MS Band ᵀᴴᵁᴿˢ";
+    
+    if (isMsBandThursday) {
+        studentsToExport = msBandStudents.map(student => {
+            const thursdayStudent = msBandThursdayStudents.find(s => s.name === student.name);
+            if (thursdayStudent) {
+                return students.find(s => s.name === student.name) || {
+                    ...student,
+                    attendance: 'Absent',
+                    score: 'EX',
+                    stands: false,
+                    intonation: false,
+                    returned: false,
+                    engagement: false,
+                    housePoints: 0,
+                    manualAdjustment: 0
+                };
+            } else {
+                return {
+                    ...student,
+                    attendance: 'Absent',
+                    score: 'EX',
+                    stands: false,
+                    intonation: false,
+                    returned: false,
+                    engagement: false,
+                    housePoints: 0,
+                    manualAdjustment: 0
+                };
+            }
+        });
+    }
+
+    let allAbsent = true;
+    for (const student of studentsToExport) {
+        if (student.attendance !== 'Absent' || student.score !== 'EX') {
+            allAbsent = false;
+            break;
+        }
+    }
+    
+    if (allAbsent) {
+        showTemporaryMessage('No changes detected—all students absent/EX. CSV not exported.');
+        return;
+    }
+
+    const regularStudents = studentsToExport.filter(s => !s.isAdditional);
+    const additionalStudents = studentsToExport.filter(s => s.isAdditional);
+
+    const headers = ['Name', ...regularStudents.map(student => `"${student.name}"`)];
+    const classworkRow = ['Classwork', ...regularStudents.map(student => `"${student.score === 'EX' ? 'EX' : `${student.score}%`}"`)];
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
+
+    const housePointsItemized = studentsToExport
+        .filter(student => student.housePoints !== 0)
+        .map(student => {
+            const masterStudent = masterList.find(s => s.name === student.name);
+            const liveschoolName = masterStudent ? masterStudent.liveschoolName : student.name;
+            return { name: liveschoolName, points: student.housePoints };
+        })
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(item => `"${item.name}",${item.points > 0 ? '+' : ''}${item.points}`);
+
+    const tardiesItemized = (isMsBandThursday ? students : studentsToExport)
+        .filter(student => student.attendance === 'Tardy')
+        .map(student => `"${student.name}",Tardy,=DATEVALUE("${dateStr}")`);
+
+    const absencesItemized = (isMsBandThursday ? students : studentsToExport)
+        .filter(student => student.attendance === 'Absent')
+        .map(student => `"${student.name}",Absent,=DATEVALUE("${dateStr}")`);
+
+    const additionalStudentsMessage = additionalStudents.length > 0
+        ? additionalStudents.map(s => `"${s.name}",Additional`)
+        : [];
+
+    const finalCsvRows = [
+        headers.join(','),
+        classworkRow.join(','),
+        ...(housePointsItemized.length > 0 ? ['', 'House Points', ...housePointsItemized] : []),
+        ...(tardiesItemized.length > 0 ? ['', 'Tardies', ...tardiesItemized] : []),
+        ...(absencesItemized.length > 0 ? ['', 'Absences', ...absencesItemized] : []),
+        ...(additionalStudentsMessage.length > 0 ? additionalStudentsMessage : [])
+    ];
+
+    const csvFileDateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
+    const className = classes[currentClassIndex].name.replace(/[^a-zA-Z0-9]/g, '_');
+    const csvContent = finalCsvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${className}_Scores_${csvFileDateStr}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    const housePointsDisplay = housePointsItemized.length > 0 
+        ? housePointsItemized.map(item => {
+            const [name, points] = item.split(',');
+            return `${name.replace(/"/g, '')}: ${points}`;
+        }).join('\n')
+        : 'No house points';
+    const tardiesDisplay = tardiesItemized.length > 0 
+        ? `Tardies:\n${tardiesItemized.map(item => {
+            const [name] = item.split(',');
+            return `${name.replace(/"/g, '')}`;
+        }).join('\n')}`
+        : 'No tardies';
+    const absencesDisplay = absencesItemized.length > 0 
+        ? `Absences:\n${absencesItemized.map(item => {
+            const [name] = item.split(',');
+            return `${name.replace(/"/g, '')}`;
+        }).join('\n')}`
+        : 'No absences';
+    const separator = housePointsItemized.length === 0 && tardiesItemized.length === 0 && absencesItemized.length === 0 ? '\n' : '\n\n';
+    const message = `House points for today:\n${housePointsDisplay}${separator}${tardiesDisplay}\n\n${absencesDisplay}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`;
+
+    showCustomAlert(message);
+    showTemporaryMessage('Scores exported as CSV');
+    closeSpecificMenu('teacher-mode');
+}
+
+function showCustomAlert(message) {
+    const alertOverlay = document.createElement('div');
+    alertOverlay.id = 'alert-overlay';
+    alertOverlay.style.position = 'fixed';
+    alertOverlay.style.top = '0';
+    alertOverlay.style.left = '0';
+    alertOverlay.style.width = '100%';
+    alertOverlay.style.height = '100%';
+    alertOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    alertOverlay.style.display = 'flex';
+    alertOverlay.style.justifyContent = 'center';
+    alertOverlay.style.alignItems = 'center';
+    alertOverlay.style.zIndex = '9999';
+
+    const alertBox = document.createElement('div');
+    alertBox.style.backgroundColor = 'white';
+    alertBox.style.padding = '20px';
+    alertBox.style.borderRadius = '5px';
+    alertBox.style.maxWidth = '80%';
+    alertBox.style.maxHeight = '80%';
+    alertBox.style.overflow = 'auto';
+    alertBox.style.position = 'relative';
+    alertBox.style.transition = 'transform 0.3s ease-in-out';
+    alertBox.style.transform = 'scale(0.8)';
+    setTimeout(() => {
+        alertBox.style.transform = 'scale(1)';
+    }, 10);
+
+    const messageElement = document.createElement('pre');
+    messageElement.textContent = message;
+    messageElement.style.whiteSpace = 'pre-wrap';
+    messageElement.style.wordBreak = 'break-word';
+
+    const okButton = document.createElement('button');
+    okButton.textContent = 'OK';
+    okButton.style.marginTop = '10px';
+    okButton.style.marginRight = '10px';
+    okButton.onclick = () => {
+        resetAllStudents();
+        closeAlert();
+    };
+
+    const closeButton = document.createElement('button');
+    closeButton.textContent = '×';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.background = 'none';
+    closeButton.style.border = 'none';
+    closeButton.style.fontSize = '20px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.onclick = closeAlert;
+
+    alertBox.appendChild(closeButton);
+    alertBox.appendChild(messageElement);
+    alertBox.appendChild(okButton);
+    alertOverlay.appendChild(alertBox);
+    document.body.appendChild(alertOverlay);
+}
+
+function closeAlert() {
+    const alertOverlay = document.getElementById('alert-overlay');
+    if (alertOverlay) {
+        const alertBox = alertOverlay.querySelector('div');
+        alertBox.style.transform = 'scale(0.8)';
+        alertBox.style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(alertOverlay);
+        }, 300);
+    }
+}
+
+function showTemporaryMessage(message) {
+    const messageElement = document.createElement('div');
+    messageElement.textContent = message;
+    messageElement.style.position = 'fixed';
+    messageElement.style.bottom = '20px';
+    messageElement.style.left = '50%';
+    messageElement.style.transform = 'translateX(-50%)';
+    messageElement.style.backgroundColor = '#4CAF50';
+    messageElement.style.color = 'white';
+    messageElement.style.padding = '10px 20px';
+    messageElement.style.borderRadius = '5px';
+    messageElement.style.zIndex = '5000';
+    messageElement.style.opacity = '1';
+    messageElement.style.transition = 'opacity 1s ease-in-out';
+    document.body.appendChild(messageElement);
+
+    setTimeout(() => {
+        messageElement.style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(messageElement);
+        }, 1000);
+    }, 1000);
+}
+
+function resetAllStudents() {
+    students.forEach(student => {
+        student.attendance = 'Absent';
+        student.stands = false;
+        student.intonation = false;   // ← changed
+        student.devices = false;
+        student.review = false;
+        student.returned = false;
+        student.progress = false;
+        student.engagement = false;
+        student.score = 'EX';
+        student.housePoints = 0;
+        updateScoreDisplay(student);
+    });
+
+    document.querySelectorAll('.attendance-dropdown select').forEach(select => {
+        select.value = 'Absent';
+    });
+
+    document.querySelectorAll('.checkbox-container input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+
+    document.querySelectorAll('.spreadsheet-row .stepper:last-child span').forEach(span => {
+        span.textContent = '0';
+    });
+
+    const bars = document.querySelectorAll('.bar');
+    bars.forEach(bar => {
+        bar.style.transition = 'height 0.5s ease-in-out, width 0.5s ease-in-out';
+        bar.style.height = '0px';
+    });
+    setTimeout(() => {
+        createBars();
+    }, 500);
+}
+
+createBars();
+updateDateTime();
+setInterval(updateDateTime, 1000);
+    </script>
 </body>
 </html>
