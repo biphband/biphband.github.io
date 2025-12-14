@@ -86,20 +86,23 @@ function playRandomSound(soundArray) {
     audio.play();
 }
 
-// SINGLE CLASS: Nutcracker Rehearsal #1
+// SINGLE CLASS: Nutcracker Rehearsal #2
 const classes = [
     {
-        name: "Marathon Rehearsal #1",
-        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], // Always active
-        
-        // timeRange: "7:00pm - 9:00pm",
-        timeRange: "7:15pm - 8:30pm",
-        
-        // startTime: { hours: 19, minutes: 0 },
-        startTime: { hours: 19, minutes: 15 },
+name: "Marathon Rehearsal #2",
+days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], // Always active
 
-        // endTime: { hours: 21, minutes: 0 },
-        endTime: { hours: 20, minutes: 30 },
+// timeRange: "7:00pm - 9:00pm",
+// timeRange: "7:15pm - 8:30pm",
+timeRange: "3:00pm - 6:00pm", // New time range
+
+// startTime: { hours: 19, minutes: 0 },
+// startTime: { hours: 19, minutes: 15 },
+startTime: { hours: 15, minutes: 0 }, // New start time
+
+// endTime: { hours: 21, minutes: 0 },
+// endTime: { hours: 20, minutes: 30 },
+endTime: { hours: 18, minutes: 0 }, // New end time
 
         students: masterList.map(s => ({
             name: s.name,
