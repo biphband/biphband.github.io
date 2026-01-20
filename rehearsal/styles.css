@@ -122,7 +122,7 @@ margin-top: -13px;
     align-items: flex-end;
     justify-content: space-around;
     padding: 20px;
-    padding-bottom: 80px; 
+    padding-bottom: 60px; 
     box-sizing: border-box;
     overflow-x: auto;
     overflow-y: hidden;
@@ -134,7 +134,9 @@ margin-top: -13px;
     box-shadow: 2px 0 15px rgba(0,0,0,0.2);
     transition: height 0.5s ease-in-out, opacity 0.8s ease;
     position: relative;
-    margin: 0 10px;
+    margin: 0 2px; 
+    margin-bottom: 10px;
+    height: calc(110% - 20px);
     cursor: pointer;
     text-align: center;
     }
@@ -218,13 +220,28 @@ left: 50%;
 bottom: -35px;
 transform: translateX(-50%); 
 text-align: center;
-font-size: 12px;
+font-size: clamp(10px, 1vw, 18px);
 white-space: nowrap;
 display: flex;
 flex-direction: column;
 align-items: center;
 transition: opacity 1.5s ease-in-out;
 justify-content: space-between; 
+color: rgb(0, 0, 0);
+transform: rotate(180deg);
+writing-mode: vertical-rl;
+width: 100%;
+height: 30%;
+bottom: 40px;
+left: 0;
+padding: -20px 0;
+line-height: 1.2;
+z-index: 50;
+display: flex;
+align-items: flex-start;
+justify-content: center;
+text-align: right;
+z-index: 500;
 }
 
 .value-label {
@@ -235,7 +252,7 @@ justify-content: space-between;
     transform: translateX(-50%);
     padding: 2px 5px;
     text-align: center;
-    font-size: 12px;
+    font-size: clamp(8px, 1vw, 18px);
     white-space: nowrap;
     display: flex;
     flex-direction: column;
@@ -245,6 +262,14 @@ justify-content: space-between;
     padding-bottom: 5px;
     transition: opacity 1.5s ease-in-out;
     color: white;  
+    transform: rotate(180deg);
+    left: 25%;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    height: auto;
+    width: 20px;
+    bottom: auto;
+    padding: 3px 0;
 }
 
 .main-labels {
@@ -259,29 +284,37 @@ justify-content: flex-end;
 height: auto; 
 }
 
+.main-labels span:first-child {
+    color: white;
+    z-index: 500;
+}
 
-.secondary-labels {
-position: absolute; 
-left: 50%; 
-top: 0px; 
-transform: translateX(-50%); 
-display: flex;
-flex-direction: column;
-align-items: center;
-cursor: default;
+.ex-score .bar-label .main-labels span:first-child {
+    color: black;
+    z-index: 500;
+}
+
+.bar-label .score {
+    display: none;
 }
 
 .tardy-label {
-    font-size: 1.1em;
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(8px, 1vw, 10px);
     color: red;
-    cursor: default;
 }
 
 .house-points {
-    font-size: 1.1em;
+    position: absolute;
+    bottom: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(10px, 1vw, 14px);
     font-weight: bold;
     transition: background-color 1.0s ease, backdrop-filter 1.0s ease;
-    background-color: rgba(0, 0, 0, 0.9); 
     border-radius: 4px;
     padding: 2px 6px;
 }
@@ -507,87 +540,6 @@ select.attendance-dropdown-select.absent {
     margin: 5px 0;
 }
 
-@media (max-width: 5000px) {
-    .bar {
-        margin: 0 2px; 
-        margin-bottom: -10px;
-        height: 110%;
-    }
-    
-    #graph-container {
-        padding-bottom: 60px; 
-    }
-    
-    .bar-label {
-        font-size: clamp(10px, 1vw, 18px);
-        color: rgb(0, 0, 0);
-        transform: rotate(180deg);
-        writing-mode: vertical-rl;
-        width: 100%;
-        height: 30%;
-        bottom: 40px;
-        left: 0;
-        padding: -20px 0;
-        line-height: 1.2;
-        z-index: 50;
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        text-align: right;
-        z-index: 500;
-    }
-
-    .bar-label .main-labels span:first-child {
-        color: white;
-        z-index: 500;
-    }
-
-    .ex-score .bar-label .main-labels span:first-child {
-        color: black;
-        z-index: 500;
-    }
-
-    .house-points {
-        font-size: clamp(10px, 1vw, 14px);
-        font-weight: bold;
-        transition: background-color 1.0s ease, backdrop-filter 1.0s ease;
-        border-radius: 4px;
-        padding: 2px 6px;
-        position: fixed;
-        top: -69px;
-        transform: translateX(52%) rotate(90deg);
-        z-index: 10;
-    }
-    
-    .value-label {
-        font-size: clamp(8px, 1vw, 18px);
-        transform: rotate(180deg);
-        left: 25%;
-        writing-mode: vertical-rl;
-        text-orientation: mixed;
-        height: auto;
-        width: 20px;
-        bottom: auto;
-        padding: 3px 0;
-    }
-    
-    .secondary-labels {
-        font-size: clamp(10px, 1vw, 14px);
-        bottom: -150%;  
-        cursor: pointer;  
-        z-index: 5;   
-    }
-
-    .tardy-label {
-        cursor: pointer;  
-        z-index: 5;   
-    }
-
-    .bar-label .score {
-        display: none;
-    }
-}
-
 #search-box {
     position: fixed;
     top: 50%;
@@ -744,4 +696,3 @@ transition: transform 0.3s ease;
 .hover-float:hover {
 transform: translateY(-5px);
 }
-

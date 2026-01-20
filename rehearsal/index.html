@@ -93,8 +93,10 @@ const classes = [
         endTime: { hours: 20, minutes: 30 },
         students: expectedList.map(s => ({
             name: s.name,
-            birthdate: s.birthdate,
+            liveschoolName: s.liveschoolName,
             house: s.house,
+            birthdate: s.birthdate,
+            altName: s.altName,
             attendance: 'Absent', // ← Starts Absent
             stands: false,
             intonation: false,
@@ -462,8 +464,7 @@ function updateHousePoints(name, change) {
         updateBarGraph(student);
         const housePointsElement = document.querySelector(`#bar-${CSS.escape(student.name)} .house-points`);
         if (housePointsElement) {
-            const houseInfo = masterList.find(s => s.name === student.name);
-            const houseColor = getHouseColor(houseInfo.house);
+            const houseColor = getHouseColor(student.house);
             housePointsElement.style.transition = 'background-color 1.0s ease, backdrop-filter 1.0s ease';
             housePointsElement.style.backgroundColor = `${houseColor}CC`;
             setTimeout(() => {
@@ -600,8 +601,7 @@ function updateScoreDisplay(student) {
             bar.classList.remove('bdaycolorful');
         }
         bar.style.transition = 'height 0.3s ease-in-out, opacity 0.5s ease';
-        const houseInfo = masterList.find(s => s.name === student.name);
-        const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080';
+        const houseColor = getHouseColor(student.house);
         if (student.score === 'EX') {
             bar.classList.add('ex-score');
             bar.style.height = '0%';
@@ -611,11 +611,9 @@ function updateScoreDisplay(student) {
                         <span>${student.name}</span>
                         <span class="score">EX</span>
                     </div>
-                    <div class="secondary-labels">
-                        ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                        ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
-                    </div>
                 </div>
+                ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
             `;
         } else {
             bar.classList.remove('ex-score');
@@ -627,11 +625,9 @@ function updateScoreDisplay(student) {
                         <span>${student.name}</span>
                         <span class="score">${student.score}%</span>
                     </div>
-                    <div class="secondary-labels">
-                        ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                        ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
-                    </div>
                 </div>
+                ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+                ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
             `;
         }
         const scoreSpan = bar.querySelector('.score');
@@ -735,8 +731,7 @@ function createBars() {
         bar.style.height = student.score === 'EX' ? '0%' : `${student.score}%`;
         bar.id = `bar-${student.name}`;
         bar.dataset.studentName = student.name;
-        const houseInfo = masterList.find(s => s.name === student.name);
-        const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080';
+        const houseColor = getHouseColor(student.house);
         bar.innerHTML = `
             ${student.score !== 'EX' ? `<div class="value-label">${student.score}%</div>` : ''}
             <div class="bar-label">
@@ -744,19 +739,17 @@ function createBars() {
                     <span ${isBday ? 'class="colorful"' : ''}>${student.name}</span>
                     <span class="score">${student.score === 'EX' ? 'EX' : `${student.score}%`}</span>
                 </div>
-                <div class="secondary-labels">
-                    ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
-                    ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
-                </div>
             </div>
+            ${student.attendance === 'Tardy' ? '<div class="tardy-label">Tardy</div>' : ''}
+            ${student.housePoints !== 0 ? `<div class="house-points" style="background-color: ${houseColor}66">${student.housePoints > 0 ? '+' : ''}${student.housePoints}</div>` : ''}
         `;
         bar.addEventListener('mouseover', () => highlightBar(student.name));
         bar.addEventListener('mouseout', () => resetBarHighlights());
         bar.addEventListener('click', (event) => {
             const nameSpan = event.target.closest('.main-labels span:first-child');
             const scoreSpan = event.target.closest('.main-labels span.score');
-            const tardyLabel = event.target.closest('.secondary-labels .tardy-label');
-            const housePoints = event.target.closest('.secondary-labels .house-points');
+            const tardyLabel = event.target.closest('.tardy-label');
+            const housePoints = event.target.closest('.house-points');
             const isNarrowView = window.matchMedia('(max-width: 1200px)').matches;
             if (nameSpan || (!isNarrowView && scoreSpan)) {
                 cycleAttendanceForStudent(student);
@@ -805,18 +798,16 @@ function updateBarGraph(student) {
     const bar = document.getElementById(`bar-${student.name}`);
     if (bar) {
         const housePointsElement = bar.querySelector('.house-points');
-        const secondaryLabels = bar.querySelector('.secondary-labels');
         if (housePointsElement) {
             housePointsElement.remove();
         }
-        if (student.housePoints !== 0 && secondaryLabels) {
-            const houseInfo = masterList.find(s => s.name === student.name);
-            const houseColor = houseInfo ? getHouseColor(houseInfo.house) : '#808080';
+        if (student.housePoints !== 0) {
+            const houseColor = getHouseColor(student.house);
             const newHousePointsElement = document.createElement('div');
             newHousePointsElement.className = 'house-points';
             newHousePointsElement.textContent = student.housePoints > 0 ? `+${student.housePoints}` : student.housePoints;
             newHousePointsElement.style.backgroundColor = `${houseColor}66`;
-            secondaryLabels.appendChild(newHousePointsElement);
+            bar.appendChild(newHousePointsElement);
             newHousePointsElement.style.transition = 'background-color 1.0s ease, backdrop-filter 1.0s ease';
             newHousePointsElement.style.backgroundColor = `${houseColor}CC`;
             setTimeout(() => {
@@ -944,8 +935,10 @@ function addStudent(name) {
     if (masterStudent && !students.some(s => s.name === name)) {
         const newStudent = {
             name: masterStudent.name,
-            birthdate: masterStudent.birthdate,
+            liveschoolName: masterStudent.liveschoolName,
             house: masterStudent.house,
+            birthdate: masterStudent.birthdate,
+            altName: masterStudent.altName,
             attendance: 'Present',
             [currentCriteria[0]]: true,
             [currentCriteria[1]]: true,
@@ -1138,12 +1131,8 @@ function activateHouseshield() {
         return;
     }
     const student = students[currentStudentIndex];
-    const houseInfo = masterList.find(s => s.name === student.name);
-    if (!houseInfo) {
-        return;
-    }
     if (houseshield) {
-        houseshield.style.backgroundImage = `url('https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/${houseInfo.house.toLowerCase()}.png')`;
+        houseshield.style.backgroundImage = `url('https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/${student.house.toLowerCase()}.png')`;
         houseshield.style.display = 'block';
         void houseshield.offsetWidth;
         houseshield.classList.add('active');
@@ -1329,27 +1318,26 @@ function exportScores() {
     }
     const regularStudents = studentsToExport.filter(s => !s.isAdditional);
     const additionalStudents = studentsToExport.filter(s => s.isAdditional);
-    const headers = ['Name', ...regularStudents.map(student => `"${student.name}"`)];
+    const headers = ['Name', ...regularStudents.map(student => `"${student.liveschoolName || student.name}"`)];
     const classworkRow = ['Classwork', ...regularStudents.map(student => `"${student.score === 'EX' ? 'EX' : `${student.score}%`}"`)];
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
     const housePointsItemized = studentsToExport
         .filter(student => student.housePoints !== 0)
         .map(student => {
-            const masterStudent = masterList.find(s => s.name === student.name);
-            const liveschoolName = masterStudent ? masterStudent.liveschoolName : student.name;
+            const liveschoolName = student.liveschoolName || student.name;
             return { name: liveschoolName, points: student.housePoints };
         })
         .sort((a, b) => a.name.localeCompare(b.name))
         .map(item => `"${item.name}",${item.points > 0 ? '+' : ''}${item.points}`);
     const tardiesItemized = (isMsBandThursday ? students : studentsToExport)
         .filter(student => student.attendance === 'Tardy')
-        .map(student => `"${student.name}",Tardy,=DATEVALUE("${dateStr}")`);
+        .map(student => `"${student.liveschoolName || student.name}",Tardy,=DATEVALUE("${dateStr}")`);
     const absencesItemized = (isMsBandThursday ? students : studentsToExport)
         .filter(student => student.attendance === 'Absent')
-        .map(student => `"${student.name}",Absent,=DATEVALUE("${dateStr}")`);
+        .map(student => `"${student.liveschoolName || student.name}",Absent,=DATEVALUE("${dateStr}")`);
     const additionalStudentsMessage = additionalStudents.length > 0
-        ? additionalStudents.map(s => `"${s.name}",Additional`)
+        ? additionalStudents.map(s => `"${s.liveschoolName || s.name}",Additional`)
         : [];
     const finalCsvRows = [
         headers.join(','),
@@ -1391,7 +1379,7 @@ function exportScores() {
         }).join('\n')}`
         : 'No absences';
     const separator = housePointsItemized.length === 0 && tardiesItemized.length === 0 && absencesItemized.length === 0 ? '\n' : '\n\n';
-    const message = `House points for today:\n${housePointsDisplay}${separator}${tardiesDisplay}\n\n${absencesDisplay}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`;
+    const message = `House points for today:\n${housePointsDisplay}${separator}${tardiesDisplay}\n\n${absencesDisplay}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.liveschoolName || s.name).join('\n')}` : ''}\n\nReset scores?`;
     showCustomAlert(message);
     showTemporaryMessage('Scores exported as CSV');
     closeSpecificMenu('teacher-mode');
