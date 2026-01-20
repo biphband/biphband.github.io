@@ -562,7 +562,7 @@ select.attendance-dropdown-select.absent {
     .value-label {
         font-size: clamp(8px, 1vw, 18px);
         transform: rotate(180deg);
-        left: 2%;
+        left: 25%;
         writing-mode: vertical-rl;
         text-orientation: mixed;
         height: auto;

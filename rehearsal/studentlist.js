@@ -1,6 +1,4 @@
-const masterList = [
-    {"name": "Kevin", "liveschoolName": "Kevin Ka Ming Chen", "house": "Red", "birthdate": "2007-06-29", "altName": "Kevin"},
-    {"name": "Angelina", "liveschoolName": "Angelina Sijia Yan", "house": "Blue", "birthdate": "2009-01-15", "altName": "Angelina"},
+const expectedList = [
     {"name": "Shine", "liveschoolName": "Shine Yu Duan", "house": "Blue", "birthdate": "2013-02-14", "altName": "Shine"},
     {"name": "Oscar", "liveschoolName": "Oscar Xinchen Fang", "house": "Red", "birthdate": "2013-03-20", "altName": "Oscar"},
     {"name": "Rebecca", "liveschoolName": "Rebecca Tsz Yin Cheung", "house": "Blue", "birthdate": "2012-05-28", "altName": "Rebecca"},
@@ -13,7 +11,6 @@ const masterList = [
     {"name": "Austen", "liveschoolName": "Austen Lihan Xie", "house": "Yellow", "birthdate": "2013-01-02", "altName": "Austen"},
     {"name": "Stella S", "liveschoolName": "Stella Yizhi Shang", "house": "Green", "birthdate": "2012-02-29", "altName": "Stella Shaong"},
     {"name": "Kyla", "liveschoolName": "Kyla Shi", "house": "Red", "birthdate": "2013-03-25", "altName": "Kyla"},
-    {"name": "Mianmian", "liveschoolName": "Mianmian Mingxuan Lyu", "house": "Red", "birthdate": "2013-03-01", "altName": "Mienn Mienn"},
     {"name": "June", "liveschoolName": "June Ziqiao Qin", "house": "Blue", "birthdate": "2011-06-18", "altName": "June"},
     {"name": "Stella Y", "liveschoolName": "Stella Yuan", "house": "Yellow", "birthdate": "2012-01-28", "altName": "Stella Yunn"},
     {"name": "Grace N", "liveschoolName": "Grace Ning", "house": "Yellow", "birthdate": "2013-03-09", "altName": "Grace Ning"},
@@ -36,11 +33,17 @@ const masterList = [
     {"name": "Luna", "liveschoolName": "Luna Mingxi Zhan", "house": "Red", "birthdate": "2009-07-08", "altName": "Luna"},
     {"name": "Calvin Z", "liveschoolName": "Calvin Zihao Zhang", "house": "Blue", "birthdate": "2010-04-21", "altName": "Calvin Jong"},
     {"name": "Jim", "liveschoolName": "Jim Zi Jing Zheng", "house": "Yellow", "birthdate": "2009-02-16", "altName": "Jimm"},
+];
+
+const masterList = [
+    {"name": "Kevin", "liveschoolName": "Kevin Ka Ming Chen", "house": "Red", "birthdate": "2007-06-29", "altName": "Kevin"},
+    {"name": "Angelina", "liveschoolName": "Angelina Sijia Yan", "house": "Blue", "birthdate": "2009-01-15", "altName": "Angelina"},
+    {"name": "Mianmian", "liveschoolName": "Mianmian Mingxuan Lyu", "house": "Red", "birthdate": "2013-03-01", "altName": "Mienn Mienn"},
     {"name": "Chris", "liveschoolName": "Chris Zirui Peng", "house": "Green", "birthdate": "2007-03-24", "altName": "Chris"},
     {"name": "Lucy", "liveschoolName": "Lucy Ruxin Sheng", "house": "Blue", "birthdate": "2008-05-16", "altName": "Lucy"},
     {"name": "Daniel", "liveschoolName": "Daniel Tianyu He", "house": "Blue", "birthdate": "2009-09-04", "altName": "Daniel"},
     {"name": "Ben", "liveschoolName": "Ben Luyue Chen", "house": "Yellow", "birthdate": "2007-12-17", "altName": "Ben"},
-    {"name": "Stuart", "liveschoolName": "Stuart Beichen Yang", "house": "Yellow", "birthdate": "", "altName": "Stuart"},
+    {"name": "Stuart", "liveschoolName": "Stuart Beichen Yang", "house": "Yellow", "birthdate": "2011-12-18", "altName": "Stuart"},
     {"name": "Kevin J", "liveschoolName": "Kevin Jincheng Jiao", "house": "Blue", "birthdate": "", "altName": "Kevin J"},
     {"name": "Vivi", "liveschoolName": "Vivi Xinran Xia", "house": "Red", "birthdate": "", "altName": "Vivi"},
     {"name": "Jason", "liveschoolName": "Jason Junxing Zhu", "house": "Red", "birthdate": "", "altName": "Jason"},

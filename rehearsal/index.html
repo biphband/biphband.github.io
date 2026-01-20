@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Dashboard</title>
+    <title>BIPH Band Rehearsal</title>
     <link rel="icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -55,7 +55,6 @@
         <h3>Within Menus:</h3>
         <div id="menuHotkeys"></div>
     </div>
-
     <script src="studentlist.js"></script>
     <script src="hotkeys.js"></script>
     <script src="stickynote.js"></script>
@@ -78,52 +77,39 @@ const negativeEffects10to50 = [
     'sounds/villager-negative5.mp3'
 ];
 const negativeEffect0 = 'sounds/villager-negative6.mp3';
-
 function playRandomSound(soundArray) {
     const randomIndex = Math.floor(Math.random() * soundArray.length);
     const audio = new Audio(soundArray[randomIndex]);
     audio.volume = 0.25;
     audio.play();
 }
-
-// SINGLE CLASS: Nutcracker Rehearsal #2
+// SINGLE CLASS: Awards Ceremony Rehearsal
 const classes = [
     {
-name: "Marathon Rehearsal #2",
-days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], // Always active
-
-// timeRange: "7:00pm - 9:00pm",
-// timeRange: "7:15pm - 8:30pm",
-timeRange: "3:00pm - 6:00pm", // New time range
-
-// startTime: { hours: 19, minutes: 0 },
-// startTime: { hours: 19, minutes: 15 },
-startTime: { hours: 15, minutes: 0 }, // New start time
-
-// endTime: { hours: 21, minutes: 0 },
-// endTime: { hours: 20, minutes: 30 },
-endTime: { hours: 18, minutes: 0 }, // New end time
-
-        students: masterList.map(s => ({
+        name: "Awards Ceremony Rehearsal",
+        days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], // Always active
+        timeRange: "7:00pm - 8:30pm",
+        startTime: { hours: 19, minutes: 0 },
+        endTime: { hours: 20, minutes: 30 },
+        students: expectedList.map(s => ({
             name: s.name,
             birthdate: s.birthdate,
             house: s.house,
-            attendance: 'Absent',      // ← Starts Absent
+            attendance: 'Absent', // ← Starts Absent
             stands: false,
-            intonation: false,
             intonation: false,
             returned: false,
             engagement: false,
-            score: 'EX',               // ← Starts EX
+            score: 'EX', // ← Starts EX
             housePoints: 0,
             manualAdjustment: 0
         })),
-        teacherModeOrder: masterList.map(s => s.name),
-        objectivesKey: "nutcrackerObjectives",
+        teacherModeOrder: expectedList.map(s => s.name),
+        objectivesKey: "awardsObjectives",
         defaultObjectives: [
-            'Intrada, Final Waltz',
-            'Clara and the Nutcracker',
-            'Snowflakes, Drosselmeyer'
+            'Warm-up',
+            'Run-through',
+            'Announcements'
         ],
         sampleObjectives: [
             'Warm-up',
@@ -141,25 +127,21 @@ endTime: { hours: 18, minutes: 0 }, // New end time
         criteria: ['stands', 'intonation', 'returned', 'engagement']
     }
 ];
-
 let currentClassIndex = 0;
 let students = classes[0].students;
 let teacherModeOrder = classes[0].teacherModeOrder;
 let currentCriteria = classes[0].criteria;
 let isObjectiveInputFocused = false;
 let isAddingStudent = false;
-
 // Always use the single class
 function getCurrentClass() {
     return 0;
 }
-
 function cycleClass() {
     // No cycling needed — only one class
     updateClassDisplay();
     updateCountdowns();
 }
-
 function updateClassDisplay() {
     const cls = classes[currentClassIndex];
     document.querySelector('#title h1').textContent = cls.name;
@@ -176,22 +158,17 @@ function updateClassDisplay() {
     updateCountdowns();
     loadStickyNotes();
 }
-
 function updateCountdowns() {
     const container = document.getElementById('countdowns');
     container.innerHTML = '';
-
     const now = new Date();
     const cls = classes[currentClassIndex];
-
     const start = new Date(now);
     start.setHours(cls.startTime.hours, cls.startTime.minutes, 0, 0);
     const end = new Date(now);
     end.setHours(cls.endTime.hours, cls.endTime.minutes, 0, 0);
-
     const toStart = (start - now) / 1000;
-    const toEnd   = (end   - now) / 1000;
-
+    const toEnd = (end - now) / 1000;
     // Only show "Rehearsal begins in…" in the last 30 min
     if (toStart > 0 && toStart <= 1800) {
         const m = Math.floor(toStart / 60);
@@ -201,37 +178,30 @@ function updateCountdowns() {
         div.textContent = `Rehearsal begins in ${m}m ${s}s`;
         container.appendChild(div);
     }
-
     // Auto-export the moment rehearsal ends
     if (toEnd < 0 && toEnd > -5) {
         exportScores();
     }
 }
-
 function loadObjectives(key) {
     const cls = classes[0];
     const objectives = JSON.parse(localStorage.getItem(key)) || cls.defaultObjectives;
     updateObjectiveList(objectives);
 }
-
 function saveObjectives(key) {
     const objectives = Array.from(document.querySelectorAll('#objectiveList li')).map(li => li.textContent);
     localStorage.setItem(key, JSON.stringify(objectives));
 }
-
 function updateObjectiveList(objectives) {
     const objectiveList = document.getElementById('objectiveList');
     objectiveList.innerHTML = objectives.map(obj => `<li class="editable" onclick="editObjective(this)">${obj}</li>`).join('');
 }
-
 function editObjective(item) {
     const cls = classes[0];
     const currentItem = item.textContent;
     const index = Array.from(item.parentElement.children).indexOf(item);
-
     const existingDialog = document.querySelector('div[style*="position: fixed"][style*="z-index: 1000"]');
     if (existingDialog) existingDialog.remove();
-
     const dialog = document.createElement('div');
     dialog.style.position = 'fixed';
     dialog.style.top = '50%';
@@ -245,7 +215,6 @@ function editObjective(item) {
     dialog.style.textAlign = 'center';
     dialog.style.lineHeight = '1.3';
     dialog.style.width = '400px';
-
     const suggestions = cls.sampleObjectives.map(obj => `
         <a href="#" style="font-size: 0.85em; text-decoration: none; display: block; margin: 2px 0;"
            onclick="
@@ -257,7 +226,6 @@ function editObjective(item) {
             ${obj}
         </a>
     `).join('');
-
     dialog.innerHTML = `
         <h3>Edit Objective</h3>
         <input type="text" id="objectiveInput" value="${currentItem}" style="width: 80%; padding: 5px;" data-original-value="${currentItem}">
@@ -275,17 +243,14 @@ function editObjective(item) {
         <button onclick="this.closest('div').remove(); window.isObjectiveInputFocused = false;">Cancel</button>
     `;
     document.body.appendChild(dialog);
-
     const input = document.getElementById('objectiveInput');
     setTimeout(() => {
         input.focus();
         input.select();
         window.isObjectiveInputFocused = true;
     }, 0);
-
     input.addEventListener('focus', () => window.isObjectiveInputFocused = true);
     input.addEventListener('blur', () => window.isObjectiveInputFocused = false);
-
     const handleKeydown = (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
@@ -303,7 +268,6 @@ function editObjective(item) {
         }
     };
     document.addEventListener('keydown', handleKeydown);
-
     const handleOutsideClick = (event) => {
         if (!dialog.contains(event.target)) {
             dialog.remove();
@@ -314,14 +278,13 @@ function editObjective(item) {
     };
     setTimeout(() => document.addEventListener('click', handleOutsideClick), 0);
 }
-
 let menuStack = [];
 let currentZIndex = 1000;
 const MODES = {
     GLOBAL: 'global',
     SEARCH: 'search',
     HOUSESHIELD: 'houseshield',
-    STICKY_NOTE: 'sticky_note' 
+    STICKY_NOTE: 'sticky_note'
 };
 let currentMode = MODES.GLOBAL;
 let currentStudentIndex = -1;
@@ -332,7 +295,6 @@ let hasCopiedScores = false;
 let hasResetReturned = false;
 let isActive = false;
 let currentPoints = 0;
-
 function globalKeydownHandler(event) {
     if (event.key === '/' && currentMode === MODES.GLOBAL) {
         event.preventDefault();
@@ -361,9 +323,7 @@ function globalKeydownHandler(event) {
             break;
     }
 }
-
 document.addEventListener('keydown', globalKeydownHandler);
-
 function openMenu(menuId) {
     try {
         if (menuId === 'houseshield') {
@@ -393,7 +353,6 @@ function openMenu(menuId) {
     } catch (error) {
     }
 }
-
 function closeTopMenu() {
     if (menuStack.length > 0) {
         const topMenu = menuStack.pop();
@@ -418,7 +377,6 @@ function closeTopMenu() {
         document.activeElement.blur();
     }
 }
-
 function closeSpecificMenu(menuId) {
     const menuIndex = menuStack.findIndex(menu => menu.id === menuId);
     if (menuIndex !== -1) {
@@ -437,7 +395,6 @@ function closeSpecificMenu(menuId) {
         }
     }
 }
-
 function populateStudents() {
     const spreadsheet = document.querySelector('.spreadsheet');
     const isProductionTech = classes[currentClassIndex].name === "Production Tech";
@@ -492,7 +449,6 @@ function populateStudents() {
         spreadsheet.appendChild(row);
     });
 }
-
 function updateHousePoints(name, change) {
     const student = students.find(s => s.name === name);
     if (student) {
@@ -516,7 +472,6 @@ function updateHousePoints(name, change) {
         }
     }
 }
-
 function getHouseColor(house) {
     switch (house.toLowerCase()) {
         case 'red': return '#FF3333';
@@ -526,7 +481,6 @@ function getHouseColor(house) {
         default: return '#808080';
     }
 }
-
 function toggleTeacherMode() {
     const teacherMode = document.getElementById('teacher-mode');
     if (teacherMode.style.display === 'block') {
@@ -536,16 +490,13 @@ function toggleTeacherMode() {
         populateStudents();
     }
 }
-
 function enterTeacherMode() {
     openMenu('teacher-mode');
     populateStudents();
 }
-
 function exitTeacherMode() {
     closeSpecificMenu('teacher-mode');
 }
-
 function syncAttendance(name, select) {
     const student = students.find(s => s.name === name);
     if (student) {
@@ -583,7 +534,6 @@ function syncAttendance(name, select) {
         }
     }
 }
-
 function syncCheckbox(name, checkbox, type) {
     const student = students.find(s => s.name === name);
     if (student) {
@@ -595,7 +545,6 @@ function syncCheckbox(name, checkbox, type) {
         updateFloatingMenu(student);
     }
 }
-
 function updateScore(name, change) {
     const student = students.find(s => s.name === name);
     if (student && student.score !== 'EX') {
@@ -627,7 +576,6 @@ function updateScore(name, change) {
         }
     }
 }
-
 function calculateScore(student) {
     if (student.attendance === 'Absent') {
         student.score = 'EX';
@@ -642,7 +590,6 @@ function calculateScore(student) {
         student.score = Math.max(0, Math.min(100, baseScore + manualAdjustment));
     }
 }
-
 function updateScoreDisplay(student) {
     const bar = document.getElementById(`bar-${student.name}`);
     if (bar) {
@@ -699,11 +646,9 @@ function updateScoreDisplay(student) {
         }
     }
 }
-
 window.addEventListener('resize', () => {
     students.forEach(student => updateScoreDisplay(student));
 });
-
 function updateTeacherMenu(student) {
     const participationSpan = document.querySelector(`.spreadsheet-row[data-student-name="${student.name}"] .stepper span`);
     if (participationSpan) {
@@ -714,7 +659,6 @@ function updateTeacherMenu(student) {
         housePointsSpan.textContent = student.housePoints;
     }
 }
-
 function updateFloatingMenu(student) {
     const floatingMenu = document.getElementById('floating-menu');
     if (!floatingMenu || floatingMenu.style.display !== 'block') {
@@ -723,7 +667,6 @@ function updateFloatingMenu(student) {
     if (floatingMenu.querySelector('h3').textContent !== student.name) {
         return;
     }
-
     setTimeout(() => {
         const isProductionTech = classes[currentClassIndex].name === "Production Tech";
         const attendanceSelect = floatingMenu.querySelector('select');
@@ -735,7 +678,7 @@ function updateFloatingMenu(student) {
             const property = checkbox.id.replace('checkbox-', '');
             checkbox.checked = student[property];
         });
-        
+       
         let participationSpan = floatingMenu.querySelector('.stepper:nth-child(7) .score');
         if (!participationSpan) {
             participationSpan = floatingMenu.querySelector('.stepper .score');
@@ -744,7 +687,7 @@ function updateFloatingMenu(student) {
             const displayText = student.score === 'EX' ? 'EX' : `${student.score}%`;
             participationSpan.textContent = displayText;
         }
-        
+       
         let housePointsSpan = floatingMenu.querySelector('.stepper:nth-child(8) span:nth-child(3)');
         if (!housePointsSpan) {
             housePointsSpan = floatingMenu.querySelector('.stepper:last-of-type span:nth-child(3)');
@@ -754,7 +697,6 @@ function updateFloatingMenu(student) {
         }
     }, 100);
 }
-
 function updateTardyLabel(student) {
     const bar = document.getElementById(`bar-${student.name}`);
     if (bar) {
@@ -776,7 +718,6 @@ function updateTardyLabel(student) {
         }
     }
 }
-
 function createBars() {
     const container = document.getElementById('graph-container');
     container.innerHTML = '';
@@ -828,7 +769,6 @@ function createBars() {
         container.appendChild(bar);
     });
 }
-
 function isBirthday(birthdate) {
     if (!birthdate) return false;
     const today = new Date();
@@ -838,7 +778,6 @@ function isBirthday(birthdate) {
     const [, birthMonth, birthDay] = birthdate.split('-');
     return `${birthMonth}-${birthDay}` === todayFormatted;
 }
-
 function highlightBar(name) {
     document.querySelectorAll('.bar, .bar-label').forEach(el => {
         if (el.id === `bar-${name}` || el.parentElement.id === `bar-${name}`) {
@@ -852,7 +791,6 @@ function highlightBar(name) {
         }
     });
 }
-
 function resetBarHighlights() {
     document.querySelectorAll('.bar, .bar-label').forEach(el => {
         el.style.opacity = '1';
@@ -863,7 +801,6 @@ function resetBarHighlights() {
         }
     });
 }
-
 function updateBarGraph(student) {
     const bar = document.getElementById(`bar-${student.name}`);
     if (bar) {
@@ -889,7 +826,6 @@ function updateBarGraph(student) {
         updateFloatingMenu(student);
     }
 }
-
 function navigateStudentMenu(direction) {
     if (currentStudentIndex === -1) {
         currentStudentIndex = direction > 0 ? 0 : students.length - 1;
@@ -900,7 +836,6 @@ function navigateStudentMenu(direction) {
     resetBarHighlights();
     showFloatingMenu(null, newStudent.name);
 }
-
 function showFloatingMenu(event, studentName) {
     const floatingMenu = document.getElementById('floating-menu');
     const student = students.find(s => s.name === studentName);
@@ -944,18 +879,15 @@ function showFloatingMenu(event, studentName) {
     openMenu('floating-menu');
     highlightBar(student.name);
 }
-
 function closeFloatingMenu() {
     closeSpecificMenu('floating-menu');
     resetBarHighlights();
 }
-
 function updateDateTime() {
     const now = new Date();
     document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     document.getElementById('currentDay').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
 }
-
 function cycleAttendance() {
     const attendanceOptions = ['Absent', 'Present', 'Tardy'];
     const currentIndex = attendanceOptions.indexOf(students[0].attendance);
@@ -996,7 +928,6 @@ function cycleAttendance() {
         }
     });
 }
-
 function toggleAllCheckboxes(type) {
     const checkboxes = document.querySelectorAll(`.spreadsheet-row .checkbox-container:nth-child(${currentCriteria.indexOf(type) + 3}) input[type="checkbox"]`);
     const anyUnchecked = Array.from(checkboxes).some(cb => !cb.checked);
@@ -1008,7 +939,6 @@ function toggleAllCheckboxes(type) {
         }
     });
 }
-
 function addStudent(name) {
     const masterStudent = masterList.find(s => s.name === name);
     if (masterStudent && !students.some(s => s.name === name)) {
@@ -1047,7 +977,6 @@ function addStudent(name) {
         closeSearchBox();
     }
 }
-
 function createSearchBox() {
     try {
         while (menuStack.length > 0) {
@@ -1072,50 +1001,46 @@ function createSearchBox() {
             ${!isAddingStudent ? '<div id="add-student-option" style="font-size: smaller; color: gray; cursor: pointer;" onmouseover="this.style.textDecoration=\'underline\';" onmouseout="this.style.textDecoration=\'none\';" onclick="toggleAddStudentMode()">Add student</div>' : ''}
         `;
         document.body.appendChild(searchBox);
-        
+       
         searchBox.style.display = 'none';
         void searchBox.offsetWidth;
         searchBox.style.display = 'block';
-        
+       
         searchResults = document.getElementById('search-results');
         if (!searchResults) {
             throw new Error('Search results element not found');
         }
-        
+       
         const searchInput = document.getElementById('search-input');
         if (!searchInput) {
             throw new Error('Search input element not found');
         }
-        
+       
         searchInput.value = '';
         setTimeout(() => {
             searchInput.focus();
             searchInput.select();
         }, 0);
-        
+       
         openMenu('search-box');
         currentMode = MODES.SEARCH;
-
         searchInput.addEventListener('input', () => {
             try {
                 updateSearchResults(searchInput.value);
             } catch (e) {
             }
         });
-
         setTimeout(() => {
             document.addEventListener('click', handleSearchOutsideClick);
         }, 0);
     } catch (error) {
     }
 }
-
 function toggleAddStudentMode() {
     closeSearchBox();
     isAddingStudent = true;
     createSearchBox();
 }
-
 function toggleSearchBox() {
     const searchBox = document.getElementById('search-box');
     if (searchBox) {
@@ -1125,7 +1050,6 @@ function toggleSearchBox() {
         createSearchBox();
     }
 }
-
 function handleSearchOutsideClick(event) {
     const searchBox = document.getElementById('search-box');
     if (searchBox && !searchBox.contains(event.target) && !event.target.closest('.search-button')) {
@@ -1133,7 +1057,6 @@ function handleSearchOutsideClick(event) {
         document.removeEventListener('click', handleSearchOutsideClick);
     }
 }
-
 function updateSearchResults(query) {
     let matchingStudents;
     searchResults.innerHTML = '';
@@ -1151,7 +1074,7 @@ function updateSearchResults(query) {
             .filter(student => !currentStudentNames.includes(student.name))
             .filter(student => student.name.toLowerCase().includes(query.toLowerCase()));
     } else {
-        matchingStudents = students.filter(student => 
+        matchingStudents = students.filter(student =>
             student.name.toLowerCase().includes(query.toLowerCase())
         );
     }
@@ -1174,7 +1097,6 @@ function updateSearchResults(query) {
         addStudentOption.style.display = 'none';
     }
 }
-
 function closeSearchBox() {
     try {
         const searchBox = document.getElementById('search-box');
@@ -1191,7 +1113,6 @@ function closeSearchBox() {
     } catch (error) {
     }
 }
-
 function toggleHouseShield() {
     const houseshield = document.getElementById('houseshield');
     if (houseshield.classList.contains('active')) {
@@ -1200,7 +1121,6 @@ function toggleHouseShield() {
         activateHouseshield();
     }
 }
-
 function activateHouseshield() {
     const houseshield = document.getElementById('houseshield');
     const points = document.getElementById('points');
@@ -1241,14 +1161,12 @@ function activateHouseshield() {
     currentMode = MODES.HOUSESHIELD;
     openMenu('houseshield');
 }
-
 function updatePoints() {
     const points = document.getElementById('points');
     if (points) {
         points.textContent = currentPoints > 0 ? `+${currentPoints}` : currentPoints;
     }
 }
-
 function applyHousePointsChange() {
     const student = students[currentStudentIndex];
     const change = currentPoints - student.housePoints;
@@ -1256,7 +1174,6 @@ function applyHousePointsChange() {
     closeFloatingMenu();
     deactivateHouseshield();
 }
-
 function deactivateHouseshield() {
     const houseshield = document.getElementById('houseshield');
     const points = document.getElementById('points');
@@ -1293,7 +1210,6 @@ function deactivateHouseshield() {
         currentMode = MODES.GLOBAL;
     }
 }
-
 function cycleAttendanceForStudent(student) {
     const attendanceOptions = ['Present', 'Tardy', 'Absent'];
     const currentIndex = attendanceOptions.indexOf(student.attendance);
@@ -1301,12 +1217,10 @@ function cycleAttendanceForStudent(student) {
     student.attendance = attendanceOptions[nextIndex];
     syncAttendance(student.name, { value: student.attendance });
 }
-
 function toggleCheckboxForStudent(student, property) {
     student[property] = !student[property];
     syncCheckbox(student.name, { checked: student[property] }, property);
 }
-
 function toggleOverlay() {
     const overlay = document.getElementById('overlay');
     if (overlay.style.display === 'block') {
@@ -1315,7 +1229,6 @@ function toggleOverlay() {
         openMenu('overlay');
     }
 }
-
 function preloadHouseImages() {
     const houses = ['red', 'blue', 'green', 'yellow'];
     houses.forEach(house => {
@@ -1323,14 +1236,11 @@ function preloadHouseImages() {
         img.src = `https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/${house}.png`;
     });
 }
-
 document.addEventListener('click', function(event) {
     if (menuStack.length === 0) return;
-
     const topMenu = menuStack[menuStack.length - 1];
     const isClickOnMenuIcon = event.target.closest('.menu-icon');
     const isClickOnBar = event.target.closest('.bar');
-
     const exceptions = {
         'teacher-mode': isClickOnMenuIcon,
         'floating-menu': isClickOnBar || isClickOnMenuIcon,
@@ -1338,7 +1248,6 @@ document.addEventListener('click', function(event) {
         'search-box': isClickOnMenuIcon || event.target.closest('.search-button'),
         'overlay': isClickOnMenuIcon
     };
-
     if (!topMenu.contains(event.target) && !exceptions[topMenu.id]) {
         if (topMenu.id === 'houseshield') {
             deactivateHouseshield();
@@ -1349,7 +1258,6 @@ document.addEventListener('click', function(event) {
         }
     }
 });
-
 document.addEventListener('click', function(event) {
     if (event.target.closest('.spreadsheet-row .student-name')) {
         const studentName = event.target.closest('.student-name').textContent;
@@ -1359,10 +1267,8 @@ document.addEventListener('click', function(event) {
         }
     }
 });
-
 document.addEventListener('keydown', (event) => {
 }, true);
-
 window.onload = function() {
     preloadHouseImages();
     currentClassIndex = 0;
@@ -1372,16 +1278,13 @@ window.onload = function() {
     setInterval(updateDateTime, 60000);
     setInterval(updateCountdowns, 1000);
 };
-
 createBars();
 updateDateTime();
 setInterval(updateDateTime, 1000);
-
-
 function exportScores() {
     let studentsToExport = students;
     const isMsBandThursday = classes[currentClassIndex].name === "MS Band ᵀᴴᵁᴿˢ";
-    
+   
     if (isMsBandThursday) {
         studentsToExport = msBandStudents.map(student => {
             const thursdayStudent = msBandThursdayStudents.find(s => s.name === student.name);
@@ -1412,7 +1315,6 @@ function exportScores() {
             }
         });
     }
-
     let allAbsent = true;
     for (const student of studentsToExport) {
         if (student.attendance !== 'Absent' || student.score !== 'EX') {
@@ -1420,21 +1322,17 @@ function exportScores() {
             break;
         }
     }
-    
+   
     if (allAbsent) {
         showTemporaryMessage('No changes detected—all students absent/EX. CSV not exported.');
         return;
     }
-
     const regularStudents = studentsToExport.filter(s => !s.isAdditional);
     const additionalStudents = studentsToExport.filter(s => s.isAdditional);
-
     const headers = ['Name', ...regularStudents.map(student => `"${student.name}"`)];
     const classworkRow = ['Classwork', ...regularStudents.map(student => `"${student.score === 'EX' ? 'EX' : `${student.score}%`}"`)];
-
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
-
     const housePointsItemized = studentsToExport
         .filter(student => student.housePoints !== 0)
         .map(student => {
@@ -1444,19 +1342,15 @@ function exportScores() {
         })
         .sort((a, b) => a.name.localeCompare(b.name))
         .map(item => `"${item.name}",${item.points > 0 ? '+' : ''}${item.points}`);
-
     const tardiesItemized = (isMsBandThursday ? students : studentsToExport)
         .filter(student => student.attendance === 'Tardy')
         .map(student => `"${student.name}",Tardy,=DATEVALUE("${dateStr}")`);
-
     const absencesItemized = (isMsBandThursday ? students : studentsToExport)
         .filter(student => student.attendance === 'Absent')
         .map(student => `"${student.name}",Absent,=DATEVALUE("${dateStr}")`);
-
     const additionalStudentsMessage = additionalStudents.length > 0
         ? additionalStudents.map(s => `"${s.name}",Additional`)
         : [];
-
     const finalCsvRows = [
         headers.join(','),
         classworkRow.join(','),
@@ -1465,7 +1359,6 @@ function exportScores() {
         ...(absencesItemized.length > 0 ? ['', 'Absences', ...absencesItemized] : []),
         ...(additionalStudentsMessage.length > 0 ? additionalStudentsMessage : [])
     ];
-
     const csvFileDateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
     const className = classes[currentClassIndex].name.replace(/[^a-zA-Z0-9]/g, '_');
     const csvContent = finalCsvRows.join('\n');
@@ -1479,20 +1372,19 @@ function exportScores() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-
-    const housePointsDisplay = housePointsItemized.length > 0 
+    const housePointsDisplay = housePointsItemized.length > 0
         ? housePointsItemized.map(item => {
             const [name, points] = item.split(',');
             return `${name.replace(/"/g, '')}: ${points}`;
         }).join('\n')
         : 'No house points';
-    const tardiesDisplay = tardiesItemized.length > 0 
+    const tardiesDisplay = tardiesItemized.length > 0
         ? `Tardies:\n${tardiesItemized.map(item => {
             const [name] = item.split(',');
             return `${name.replace(/"/g, '')}`;
         }).join('\n')}`
         : 'No tardies';
-    const absencesDisplay = absencesItemized.length > 0 
+    const absencesDisplay = absencesItemized.length > 0
         ? `Absences:\n${absencesItemized.map(item => {
             const [name] = item.split(',');
             return `${name.replace(/"/g, '')}`;
@@ -1500,12 +1392,10 @@ function exportScores() {
         : 'No absences';
     const separator = housePointsItemized.length === 0 && tardiesItemized.length === 0 && absencesItemized.length === 0 ? '\n' : '\n\n';
     const message = `House points for today:\n${housePointsDisplay}${separator}${tardiesDisplay}\n\n${absencesDisplay}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.name).join('\n')}` : ''}\n\nReset scores?`;
-
     showCustomAlert(message);
     showTemporaryMessage('Scores exported as CSV');
     closeSpecificMenu('teacher-mode');
 }
-
 function showCustomAlert(message) {
     const alertOverlay = document.createElement('div');
     alertOverlay.id = 'alert-overlay';
@@ -1519,7 +1409,6 @@ function showCustomAlert(message) {
     alertOverlay.style.justifyContent = 'center';
     alertOverlay.style.alignItems = 'center';
     alertOverlay.style.zIndex = '9999';
-
     const alertBox = document.createElement('div');
     alertBox.style.backgroundColor = 'white';
     alertBox.style.padding = '20px';
@@ -1533,12 +1422,10 @@ function showCustomAlert(message) {
     setTimeout(() => {
         alertBox.style.transform = 'scale(1)';
     }, 10);
-
     const messageElement = document.createElement('pre');
     messageElement.textContent = message;
     messageElement.style.whiteSpace = 'pre-wrap';
     messageElement.style.wordBreak = 'break-word';
-
     const okButton = document.createElement('button');
     okButton.textContent = 'OK';
     okButton.style.marginTop = '10px';
@@ -1547,7 +1434,6 @@ function showCustomAlert(message) {
         resetAllStudents();
         closeAlert();
     };
-
     const closeButton = document.createElement('button');
     closeButton.textContent = '×';
     closeButton.style.position = 'absolute';
@@ -1558,14 +1444,12 @@ function showCustomAlert(message) {
     closeButton.style.fontSize = '20px';
     closeButton.style.cursor = 'pointer';
     closeButton.onclick = closeAlert;
-
     alertBox.appendChild(closeButton);
     alertBox.appendChild(messageElement);
     alertBox.appendChild(okButton);
     alertOverlay.appendChild(alertBox);
     document.body.appendChild(alertOverlay);
 }
-
 function closeAlert() {
     const alertOverlay = document.getElementById('alert-overlay');
     if (alertOverlay) {
@@ -1577,7 +1461,6 @@ function closeAlert() {
         }, 300);
     }
 }
-
 function showTemporaryMessage(message) {
     const messageElement = document.createElement('div');
     messageElement.textContent = message;
@@ -1593,7 +1476,6 @@ function showTemporaryMessage(message) {
     messageElement.style.opacity = '1';
     messageElement.style.transition = 'opacity 1s ease-in-out';
     document.body.appendChild(messageElement);
-
     setTimeout(() => {
         messageElement.style.opacity = '0';
         setTimeout(() => {
@@ -1601,12 +1483,11 @@ function showTemporaryMessage(message) {
         }, 1000);
     }, 1000);
 }
-
 function resetAllStudents() {
     students.forEach(student => {
         student.attendance = 'Absent';
         student.stands = false;
-        student.intonation = false;   // ← changed
+        student.intonation = false; // ← changed
         student.devices = false;
         student.review = false;
         student.returned = false;
@@ -1616,19 +1497,15 @@ function resetAllStudents() {
         student.housePoints = 0;
         updateScoreDisplay(student);
     });
-
     document.querySelectorAll('.attendance-dropdown select').forEach(select => {
         select.value = 'Absent';
     });
-
     document.querySelectorAll('.checkbox-container input[type="checkbox"]').forEach(checkbox => {
         checkbox.checked = false;
     });
-
     document.querySelectorAll('.spreadsheet-row .stepper:last-child span').forEach(span => {
         span.textContent = '0';
     });
-
     const bars = document.querySelectorAll('.bar');
     bars.forEach(bar => {
         bar.style.transition = 'height 0.5s ease-in-out, width 0.5s ease-in-out';
@@ -1638,7 +1515,6 @@ function resetAllStudents() {
         createBars();
     }, 500);
 }
-
 createBars();
 updateDateTime();
 setInterval(updateDateTime, 1000);
