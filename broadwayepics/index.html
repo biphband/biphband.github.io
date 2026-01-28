@@ -167,7 +167,7 @@
       background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(30, 30, 30, 0.8));
       border-radius: 5px;
       width: 250px;
-      height: 90vh;
+      height: 88vh;
       padding-top: 20px;
       transition: left 0.3s ease-in-out, opacity 0.3s ease-in-out;
       opacity: 0;
@@ -510,7 +510,8 @@
 
       if (isIOS) {
         // On iPad/iOS: open directly in new tab for native PDF viewer (full pages, interactivity)
-        window.open(filePath, '_blank');
+        window.location.href = filePath;
+        // window.open(filePath, '_blank');
       } else {
         // Desktop / non-iOS: keep iframe modal
         document.getElementById('pdf-iframe').src = filePath;
