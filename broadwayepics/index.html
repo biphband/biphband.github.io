@@ -125,7 +125,12 @@
       margin-left: 7px;
       top: 20px;
       left: 13px;
-      z-index: 1000;
+      z-index: 10002;
+      transition: top 0.3s ease-in-out;
+    }
+
+    .hamburger-menu.open {
+      top: 10px;
     }
 
     .menu-toggle {
@@ -138,7 +143,7 @@
       border: none;
       cursor: pointer;
       padding: 20;
-      z-index: 1001;
+      z-index: 10003;
     }
 
     .menu-toggle span {
@@ -173,6 +178,7 @@
       transition: all 0.3s ease-in-out;
       opacity: 0;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      z-index: 10002;
     }
 
     .menu-items.show {
@@ -237,22 +243,71 @@
       width: 130px;
       height: auto;
     }
+
+    /* Recorder styles */
+    #recorder-floating section {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: calc(100% - 30px); /* Account for header */
+      padding: 10px;
+    }
+    #recorder-floating input, #recorder-floating button {
+      margin: 5px;
+      padding: 8px 16px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+    }
+    #recorder-floating button {
+      background-color: #007aff;
+      color: white;
+    }
+    #recorder-floating button:disabled {
+      background-color: #ccc;
+    }
+    #recorder-floating video {
+      width: 100%;
+      max-height: 60%;
+      background-color: black;
+      object-fit: contain;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    #recorder-floating #preview {
+      transform: scaleX(-1);
+      -webkit-transform: scaleX(-1);
+    }
+    #recorder-floating #playback {
+      transform: none;
+      -webkit-transform: none;
+    }
+    #recorder-floating #record-btn.recording {
+      background-color: #ff3b30;
+    }
+    #recorder-floating h2 {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
   <div class="hamburger-menu">
-    <menubutton class="menu-toggle" onclick="toggleMenu()">
+    <button class="menu-toggle" onclick="toggleMenu()">
       <span></span>
       <span></span>
       <span></span>
-    </menubutton>
+    </button>
     <div class="menu-items" id="menu-items">
             <div class="menu-title">BIPH Music</div>
             <a href="https://biphband.github.io/">Home</a>
             <a href="https://biphband.github.io/awardsceremony/">Mid-Year Awards Ceremony</a>
             <a href="https://biphband.github.io/broadwayepics/">Broadway Epics</a>
             <a href="https://biphband.github.io/tuner/">Tuner</a>
-            <a href="https://biphband.github.io/camera/">Video Recorder</a>
+            <a onclick="openRecorder(); return false;">Video Recorder</a>
             <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
             <div class="menu-footer"><img src="../qr.png" alt="QR Code" class="qr-image">© Garrison Tubbs 2026</div>
         </div>
@@ -264,6 +319,33 @@
 
     <div id="instrument-selection" class="space-y-6 mb-8"></div>
     <img src="Full logo original.png" class="logo">
+  </div>
+
+  <!-- PDF Modal -->
+  <div id="pdf-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center; flex-direction:column;">
+    <button id="close-pdf" style="background:red; color:white; padding:8px 16px; border:none; border-radius:5px; cursor:pointer; margin-bottom:10px;">Close</button>
+    <iframe id="pdf-iframe" style="width:95vw; height:90vh; border:none;"></iframe>
+  </div>
+
+  <!-- Floating Recorder Window -->
+  <div id="recorder-floating" style="display:none; position:fixed; bottom:20px; right:20px; width:320px; height:480px; background:white; border:2px solid #007aff; border-radius:12px; z-index:10001; overflow:hidden; box-shadow:0 4px 8px rgba(0,0,0,0.2);">
+    <div id="recorder-header" style="height:30px; background:#007aff; color:white; text-align:center; line-height:30px; cursor:move; position:relative;">Video Recorder
+      <button id="close-recorder" style="position:absolute; top:0; right:0; background:red; color:white; border:none; padding:2px 8px; cursor:pointer;">X</button>
+    </div>
+    <section id="password-section">
+      <h2>Enter Password</h2>
+      <input type="password" id="password-input" placeholder="Password" autocomplete="off" onkeydown="handleKeyDown(event)">
+      <button onclick="checkPassword()">Submit</button>
+    </section>
+    <section id="recording-section" style="display: none;">
+      <video id="preview" autoplay playsinline muted></video>
+      <button id="record-btn" onclick="toggleRecording()">🔴 Record</button>
+    </section>
+    <section id="playback-section" style="display: none;">
+      <video id="playback" controls playsinline></video>
+      <button onclick="reRecord()">Re-Record</button>
+      <button onclick="shareVideo()">AirDrop/Share</button>
+    </section>
   </div>
 
   <script>
@@ -336,27 +418,249 @@
 
     function displayContent(file) {
       const filePath = `Broadway Epics 2026_Parts/${file}`;
-      window.location.href = filePath;
+      document.getElementById('pdf-iframe').src = filePath;
+      document.getElementById('pdf-modal').style.display = 'flex';
     }
 
+    // Close PDF modal
+    document.getElementById('close-pdf').addEventListener('click', () => {
+      document.getElementById('pdf-modal').style.display = 'none';
+      document.getElementById('pdf-iframe').src = '';
+    });
+
     // Hamburger menu functionality
-    const menuToggle = document.querySelector('.menu-toggle');
-    const menuItems = document.querySelector('.menu-items');
-    
-    menuToggle.addEventListener('click', () => {
+    function toggleMenu() {
+      const hamburgerMenu = document.querySelector('.hamburger-menu');
+      const menuToggle = document.querySelector('.menu-toggle');
+      const menuItems = document.querySelector('.menu-items');
+      hamburgerMenu.classList.toggle('open');
       menuToggle.classList.toggle('open');
       menuItems.classList.toggle('show');
-    });
-    
+    }
+
     // Close the menu when clicking outside
     document.addEventListener('click', (event) => {
-      if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
-        menuToggle.classList.remove('open');
-        menuItems.classList.remove('show');
+      const hamburgerMenu = document.querySelector('.hamburger-menu');
+      const menuItems = document.querySelector('.menu-items');
+      if (!hamburgerMenu.contains(event.target) && menuItems.classList.contains('show')) {
+        toggleMenu();
+      }
+    });
+
+    // Close menu on Escape key
+    document.addEventListener('keydown', function(event) {
+      const menuItems = document.querySelector('.menu-items');
+      if (event.key === 'Escape' && menuItems.classList.contains('show')) {
+        toggleMenu();
       }
     });
 
     showInstrumentSelection();
+
+    // Recorder functionality
+    const hardcodedPassword = atob('a3Jha2Vu'); // Obfuscated password
+    let mediaRecorder;
+    let recordedChunks = [];
+    let recordedBlob;
+    let mediaStream;
+    let isRecording = false;
+
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+
+    function handleKeyDown(event) {
+      if (event.key === 'Enter') {
+        checkPassword();
+      }
+    }
+
+    function checkPassword() {
+      const input = document.getElementById('password-input').value;
+      if (input === hardcodedPassword) {
+        document.getElementById('password-section').style.display = 'none';
+        document.getElementById('recording-section').style.display = 'flex';
+        initCamera();
+      } else {
+        alert('Incorrect password');
+      }
+    }
+
+    async function initCamera() {
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { 
+            facingMode: 'user',
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          },
+          audio: true
+        });
+        const preview = document.getElementById('preview');
+        preview.srcObject = mediaStream;
+        adjustWindowHeight(preview);
+      } catch (err) {
+        alert('Error accessing camera/microphone: ' + err.message);
+      }
+    }
+
+    function toggleRecording() {
+      if (!isRecording) {
+        startRecording();
+      } else {
+        stopRecording();
+      }
+    }
+
+    function startRecording() {
+      recordedChunks = [];
+      let mimeType = 'video/mp4';
+      if (isSafari || isChrome) {
+        mimeType = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2';
+      }
+      mediaRecorder = new MediaRecorder(mediaStream, { mimeType: mimeType });
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) recordedChunks.push(event.data);
+      };
+      mediaRecorder.onstop = () => {
+        recordedBlob = new Blob(recordedChunks, { type: 'video/mp4' });
+        document.getElementById('recording-section').style.display = 'none';
+        document.getElementById('playback-section').style.display = 'flex';
+        const playback = document.getElementById('playback');
+        playback.src = URL.createObjectURL(recordedBlob);
+        adjustWindowHeight(playback);
+      };
+      mediaRecorder.start(1000); // Use timeslice to ensure chunks include audio
+      isRecording = true;
+      const btn = document.getElementById('record-btn');
+      btn.innerHTML = '🟥 Stop';
+      btn.classList.add('recording');
+    }
+
+    function stopRecording() {
+      mediaRecorder.stop();
+      isRecording = false;
+      const btn = document.getElementById('record-btn');
+      btn.innerHTML = '🔴 Record';
+      btn.classList.remove('recording');
+    }
+
+    function reRecord() {
+      document.getElementById('playback-section').style.display = 'none';
+      document.getElementById('recording-section').style.display = 'flex';
+      // Reset for new recording
+      recordedBlob = null;
+      recordedChunks = [];
+      document.getElementById('playback').src = '';
+      document.getElementById('recorder-floating').style.height = '480px'; // Reset to default
+    }
+
+    async function shareVideo() {
+      if (!recordedBlob) return;
+      const file = new File([recordedBlob], 'recording.mp4', { type: 'video/mp4' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'Recorded Video',
+            text: 'Share this video'
+          });
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            console.error('Sharing error:', err);
+          }
+        }
+      } else {
+        // Fallback for environments where sharing files is not supported (e.g., desktop Safari)
+        const url = URL.createObjectURL(recordedBlob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'recording.mp4';
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+    }
+
+    function adjustWindowHeight(video) {
+      video.addEventListener('loadedmetadata', () => {
+        const aspect = video.videoWidth / video.videoHeight;
+        const recorderFloating = document.getElementById('recorder-floating');
+        if (aspect > 1) { // landscape
+          recorderFloating.style.height = '360px';
+        } else {
+          recorderFloating.style.height = '480px';
+        }
+      }, { once: true });
+    }
+
+    // Open recorder floating window
+    function openRecorder() {
+      document.getElementById('recorder-floating').style.display = 'block';
+      document.getElementById('password-input').focus();
+      toggleMenu(); // Close menu after opening
+    }
+
+    // Close recorder
+    document.getElementById('close-recorder').addEventListener('click', () => {
+      document.getElementById('recorder-floating').style.display = 'none';
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+      }
+      // Reset sections
+      document.getElementById('password-section').style.display = 'flex';
+      document.getElementById('recording-section').style.display = 'none';
+      document.getElementById('playback-section').style.display = 'none';
+      document.getElementById('recorder-floating').style.height = '480px'; // Reset to default
+    });
+
+    // Draggable functionality for recorder window
+    let isDragging = false;
+    let initialX;
+    let initialY;
+    const recorderFloating = document.getElementById('recorder-floating');
+    const recorderHeader = document.getElementById('recorder-header');
+
+    recorderHeader.addEventListener('mousedown', dragStart);
+    recorderHeader.addEventListener('touchstart', dragStart);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('touchmove', drag, { passive: false });
+    document.addEventListener('mouseup', dragEnd);
+    document.addEventListener('touchend', dragEnd);
+
+    function dragStart(e) {
+      if (e.type === 'touchstart') {
+        initialX = e.touches[0].clientX - recorderFloating.offsetLeft;
+        initialY = e.touches[0].clientY - recorderFloating.offsetTop;
+      } else {
+        initialX = e.clientX - recorderFloating.offsetLeft;
+        initialY = e.clientY - recorderFloating.offsetTop;
+      }
+      isDragging = true;
+    }
+
+    function drag(e) {
+      if (isDragging) {
+        e.preventDefault();
+        let currentX, currentY;
+        if (e.type === 'touchmove') {
+          currentX = e.touches[0].clientX - initialX;
+          currentY = e.touches[0].clientY - initialY;
+        } else {
+          currentX = e.clientX - initialX;
+          currentY = e.clientY - initialY;
+        }
+        recorderFloating.style.left = `${currentX}px`;
+        recorderFloating.style.top = `${currentY}px`;
+        recorderFloating.style.right = 'auto';
+        recorderFloating.style.bottom = 'auto';
+      }
+    }
+
+    function dragEnd() {
+      isDragging = false;
+    }
   </script>
 </body>
 </html>
