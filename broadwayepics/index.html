@@ -238,7 +238,7 @@
       height: auto;
     }
 
-    /* Recorder styles */
+    /* Recorder styles unchanged */
     #recorder-floating {
       display: none;
       position: fixed;
@@ -397,13 +397,13 @@
     <img src="Full logo original.png" class="logo">
   </div>
 
-  <!-- PDF Modal -->
+  <!-- PDF Modal (kept but now mostly fallback for non-iOS) -->
   <div id="pdf-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center; flex-direction:column;">
     <button id="close-pdf" style="background:red; color:white; padding:8px 16px; border:none; border-radius:5px; cursor:pointer; margin-bottom:10px;">Close</button>
     <iframe id="pdf-iframe" style="width:95vw; height:90vh; border:none;"></iframe>
   </div>
 
-  <!-- Floating Recorder Window -->
+  <!-- Floating Recorder Window (unchanged) -->
   <div id="recorder-floating">
     <div id="recorder-header">Video Recorder
       <button id="close-recorder" style="position:absolute; top:0; right:0; background:red; color:white; border:none; padding:2px 8px; cursor:pointer;">X</button>
@@ -501,10 +501,21 @@
       }
     }
 
+    // iOS/iPad detection
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
     function displayContent(file) {
       const filePath = `Broadway Epics 2026_Parts/${file}`;
-      document.getElementById('pdf-iframe').src = filePath;
-      document.getElementById('pdf-modal').style.display = 'flex';
+
+      if (isIOS) {
+        // On iPad/iOS: open directly in new tab for native PDF viewer (full pages, interactivity)
+        window.open(filePath, '_blank');
+      } else {
+        // Desktop / non-iOS: keep iframe modal
+        document.getElementById('pdf-iframe').src = filePath;
+        document.getElementById('pdf-modal').style.display = 'flex';
+      }
     }
 
     document.getElementById('close-pdf').addEventListener('click', () => {
@@ -512,7 +523,7 @@
       document.getElementById('pdf-iframe').src = '';
     });
 
-    // Simplified Hamburger menu functionality
+    // Simplified Hamburger menu functionality (unchanged)
     const menuToggle = document.querySelector('.menu-toggle');
     const menuItems = document.querySelector('.menu-items');
 
@@ -521,7 +532,6 @@
       menuItems.classList.toggle('show');
     });
 
-    // Close menu when clicking outside
     document.addEventListener('click', (event) => {
       if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
         menuToggle.classList.remove('open');
@@ -529,7 +539,6 @@
       }
     });
 
-    // Optional: Close with Escape key
     document.addEventListener('keydown', function(event) {
       if (event.key === 'Escape') {
         menuToggle.classList.remove('open');
@@ -539,8 +548,8 @@
 
     showInstrumentSelection();
 
-    // Recorder functionality
-    const hardcodedPassword = atob('a3Jha2Vu'); // "kraken"
+    // Recorder functionality (unchanged from previous version)
+    const hardcodedPassword = atob('a3Jha2Vu');
     let mediaRecorder;
     let recordedChunks = [];
     let recordedBlob;
@@ -701,7 +710,6 @@
     function openRecorder() {
       document.getElementById('recorder-floating').style.display = 'block';
       document.getElementById('password-input').focus();
-      // Close menu when opening recorder
       menuToggle.classList.remove('open');
       menuItems.classList.remove('show');
     }
@@ -723,7 +731,6 @@
 
     document.getElementById('stop-minimized').addEventListener('click', stopRecording);
 
-    // Draggable recorder window
     let isDragging = false;
     let initialX, initialY;
     const recorderHeader = document.getElementById('recorder-header');
