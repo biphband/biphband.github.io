@@ -24,8 +24,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow-x: hidden; /* Prevent horizontal scrolling */
-      overflow-y: auto; /* Allow vertical scrolling */
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
     .container {
@@ -40,17 +40,17 @@
       padding-top: 0px; 
       padding-bottom: 100px;
       position: relative; 
-      overflow: hidden; /* Hide overflow within container */
+      overflow: hidden;
     }
 
     h1 {
       color: rgba(2, 24, 168, 0.758); 
       font-family: 'Zapfino', cursive; 
-      font-size: clamp(1.5rem, 3vw, 1.5rem); /* Smaller font on narrow viewports */
+      font-size: clamp(1.5rem, 3vw, 1.5rem);
       text-align: center;
       margin-top: 20px; 
       margin-bottom: -50px;
-      white-space: nowrap; /* Prevent line breaks */
+      white-space: nowrap;
     }
 
     .family-section { 
@@ -77,7 +77,7 @@
       border: 1px solid #1e40af; 
       border-radius: 6px; 
       padding: 12px 20px; 
-      font-size: clamp(0.9rem, 2.5vw, 1.1rem); /* Responsive button text size */
+      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
       touch-action: manipulation;
       flex: 1; 
       min-width: 80px; 
@@ -122,15 +122,9 @@
 
     .hamburger-menu {
       position: absolute;
-      margin-left: 7px;
       top: 20px;
       left: 13px;
       z-index: 10002;
-      transition: top 0.3s ease-in-out;
-    }
-
-    .hamburger-menu.open {
-      top: 10px;
     }
 
     .menu-toggle {
@@ -142,7 +136,7 @@
       background: transparent;
       border: none;
       cursor: pointer;
-      padding: 20;
+      padding: 0;
       z-index: 10003;
     }
 
@@ -168,14 +162,14 @@
 
     .menu-items {
       position: absolute;
-      top: 25px;
+      top: 40px;
       left: -250px;
       background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(30, 30, 30, 0.8));
       border-radius: 5px;
       width: 250px;
       height: 90vh;
       padding-top: 20px;
-      transition: all 0.3s ease-in-out;
+      transition: left 0.3s ease-in-out, opacity 0.3s ease-in-out;
       opacity: 0;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       z-index: 10002;
@@ -186,19 +180,19 @@
       opacity: 1;
     }
 
-        .menu-items a {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 22px;
-            color: white;
-            text-decoration: none;
-            font-size: 1rem;
-            opacity: 0;
-            transform: translateX(-20px);
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-            white-space: nowrap;
-        }
+    .menu-items a {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 22px;
+      color: white;
+      text-decoration: none;
+      font-size: 1rem;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+      white-space: nowrap;
+    }
 
     .menu-items.show a {
       opacity: 1;
@@ -245,15 +239,50 @@
     }
 
     /* Recorder styles */
+    #recorder-floating {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 320px;
+      height: 480px;
+      background: white;
+      border: 2px solid #007aff;
+      border-radius: 12px;
+      z-index: 10001;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: height 0.3s ease, width 0.3s ease;
+    }
+
+    #recorder-floating.minimized {
+      height: 70px !important;
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0,122,255,0.4);
+    }
+
+    #recorder-header {
+      height: 30px;
+      background: #007aff;
+      color: white;
+      text-align: center;
+      line-height: 30px;
+      cursor: move;
+      position: relative;
+      font-weight: 500;
+    }
+
     #recorder-floating section {
       text-align: center;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: calc(100% - 30px); /* Account for header */
+      height: calc(100% - 30px);
       padding: 10px;
     }
+
     #recorder-floating input, #recorder-floating button {
       margin: 5px;
       padding: 8px 16px;
@@ -262,13 +291,16 @@
       border: none;
       cursor: pointer;
     }
+
     #recorder-floating button {
       background-color: #007aff;
       color: white;
     }
+
     #recorder-floating button:disabled {
       background-color: #ccc;
     }
+
     #recorder-floating video {
       width: 100%;
       max-height: 60%;
@@ -277,42 +309,86 @@
       border-radius: 8px;
       margin: 10px 0;
     }
+
     #recorder-floating #preview {
       transform: scaleX(-1);
       -webkit-transform: scaleX(-1);
     }
+
     #recorder-floating #playback {
       transform: none;
       -webkit-transform: none;
     }
+
     #recorder-floating #record-btn.recording {
       background-color: #ff3b30;
     }
+
     #recorder-floating h2 {
       font-size: 1.2em;
       margin-bottom: 10px;
+    }
+
+    #minimized-section {
+      height: 100%;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      font-family: system-ui, sans-serif;
+    }
+
+    #rec-dot {
+      width: 12px;
+      height: 12px;
+      background: #ff3b30;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    #timer {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    #stop-minimized {
+      background: #ff3b30;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 1.4rem;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.4; }
+      100% { opacity: 1; }
     }
   </style>
 </head>
 <body>
   <div class="hamburger-menu">
-    <button class="menu-toggle" onclick="toggleMenu()">
+    <button class="menu-toggle">
       <span></span>
       <span></span>
       <span></span>
     </button>
     <div class="menu-items" id="menu-items">
-            <div class="menu-title">BIPH Music</div>
-            <a href="https://biphband.github.io/">Home</a>
-            <a href="https://biphband.github.io/awardsceremony/">Mid-Year Awards Ceremony</a>
-            <a href="https://biphband.github.io/broadwayepics/">Broadway Epics</a>
-            <a href="https://biphband.github.io/tuner/">Tuner</a>
-            <a onclick="openRecorder(); return false;">Video Recorder</a>
-            <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
-            <div class="menu-footer"><img src="../qr.png" alt="QR Code" class="qr-image">© Garrison Tubbs 2026</div>
-        </div>
+      <div class="menu-title">BIPH Music</div>
+      <a href="https://biphband.github.io/">Home</a>
+      <a href="https://biphband.github.io/awardsceremony/">Mid-Year Awards Ceremony</a>
+      <a href="https://biphband.github.io/broadwayepics/">Broadway Epics</a>
+      <a href="https://biphband.github.io/tuner/">Tuner</a>
+      <a onclick="openRecorder(); return false;">Video Recorder</a>
+      <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
+      <div class="menu-footer"><img src="../qr.png" alt="QR Code" class="qr-image">© Garrison Tubbs 2026</div>
+    </div>
   </div>
-
 
   <div class="container mx-auto flex flex-col justify-center min-h-screen">
     <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">Broadway Epics 2026</h1>
@@ -328,19 +404,30 @@
   </div>
 
   <!-- Floating Recorder Window -->
-  <div id="recorder-floating" style="display:none; position:fixed; bottom:20px; right:20px; width:320px; height:480px; background:white; border:2px solid #007aff; border-radius:12px; z-index:10001; overflow:hidden; box-shadow:0 4px 8px rgba(0,0,0,0.2);">
-    <div id="recorder-header" style="height:30px; background:#007aff; color:white; text-align:center; line-height:30px; cursor:move; position:relative;">Video Recorder
+  <div id="recorder-floating">
+    <div id="recorder-header">Video Recorder
       <button id="close-recorder" style="position:absolute; top:0; right:0; background:red; color:white; border:none; padding:2px 8px; cursor:pointer;">X</button>
     </div>
+
     <section id="password-section">
       <h2>Enter Password</h2>
       <input type="password" id="password-input" placeholder="Password" autocomplete="off" onkeydown="handleKeyDown(event)">
       <button onclick="checkPassword()">Submit</button>
     </section>
+
     <section id="recording-section" style="display: none;">
       <video id="preview" autoplay playsinline muted></video>
       <button id="record-btn" onclick="toggleRecording()">🔴 Record</button>
     </section>
+
+    <section id="minimized-section" style="display: none;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div id="rec-dot"></div>
+        <span id="timer">00:00</span>
+      </div>
+      <button id="stop-minimized">■</button>
+    </section>
+
     <section id="playback-section" style="display: none;">
       <video id="playback" controls playsinline></video>
       <button onclick="reRecord()">Re-Record</button>
@@ -393,9 +480,7 @@
           groupDiv.className = 'instrument-group';
           instruments.forEach(file => {
             let instrument = file.replace('Broadway Epics 2026_', '').replace('_Parts.pdf', '').replace(/_/g, ' ').replace('.pdf', '');
-            if (instrument === 'Tenor Saxophone') {
-              instrument = 'Tenor Sax';
-            }
+            if (instrument === 'Tenor Saxophone') instrument = 'Tenor Sax';
             instrument = instrument.split(' ').map(word => 
               word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
             ).join(' ');
@@ -422,56 +507,77 @@
       document.getElementById('pdf-modal').style.display = 'flex';
     }
 
-    // Close PDF modal
     document.getElementById('close-pdf').addEventListener('click', () => {
       document.getElementById('pdf-modal').style.display = 'none';
       document.getElementById('pdf-iframe').src = '';
     });
 
-    // Hamburger menu functionality
-    function toggleMenu() {
-      const hamburgerMenu = document.querySelector('.hamburger-menu');
-      const menuToggle = document.querySelector('.menu-toggle');
-      const menuItems = document.querySelector('.menu-items');
-      hamburgerMenu.classList.toggle('open');
+    // Simplified Hamburger menu functionality
+    const menuToggle = document.querySelector('.menu-toggle');
+    const menuItems = document.querySelector('.menu-items');
+
+    menuToggle.addEventListener('click', () => {
       menuToggle.classList.toggle('open');
       menuItems.classList.toggle('show');
-    }
+    });
 
-    // Close the menu when clicking outside
+    // Close menu when clicking outside
     document.addEventListener('click', (event) => {
-      const hamburgerMenu = document.querySelector('.hamburger-menu');
-      const menuItems = document.querySelector('.menu-items');
-      if (!hamburgerMenu.contains(event.target) && menuItems.classList.contains('show')) {
-        toggleMenu();
+      if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
+        menuToggle.classList.remove('open');
+        menuItems.classList.remove('show');
       }
     });
 
-    // Close menu on Escape key
+    // Optional: Close with Escape key
     document.addEventListener('keydown', function(event) {
-      const menuItems = document.querySelector('.menu-items');
-      if (event.key === 'Escape' && menuItems.classList.contains('show')) {
-        toggleMenu();
+      if (event.key === 'Escape') {
+        menuToggle.classList.remove('open');
+        menuItems.classList.remove('show');
       }
     });
 
     showInstrumentSelection();
 
     // Recorder functionality
-    const hardcodedPassword = atob('a3Jha2Vu'); // Obfuscated password
+    const hardcodedPassword = atob('a3Jha2Vu'); // "kraken"
     let mediaRecorder;
     let recordedChunks = [];
     let recordedBlob;
     let mediaStream;
     let isRecording = false;
+    let recordingStartTime = null;
+    let timerInterval = null;
 
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 
-    function handleKeyDown(event) {
-      if (event.key === 'Enter') {
-        checkPassword();
+    const recorderFloating = document.getElementById('recorder-floating');
+
+    function startTimer() {
+      recordingStartTime = Date.now();
+      const timerEl = document.getElementById('timer');
+      timerInterval = setInterval(() => {
+        if (!recordingStartTime) return;
+        const elapsed = Date.now() - recordingStartTime;
+        const seconds = Math.floor(elapsed / 1000);
+        const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const secs = (seconds % 60).toString().padStart(2, '0');
+        timerEl.textContent = `${mins}:${secs}`;
+      }, 200);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
       }
+      recordingStartTime = null;
+      document.getElementById('timer').textContent = '00:00';
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Enter') checkPassword();
     }
 
     function checkPassword() {
@@ -488,16 +594,11 @@
     async function initCamera() {
       try {
         mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: { 
-            facingMode: 'user',
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          },
+          video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
           audio: true
         });
         const preview = document.getElementById('preview');
         preview.srcObject = mediaStream;
-        adjustWindowHeight(preview);
       } catch (err) {
         alert('Error accessing camera/microphone: ' + err.message);
       }
@@ -517,41 +618,58 @@
       if (isSafari || isChrome) {
         mimeType = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2';
       }
-      mediaRecorder = new MediaRecorder(mediaStream, { mimeType: mimeType });
+
+      mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
+
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) recordedChunks.push(event.data);
       };
+
       mediaRecorder.onstop = () => {
         recordedBlob = new Blob(recordedChunks, { type: 'video/mp4' });
+        stopTimer();
+
+        document.getElementById('minimized-section').style.display = 'none';
         document.getElementById('recording-section').style.display = 'none';
         document.getElementById('playback-section').style.display = 'flex';
+
         const playback = document.getElementById('playback');
         playback.src = URL.createObjectURL(recordedBlob);
-        adjustWindowHeight(playback);
+
+        recorderFloating.style.height = '480px';
+        recorderFloating.classList.remove('minimized');
       };
-      mediaRecorder.start(1000); // Use timeslice to ensure chunks include audio
+
+      mediaRecorder.start(1000);
       isRecording = true;
+
+      document.getElementById('recording-section').style.display = 'none';
+      document.getElementById('minimized-section').style.display = 'flex';
+      recorderFloating.style.height = '70px';
+      recorderFloating.classList.add('minimized');
+
+      startTimer();
+
       const btn = document.getElementById('record-btn');
       btn.innerHTML = '🟥 Stop';
       btn.classList.add('recording');
     }
 
     function stopRecording() {
-      mediaRecorder.stop();
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
       isRecording = false;
-      const btn = document.getElementById('record-btn');
-      btn.innerHTML = '🔴 Record';
-      btn.classList.remove('recording');
     }
 
     function reRecord() {
       document.getElementById('playback-section').style.display = 'none';
       document.getElementById('recording-section').style.display = 'flex';
-      // Reset for new recording
       recordedBlob = null;
       recordedChunks = [];
       document.getElementById('playback').src = '';
-      document.getElementById('recorder-floating').style.height = '480px'; // Reset to default
+      recorderFloating.style.height = '480px';
+      recorderFloating.classList.remove('minimized');
     }
 
     async function shareVideo() {
@@ -565,12 +683,9 @@
             text: 'Share this video'
           });
         } catch (err) {
-          if (err.name !== 'AbortError') {
-            console.error('Sharing error:', err);
-          }
+          if (err.name !== 'AbortError') console.error('Sharing error:', err);
         }
       } else {
-        // Fallback for environments where sharing files is not supported (e.g., desktop Safari)
         const url = URL.createObjectURL(recordedBlob);
         const a = document.createElement('a');
         a.style.display = 'none';
@@ -583,43 +698,34 @@
       }
     }
 
-    function adjustWindowHeight(video) {
-      video.addEventListener('loadedmetadata', () => {
-        const aspect = video.videoWidth / video.videoHeight;
-        const recorderFloating = document.getElementById('recorder-floating');
-        if (aspect > 1) { // landscape
-          recorderFloating.style.height = '360px';
-        } else {
-          recorderFloating.style.height = '480px';
-        }
-      }, { once: true });
-    }
-
-    // Open recorder floating window
     function openRecorder() {
       document.getElementById('recorder-floating').style.display = 'block';
       document.getElementById('password-input').focus();
-      toggleMenu(); // Close menu after opening
+      // Close menu when opening recorder
+      menuToggle.classList.remove('open');
+      menuItems.classList.remove('show');
     }
 
-    // Close recorder
     document.getElementById('close-recorder').addEventListener('click', () => {
       document.getElementById('recorder-floating').style.display = 'none';
       if (mediaStream) {
         mediaStream.getTracks().forEach(track => track.stop());
       }
-      // Reset sections
       document.getElementById('password-section').style.display = 'flex';
       document.getElementById('recording-section').style.display = 'none';
+      document.getElementById('minimized-section').style.display = 'none';
       document.getElementById('playback-section').style.display = 'none';
-      document.getElementById('recorder-floating').style.height = '480px'; // Reset to default
+      recorderFloating.style.height = '480px';
+      recorderFloating.classList.remove('minimized');
+      stopTimer();
+      isRecording = false;
     });
 
-    // Draggable functionality for recorder window
+    document.getElementById('stop-minimized').addEventListener('click', stopRecording);
+
+    // Draggable recorder window
     let isDragging = false;
-    let initialX;
-    let initialY;
-    const recorderFloating = document.getElementById('recorder-floating');
+    let initialX, initialY;
     const recorderHeader = document.getElementById('recorder-header');
 
     recorderHeader.addEventListener('mousedown', dragStart);
@@ -641,21 +747,20 @@
     }
 
     function drag(e) {
-      if (isDragging) {
-        e.preventDefault();
-        let currentX, currentY;
-        if (e.type === 'touchmove') {
-          currentX = e.touches[0].clientX - initialX;
-          currentY = e.touches[0].clientY - initialY;
-        } else {
-          currentX = e.clientX - initialX;
-          currentY = e.clientY - initialY;
-        }
-        recorderFloating.style.left = `${currentX}px`;
-        recorderFloating.style.top = `${currentY}px`;
-        recorderFloating.style.right = 'auto';
-        recorderFloating.style.bottom = 'auto';
+      if (!isDragging) return;
+      e.preventDefault();
+      let currentX, currentY;
+      if (e.type === 'touchmove') {
+        currentX = e.touches[0].clientX - initialX;
+        currentY = e.touches[0].clientY - initialY;
+      } else {
+        currentX = e.clientX - initialX;
+        currentY = e.clientY - initialY;
       }
+      recorderFloating.style.left = `${currentX}px`;
+      recorderFloating.style.top = `${currentY}px`;
+      recorderFloating.style.right = 'auto';
+      recorderFloating.style.bottom = 'auto';
     }
 
     function dragEnd() {
