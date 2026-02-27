@@ -184,7 +184,7 @@ const blackBoxFixtures = [
     { name: "Par - 3.2", type: 'Par', from: 479, to: 487 },
     { name: "Par - 3.3", type: 'Par', from: 488, to: 496 },
     { name: "Par - 3.4", type: 'Par', from: 497, to: 505 },
-    { name: "Fog", type: 'Fog Machine', from: 506, to: 507 }
+    { name: "Fog", type: 'Fog Machine', from: 506, to: 506 }
 ];
 
 const auditoriumFixtures = [
@@ -207,7 +207,7 @@ const auditoriumFixtures = [
     { name: "Tube Light 6", type: 'Tube Light', from: 425, to: 436 },
     { name: "Tube Light 7", type: 'Tube Light', from: 437, to: 448 },
     { name: "Tube Light 8", type: 'Tube Light', from: 449, to: 460 },
-    { name: "Fog", type: 'Fog Machine', from: 506, to: 507 }
+    { name: "Fog", type: 'Fog Machine', from: 506, to: 506 }
 ];
 
 const mobileFixtures = [
@@ -263,7 +263,7 @@ const mobileFixtures = [
     { name: "Tube Light 6", type: 'Tube Light', from: 425, to: 436 },
     { name: "Tube Light 7", type: 'Tube Light', from: 437, to: 448 },
     { name: "Tube Light 8", type: 'Tube Light', from: 449, to: 460 },
-    { name: "Fog", type: 'Fog Machine', from: 506, to: 507 }
+    { name: "Fog", type: 'Fog Machine', from: 506, to: 506 }
 ];
 
 function getCurrentModeFixtures() {
