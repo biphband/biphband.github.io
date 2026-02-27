@@ -14,6 +14,8 @@ let lastSelectedChannel = null;
 let selectedFixtures = new Set();
 let isColorWheelOpen = false;
 let copiedFixtureData = null; // Store copied fixture data (channels and labels)
+let history = [];
+let historyIndex = -1;
 
 const MOTORIZED_PAR_BLACKOUT_VALUES = {
     'Colors': 56,
@@ -78,6 +80,9 @@ function changeMode(mode) {
     createMacroButtons();
     createFixtureLabelGrid();
     toggleMenu();
+    // Clear history when changing mode
+    history = [];
+    historyIndex = -1;
 }
 
 function changePage(page) {
@@ -175,7 +180,7 @@ function updateSliders() {
         const idx = parseInt(sliderId.replace('fader-', ''));
         if (state.current !== state.target) {
             const diff = state.target - state.current;
-            state.current += diff * 0.08;
+            state.current += diff * 0.08; // Smoothing factor for all slider movements
 
             if (Math.abs(diff) < 0.1) {
                 state.current = state.target;
@@ -246,11 +251,120 @@ function hexToRGBA(hex, opacity) {
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
 
+function saveToHistory(entry) {
+    // Truncate history after current index
+    history = history.slice(0, historyIndex + 1);
+    history.push(entry);
+    historyIndex++;
+    console.log('Saved to history:', entry);
+}
+
+function undo() {
+    if (historyIndex < 0) return;
+
+    const entry = history[historyIndex];
+    const channelChanges = new Map();
+    const labelChanges = new Map();
+
+    if (entry.type === 'slider') {
+        entry.channels.forEach(({ channel, oldValue }) => {
+            const idx = channel - 1;
+            channelChanges.set(idx, {
+                initialValue: faderValues[idx],
+                targetValue: oldValue
+            });
+        });
+    } else if (entry.type === 'paste') {
+        entry.channelChanges.forEach((change, idx) => {
+            channelChanges.set(idx, {
+                initialValue: faderValues[idx],
+                targetValue: change.initialValue
+            });
+        });
+        entry.labelChanges.forEach((change, fixtureStart) => {
+            labelChanges.set(fixtureStart, {
+                hex: change.initialHex || '#333333',
+                opacity: change.initialOpacity || 0
+            });
+        });
+    } else if (entry.type === 'color') {
+        entry.channelChanges.forEach((change, idx) => {
+            channelChanges.set(idx, {
+                initialValue: faderValues[idx],
+                targetValue: change.initialValue
+            });
+        });
+        entry.labelChanges.forEach((change, fixtureStart) => {
+            const currentState = labelBackgroundStates.get(`label-${fixtureStart}`);
+            labelChanges.set(fixtureStart, {
+                hex: currentState?.hex || '#333333',
+                opacity: currentState?.currentOpacity || 0
+            });
+        });
+    }
+
+    fadeChannelsAndLabels(channelChanges, labelChanges, entry.fixtures.map(f => ({ from: f })));
+    historyIndex--;
+}
+
+function redo() {
+    if (historyIndex >= history.length - 1) return;
+
+    historyIndex++;
+    const entry = history[historyIndex];
+    const channelChanges = new Map();
+    const labelChanges = new Map();
+
+    if (entry.type === 'slider') {
+        entry.channels.forEach(({ channel, newValue }) => {
+            const idx = channel - 1;
+            channelChanges.set(idx, {
+                initialValue: faderValues[idx],
+                targetValue: newValue
+            });
+        });
+    } else if (entry.type === 'paste') {
+        entry.channelChanges.forEach((change, idx) => {
+            channelChanges.set(idx, {
+                initialValue: faderValues[idx],
+                targetValue: change.targetValue
+            });
+        });
+        entry.labelChanges.forEach((change, fixtureStart) => {
+            labelChanges.set(fixtureStart, {
+                hex: change.targetHex,
+                opacity: change.targetOpacity
+            });
+        });
+    } else if (entry.type === 'color') {
+        entry.channelChanges.forEach((change, idx) => {
+            channelChanges.set(idx, {
+                initialValue: faderValues[idx],
+                targetValue: change.targetValue
+            });
+        });
+        entry.labelChanges.forEach((change, fixtureStart) => {
+            labelChanges.set(fixtureStart, {
+                hex: change.hex,
+                opacity: change.opacity
+            });
+        });
+    }
+
+    fadeChannelsAndLabels(channelChanges, labelChanges, entry.fixtures.map(f => ({ from: f })));
+}
+
 function blackout() {
     const fixtures = getCurrentModeFixtures();
     const channelsToBlackout = new Set();
     const labelChanges = new Map();
     const channelChanges = new Map();
+    const historyEntry = {
+        type: 'blackout',
+        fixtures: [],
+        channelChanges: new Map(),
+        labelChanges: new Map()
+    };
 
     fixtures.forEach(fixture => {
         if (fixture.type === 'Motorized Par') {
@@ -266,6 +380,10 @@ function blackout() {
                     initialValue: faderValues[idx] || 0,
                     targetValue: targetValue
                 });
+                historyEntry.channelChanges.set(idx, {
+                    initialValue: faderValues[idx] || 0,
+                    targetValue: targetValue
+                });
             }
         } else {
             // Other fixtures: set all channels to 0
@@ -276,15 +394,26 @@ function blackout() {
                     initialValue: faderValues[idx] || 0,
                     targetValue: 0
                 });
+                historyEntry.channelChanges.set(idx, {
+                    initialValue: faderValues[idx] || 0,
+                    targetValue: 0
+                });
             }
         }
         labelChanges.set(fixture.from, {
             hex: '#333333',
             opacity: 0
         });
+        historyEntry.labelChanges.set(fixture.from, {
+            hex: '#333333',
+            opacity: 0
+        });
+        historyEntry.fixtures.push(fixture.from);
     });
 
-    fadeChannelsAndLabels(channelChanges, labelChanges, fixtures);
+    fadeChannelsAndLabels(channelChanges, labelChanges, fixtures, () => {
+        saveToHistory(historyEntry);
+    });
     deselectAll();
 }
 
@@ -293,6 +422,12 @@ function blackoutSelectedFixtures() {
     const affectedFixtures = [];
     const labelChanges = new Map();
     const channelChanges = new Map();
+    const historyEntry = {
+        type: 'blackout',
+        fixtures: [],
+        channelChanges: new Map(),
+        labelChanges: new Map()
+    };
 
     selectedFixtures.forEach(fixtureStart => {
         const fixture = getCurrentModeFixtures().find(f => f.from === fixtureStart);
@@ -310,6 +445,10 @@ function blackoutSelectedFixtures() {
                         initialValue: faderValues[idx] || 0,
                         targetValue: targetValue
                     });
+                    historyEntry.channelChanges.set(idx, {
+                        initialValue: faderValues[idx] || 0,
+                        targetValue: targetValue
+                    });
                 }
             } else {
                 // Other fixtures: set all channels to 0
@@ -320,6 +459,10 @@ function blackoutSelectedFixtures() {
                         initialValue: faderValues[idx] || 0,
                         targetValue: 0
                     });
+                    historyEntry.channelChanges.set(idx, {
+                        initialValue: faderValues[idx] || 0,
+                        targetValue: 0
+                    });
                 }
             }
             affectedFixtures.push(fixture);
@@ -327,13 +470,20 @@ function blackoutSelectedFixtures() {
                 hex: '#333333',
                 opacity: 0
             });
+            historyEntry.labelChanges.set(fixtureStart, {
+                hex: '#333333',
+                opacity: 0
+            });
+            historyEntry.fixtures.push(fixtureStart);
         }
     });
 
-    fadeChannelsAndLabels(channelChanges, labelChanges, affectedFixtures);
+    fadeChannelsAndLabels(channelChanges, labelChanges, affectedFixtures, () => {
+        saveToHistory(historyEntry);
+    });
 }
 
-function fadeChannelsAndLabels(channelChanges, labelChanges, fixtures) {
+function fadeChannelsAndLabels(channelChanges, labelChanges, fixtures, callback) {
     const FADE_DURATION = 1000; // 1 second fade
     const STEPS = 20; // Number of steps for smooth fade
     const STEP_INTERVAL = FADE_DURATION / STEPS;
@@ -389,6 +539,8 @@ function fadeChannelsAndLabels(channelChanges, labelChanges, fixtures) {
 
             step++;
             setTimeout(fadeStep, STEP_INTERVAL);
+        } else if (callback) {
+            callback();
         }
     }
 
@@ -500,7 +652,6 @@ function createMacroButtons() {
     }
 }
 
-// Add this new function in main.js
 function handleChannelSelection(channel, event) {
     const allContainers = Array.from(document.querySelectorAll('.fader-container'));
     const container = allContainers.find(c => parseInt(c.dataset.channel) === channel);
@@ -566,7 +717,6 @@ function handleChannelSelection(channel, event) {
     updateFixtureGroupPositions();
 }
 
-// Update the createFaders function in main.js (replace the existing one)
 function createFaders() {
     sliderStates.clear();
     const grid = document.getElementById('faderGrid');
@@ -652,13 +802,26 @@ function createFaders() {
             }
 
             fader.addEventListener('input', () => {
-                const value = parseInt(fader.value);
-                faderValues[faderIndex] = value;
-                sliderStates.get(fader.id).target = value;
-                valueInput.value = Math.round((value / 127) * 100);
-                sendMIDICC(midiChannel, ccNumber, value);
-                updateFixtureLabelBackground(channel);
-            });
+    const value = parseInt(fader.value);
+    const oldValue = faderValues[faderIndex];
+    const state = sliderStates.get(fader.id);
+    state.target = value;
+
+    const valueInput = container.querySelector('.fader-value');
+    if (valueInput && !valueInput.classList.contains('editable')) {
+        valueInput.value = Math.round((value / 127) * 100);
+    }
+
+    saveToHistory({
+        type: 'slider',
+        channels: [{ channel: channel, oldValue, newValue: value }],
+        fixtures: fixture ? [fixture.from] : []
+    });
+
+    if (!animationFrameId) {
+        animationFrameId = requestAnimationFrame(updateSliders);
+    }
+});
 
             valueInput.addEventListener('click', () => {
                 valueInput.select();
