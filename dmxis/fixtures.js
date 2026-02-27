@@ -126,6 +126,9 @@ const fixtureParameters = {
         { name: 'Green', abbr: '🟢' },
         { name: 'Blue', abbr: '🔵' },
         { name: 'White', abbr: '⚪️' }
+    ],
+        'FogMachine': [
+        { name: 'On/Off', abbr: '(💨)' },
     ]
 };
 
@@ -181,10 +184,11 @@ const blackBoxFixtures = [
     { name: "Par - 3.2", type: 'Par', from: 479, to: 487 },
     { name: "Par - 3.3", type: 'Par', from: 488, to: 496 },
     { name: "Par - 3.4", type: 'Par', from: 497, to: 505 },
-    { name: "LED Tree", type: 'Tree', from: 506, to: 512 }
+    { name: "Fog", type: 'FogMachine', from: 506, to: 507 }
 ];
 
 const auditoriumFixtures = [
+    { name: "LED Row 2", type: 'AuditoriumLEDrow2', from: 1, to: 8 },
     { name: "Row 1 Floods", type: 'Auditorium Flood', from: 9, to: 12 },
     { name: "Row 2 Floods", type: 'Auditorium Flood', from: 20, to: 23 },
     { name: "LED 1", type: 'AuditoriumLED', from: 101, to: 108 },
@@ -195,7 +199,15 @@ const auditoriumFixtures = [
     { name: "LED 6", type: 'AuditoriumLED', from: 141, to: 148 },
     { name: "LED 7", type: 'AuditoriumLED', from: 149, to: 156 },
     { name: "LED 8", type: 'AuditoriumLED', from: 157, to: 164 },
-    { name: "LED Row 2", type: 'AuditoriumLEDrow2', from: 1, to: 8 }
+    { name: "Tube Light 1", type: 'Tube Light', from: 365, to: 376 },
+    { name: "Tube Light 2", type: 'Tube Light', from: 377, to: 388 },
+    { name: "Tube Light 3", type: 'Tube Light', from: 389, to: 400 },
+    { name: "Tube Light 4", type: 'Tube Light', from: 401, to: 412 },
+    { name: "Tube Light 5", type: 'Tube Light', from: 413, to: 424 },
+    { name: "Tube Light 6", type: 'Tube Light', from: 425, to: 436 },
+    { name: "Tube Light 7", type: 'Tube Light', from: 437, to: 448 },
+    { name: "Tube Light 8", type: 'Tube Light', from: 449, to: 460 },
+    { name: "Fog", type: 'FogMachine', from: 506, to: 507 }
 ];
 
 const mobileFixtures = [
@@ -250,7 +262,8 @@ const mobileFixtures = [
     { name: "Tube Light 5", type: 'Tube Light', from: 413, to: 424 },
     { name: "Tube Light 6", type: 'Tube Light', from: 425, to: 436 },
     { name: "Tube Light 7", type: 'Tube Light', from: 437, to: 448 },
-    { name: "Tube Light 8", type: 'Tube Light', from: 449, to: 460 }
+    { name: "Tube Light 8", type: 'Tube Light', from: 449, to: 460 },
+    { name: "Fog", type: 'FogMachine', from: 506, to: 507 }
 ];
 
 function getCurrentModeFixtures() {
