@@ -107,7 +107,7 @@ const fixtureParameters = {
         { name: 'Warm', abbr: '🟡' },
         { name: 'Strobe', abbr: '⚡' },
     ],
-    'AuditoriumLED': [
+    'Auditorium LED': [
         { name: 'Shutter', abbr: '(💡)' },
         { name: 'Strobe', abbr: '⚡' },
         { name: 'Macros', abbr: '▶️' },
@@ -117,7 +117,7 @@ const fixtureParameters = {
         { name: 'Blue', abbr: '🔵' },
         { name: 'White', abbr: '⚪️' }
     ],
-    'AuditoriumLEDrow2': [
+    'Auditorium LED row2': [
         { name: 'Shutter', abbr: '(💡)' },
         { name: 'Strobe', abbr: '⚡' },
         { name: 'Macros', abbr: '▶️' },
@@ -188,17 +188,17 @@ const blackBoxFixtures = [
 ];
 
 const auditoriumFixtures = [
-    { name: "LED Row 2", type: 'AuditoriumLEDrow2', from: 1, to: 8 },
+    { name: "LED Row 2", type: 'Auditorium LED row2', from: 1, to: 8 },
     { name: "Row 1 Floods", type: 'Auditorium Flood', from: 9, to: 12 },
     { name: "Row 2 Floods", type: 'Auditorium Flood', from: 20, to: 23 },
-    { name: "LED 1", type: 'AuditoriumLED', from: 101, to: 108 },
-    { name: "LED 2", type: 'AuditoriumLED', from: 109, to: 116 },
-    { name: "LED 3", type: 'AuditoriumLED', from: 117, to: 124 },
-    { name: "LED 4", type: 'AuditoriumLED', from: 125, to: 132 },
-    { name: "LED 5", type: 'AuditoriumLED', from: 133, to: 140 },
-    { name: "LED 6", type: 'AuditoriumLED', from: 141, to: 148 },
-    { name: "LED 7", type: 'AuditoriumLED', from: 149, to: 156 },
-    { name: "LED 8", type: 'AuditoriumLED', from: 157, to: 164 },
+    { name: "LED 1", type: 'Auditorium LED', from: 101, to: 108 },
+    { name: "LED 2", type: 'Auditorium LED', from: 109, to: 116 },
+    { name: "LED 3", type: 'Auditorium LED', from: 117, to: 124 },
+    { name: "LED 4", type: 'Auditorium LED', from: 125, to: 132 },
+    { name: "LED 5", type: 'Auditorium LED', from: 133, to: 140 },
+    { name: "LED 6", type: 'Auditorium LED', from: 141, to: 148 },
+    { name: "LED 7", type: 'Auditorium LED', from: 149, to: 156 },
+    { name: "LED 8", type: 'Auditorium LED', from: 157, to: 164 },
     { name: "Tube Light 1", type: 'Tube Light', from: 365, to: 376 },
     { name: "Tube Light 2", type: 'Tube Light', from: 377, to: 388 },
     { name: "Tube Light 3", type: 'Tube Light', from: 389, to: 400 },
