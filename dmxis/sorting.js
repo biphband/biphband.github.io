@@ -31,12 +31,12 @@ function sortFixtureLabels(sortBy) {
         } else if (currentMode === 'Mobile') {
             const customOrder = [
                 'Flood', null, null, null, null, null,
-                'BandLED', 'BandLED', 'BandLED', 'BandLED', 'BandLED', 'BandLED',
-                'DramaLED', 'DramaLED', 'DramaLED', 'DramaLED', 'DramaLED', 'DramaLED',
-                'Tree 1', 'Tree 1', 'Tree 1', 'Tree 1', 'Tree 1', null,
-                'Tree 1', 'Tree 1', 'Tree 1', 'Tree 1', 'Tree 1', null,
-                'Tree 2', 'Tree 2', 'Tree 2', 'Tree 2', 'Tree 2', null,
-                'Tree 2', 'Tree 2', 'Tree 2', 'Tree 2', null, null,
+                'Band LED 1', 'Band LED 2', 'Band LED 3', 'Band LED 4', 'Band LED 5', 'Band LED 6',
+                'Drama LED 1', 'Drama LED 2', 'Drama LED 3', 'Drama LED 4', 'Drama LED 5', 'Drama LED 6',
+                'Tree 1.1', 'Tree 1.2', 'Tree 1.3', 'Tree 1.4', 'Tree 1.5', null,
+                'Tree 1.6', 'Tree 1.7', 'Tree 1.8', 'Tree 1.9', 'Tree 1.10', null,
+                'Tree 2.1', 'Tree 2.2', 'Tree 2.3', 'Tree 2.4', 'Tree 2.5', null,
+                'Tree 2.6', 'Tree 2.7', 'Tree 2.8', 'Tree 2.9', null, null,
                 'Tube Light 1', 'Tube Light 2', 'Tube Light 3', 'Tube Light 4', null, null,
                 'Tube Light 5', 'Tube Light 6', 'Tube Light 7', 'Tube Light 8', null, null,
                 'Uplighting', 'Uplighting', 'Uplighting', 'Uplighting', 'Uplighting', 'Uplighting',
@@ -46,9 +46,12 @@ function sortFixtureLabels(sortBy) {
         } else if (currentMode === 'Auditorium') {
             const customOrder = [
                 'Row 1 Floods', 'Row 2 Floods', null, null, null, null,
-                'LED 1', 'LED 2', 'LED 3', 'LED 4', null, null,
-                'LED 5', 'LED 6', 'LED 7', 'LED 8', null, null,
-                'LED Row 2', null, null, null, null, null
+                'Row 1 LED 1', 'Row 1 LED 2', 'Row 1 LED 3', 'Row 1 LED 4', null, null,
+                'Row 1 LED 5', 'Row 1 LED 6', 'Row 1 LED 7', 'Row 1 LED 8', null, null,
+                'Row 2 LEDs', null, null, null, null, null,
+                'Tube Light 1', 'Tube Light 2', 'Tube Light 3', 'Tube Light 4', null, null,
+                'Tube Light 5', 'Tube Light 6', 'Tube Light 7', 'Tube Light 8', null, null,
+                'Fog', 
             ];
             sortedFixtures = customOrder.map(name => name ? fixtures.find(f => f.name === name) : null);
         } else {

@@ -18,15 +18,17 @@ const FIXTURE_GROUPS = {
         { name: 'All Box Lights', fixtureTypes: ['BoxLight'], filter: () => true }
     ],
     'Auditorium': [
-        { name: 'All LEDs', fixtureTypes: ['LED'], filter: () => true }
+        { name: 'All LEDs', fixtureTypes: ['Auditorium LED'], filter: () => true },
+        { name: 'Row 1 LEDs', fixtureTypes: ['Auditorium LED'], filter: f => f.name.includes('LED ') },
+        { name: 'All Tube Lights', fixtureTypes: ['Tube Light'], filter: () => true },
     ],
     'Mobile': [
         { name: 'All Uplighting', fixtureTypes: ['Uplighting'], filter: () => true },
-        { name: 'All Band LEDs', fixtureTypes: ['LED'], filter: f => f.name.includes('BandLED') },
-        { name: 'All Drama LEDs', fixtureTypes: ['LED'], filter: f => f.name.includes('DramaLED') },
+        { name: 'All Band LEDs', fixtureTypes: ['LED'], filter: f => f.name.includes('Band') },
+        { name: 'All Drama LEDs', fixtureTypes: ['LED'], filter: f => f.name.includes('Drama') },
         { name: 'All Trees', fixtureTypes: ['Tree'], filter: () => true },
-        { name: 'Tree 1', fixtureTypes: ['Tree'], filter: f => f.name === 'Tree 1' },
-        { name: 'Tree 2', fixtureTypes: ['Tree'], filter: f => f.name === 'Tree 2' },
+        { name: 'Tree 1', fixtureTypes: ['Tree'], filter: f => f.name.includes(' 1') },
+        { name: 'Tree 2', fixtureTypes: ['Tree'], filter: f => f.name.includes(' 2') },
         { name: 'All Tube Lights', fixtureTypes: ['Tube Light'], filter: () => true },
         { name: 'All Floods', fixtureTypes: ['Flood'], filter: () => true }
     ]
