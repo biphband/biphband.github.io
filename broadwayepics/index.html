@@ -238,39 +238,6 @@
       height: auto;
     }
 
-    /* PDF Modal */
-    #pdf-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      backdrop-filter: blur(4px);
-    }
-
-    #pdf-close-btn {
-      background: #ef4444;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      margin-bottom: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
-
-    #pdf-iframe {
-      width: 94vw;
-      height: 88vh;
-      border: none;
-      border-radius: 8px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    }
-
     /* Recorder styles (unchanged) */
     #recorder-floating {
       display: none;
@@ -294,8 +261,6 @@
       backdrop-filter: blur(10px);
       border: 1px solid rgba(0,122,255,0.4);
     }
-
-    /* ... rest of recorder styles unchanged ... */
   </style>
 </head>
 <body>
@@ -324,13 +289,7 @@
     <img src="Full logo original.png" class="logo">
   </div>
 
-  <!-- PDF Modal -->
-  <div id="pdf-modal">
-    <button id="pdf-close-btn">Close</button>
-    <iframe id="pdf-iframe"></iframe>
-  </div>
-
-  <!-- Floating Recorder Window (unchanged) -->
+  <!-- Floating Recorder Window -->
   <div id="recorder-floating">
     <div id="recorder-header">Video Recorder
       <button id="close-recorder" style="position:absolute; top:0; right:0; background:red; color:white; border:none; padding:2px 8px; cursor:pointer;">X</button>
@@ -382,9 +341,9 @@
         ['Broadway Epics 2026_Tuba_Parts.pdf']
       ],
       Percussion: [
-        ['Broadway Epics 2026_Percussion_1_Parts.pdf', 'Broadway Epics 2026_Drum_Kit_Parts.pdf'],
-        ['Broadway Epics 2026_Marimba_Parts.pdf', 'Broadway Epics 2026_Timpani_Parts.pdf'],
-        ['Broadway Epics 2026_Piano_Parts.pdf']
+        ['Broadway Epics 2026_Percussion_1_Parts.pdf', 'Broadway Epics 2026_Percussion_2_Parts.pdf'],
+        ['Broadway Epics 2026_Marimba_Parts.pdf', 'Broadway Epics 2026_Drum_Kit_Parts.pdf'],
+        ['Broadway Epics 2026_Timpani_Parts.pdf','Broadway Epics 2026_Piano_Parts.pdf']
       ],
       Other: [
         ['Broadway Epics 2026_Conductor_Parts.pdf']
@@ -436,63 +395,12 @@
       }
     }
 
-    // iOS/iPad detection
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-                  function displayContent(file) {
-  const filePath = `Broadway Epics 2026_Parts/${file}`;
-
-  if (isIOS) {
-    window.location.href = filePath;
-    return;
-  }
-
-  // Non-iOS: show modal + push state
-  document.getElementById('pdf-iframe').src = filePath;
-  document.getElementById('pdf-modal').style.display = 'flex';
-  
-  // Only push state if we haven't already (prevents stacking multiple #pdf entries)
-  if (!history.state || !history.state.pdfOpen) {
-    history.pushState({ pdfOpen: true }, '', '#pdf');
-  }
-}
-
-function closePdfModal() {
-  document.getElementById('pdf-modal').style.display = 'none';
-  document.getElementById('pdf-iframe').src = '';
-  
-  // Clean up the fake history entry we added
-  if (history.state && history.state.pdfOpen) {
-    history.replaceState(null, '', ' ');   // removes #pdf from URL without adding another entry
-    // Alternative: history.back();  ← but only if you want the back button to "undo" the open action
-  }
-}
-
-// Close handlers
-document.getElementById('pdf-close-btn').addEventListener('click', closePdfModal);
-
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && document.getElementById('pdf-modal').style.display === 'flex') {
-    closePdfModal();
-  }
-});
-
-// Handle browser/mobile back
-window.addEventListener('popstate', (e) => {
-  if (document.getElementById('pdf-modal').style.display === 'flex') {
-    // Same actions as Escape / close button
-    document.getElementById('pdf-modal').style.display = 'none';
-    document.getElementById('pdf-iframe').src = '';
-    
-    // (prevents the URL bar showing #pdf after closing)
-    if (history.state && history.state.pdfOpen) {
-      history.replaceState(null, '', ' ');  // or window.location.href = window.location.pathname;
+    function displayContent(file) {
+      const filePath = `Broadway Epics 2026_Parts/${file}`;
+      window.location.href = filePath;
     }
-  }
-});
 
-    // Hamburger menu (unchanged)
+    // Hamburger menu
     const menuToggle = document.querySelector('.menu-toggle');
     const menuItems = document.querySelector('.menu-items');
 
@@ -517,7 +425,9 @@ window.addEventListener('popstate', (e) => {
 
     showInstrumentSelection();
 
-    // Recorder functionality (unchanged from previous version)
+    // ────────────────────────────────────────────────
+    // Recorder functionality (kept unchanged)
+    // ────────────────────────────────────────────────
     const hardcodedPassword = atob('a3Jha2Vu');
     let mediaRecorder;
     let recordedChunks = [];
