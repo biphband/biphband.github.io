@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Motion Ripple Painting</title>
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #000;
+    height: 100%;
+    touch-action: manipulation;
+  }
+  canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+  }
+  #v { display: none; }
+
+  #start-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: opacity 1.2s ease;
+    cursor: pointer;
+  }
+  #start-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  #start-btn {
+    padding: 1.2rem 2.8rem;
+    font-size: 1.5rem;
+    font-family: system-ui, sans-serif;
+    background: rgba(255,255,255,0.15);
+    color: #eee;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  #start-btn:hover {
+    background: rgba(255,255,255,0.25);
+    transform: scale(1.05);
+  }
+  #status {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    color: #aaa;
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    background: rgba(0,0,0,0.6);
+    padding: 6px 12px;
+    border-radius: 6px;
+    z-index: 5;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+<video id="v" autoplay playsinline muted></video>
+
+<div id="start-overlay">
+  <button id="start-btn">Start</button>
+</div>
+
+<div id="status">Waiting to start…</div>
+
+<script>
+// ────────────────────────────────────────────── Config ─────
+const IMG_URL = "VincentvanGogh-StarryNightontheRhone.jpg";
+const MUSIC_FOLDER = "./music/";
+
+const RIPPLE_DAMPING    = 0.6;
+const SENSITIVITY       = 35;
+const RIPPLE_STRENGTH   = 10;
+const RIPPLE_DECAY_MS   = 0;
+
+// Playlist & durations in seconds
+const playlist = [
+  "Claude Debussy - Arabesque No. 1.mp3",
+  "Claude Debussy - Clair de Lune.mp3",
+  "Claude Debussy - Girl With Flaxen Hair.mp3",
+  "Claude Debussy - La fille aux cheveux de lin.mp3",
+  "Claude Debussy - Petite Suite En Bateau.mp3",
+  "Claude Debussy - Pour invoquer Pan, dieu du vent d'été.mp3",
+  "Claude Debussy - Reverie.mp3",
+  "Claude Debussy - Sarabande.mp3",
+  "Erik Satie - Gymnopedie No. 1.mp3",
+  "Gabriel Faure - Pavane.mp3",
+  "Maurice Ravel - Pavane pour une infante defunte.mp3",
+  "Maurice Ravel - Une barque sur l ocean.mp3"
+];
+
+const durations = [229,271,173,293,242,134,200,272,217,192,423,429];
+
+const TOTAL_PLAYLIST_SEC = durations.reduce((a,b)=>a+b, 0);
+
+// Music window: 07:00:00 – 21:30:00 HKT every day
+const START_HOUR   = 7;
+const END_HOUR     = 21;
+const END_MINUTE   = 30;
+
+// ────────────────────────────────────────────── Setup ─────
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
+const video = document.getElementById('v');
+const startOverlay = document.getElementById('start-overlay');
+const statusEl = document.getElementById('status');
+
+let w, h;
+let bufferCanvas, bufferCtx, lastData;
+let rippleMap1, rippleMap2;
+let oldTime = 0;
+
+let img = new Image();
+img.crossOrigin = "anonymous";
+img.src = IMG_URL;
+
+// Audio
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let currentAudio = null;
+let gainNode = audioCtx.createGain();
+gainNode.connect(audioCtx.destination);
+gainNode.gain.value = 0;
+
+let isMuted = false;
+let fadeTarget = 0;
+let fadeStartTime = 0;
+const FADE_DURATION = 5.0;
+
+let started = false;
+let webcamReadyTime = 0;
+const IGNORE_MOTION_MS = 1500;
+
+let activeTrackIndex = -1;
+
+// ────────────────────────────────────────────── Time & Music Window ─────
+function getHKSecondsSinceMidnight() {
+  const now = new Date();
+  // Hong Kong is UTC+8, no DST
+  const utcMs = now.getTime();
+  const hkMs = utcMs + (8 * 3600 * 1000);
+  const hkDate = new Date(hkMs);
+
+  return (
+    hkDate.getUTCHours() * 3600 +
+    hkDate.getUTCMinutes() * 60 +
+    hkDate.getUTCSeconds() +
+    hkDate.getUTCMilliseconds() / 1000
+  );
+}
+
+function isWithinActiveWindow() {
+  const sec = getHKSecondsSinceMidnight();
+  const startSec = START_HOUR * 3600;
+  const endSec   = END_HOUR * 3600 + END_MINUTE * 60;
+  return sec >= startSec && sec < endSec;
+}
+
+function getElapsedSinceStartToday() {
+  const sec = getHKSecondsSinceMidnight();
+  const startSec = START_HOUR * 3600;
+  if (sec < startSec) return 0;
+  return sec - startSec;
+}
+
+function getCurrentTrackAndPosition() {
+  if (!isWithinActiveWindow()) {
+    return { trackIndex: -1, positionSec: 0 };
+  }
+
+  const elapsed = getElapsedSinceStartToday();
+  let pos = elapsed % TOTAL_PLAYLIST_SEC;
+
+  let sum = 0;
+  for (let i = 0; i < durations.length; i++) {
+    if (pos < sum + durations[i]) {
+      return {
+        trackIndex: i,
+        positionSec: pos - sum
+      };
+    }
+    sum += durations[i];
+  }
+  return { trackIndex: 0, positionSec: 0 };
+}
+
+// ────────────────────────────────────────────── Music Update ─────
+function updateMusic() {
+  if (!started) return;
+
+  const { trackIndex, positionSec } = getCurrentTrackAndPosition();
+  const shouldBePlaying = (trackIndex >= 0 && !isMuted);
+
+  if (trackIndex !== activeTrackIndex) {
+    // New track or stopping
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.src = "";
+      currentAudio = null;
+    }
+
+    activeTrackIndex = trackIndex;
+
+    if (trackIndex >= 0) {
+      const url = MUSIC_FOLDER + playlist[trackIndex];
+      currentAudio = new Audio();
+      currentAudio.crossOrigin = "anonymous";
+      currentAudio.src = url;
+      currentAudio.loop = false;
+
+      const source = audioCtx.createMediaElementSource(currentAudio);
+      source.connect(gainNode);
+
+      // Set precise position
+      currentAudio.currentTime = Math.max(0, positionSec);
+      currentAudio.play().catch(() => {});
+
+      fadeTarget = shouldBePlaying ? 1 : 0;
+      fadeStartTime = performance.now() / 1000;
+    } else {
+      fadeTarget = 0;
+      fadeStartTime = performance.now() / 1000;
+    }
+  } else if (currentAudio && trackIndex >= 0) {
+    // Drift correction (tolerance 150 ms)
+    const drift = Math.abs(currentAudio.currentTime - positionSec);
+    if (drift > 0.15 && drift < 10) {
+      currentAudio.currentTime = positionSec;
+    }
+  }
+
+  // Status message
+  if (!isWithinActiveWindow()) {
+    statusEl.textContent = "Music window closed (07:00 – 21:30 HKT)";
+  } else if (trackIndex >= 0) {
+    statusEl.textContent = `Playing: ${playlist[trackIndex].replace(/_/g,' ')}  •  ${Math.floor(positionSec)}s`;
+  } else {
+    statusEl.textContent = "Waiting for music window…";
+  }
+}
+
+setInterval(updateMusic, 800);
+
+// ────────────────────────────────────────────── Fade ─────
+function updateFade(nowSec) {
+  if (Math.abs(gainNode.gain.value - fadeTarget) < 0.002) {
+    gainNode.gain.value = fadeTarget;
+    return;
+  }
+  const t = Math.min(1, (nowSec - fadeStartTime) / FADE_DURATION);
+  const ease = t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2;
+  gainNode.gain.value = (1 - ease) * gainNode.gain.value + ease * fadeTarget;
+}
+
+// Add this small helper near the top (with other utils)
+function waitForNextWholeSecond() {
+  return new Promise(resolve => {
+    const ms = new Date().getMilliseconds();
+    const delay = (1000 - ms) % 1000;  // 1–999 ms, or 0 if already at .000
+    setTimeout(resolve, delay);
+  });
+}
+
+// Updated startExperience – now async
+async function startExperience() {
+  if (started) return;
+  
+  // Visual feedback: change button text or show "Syncing time…"
+  document.getElementById('start-btn').textContent = "Syncing…";
+  statusEl.textContent = "Waiting for second boundary…";
+
+  // Wait for next :00 ms
+  await waitForNextWholeSecond();
+
+  // Now really start
+  started = true;
+  startOverlay.classList.add('hidden');
+
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(()=>{});
+  }
+
+  fadeTarget = isMuted ? 0 : 1;
+  fadeStartTime = performance.now() / 1000;
+  webcamReadyTime = performance.now() + IGNORE_MOTION_MS;
+
+  updateMusic();           // will load correct track + seek to correct position
+  document.getElementById('start-btn').textContent = "Start"; // reset in case
+  statusEl.textContent = "Started – synced";
+
+  // Optional: tiny extra safety delay after await (some browsers need it)
+  setTimeout(() => requestAnimationFrame(loop), 20);
+}
+
+// ────────────────────────────────────────────── Start ─────
+function startExperience() {
+  if (started) return;
+  started = true;
+  startOverlay.classList.add('hidden');
+
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(()=>{});
+  }
+
+  fadeTarget = isMuted ? 0 : 1;
+  fadeStartTime = performance.now() / 1000;
+  webcamReadyTime = performance.now() + IGNORE_MOTION_MS;
+
+  updateMusic();
+}
+
+document.getElementById('start-btn').onclick = startExperience;
+
+window.addEventListener('keydown', e => {
+  if (!started && (e.key === 'Enter' || e.key === ' ')) {
+    e.preventDefault();
+    startExperience();
+  }
+  if (started && e.key.toLowerCase() === 'm') {
+    isMuted = !isMuted;
+    fadeTarget = isMuted ? 0 : 1;
+    fadeStartTime = performance.now() / 1000;
+  }
+});
+
+// ────────────────────────────────────────────── Resize & Buffers ─────
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+  initBuffers();
+}
+window.addEventListener('resize', resize);
+resize();
+
+function initBuffers() {
+  bufferCanvas = document.createElement('canvas');
+  bufferCanvas.width = w;
+  bufferCanvas.height = h;
+  bufferCtx = bufferCanvas.getContext('2d', { willReadFrequently: true });
+
+  rippleMap1 = new Int16Array(w * h);
+  rippleMap2 = new Int16Array(w * h);
+  lastData = ctx.createImageData(w, h);
+}
+
+// ────────────────────────────────────────────── Main Loop ─────
+function loop(timeMs) {
+  requestAnimationFrame(loop);
+
+  if (!started) {
+    ctx.filter = 'brightness(0.35) blur(12px)';
+    drawCover(ctx, img, w, h);
+    ctx.filter = 'none';
+    return;
+  }
+
+  if (!video.videoWidth) return;
+
+  const nowSec = timeMs / 1000;
+  updateFade(nowSec);
+
+  // Mirror webcam
+  bufferCtx.save();
+  bufferCtx.translate(w, 0);
+  bufferCtx.scale(-1, 1);
+  drawCover(bufferCtx, video, w, h);
+  bufferCtx.restore();
+
+  const nowData = bufferCtx.getImageData(0, 0, w, h).data;
+
+  // Motion detection
+  let motionFound = false;
+  if (timeMs > webcamReadyTime) {
+    for (let i = 0; i < nowData.length; i += 4) {
+      const diff =
+        Math.abs(nowData[i]   - lastData.data[i]) +
+        Math.abs(nowData[i+1] - lastData.data[i+1]) +
+        Math.abs(nowData[i+2] - lastData.data[i+2]);
+
+      if (diff > SENSITIVITY * 3) {
+        const x = (i / 4) % w | 0;
+        const y = Math.floor((i / 4) / w);
+        addRipple(x, y, 80);
+        motionFound = true;
+      }
+    }
+  }
+
+  if (!motionFound && timeMs - oldTime > RIPPLE_DECAY_MS) {
+    for (let i = 0; i < rippleMap1.length; i++) {
+      rippleMap1[i] *= 0.992;
+      rippleMap2[i] *= 0.992;
+    }
+  }
+  if (motionFound) oldTime = timeMs;
+
+  updateRipples();
+
+  drawCover(ctx, img, w, h);
+  applyDistortion();
+
+  lastData = bufferCtx.getImageData(0, 0, w, h);
+}
+
+// ────────────────────────────────────────────── Helpers ─────
+function drawCover(targetCtx, source, targetW, targetH) {
+  const sw = source.width || source.videoWidth;
+  const sh = source.height || source.videoHeight;
+  if (!sw || !sh) return;
+
+  const sRatio = sw / sh;
+  const tRatio = targetW / targetH;
+
+  let drawW, drawH, offsetX, offsetY;
+
+  if (sRatio > tRatio) {
+    drawH = targetH;
+    drawW = targetH * sRatio;
+    offsetX = (targetW - drawW) / 2;
+    offsetY = 0;
+  } else {
+    drawW = targetW;
+    drawH = targetW / sRatio;
+    offsetX = 0;
+    offsetY = (targetH - drawH) / 2;
+  }
+
+  targetCtx.drawImage(source, offsetX, offsetY, drawW, drawH);
+}
+
+function addRipple(x, y, strength = 60) {
+  if (x < 2 || x >= w-2 || y < 2 || y >= h-2) return;
+  const idx = y * w + x;
+  rippleMap1[idx] += strength;
+  rippleMap1[idx-1] += strength * 0.6;
+  rippleMap1[idx+1] += strength * 0.6;
+  rippleMap1[idx-w] += strength * 0.6;
+  rippleMap1[idx+w] += strength * 0.6;
+}
+
+function updateRipples() {
+  let temp = rippleMap1;
+  rippleMap1 = rippleMap2;
+  rippleMap2 = temp;
+
+  for (let x = 2; x < w-2; x++) {
+    for (let y = 2; y < h-2; y++) {
+      const idx = y * w + x;
+      const val =
+        (rippleMap1[(y-1)*w + x] +
+         rippleMap1[(y+1)*w + x] +
+         rippleMap1[y*w + x-1] +
+         rippleMap1[y*w + x+1]) / 2 -
+        rippleMap2[idx];
+      rippleMap2[idx] = val * RIPPLE_DAMPING;
+    }
+  }
+}
+
+function applyDistortion() {
+  const src = ctx.getImageData(0, 0, w, h).data;
+  const out = ctx.createImageData(w, h).data;
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const idx = (y * w + x) * 4;
+      const height = rippleMap2[y * w + x] * 0.08;
+
+      const ox = Math.round(x + height * RIPPLE_STRENGTH);
+      const oy = Math.round(y + height * RIPPLE_STRENGTH * 0.7);
+
+      let sx = Math.max(0, Math.min(w-1, ox));
+      let sy = Math.max(0, Math.min(h-1, oy));
+
+      const sidx = (sy * w + sx) * 4;
+
+      out[idx]   = src[sidx];
+      out[idx+1] = src[sidx+1];
+      out[idx+2] = src[sidx+2];
+      out[idx+3] = 255;
+    }
+  }
+  ctx.putImageData(new ImageData(out, w, h), 0, 0);
+}
+
+// ────────────────────────────────────────────── Launch ─────
+navigator.mediaDevices.getUserMedia({
+  video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }
+})
+.then(stream => {
+  video.srcObject = stream;
+  video.onloadedmetadata = () => {
+    video.play().catch(()=>{});
+    requestAnimationFrame(loop);
+  };
+})
+.catch(err => {
+  console.warn("Webcam access issue", err);
+  statusEl.textContent = "Webcam access denied or unavailable";
+});
+
+img.onload = () => {
+  ctx.filter = 'brightness(0.35) blur(12px)';
+  drawCover(ctx, img, w, h);
+  ctx.filter = 'none';
+};
+</script>
+</body>
+</html>
