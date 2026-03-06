@@ -105,25 +105,43 @@ function initMIDI() {
 
 function onMIDISuccess(midiAccess) {
     const outputs = Array.from(midiAccess.outputs.values());
-    // Available MIDI output options
-    const midiOptions = [
-        'Network Session 1', // Mac, Wireless
-        'IAC Driver Bus 1',  // Mac, Wired
-        'loopMIDI Port 1'      // PC, Wired
-    ];
+    const ua = navigator.userAgent.toLowerCase();
+    const isMac = /macintosh|mac os x/.test(ua);
 
-    // Find available outputs that match our options
-    const availableOutputs = outputs.filter(output => midiOptions.includes(output.name));
+    let targetNames = isMac
+        ? ['IAC Driver Bus 1', 'IAC Driver IAC Bus 1']
+        : ['loopMIDI Port 1', 'loopMIDI Port'];
 
-    // Default selection logic: prefer 'IAC Driver Bus 1' if available, otherwise first available
-    if (availableOutputs.length > 0) {
-        midiOutput = availableOutputs.find(output => output.name === 'IAC Driver Bus 1') || availableOutputs[0];
-        console.log(`MIDI: Selected output "${midiOutput.name}"`);
-    } else {
-        console.error('MIDI: No supported MIDI output found');
+    let selected = null;
+
+    // Try exact matches first
+    for (const name of targetNames) {
+        selected = outputs.find(o => o.name === name);
+        if (selected) break;
     }
 
-    // Update menu to highlight selected MIDI output
+    // Then try partial matches
+    if (!selected) {
+        for (const name of targetNames) {
+            selected = outputs.find(o => o.name.includes(name));
+            if (selected) break;
+        }
+    }
+
+    // Last resort
+    if (!selected && outputs.length > 0) {
+        selected = outputs[0];
+        console.warn("Using first available MIDI output as fallback");
+    }
+
+    midiOutput = selected;
+
+    if (midiOutput) {
+        console.log(`Auto-selected MIDI output: ${midiOutput.name}`);
+    } else {
+        console.warn("No suitable MIDI output found");
+    }
+
     updateMIDISelectionUI();
 }
 
