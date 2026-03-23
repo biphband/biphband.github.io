@@ -16,7 +16,7 @@
             <ul id="objectiveList"></ul>
         </div>
         <div id="title">
-            <h1 onclick="cycleClass()">Class Name</h1>
+            <h1 onclick="editRehearsalTitle()">Class Name</h1>
             <h2 id="timeRange">Time Range</h2>
             <div id="countdowns"></div>
         </div>
@@ -129,25 +129,17 @@ const classes = [
         criteria: ['stands', 'intonation', 'returned', 'engagement']
     }
 ];
-let currentClassIndex = 0;
 let students = classes[0].students;
 let teacherModeOrder = classes[0].teacherModeOrder;
 let currentCriteria = classes[0].criteria;
 let isObjectiveInputFocused = false;
+let isTitleInputFocused = false;
 let isAddingStudent = false;
 let lastExportDate = null;
 
-function getCurrentClass() {
-    return 0;
-}
-function cycleClass() {
-    // No cycling needed — only one class
-    updateClassDisplay();
-    updateCountdowns();
-}
+
 function updateClassDisplay() {
-    const cls = classes[currentClassIndex];
-    document.querySelector('#title h1').textContent = cls.name;
+    const cls = classes[0];
     document.querySelector('#timeRange').textContent = cls.timeRange;
     students = cls.students;
     teacherModeOrder = cls.teacherModeOrder;
@@ -160,6 +152,7 @@ function updateClassDisplay() {
     updateHotkeysDisplay();
     updateCountdowns();
     loadStickyNotes();
+    loadRehearsalTitle();
 }
 
 function updateCountdowns() {
@@ -206,19 +199,121 @@ function updateCountdowns() {
 }
 
 
+// Load saved custom title (or fall back to default from classes)
+function loadRehearsalTitle() {
+    const savedTitle = localStorage.getItem('rehearsalTitle');
+    const defaultTitle = classes[currentClassIndex].name;
+    const titleElement = document.querySelector('#title h1');
+    if (titleElement) {
+        titleElement.textContent = savedTitle || defaultTitle;
+    }
+}
+
+// Save new title
+function saveRehearsalTitle(newTitle) {
+    localStorage.setItem('rehearsalTitle', newTitle.trim());
+}
+
+function editRehearsalTitle() {
+    const titleElement = document.querySelector('#title h1');
+    const currentTitle = titleElement.textContent;
+
+    const existing = document.querySelector('div[style*="position: fixed"][style*="z-index: 1000"]');
+    if (existing) existing.remove();
+
+    const dialog = document.createElement('div');
+    dialog.style.cssText = `
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: white; padding: 20px; border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 1000;
+        text-align: center; width: 420px; max-width: 90%;
+    `;
+
+    dialog.innerHTML = `
+        <h3>Edit Rehearsal Title</h3>
+        <input type="text" id="rehearsalTitleInput" value="${currentTitle.replace(/"/g, '&quot;')}" 
+               style="width: 100%; padding: 10px; font-size: 1.2em; box-sizing: border-box;">
+        <div style="margin-top: 20px;">
+            <button id="saveTitleBtn">Save</button>
+            <button onclick="this.closest('div').remove(); isTitleInputFocused = false;">Cancel</button>
+        </div>
+    `;
+
+    document.body.appendChild(dialog);
+
+    const input = document.getElementById('rehearsalTitleInput');
+    setTimeout(() => {
+        input.focus();
+        input.select();
+        isTitleInputFocused = true;
+    }, 10);
+
+// Add global Esc listener just for this dialog
+const escListener = (e) => {
+    if (e.key === 'Escape') {
+        dialog.remove();
+        isTitleInputFocused = false;
+        document.removeEventListener('keydown', escListener);
+    }
+};
+document.addEventListener('keydown', escListener);
+
+// Also add to the input itself if you want Enter to save
+input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        // your save logic here, e.g.:
+        const newTitle = input.value.trim();
+        if (newTitle) {
+            document.querySelector('#title h1').textContent = newTitle;
+            localStorage.setItem('rehearsalTitle', newTitle);
+        }
+        dialog.remove();
+        isTitleInputFocused = false;
+        document.removeEventListener('keydown', escListener);
+    }
+});
+
+    document.getElementById('saveTitleBtn').onclick = saveTitleAndClose;
+
+    function saveTitleAndClose() {
+        const newTitle = input.value.trim();
+        if (newTitle) {
+            titleElement.textContent = newTitle;
+            localStorage.setItem('rehearsalTitle', newTitle);
+        }
+        dialog.remove();
+        isTitleInputFocused = false;
+    }
+
+    // Click outside → cancel
+    const outsideClick = (e) => {
+        if (!dialog.contains(e.target)) {
+            dialog.remove();
+            isTitleInputFocused = false;
+            document.removeEventListener('click', outsideClick);
+        }
+    };
+    setTimeout(() => document.addEventListener('click', outsideClick), 50);
+}
+
+
 function loadObjectives(key) {
     const cls = classes[0];
     const objectives = JSON.parse(localStorage.getItem(key)) || cls.defaultObjectives;
     updateObjectiveList(objectives);
 }
+
 function saveObjectives(key) {
     const objectives = Array.from(document.querySelectorAll('#objectiveList li')).map(li => li.textContent);
     localStorage.setItem(key, JSON.stringify(objectives));
 }
+
 function updateObjectiveList(objectives) {
     const objectiveList = document.getElementById('objectiveList');
     objectiveList.innerHTML = objectives.map(obj => `<li class="editable" onclick="editObjective(this)">${obj}</li>`).join('');
 }
+
 function editObjective(item) {
     const cls = classes[0];
     const currentItem = item.textContent;
@@ -301,6 +396,7 @@ function editObjective(item) {
     };
     setTimeout(() => document.addEventListener('click', handleOutsideClick), 0);
 }
+
 let menuStack = [];
 let currentZIndex = 1000;
 const MODES = {
@@ -1285,12 +1381,15 @@ window.onload = function() {
     updateClassDisplay();
     updateDateTime();
     loadStickyNotes();
+    loadRehearsalTitle();         
     setInterval(updateDateTime, 60000);
     setInterval(updateCountdowns, 1000);
 };
 createBars();
 updateDateTime();
 setInterval(updateDateTime, 1000);
+
+
 function exportScores() {
     let studentsToExport = students;
     const isMsBandThursday = classes[currentClassIndex].name === "MS Band ᵀᴴᵁᴿˢ";
@@ -1325,6 +1424,7 @@ function exportScores() {
             }
         });
     }
+
     let allAbsent = true;
     for (const student of studentsToExport) {
         if (student.attendance !== 'Absent' || student.score !== 'EX') {
@@ -1337,12 +1437,28 @@ function exportScores() {
         showTemporaryMessage('No changes detected—all students absent/EX. CSV not exported.');
         return;
     }
+
     const regularStudents = studentsToExport.filter(s => !s.isAdditional);
     const additionalStudents = studentsToExport.filter(s => s.isAdditional);
-    const headers = ['Name', ...regularStudents.map(student => `"${student.liveschoolName || student.name}"`)];
-    const classworkRow = ['Classwork', ...regularStudents.map(student => `"${student.score === 'EX' ? 'EX' : `${student.score}%`}"`)];
+
+    // Use the currently displayed title (edited or default)
+    const displayedTitle = document.querySelector('#title h1')?.textContent.trim() || 'Rehearsal';
+
+    // Sanitize for safe filename (remove special chars, spaces → underscores)
+    const safeFileName = displayedTitle
+        .replace(/[^a-zA-Z0-9\s-]/g, '')     // keep letters, numbers, spaces, hyphens
+        .replace(/\s+/g, '_')                // spaces to single underscore
+        .replace(/_+/g, '_')                 // collapse multiple underscores
+        .replace(/^_+|_+$/g, '');            // trim leading/trailing underscores
+
+    // CSV headers: first cell = displayed title (instead of 'Name')
+    const headers = [displayedTitle, ...regularStudents.map(student => `"${student.liveschoolName || student.name}"`)];
+
+    const classworkRow = [displayedTitle, ...regularStudents.map(student => `"${student.score === 'EX' ? 'EX' : `${student.score}%`}"`)];
+
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
+
     const housePointsItemized = studentsToExport
         .filter(student => student.housePoints !== 0)
         .map(student => {
@@ -1351,15 +1467,19 @@ function exportScores() {
         })
         .sort((a, b) => a.name.localeCompare(b.name))
         .map(item => `"${item.name}",${item.points > 0 ? '+' : ''}${item.points}`);
+
     const tardiesItemized = (isMsBandThursday ? students : studentsToExport)
         .filter(student => student.attendance === 'Tardy')
         .map(student => `"${student.liveschoolName || student.name}",Tardy,=DATEVALUE("${dateStr}")`);
+
     const absencesItemized = (isMsBandThursday ? students : studentsToExport)
         .filter(student => student.attendance === 'Absent')
         .map(student => `"${student.liveschoolName || student.name}",Absent,=DATEVALUE("${dateStr}")`);
+
     const additionalStudentsMessage = additionalStudents.length > 0
         ? additionalStudents.map(s => `"${s.liveschoolName || s.name}",Additional`)
         : [];
+
     const finalCsvRows = [
         headers.join(','),
         classworkRow.join(','),
@@ -1368,43 +1488,51 @@ function exportScores() {
         ...(absencesItemized.length > 0 ? ['', 'Absences', ...absencesItemized] : []),
         ...(additionalStudentsMessage.length > 0 ? additionalStudentsMessage : [])
     ];
+
     const csvFileDateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
-    const className = classes[currentClassIndex].name.replace(/[^a-zA-Z0-9]/g, '_');
+
     const csvContent = finalCsvRows.join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `${className}_Scores_${csvFileDateStr}.csv`);
+    link.setAttribute('download', `${safeFileName}_Scores_${csvFileDateStr}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+
     const housePointsDisplay = housePointsItemized.length > 0
         ? housePointsItemized.map(item => {
             const [name, points] = item.split(',');
             return `${name.replace(/"/g, '')}: ${points}`;
         }).join('\n')
         : 'No house points';
+
     const tardiesDisplay = tardiesItemized.length > 0
         ? `Tardies:\n${tardiesItemized.map(item => {
             const [name] = item.split(',');
             return `${name.replace(/"/g, '')}`;
         }).join('\n')}`
         : 'No tardies';
+
     const absencesDisplay = absencesItemized.length > 0
         ? `Absences:\n${absencesItemized.map(item => {
             const [name] = item.split(',');
             return `${name.replace(/"/g, '')}`;
         }).join('\n')}`
         : 'No absences';
+
     const separator = housePointsItemized.length === 0 && tardiesItemized.length === 0 && absencesItemized.length === 0 ? '\n' : '\n\n';
-    const message = `House points for today:\n${housePointsDisplay}${separator}${tardiesDisplay}\n\n${absencesDisplay}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.liveschoolName || s.name).join('\n')}` : ''}\n\nReset scores?`;
+
+    const message = `${displayedTitle}\n\nHouse points for today:\n${housePointsDisplay}${separator}${tardiesDisplay}\n\n${absencesDisplay}${additionalStudentsMessage.length > 0 ? `\n\nAdditional students:\n${additionalStudents.map(s => s.liveschoolName || s.name).join('\n')}` : ''}\n\nReset scores?`;
+
     showCustomAlert(message);
     showTemporaryMessage('Scores exported as CSV');
     closeSpecificMenu('teacher-mode');
 }
+
 function showCustomAlert(message) {
     const alertOverlay = document.createElement('div');
     alertOverlay.id = 'alert-overlay';
