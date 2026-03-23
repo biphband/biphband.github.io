@@ -135,7 +135,8 @@ let teacherModeOrder = classes[0].teacherModeOrder;
 let currentCriteria = classes[0].criteria;
 let isObjectiveInputFocused = false;
 let isAddingStudent = false;
-// Always use the single class
+let lastExportDate = null;
+
 function getCurrentClass() {
     return 0;
 }
@@ -160,18 +161,24 @@ function updateClassDisplay() {
     updateCountdowns();
     loadStickyNotes();
 }
+
 function updateCountdowns() {
     const container = document.getElementById('countdowns');
     container.innerHTML = '';
+
     const now = new Date();
-    const cls = classes[currentClassIndex];
+    const cls   = classes[currentClassIndex];
+
     const start = new Date(now);
     start.setHours(cls.startTime.hours, cls.startTime.minutes, 0, 0);
+
     const end = new Date(now);
     end.setHours(cls.endTime.hours, cls.endTime.minutes, 0, 0);
+
     const toStart = (start - now) / 1000;
-    const toEnd = (end - now) / 1000;
-    // Only show "Rehearsal begins in…" in the last 30 min
+    const toEnd   = (end   - now) / 1000;
+
+    // Countdown to start (last 30 min)
     if (toStart > 0 && toStart <= 1800) {
         const m = Math.floor(toStart / 60);
         const s = Math.floor(toStart % 60);
@@ -180,11 +187,25 @@ function updateCountdowns() {
         div.textContent = `Rehearsal begins in ${m}m ${s}s`;
         container.appendChild(div);
     }
-    // Auto-export the moment rehearsal ends
-    if (toEnd < 0 && toEnd > -5) {
-        exportScores();
+
+
+    const todayStr = now.toDateString();  
+
+    if (toEnd <= 0 && toEnd > -90) {       
+        if (lastExportDate !== todayStr) {
+            console.log(`Auto-export triggered at ${now.toLocaleTimeString()}`);
+            exportScores();
+            lastExportDate = todayStr;
+            showTemporaryMessage("Rehearsal ended — scores auto-exported (once per day)");
+        }
+    }
+
+    if (now.getHours() === 0 && now.getMinutes() < 10) {
+        lastExportDate = null;
     }
 }
+
+
 function loadObjectives(key) {
     const cls = classes[0];
     const objectives = JSON.parse(localStorage.getItem(key)) || cls.defaultObjectives;
