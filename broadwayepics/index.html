@@ -373,6 +373,7 @@
             if (displayName === 'Alto Saxophone 1') displayName = 'Alto Sax 1';
             if (displayName === 'Alto Saxophone 2') displayName = 'Alto Sax 2';
             if (displayName === 'Tenor Saxophone') displayName = 'Tenor Sax';
+            if (file === 'Broadway Epics 2026_Seating_Chart.pdf') displayName = 'Seating Chart';
 
             // Capitalize properly
             displayName = displayName.split(' ')
@@ -397,13 +398,16 @@
       }
     }
 
-    function displayContent(file) {
+function displayContent(file) {
       let filePath;
-      if (file === 'Broadway Epics 2026_Seating_Chart.pdf') {
-        filePath = file;  // root directory
+
+      if (file === 'Broadway Epics 2026_Conductor_Parts.pdf' || 
+          file === 'Broadway Epics 2026_Seating_Chart.pdf') {
+        filePath = file;                    // load from root directory
       } else {
         filePath = `Broadway Epics 2026_Parts/${file}`;
       }
+
       window.location.href = filePath;
     }
 
