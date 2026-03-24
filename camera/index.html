@@ -64,7 +64,7 @@
             margin-left: -5px;
             top: 10px;
             left: 13px;
-            z-index: 10000; /* Increased for highest priority */
+            z-index: 10000;
         }
 
         .menu-toggle {
@@ -112,7 +112,7 @@
             transition: all 0.3s ease-in-out;
             opacity: 0;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            z-index: 10000; /* Ensure menu items also have high z-index */
+            z-index: 10000;
         }
 
         .menu-items.show {
@@ -217,7 +217,9 @@
     </section>
 
     <script>
-        const hardcodedPassword = atob('a3Jha2Vu'); // Obfuscated password
+        // Updated obfuscated password ("Kraken" → base64)
+        const hardcodedPassword = atob('S3Jha2Vu');
+
         let mediaRecorder;
         let recordedChunks = [];
         let recordedBlob;
@@ -251,21 +253,45 @@
             }
         }
 
-        async function initCamera() {
-            try {
-                mediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: { 
-                        facingMode: 'user',
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    },
-                    audio: true
-                });
-                document.getElementById('preview').srcObject = mediaStream;
-            } catch (err) {
-                alert('Error accessing camera/microphone: ' + err.message);
+async function initCamera() {
+    try {
+        // This is the strongest way to request the system's current default microphone
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+            video: { 
+                facingMode: 'user',
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            },
+            audio: {
+                deviceId: { ideal: 'default' },   // ← Best for system default
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
             }
+        });
+        document.getElementById('preview').srcObject = mediaStream;
+    } catch (err) {
+        console.warn('Failed with deviceId: default → trying simple audio', err);
+        // Fallback: let the browser/OS choose without forcing deviceId
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({
+                video: { 
+                    facingMode: 'user',
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                },
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
+            });
+            document.getElementById('preview').srcObject = mediaStream;
+        } catch (fallbackErr) {
+            alert('Error accessing camera/microphone: ' + fallbackErr.message);
         }
+    }
+}
 
         function toggleRecording() {
             if (!isRecording) {
@@ -292,7 +318,7 @@
                 const playback = document.getElementById('playback');
                 playback.src = URL.createObjectURL(recordedBlob);
             };
-            mediaRecorder.start(1000); // Use timeslice to ensure chunks include audio
+            mediaRecorder.start(1000);
             isRecording = true;
             const btn = document.getElementById('record-btn');
             btn.innerHTML = '🟥 Stop';
@@ -310,7 +336,6 @@
         function reRecord() {
             document.getElementById('playback-section').style.display = 'none';
             document.getElementById('recording-section').style.display = 'flex';
-            // Reset for new recording
             recordedBlob = null;
             recordedChunks = [];
             document.getElementById('playback').src = '';
@@ -332,7 +357,6 @@
                     }
                 }
             } else {
-                // Fallback for environments where sharing files is not supported (e.g., desktop Safari)
                 const url = URL.createObjectURL(recordedBlob);
                 const a = document.createElement('a');
                 a.style.display = 'none';
