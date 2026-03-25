@@ -18,6 +18,8 @@
             overflow: hidden;
             touch-action: none;
             cursor: none;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
         }
         
         canvas {
@@ -25,53 +27,122 @@
             width: 100vw;
             height: 100vh;
         }
+
+        /* MIDI Selection Modal */
+        #midi-modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.4s ease;
+        }
         
-        /* Subtle scanline effect for visualizer feel (very faint) */
-        canvas::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                to bottom,
-                transparent 0px,
-                transparent 3px,
-                rgba(255,255,255,0.02) 3px,
-                rgba(255,255,255,0.02) 6px
-            );
+        #midi-modal.hidden {
+            opacity: 0;
             pointer-events: none;
-            z-index: 10;
-            display: none; /* disabled by default - too distracting */
+        }
+        
+        .modal-content {
+            background: #111;
+            padding: 40px 50px;
+            border-radius: 16px;
+            border: 1px solid #333;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+        
+        .modal-content h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #FF00FF;
+        }
+        
+        .modal-content p {
+            color: #aaa;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        
+        select {
+            width: 100%;
+            padding: 14px 16px;
+            background: #222;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 25px;
+            outline: none;
+        }
+        
+        select:focus {
+            border-color: #FF00FF;
+        }
+        
+        button {
+            background: #FF00FF;
+            color: #000;
+            font-weight: 700;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background: #CC00FF;
+            transform: scale(1.03);
+        }
+        
+        .status {
+            margin-top: 15px;
+            font-size: 14px;
+            min-height: 20px;
         }
     </style>
 </head>
 <body>
     <canvas id="canvas"></canvas>
 
+    <!-- MIDI Selection Modal -->
+    <div id="midi-modal">
+        <div class="modal-content">
+            <h1>🌊 Ripple MIDI Visualizer</h1>
+            <p>Choose your MIDI output device.<br>Default is usually <strong>IAC Driver Bus 1</strong> (macOS) or similar virtual bus.</p>
+            
+            <select id="midi-select"></select>
+            
+            <button id="connect-btn">Connect & Start Visualizer</button>
+            
+            <div class="status" id="status"></div>
+        </div>
+    </div>
+
     <script>
         // ============== CONFIG ==============
         const COLORS = [
-            '#FF4500', // 1. Orange
-            '#FFEA00', // 2. Yellow
-            '#BFFF00', // 3. Lime
-            '#00FF66', // 4. Green
-            '#00FFFF', // 5. Aqua
-            '#6600FF', // 6. Indigo
-            '#CC00FF', // 7. Purple
-            '#FF00FF'  // 8. Magenta
+            '#FF4500', '#FFEA00', '#BFFF00', '#00FF66',
+            '#00FFFF', '#6600FF', '#CC00FF', '#FF00FF'
         ];
         
         const MIDI_NOTE_VELOCITY = 99;
         const RIPPLE_LIFE_MS = 2100;
-        const RIPPLE_SPEED_PPS = 180;        // pixels per second (user clicks/drags)
-        const IDLE_RIPPLE_SPEED_PPS = 160;   // much slower for subtle idle
+        const RIPPLE_SPEED_PPS = 180;
+        const IDLE_RIPPLE_SPEED_PPS = 160;
         const IDLE_RIPPLE_LIFE_MS = 3800;
-        const IDLE_INTENSITY = 0.085;        // VERY subtle
-        const IDLE_INTERVAL_MS = 2450;       // occasional idle ripples
-        const DRAG_THROTTLE_MS = 1;         // smooth trail without flooding
-        
+        const IDLE_INTENSITY = 0.085;
+        const IDLE_INTERVAL_MS = 2450;
+        const DRAG_THROTTLE_MS = 1;
+
         // ============== SETUP ==============
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d', { alpha: true });
@@ -87,7 +158,7 @@
         }
         window.addEventListener('resize', resize);
         resize();
-        
+
         // State
         let ripples = [];
         let currentColorIndex = 0;
@@ -97,99 +168,121 @@
         let isDragging = false;
         let lastDragRippleTime = 0;
         let lastIdleTime = Date.now();
-        
+
         // ============== MIDI ==============
+        let midiAccess = null;
+
         async function initMIDI() {
             if (!navigator.requestMIDIAccess) {
-                console.log('%cWeb MIDI not supported in this browser', 'color:#FF4500');
-                return;
+                showStatus('Web MIDI not supported in this browser', 'error');
+                return null;
             }
-            
+
             try {
-                const midiAccess = await navigator.requestMIDIAccess({ sysex: false });
-                const outputs = Array.from(midiAccess.outputs.values());
-                
-                // Look for exact "IAC Driver Bus 1" (macOS standard name)
-                midiOutput = outputs.find(output => 
-                    output.name === 'IAC Driver Bus 1' || 
-                    output.name.includes('IAC Driver Bus 1')
-                );
-                
-                if (midiOutput) {
-                    console.log('%c✅ MIDI connected → IAC Driver Bus 1', 'color:#00FF66;font-weight:700');
-                } else {
-                    console.log('%c⚠️ IAC Driver Bus 1 not found. Available outputs:', 'color:#FFEA00', outputs.map(o => o.name));
-                }
+                midiAccess = await navigator.requestMIDIAccess({ sysex: false });
+                return Array.from(midiAccess.outputs.values());
             } catch (err) {
-                console.log('%cMIDI access denied or unavailable', 'color:#FF4500');
+                showStatus('MIDI access denied or unavailable', 'error');
+                return null;
             }
         }
-        
+
+        function populateMidiSelect(outputs) {
+            const select = document.getElementById('midi-select');
+            select.innerHTML = '';
+
+            if (!outputs || outputs.length === 0) {
+                const opt = document.createElement('option');
+                opt.textContent = 'No MIDI outputs found';
+                opt.disabled = true;
+                select.appendChild(opt);
+                return;
+            }
+
+            // Try to find a sensible default (IAC Driver Bus 1 or similar)
+            let defaultIndex = -1;
+            outputs.forEach((output, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = output.name;
+                select.appendChild(opt);
+
+                const name = output.name.toLowerCase();
+                if (defaultIndex === -1 && 
+                    (name.includes('iac') || name.includes('bus 1') || name.includes('virtual') || name.includes('loopmidi'))) {
+                    defaultIndex = i;
+                }
+            });
+
+            if (defaultIndex !== -1) {
+                select.value = defaultIndex;
+            }
+        }
+
+        function connectSelectedMidi() {
+            const select = document.getElementById('midi-select');
+            const outputs = Array.from(midiAccess.outputs.values());
+            const selectedIndex = parseInt(select.value);
+
+            if (isNaN(selectedIndex) || !outputs[selectedIndex]) {
+                showStatus('Please select a valid MIDI output', 'error');
+                return;
+            }
+
+            midiOutput = outputs[selectedIndex];
+            console.log(`%c✅ MIDI connected → ${midiOutput.name}`, 'color:#00FF66;font-weight:700');
+
+            // Hide modal and start visualizer
+            document.getElementById('midi-modal').classList.add('hidden');
+            startVisualizer();
+        }
+
+        function showStatus(msg, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = msg;
+            statusEl.style.color = type === 'error' ? '#FF4500' : '#FFEA00';
+        }
+
         function sendMIDINote(noteNumber) {
             if (!midiOutput) return;
             
-            // Note ON - Channel 1 (0x90)
             midiOutput.send([0x90, noteNumber, MIDI_NOTE_VELOCITY]);
             
-            // Note OFF after short trigger (100ms) - typical for percussive/click triggers
             setTimeout(() => {
-                if (midiOutput) {
-                    midiOutput.send([0x80, noteNumber, 0]);
-                }
+                if (midiOutput) midiOutput.send([0x80, noteNumber, 0]);
             }, 100);
         }
-        
+
         // ============== RIPPLE SYSTEM ==============
         class Ripple {
             constructor(x, y, color, intensity, speed, life) {
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                this.intensity = intensity;
-                this.speed = speed;
-                this.life = life;
+                this.x = x; this.y = y; this.color = color;
+                this.intensity = intensity; this.speed = speed; this.life = life;
                 this.birth = Date.now();
             }
-            
-            getAge() {
-                return Date.now() - this.birth;
-            }
-            
-            isDead() {
-                return this.getAge() > this.life;
-            }
-            
-            getProgress() {
-                return Math.min(this.getAge() / this.life, 1);
-            }
-            
-            getRadius() {
-                return 8 + (this.getAge() / 1000) * this.speed;
-            }
-            
+            getAge() { return Date.now() - this.birth; }
+            isDead() { return this.getAge() > this.life; }
+            getProgress() { return Math.min(this.getAge() / this.life, 1); }
+            getRadius() { return 8 + (this.getAge() / 1000) * this.speed; }
             getAlpha() {
                 const progress = this.getProgress();
-                // Gentle quadratic fade for beautiful ripple dissolve
                 return (1 - Math.pow(progress, 1.6)) * this.intensity;
             }
         }
-        
+
         function createRipple(x, y, color, intensity = 1, speed = RIPPLE_SPEED_PPS, life = RIPPLE_LIFE_MS) {
             ripples.push(new Ripple(x, y, color, intensity, speed, life));
         }
-        
+
         // ============== ANIMATION LOOP ==============
         function animate() {
             const now = Date.now();
             
-            // Soft fade trail instead of hard clear (gives that dreamy visualizer persistence)
             ctx.fillStyle = 'rgba(0, 0, 0, 0.13)';
             ctx.fillRect(0, 0, width, height);
             
-            // Draw all ripples
             for (let i = ripples.length - 1; i >= 0; i--) {
                 const r = ripples[i];
-                
                 if (r.isDead()) {
                     ripples.splice(i, 1);
                     continue;
@@ -198,7 +291,6 @@
                 const radius = r.getRadius();
                 const alpha = r.getAlpha();
                 
-                // Glow effect
                 ctx.shadowBlur = 22;
                 ctx.shadowColor = r.color;
                 
@@ -211,13 +303,11 @@
                 ctx.stroke();
                 ctx.restore();
                 
-                // Reset shadow for next ripple
                 ctx.shadowBlur = 0;
             }
             
-            // ============== IDLE RIPPLE EFFECT (very very subtle) ==============
+            // Idle ripples
             if (hasInteracted && now - lastIdleTime > IDLE_INTERVAL_MS) {
-                // Random position, very slow and faint
                 const idleX = Math.random() * width;
                 const idleY = Math.random() * height;
                 createRipple(idleX, idleY, lastColor, IDLE_INTENSITY, IDLE_RIPPLE_SPEED_PPS, IDLE_RIPPLE_LIFE_MS);
@@ -226,39 +316,27 @@
             
             requestAnimationFrame(animate);
         }
-        
+
         // ============== INTERACTION ==============
         function handleClick(e) {
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             
-            // Use current color
             const color = COLORS[currentColorIndex];
-            
-            // Create main ripple
             createRipple(x, y, color, 1, RIPPLE_SPEED_PPS, RIPPLE_LIFE_MS);
-            
-            // Update last color for idle + drag trails
             lastColor = color;
             
-            // Send MIDI (only on actual clicks, not drags)
-            const noteNumber = currentColorIndex + 1; // 1 through 8
+            const noteNumber = currentColorIndex + 1; // 1-8
             sendMIDINote(noteNumber);
             
-            // Cycle to next color
             currentColorIndex = (currentColorIndex + 1) % COLORS.length;
-            
             hasInteracted = true;
         }
-        
-        function startDrag() {
-            isDragging = true;
-        }
-        
+
+        function startDrag() { isDragging = true; }
         function handleDrag(e) {
             if (!isDragging) return;
-            
             const now = Date.now();
             if (now - lastDragRippleTime < DRAG_THROTTLE_MS) return;
             
@@ -266,65 +344,65 @@
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             
-            // Drag ripples follow using the SAME color as the initial click
-            // (no MIDI, no color change)
             createRipple(x, y, lastColor, 0.95, RIPPLE_SPEED_PPS * 0.9, RIPPLE_LIFE_MS * 0.85);
-            
             lastDragRippleTime = now;
         }
-        
-        function endDrag() {
-            isDragging = false;
-        }
-        
-        // ============== EVENT LISTENERS ==============
+        function endDrag() { isDragging = false; }
+
         function addListeners() {
-            // Pointer events work for both mouse and touch
             canvas.addEventListener('pointerdown', (e) => {
                 if (e.pointerType === 'mouse' && e.button !== 0) return;
                 startDrag();
                 handleClick(e);
             });
             
-            canvas.addEventListener('pointermove', (e) => {
-                handleDrag(e);
-            });
-            
+            canvas.addEventListener('pointermove', handleDrag);
             canvas.addEventListener('pointerup', endDrag);
             canvas.addEventListener('pointerleave', endDrag);
             canvas.addEventListener('pointercancel', endDrag);
-            
-            // Keyboard shortcut: press any key to simulate a click at center (for testing)
+
+            // Keyboard fallback
             document.addEventListener('keydown', (e) => {
                 if (!hasInteracted) {
-                    // Fake center click on first keyboard press
-                    const fakeEvent = {
-                        clientX: width / 2,
-                        clientY: height / 2
-                    };
+                    const fakeEvent = { clientX: width / 2, clientY: height / 2 };
                     startDrag();
                     handleClick(fakeEvent);
                     endDrag();
                 }
             });
         }
-        
-        // ============== START EVERYTHING ==============
-        function start() {
-            console.log('%c🌊 Fullscreen Ripple MIDI Visualizer ready', 'color:#FF00FF;font-size:13px;font-weight:700');
-            console.log('→ Click or drag anywhere. MIDI sent to IAC Driver Bus 1 (notes 1-8)');
-            console.log('→ Colors cycle: Orange → Yellow → Lime → Green → Aqua → Indigo → Purple → Magenta');
-            
-            initMIDI();
+
+        // ============== START VISUALIZER (after MIDI choice) ==============
+        function startVisualizer() {
+            console.log('%c🌊 Ripple MIDI Visualizer ready', 'color:#FF00FF;font-size:13px;font-weight:700');
+            console.log(`→ MIDI output: ${midiOutput ? midiOutput.name : 'None (visuals only)'}`);
+            console.log('→ Click or drag anywhere. Colors cycle through 8 vibrant hues.');
+
             addListeners();
             animate();
-            
-            // Initial idle ripple so it feels alive immediately
+
+            // Gentle starting ripple
             setTimeout(() => {
                 createRipple(width * 0.3, height * 0.4, COLORS[0], IDLE_INTENSITY * 1.4, IDLE_RIPPLE_SPEED_PPS * 0.5, IDLE_RIPPLE_LIFE_MS);
-            }, 800);
+            }, 600);
         }
-        
+
+        // ============== MAIN START ==============
+        async function start() {
+            const outputs = await initMIDI();
+            populateMidiSelect(outputs);
+            
+            document.getElementById('connect-btn').addEventListener('click', connectSelectedMidi);
+            
+            // Auto-connect if only one output exists (optional quality-of-life)
+            if (outputs && outputs.length === 1) {
+                setTimeout(() => {
+                    document.getElementById('midi-select').value = 0;
+                    connectSelectedMidi();
+                }, 800);
+            }
+        }
+
         // Launch
         start();
     </script>
