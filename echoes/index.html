@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echoes of Touch</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #000;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <script>
+        let particles = [];
+        let ripples = [];
+        const NUM_PARTICLES = 300;
+        let synth;
+        let isDragging = false;
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            colorMode(HSB, 360, 100, 100, 1);
+            background(0);
+
+            for (let i = 0; i < NUM_PARTICLES; i++) {
+                particles.push(new Particle());
+            }
+
+            // Set up Tone.js synth with lower volume and echoey reverb
+            synth = new Tone.PolySynth(Tone.Synth, {
+                oscillator: { type: "sine" },
+                envelope: { attack: 0.2, decay: 0.7, sustain: 0, release: 1.5 } // Softer envelope
+            });
+            synth.volume.value = -20; // Reduce volume (in decibels, -20 is much quieter)
+            const reverb = new Tone.Reverb({ decay: 3, wet: 0.7 }).toDestination();
+            synth.connect(reverb);
+            Tone.start();
+        }
+
+        function draw() {
+            background(0, 0, 0, 0.1); // Slower fade for softer trails
+
+            for (let p of particles) {
+                p.update();
+                p.display();
+            }
+
+            for (let i = ripples.length - 1; i >= 0; i--) {
+                ripples[i].update();
+                ripples[i].display();
+                if (ripples[i].isDone()) ripples.splice(i, 1);
+            }
+
+            if (isDragging) {
+                let glow = createVector(mouseX, mouseY);
+                addGlow(glow.x, glow.y);
+            }
+        }
+
+        function mousePressed() {
+            isDragging = true;
+            ripples.push(new Ripple(mouseX, mouseY));
+            triggerSound();
+            return false;
+        }
+
+        function mouseDragged() {
+            ripples.push(new Ripple(mouseX, mouseY));
+            triggerSound();
+            return false;
+        }
+
+        function mouseReleased() {
+            isDragging = false;
+        }
+
+        function touchStarted() {
+            isDragging = true;
+            for (let t of touches) {
+                ripples.push(new Ripple(t.x, t.y));
+                triggerSound();
+            }
+            return false;
+        }
+
+        function touchMoved() {
+            for (let t of touches) {
+                ripples.push(new Ripple(t.x, t.y));
+                triggerSound();
+            }
+            return false;
+        }
+
+        function touchEnded() {
+            isDragging = false;
+        }
+
+        class Particle {
+            constructor() {
+                this.pos = createVector(random(width), random(height));
+                this.vel = createVector(0, 0);
+                this.hue = random(360);
+                this.brightness = 40; // Lower initial brightness
+            }
+
+            update() {
+                let noiseVal = noise(this.pos.x * 0.01, this.pos.y * 0.01, frameCount * 0.01);
+                this.vel = p5.Vector.fromAngle(noiseVal * TWO_PI).mult(1.5); // Slower movement
+                this.pos.add(this.vel);
+
+                if (this.pos.x < 0) this.pos.x += width;
+                if (this.pos.x > width) this.pos.x -= width;
+                if (this.pos.y < 0) this.pos.y += height;
+                if (this.pos.y > height) this.pos.y -= height;
+
+                for (let r of ripples) {
+                    let d = dist(this.pos.x, this.pos.y, r.x, r.y);
+                    if (d < r.radius) {
+                        let force = p5.Vector.sub(this.pos, createVector(r.x, r.y));
+                        force.setMag(map(d, 0, r.radius, 6, 0)); // Gentler push
+                        this.pos.add(force);
+                        this.hue = (this.hue + 5) % 360; // Subtler color shift
+                        this.brightness = min(this.brightness + 8, 80); // Softer brightening
+                    }
+                }
+                this.brightness = max(this.brightness - 0.3, 40); // Slower fade
+            }
+
+            display() {
+                noStroke();
+                fill(this.hue, 60, this.brightness, 0.6); // Lower saturation and alpha
+                ellipse(this.pos.x, this.pos.y, 15); // Slightly larger for softer look
+            }
+        }
+
+        class Ripple {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 0;
+                this.maxRadius = 300; // Larger ripples
+                this.alpha = 0.8; // Softer starting alpha
+            }
+
+            update() {
+                this.radius += 3; // Slower expansion
+                this.alpha = map(this.radius, 0, this.maxRadius, 0.8, 0);
+            }
+
+            display() {
+                noFill();
+                stroke(0, 0, 90, this.alpha); // Softer white
+                strokeWeight(2); // Thinner line
+                ellipse(this.x, this.y, this.radius * 2);
+            }
+
+            isDone() {
+                return this.radius >= this.maxRadius;
+            }
+        }
+
+        function addGlow(x, y) {
+            let glowSize = 80; // Larger glow area
+            for (let i = glowSize; i > 0; i -= 4) { // More layers for smoother gradient
+                let alpha = map(i, 0, glowSize, 0.05, 0.6); // Softer glow
+                fill(0, 0, 95, alpha); // Slightly dimmer white
+                noStroke();
+                ellipse(x, y, i * 2);
+            }
+        }
+
+        function triggerSound() {
+            let notes = ["C4", "E4", "G4", "B4"];
+            synth.triggerAttackRelease(random(notes), "8n");
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+    </script>
+</head>
+<body>
+</body>
+</html>
