@@ -48,7 +48,7 @@
         /* Top Section */
         .top-section {
             text-align: center;
-            padding-top: 8vh;
+            padding-top: 4vh;
             flex-shrink: 0;
         }
 
@@ -59,14 +59,14 @@
             letter-spacing: 4px;
             text-transform: uppercase;
             color: #ffffff;
-            margin: 6px 0;
+            margin: 4px 0;
         }
 
         #bibscaf-title {
             font-family: 'Poppins', sans-serif;
             font-size: 7.8vw;
             font-weight: 900;
-            letter-spacing: -3px;
+            letter-spacing: 0px;
             line-height: 0.88;
             margin: 12px 0 18px 0;
             background: linear-gradient(90deg, 
@@ -101,7 +101,7 @@
             text-shadow: 0 0 25px rgba(255,255,255,0.8);
         }
 
-        /* Center - Touch Anywhere (darker as requested) */
+        /* Center - Touch Anywhere (darker) */
         .center-section {
             flex: 1;
             display: flex;
@@ -113,7 +113,7 @@
             width: 540px;
             max-width: 88vw;
             height: 190px;
-            background: rgba(25, 25, 30, 0.82);   /* Darker background */
+            background: rgba(25, 25, 30, 0.82);
             backdrop-filter: blur(14px);
             border-radius: 50px;
             display: flex;
@@ -141,7 +141,7 @@
             letter-spacing: 6px;
             color: transparent;
             -webkit-text-fill-color: transparent;
-            background: linear-gradient(to bottom, #cccccc, #999999);   /* Darker text */
+            background: linear-gradient(to bottom, #cccccc, #999999);
             -webkit-background-clip: text;
             background-clip: text;
             text-align: center;
@@ -151,7 +151,7 @@
         /* Bottom Credit */
         .bottom-section {
             text-align: center;
-            padding-bottom: 6vh;
+            padding-bottom: 3vh;
             flex-shrink: 0;
         }
 
@@ -221,6 +221,7 @@
         let width = window.innerWidth;
         let height = window.innerHeight;
         let lastUserInteractionTime = Date.now();
+        let lastIdleTime = Date.now();
 
         function resize() {
             width = window.innerWidth;
@@ -238,7 +239,6 @@
         let midiOutput = null;
         let dragging = false;
         let lastDragRippleTime = 0;
-        let lastIdleTime = Date.now();   // Separate timer for idle ripples
 
         // ============== MIDI ==============
         async function initMIDI() {
@@ -308,8 +308,8 @@
                 ctx.shadowBlur = 0;
             }
 
-            // ============== IDLE RIPPLE EFFECT (restored to original behavior) ==============
-            if (hasInteracted && Date.now() - lastIdleTime > IDLE_INTERVAL_MS) {
+            // Idle ripples now run continuously (behind splash too)
+            if (Date.now() - lastIdleTime > IDLE_INTERVAL_MS) {
                 const idleX = Math.random() * width;
                 const idleY = Math.random() * height;
                 createRipple(idleX, idleY, lastColor, IDLE_INTENSITY, IDLE_RIPPLE_SPEED_PPS, IDLE_RIPPLE_LIFE_MS);
@@ -382,7 +382,7 @@
 
         // ============== START ==============
         function start() {
-            console.log('%c🌊 Ripple MIDI Visualizer + BIBSCAF Splash Ready', 'color:#FF00FF;font-weight:700');
+            console.log('%c🌊 Ripple MIDI Visualizer + BIBSCAF Splash (idle ripples always on)', 'color:#FF00FF;font-weight:700');
 
             initMIDI();
             addListeners();
@@ -390,14 +390,14 @@
 
             setTimeout(() => showSplash(), 400);
 
-            // Check idle every 500ms
+            // Idle check for splash (10 seconds)
             setInterval(() => {
                 if (Date.now() - lastUserInteractionTime > IDLE_TIMEOUT_MS) {
                     showSplash();
                 }
             }, 500);
 
-            // Initial subtle ripple
+            // Initial ripple
             setTimeout(() => {
                 createRipple(width * 0.4, height * 0.45, COLORS[0], 0.14, 95, 4500);
             }, 1500);
