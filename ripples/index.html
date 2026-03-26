@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ripple MIDI Visualizer</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Poppins:wght@700;900&display=swap');
         
         * {
             margin: 0;
@@ -18,112 +18,184 @@
             overflow: hidden;
             touch-action: none;
             cursor: none;
-            font-family: 'Inter', sans-serif;
-            color: #fff;
         }
         
         canvas {
             display: block;
             width: 100vw;
             height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
 
-        /* MIDI Selection Modal */
-        #midi-modal {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.95);
+        /* ===================== SPLASH SCREEN ===================== */
+        #splash {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 5s ease-in-out;
+        }
+
+        /* Top Section */
+        .top-section {
+            text-align: center;
+            padding-top: 4vh;
+            flex-shrink: 0;
+        }
+
+        .top-text p {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #ffffff;
+            margin: 6px 0;
+        }
+
+        #bibscaf-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 7.8vw;
+            font-weight: 900;
+            letter-spacing: -1px;
+            line-height: 0.88;
+            margin: 12px 0 18px 0;
+            background: linear-gradient(90deg, 
+                #ff00ff, #00ffff, #ffff00, #00ff88, 
+                #ff00ff, #00ffff, #ffff00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 280% 280%;
+            animation: iridescentShift 7s ease-in-out infinite;
+            text-shadow: 
+                0 0 40px rgba(255,255,255,0.7),
+                0 0 80px rgba(255,0,255,0.5);
+            -webkit-text-stroke: 3px rgba(255,255,255,0.15);
+        }
+
+        @keyframes iridescentShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        #bibscaf-title::after {
+            content: 'Iridescence';
+            display: block;
+            margin-top: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 2.4vw;
+            font-style: italic;
+            font-weight: 400;
+            letter-spacing: 7px;
+            color: rgba(255,255,255,0.92);
+            text-shadow: 0 0 25px rgba(255,255,255,0.8);
+        }
+
+        /* Center - Touch Anywhere (always centered) */
+        .center-section {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
-            opacity: 1;
-            transition: opacity 0.4s ease;
         }
-        
-        #midi-modal.hidden {
-            opacity: 0;
-            pointer-events: none;
+
+        .touch-block {
+            width: 540px;
+            max-width: 88vw;
+            height: 190px;
+            background: rgba(240, 240, 240, 0.133);
+            backdrop-filter: blur(14px);
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255,255,255,0.18);
+            box-shadow: 0 25px 70px rgba(0,0,0,0.65);
+            position: relative;
+            overflow: hidden;
         }
-        
-        .modal-content {
-            background: #111;
-            padding: 40px 50px;
-            border-radius: 16px;
-            border: 1px solid #333;
-            max-width: 420px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+
+        .touch-block::before {
+            content: '';
+            position: absolute;
+            inset: -50%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            animation: shine 5.5s linear infinite;
         }
-        
-        .modal-content h1 {
-            font-size: 24px;
-            margin-bottom: 8px;
-            color: #FF00FF;
-        }
-        
-        .modal-content p {
-            color: #aaa;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-        
-        select {
-            width: 100%;
-            padding: 14px 16px;
-            background: #222;
-            color: #fff;
-            border: 1px solid #555;
-            border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 25px;
-            outline: none;
-        }
-        
-        select:focus {
-            border-color: #FF00FF;
-        }
-        
-        button {
-            background: #FF00FF;
-            color: #000;
+
+        .touch-text {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.65rem;
             font-weight: 700;
-            padding: 14px 32px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+            background: linear-gradient(to bottom, #ffffff, rgba(255,255,255,0.75));
+            -webkit-background-clip: text;
+            background-clip: text;
+            text-align: center;
+            text-shadow: 0 0 30px rgba(255,255,255,0.95);
         }
-        
-        button:hover {
-            background: #CC00FF;
-            transform: scale(1.03);
+
+        /* Bottom Credit */
+        .bottom-section {
+            text-align: center;
+            padding-bottom: 4vh;
+            flex-shrink: 0;
         }
-        
-        .status {
-            margin-top: 15px;
-            font-size: 14px;
-            min-height: 20px;
+
+        .bottom-credit {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.84rem;
+            color: rgba(255,255,255,0.68);
+            letter-spacing: 2.5px;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-120%); }
+            100% { transform: translateX(220%); }
         }
     </style>
 </head>
 <body>
     <canvas id="canvas"></canvas>
 
-    <!-- MIDI Selection Modal -->
-    <div id="midi-modal">
-        <div class="modal-content">
-            <h1>🌊 Ripple MIDI Visualizer</h1>
-            <p>Choose your MIDI output device.<br>Default is usually <strong>IAC Driver Bus 1</strong> (macOS) or similar virtual bus.</p>
-            
-            <select id="midi-select"></select>
-            
-            <button id="connect-btn">Connect & Start Visualizer</button>
-            
-            <div class="status" id="status"></div>
+    <!-- SPLASH SCREEN -->
+    <div id="splash">
+        <!-- Top Section -->
+        <div class="top-section">
+            <div class="top-text">
+                <p>BIPH Art Department</p>
+                <p>Proudly Presents</p>
+            </div>
+            <div id="bibscaf-title">
+                BIBSCAF
+            </div>
+        </div>
+
+        <!-- Center - Always centered Touch Anywhere -->
+        <div class="center-section">
+            <div class="touch-block">
+                <div class="touch-text">Touch Anywhere</div>
+            </div>
+        </div>
+
+        <!-- Bottom Section -->
+        <div class="bottom-section">
+            <div class="bottom-credit">
+                Interactive lighting installation by Mr. Tubbs' Production Tech class
+            </div>
         </div>
     </div>
 
@@ -142,14 +214,17 @@
         const IDLE_INTENSITY = 0.085;
         const IDLE_INTERVAL_MS = 2450;
         const DRAG_THROTTLE_MS = 1;
+        const IDLE_TIMEOUT_MS = 60000; // 1 minute
 
         // ============== SETUP ==============
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d', { alpha: true });
-        
+        const splash = document.getElementById('splash');
+
         let width = window.innerWidth;
         let height = window.innerHeight;
-        
+        let lastInteractionTime = Date.now();
+
         function resize() {
             width = window.innerWidth;
             height = window.innerHeight;
@@ -159,7 +234,6 @@
         window.addEventListener('resize', resize);
         resize();
 
-        // State
         let ripples = [];
         let currentColorIndex = 0;
         let lastColor = COLORS[0];
@@ -167,87 +241,22 @@
         let midiOutput = null;
         let isDragging = false;
         let lastDragRippleTime = 0;
-        let lastIdleTime = Date.now();
 
         // ============== MIDI ==============
-        let midiAccess = null;
-
         async function initMIDI() {
-            if (!navigator.requestMIDIAccess) {
-                showStatus('Web MIDI not supported in this browser', 'error');
-                return null;
-            }
-
+            if (!navigator.requestMIDIAccess) return;
             try {
-                midiAccess = await navigator.requestMIDIAccess({ sysex: false });
-                return Array.from(midiAccess.outputs.values());
-            } catch (err) {
-                showStatus('MIDI access denied or unavailable', 'error');
-                return null;
-            }
-        }
-
-        function populateMidiSelect(outputs) {
-            const select = document.getElementById('midi-select');
-            select.innerHTML = '';
-
-            if (!outputs || outputs.length === 0) {
-                const opt = document.createElement('option');
-                opt.textContent = 'No MIDI outputs found';
-                opt.disabled = true;
-                select.appendChild(opt);
-                return;
-            }
-
-            // Try to find a sensible default (IAC Driver Bus 1 or similar)
-            let defaultIndex = -1;
-            outputs.forEach((output, i) => {
-                const opt = document.createElement('option');
-                opt.value = i;
-                opt.textContent = output.name;
-                select.appendChild(opt);
-
-                const name = output.name.toLowerCase();
-                if (defaultIndex === -1 && 
-                    (name.includes('iac') || name.includes('bus 1') || name.includes('virtual') || name.includes('loopmidi'))) {
-                    defaultIndex = i;
-                }
-            });
-
-            if (defaultIndex !== -1) {
-                select.value = defaultIndex;
-            }
-        }
-
-        function connectSelectedMidi() {
-            const select = document.getElementById('midi-select');
-            const outputs = Array.from(midiAccess.outputs.values());
-            const selectedIndex = parseInt(select.value);
-
-            if (isNaN(selectedIndex) || !outputs[selectedIndex]) {
-                showStatus('Please select a valid MIDI output', 'error');
-                return;
-            }
-
-            midiOutput = outputs[selectedIndex];
-            console.log(`%c✅ MIDI connected → ${midiOutput.name}`, 'color:#00FF66;font-weight:700');
-
-            // Hide modal and start visualizer
-            document.getElementById('midi-modal').classList.add('hidden');
-            startVisualizer();
-        }
-
-        function showStatus(msg, type = 'info') {
-            const statusEl = document.getElementById('status');
-            statusEl.textContent = msg;
-            statusEl.style.color = type === 'error' ? '#FF4500' : '#FFEA00';
+                const midiAccess = await navigator.requestMIDIAccess({ sysex: false });
+                const outputs = Array.from(midiAccess.outputs.values());
+                midiOutput = outputs.find(o => 
+                    o.name === 'IAC Driver Bus 1' || o.name.includes('IAC Driver Bus 1')
+                );
+            } catch (err) {}
         }
 
         function sendMIDINote(noteNumber) {
             if (!midiOutput) return;
-            
             midiOutput.send([0x90, noteNumber, MIDI_NOTE_VELOCITY]);
-            
             setTimeout(() => {
                 if (midiOutput) midiOutput.send([0x80, noteNumber, 0]);
             }, 100);
@@ -276,24 +285,20 @@
 
         // ============== ANIMATION LOOP ==============
         function animate() {
-            const now = Date.now();
-            
             ctx.fillStyle = 'rgba(0, 0, 0, 0.13)';
             ctx.fillRect(0, 0, width, height);
-            
+
             for (let i = ripples.length - 1; i >= 0; i--) {
                 const r = ripples[i];
                 if (r.isDead()) {
                     ripples.splice(i, 1);
                     continue;
                 }
-                
                 const radius = r.getRadius();
                 const alpha = r.getAlpha();
-                
+
                 ctx.shadowBlur = 22;
                 ctx.shadowColor = r.color;
-                
                 ctx.save();
                 ctx.globalAlpha = alpha;
                 ctx.strokeStyle = r.color;
@@ -302,108 +307,102 @@
                 ctx.arc(r.x, r.y, radius, 0, Math.PI * 2);
                 ctx.stroke();
                 ctx.restore();
-                
                 ctx.shadowBlur = 0;
             }
-            
-            // Idle ripples
-            if (hasInteracted && now - lastIdleTime > IDLE_INTERVAL_MS) {
+
+            if (hasInteracted && Date.now() - lastInteractionTime > IDLE_INTERVAL_MS) {
                 const idleX = Math.random() * width;
                 const idleY = Math.random() * height;
                 createRipple(idleX, idleY, lastColor, IDLE_INTENSITY, IDLE_RIPPLE_SPEED_PPS, IDLE_RIPPLE_LIFE_MS);
-                lastIdleTime = now;
+                lastInteractionTime = Date.now();
             }
-            
+
             requestAnimationFrame(animate);
         }
 
-        // ============== INTERACTION ==============
-        function handleClick(e) {
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const color = COLORS[currentColorIndex];
-            createRipple(x, y, color, 1, RIPPLE_SPEED_PPS, RIPPLE_LIFE_MS);
-            lastColor = color;
-            
-            const noteNumber = currentColorIndex + 1; // 1-8
-            sendMIDINote(noteNumber);
-            
-            currentColorIndex = (currentColorIndex + 1) % COLORS.length;
-            hasInteracted = true;
+        // ============== SPLASH & INTERACTION ==============
+        function hideSplash() {
+            splash.style.transition = 'opacity 0.6s ease-out';
+            splash.style.opacity = '0';
         }
 
-        function startDrag() { isDragging = true; }
-        function handleDrag(e) {
-            if (!isDragging) return;
-            const now = Date.now();
-            if (now - lastDragRippleTime < DRAG_THROTTLE_MS) return;
-            
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            createRipple(x, y, lastColor, 0.95, RIPPLE_SPEED_PPS * 0.9, RIPPLE_LIFE_MS * 0.85);
-            lastDragRippleTime = now;
+        function showSplash() {
+            splash.style.transition = 'opacity 5s ease-in-out';
+            splash.style.opacity = '1';
         }
-        function endDrag() { isDragging = false; }
+
+        function handleInteraction(e) {
+            lastInteractionTime = Date.now();
+            hideSplash();
+            hasInteracted = true;
+
+            if (e.type.includes('down') || e.type === 'touchstart') {
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+                const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+                const color = COLORS[currentColorIndex];
+                createRipple(x, y, color, 1);
+                lastColor = color;
+
+                sendMIDINote(currentColorIndex + 1);
+                currentColorIndex = (currentColorIndex + 1) % COLORS.length;
+            }
+        }
+
+        function checkIdle() {
+            if (Date.now() - lastInteractionTime > IDLE_TIMEOUT_MS) {
+                showSplash();
+            }
+        }
 
         function addListeners() {
-            canvas.addEventListener('pointerdown', (e) => {
-                if (e.pointerType === 'mouse' && e.button !== 0) return;
-                startDrag();
-                handleClick(e);
-            });
-            
-            canvas.addEventListener('pointermove', handleDrag);
-            canvas.addEventListener('pointerup', endDrag);
-            canvas.addEventListener('pointerleave', endDrag);
-            canvas.addEventListener('pointercancel', endDrag);
+            canvas.addEventListener('pointerdown', handleInteraction);
+            canvas.addEventListener('touchstart', handleInteraction, { passive: false });
 
-            // Keyboard fallback
-            document.addEventListener('keydown', (e) => {
+            let dragging = false;
+            let lastDragTime = 0;
+
+            canvas.addEventListener('pointermove', (e) => {
+                if (!dragging) return;
+                const now = Date.now();
+                if (now - lastDragTime < DRAG_THROTTLE_MS) return;
+
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                createRipple(x, y, lastColor, 0.9, RIPPLE_SPEED_PPS * 0.85, RIPPLE_LIFE_MS * 0.8);
+                lastDragTime = now;
+            });
+
+            canvas.addEventListener('pointerdown', () => dragging = true);
+            canvas.addEventListener('pointerup', () => dragging = false);
+            canvas.addEventListener('pointerleave', () => dragging = false);
+
+            document.addEventListener('keydown', () => {
                 if (!hasInteracted) {
-                    const fakeEvent = { clientX: width / 2, clientY: height / 2 };
-                    startDrag();
-                    handleClick(fakeEvent);
-                    endDrag();
+                    handleInteraction({ type: 'pointerdown', clientX: width/2, clientY: height/2 });
                 }
             });
         }
 
-        // ============== START VISUALIZER (after MIDI choice) ==============
-        function startVisualizer() {
-            console.log('%c🌊 Ripple MIDI Visualizer ready', 'color:#FF00FF;font-size:13px;font-weight:700');
-            console.log(`→ MIDI output: ${midiOutput ? midiOutput.name : 'None (visuals only)'}`);
-            console.log('→ Click or drag anywhere. Colors cycle through 8 vibrant hues.');
-
+        // ============== START ==============
+        function start() {
+            initMIDI();
             addListeners();
             animate();
 
-            // Gentle starting ripple
+            setTimeout(() => showSplash(), 400);
+
+            setInterval(checkIdle, 1000);
+
+            // Initial subtle ripple
             setTimeout(() => {
-                createRipple(width * 0.3, height * 0.4, COLORS[0], IDLE_INTENSITY * 1.4, IDLE_RIPPLE_SPEED_PPS * 0.5, IDLE_RIPPLE_LIFE_MS);
-            }, 600);
+                createRipple(width * 0.4, height * 0.45, COLORS[0], 0.14, 95, 4500);
+            }, 1500);
         }
 
-        // ============== MAIN START ==============
-        async function start() {
-            const outputs = await initMIDI();
-            populateMidiSelect(outputs);
-            
-            document.getElementById('connect-btn').addEventListener('click', connectSelectedMidi);
-            
-            // Auto-connect if only one output exists (optional quality-of-life)
-            if (outputs && outputs.length === 1) {
-                setTimeout(() => {
-                    document.getElementById('midi-select').value = 0;
-                    connectSelectedMidi();
-                }, 800);
-            }
-        }
-
-        // Launch
         start();
     </script>
 </body>
