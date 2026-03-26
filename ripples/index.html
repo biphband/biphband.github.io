@@ -214,7 +214,7 @@
         const IDLE_INTENSITY = 0.085;
         const IDLE_INTERVAL_MS = 2450;
         const DRAG_THROTTLE_MS = 1;
-        const IDLE_TIMEOUT_MS = 60000; // 1 minute
+        const IDLE_TIMEOUT_MS = 30000; // 30 seconds
 
         // ============== SETUP ==============
         const canvas = document.getElementById('canvas');
@@ -321,87 +321,105 @@
         }
 
         // ============== SPLASH & INTERACTION ==============
-        function hideSplash() {
-            splash.style.transition = 'opacity 0.6s ease-out';
-            splash.style.opacity = '0';
+function hideSplash() {
+    splash.style.transition = 'opacity 0.6s ease-out';
+    splash.style.opacity = '0';
+}
+
+function showSplash() {
+    splash.style.transition = 'opacity 5s ease-in-out';
+    splash.style.opacity = '1';
+}
+
+// Reset idle timer on any user interaction
+function resetIdleTimer() {
+    lastInteractionTime = Date.now();
+    hideSplash();
+    hasInteracted = true;
+}
+
+function handleInteraction(e) {
+    resetIdleTimer();
+
+    // Only create ripple + MIDI on actual taps/clicks (not moves)
+    if (e.type.includes('down') || e.type === 'touchstart') {
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+        const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+
+        const color = COLORS[currentColorIndex];
+        createRipple(x, y, color, 1);
+        lastColor = color;
+
+        sendMIDINote(currentColorIndex + 1);
+        currentColorIndex = (currentColorIndex + 1) % COLORS.length;
+    }
+}
+
+// Check for idle every second
+function checkIdle() {
+    if (Date.now() - lastInteractionTime > IDLE_TIMEOUT_MS) {
+        showSplash();
+    }
+}
+
+// ============== In addListeners() - make sure you update this part ==============
+function addListeners() {
+    // Any interaction resets the idle timer and hides splash
+    canvas.addEventListener('pointerdown', handleInteraction);
+    canvas.addEventListener('pointermove', handleInteraction);   // important for drag/touch move
+    canvas.addEventListener('touchstart', handleInteraction, { passive: false });
+    canvas.addEventListener('touchmove', handleInteraction, { passive: false });
+
+    // Also reset on mouse move (so moving the cursor counts as activity)
+    canvas.addEventListener('mousemove', () => {
+        resetIdleTimer();
+    });
+
+    let dragging = false;
+    let lastDragTime = 0;
+
+    canvas.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const now = Date.now();
+        if (now - lastDragTime < DRAG_THROTTLE_MS) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        createRipple(x, y, lastColor, 0.9, RIPPLE_SPEED_PPS * 0.85, RIPPLE_LIFE_MS * 0.8);
+        lastDragTime = now;
+    });
+
+    canvas.addEventListener('pointerdown', () => dragging = true);
+    canvas.addEventListener('pointerup', () => dragging = false);
+    canvas.addEventListener('pointerleave', () => dragging = false);
+
+    document.addEventListener('keydown', () => {
+        if (!hasInteracted) {
+            handleInteraction({ type: 'pointerdown', clientX: width/2, clientY: height/2 });
         }
+    });
+}
 
-        function showSplash() {
-            splash.style.transition = 'opacity 5s ease-in-out';
-            splash.style.opacity = '1';
-        }
+// ============== START ==============
+function start() {
+    initMIDI();
+    addListeners();
+    animate();
 
-        function handleInteraction(e) {
-            lastInteractionTime = Date.now();
-            hideSplash();
-            hasInteracted = true;
+    // Initial show
+    setTimeout(() => showSplash(), 400);
 
-            if (e.type.includes('down') || e.type === 'touchstart') {
-                const rect = canvas.getBoundingClientRect();
-                const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
-                const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+    // Idle check every second
+    setInterval(checkIdle, 1000);
 
-                const color = COLORS[currentColorIndex];
-                createRipple(x, y, color, 1);
-                lastColor = color;
-
-                sendMIDINote(currentColorIndex + 1);
-                currentColorIndex = (currentColorIndex + 1) % COLORS.length;
-            }
-        }
-
-        function checkIdle() {
-            if (Date.now() - lastInteractionTime > IDLE_TIMEOUT_MS) {
-                showSplash();
-            }
-        }
-
-        function addListeners() {
-            canvas.addEventListener('pointerdown', handleInteraction);
-            canvas.addEventListener('touchstart', handleInteraction, { passive: false });
-
-            let dragging = false;
-            let lastDragTime = 0;
-
-            canvas.addEventListener('pointermove', (e) => {
-                if (!dragging) return;
-                const now = Date.now();
-                if (now - lastDragTime < DRAG_THROTTLE_MS) return;
-
-                const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-
-                createRipple(x, y, lastColor, 0.9, RIPPLE_SPEED_PPS * 0.85, RIPPLE_LIFE_MS * 0.8);
-                lastDragTime = now;
-            });
-
-            canvas.addEventListener('pointerdown', () => dragging = true);
-            canvas.addEventListener('pointerup', () => dragging = false);
-            canvas.addEventListener('pointerleave', () => dragging = false);
-
-            document.addEventListener('keydown', () => {
-                if (!hasInteracted) {
-                    handleInteraction({ type: 'pointerdown', clientX: width/2, clientY: height/2 });
-                }
-            });
-        }
-
-        // ============== START ==============
-        function start() {
-            initMIDI();
-            addListeners();
-            animate();
-
-            setTimeout(() => showSplash(), 400);
-
-            setInterval(checkIdle, 1000);
-
-            // Initial subtle ripple
-            setTimeout(() => {
-                createRipple(width * 0.4, height * 0.45, COLORS[0], 0.14, 95, 4500);
-            }, 1500);
-        }
+    // Initial subtle ripple
+    setTimeout(() => {
+        createRipple(width * 0.4, height * 0.45, COLORS[0], 0.14, 95, 4500);
+    }, 1500);
+}
 
         start();
     </script>
