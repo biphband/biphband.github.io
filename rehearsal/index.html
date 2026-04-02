@@ -134,6 +134,7 @@ let teacherModeOrder = classes[0].teacherModeOrder;
 let currentCriteria = classes[0].criteria;
 let isObjectiveInputFocused = false;
 let isTitleInputFocused = false;
+let isAnyTextInputFocused = false;
 let isAddingStudent = false;
 let lastExportDate = null;
 
@@ -218,6 +219,7 @@ function editRehearsalTitle() {
     const titleElement = document.querySelector('#title h1');
     const currentTitle = titleElement.textContent;
 
+    // Remove any existing dialog
     const existing = document.querySelector('div[style*="position: fixed"][style*="z-index: 1000"]');
     if (existing) existing.remove();
 
@@ -231,66 +233,63 @@ function editRehearsalTitle() {
 
     dialog.innerHTML = `
         <h3>Edit Rehearsal Title</h3>
-        <input type="text" id="rehearsalTitleInput" value="${currentTitle.replace(/"/g, '&quot;')}" 
+        <input type="text" id="rehearsalTitleInput" value="${currentTitle.replace(/"/g, '&quot;')}"
                style="width: 100%; padding: 10px; font-size: 1.2em; box-sizing: border-box;">
         <div style="margin-top: 20px;">
             <button id="saveTitleBtn">Save</button>
-            <button onclick="this.closest('div').remove(); isTitleInputFocused = false;">Cancel</button>
+            <button id="cancelTitleBtn">Cancel</button>
         </div>
     `;
 
     document.body.appendChild(dialog);
 
     const input = document.getElementById('rehearsalTitleInput');
+    
+    const closeDialog = () => {
+        dialog.remove();
+        isTitleInputFocused = false;
+        window.isTitleInputFocused = false;  // also update global
+    };
+
+    // Focus the input
     setTimeout(() => {
         input.focus();
         input.select();
         isTitleInputFocused = true;
+        window.isTitleInputFocused = true;
     }, 10);
 
-// Add global Esc listener just for this dialog
-const escListener = (e) => {
-    if (e.key === 'Escape') {
-        dialog.remove();
-        isTitleInputFocused = false;
-        document.removeEventListener('keydown', escListener);
-    }
-};
-document.addEventListener('keydown', escListener);
-
-// Also add to the input itself if you want Enter to save
-input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        // your save logic here, e.g.:
-        const newTitle = input.value.trim();
-        if (newTitle) {
-            document.querySelector('#title h1').textContent = newTitle;
-            localStorage.setItem('rehearsalTitle', newTitle);
+    // Save on Enter
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const newTitle = input.value.trim();
+            if (newTitle) {
+                titleElement.textContent = newTitle;
+                saveRehearsalTitle(newTitle);
+            }
+            closeDialog();
+        } else if (e.key === 'Escape') {
+            closeDialog();
         }
-        dialog.remove();
-        isTitleInputFocused = false;
-        document.removeEventListener('keydown', escListener);
-    }
-});
+    });
 
-    document.getElementById('saveTitleBtn').onclick = saveTitleAndClose;
-
-    function saveTitleAndClose() {
+    // Buttons
+    document.getElementById('saveTitleBtn').onclick = () => {
         const newTitle = input.value.trim();
         if (newTitle) {
             titleElement.textContent = newTitle;
-            localStorage.setItem('rehearsalTitle', newTitle);
+            saveRehearsalTitle(newTitle);
         }
-        dialog.remove();
-        isTitleInputFocused = false;
-    }
+        closeDialog();
+    };
 
-    // Click outside → cancel
+    document.getElementById('cancelTitleBtn').onclick = closeDialog;
+
+    // Click outside to cancel
     const outsideClick = (e) => {
         if (!dialog.contains(e.target)) {
-            dialog.remove();
-            isTitleInputFocused = false;
+            closeDialog();
             document.removeEventListener('click', outsideClick);
         }
     };
@@ -318,8 +317,11 @@ function editObjective(item) {
     const cls = classes[0];
     const currentItem = item.textContent;
     const index = Array.from(item.parentElement.children).indexOf(item);
+
+    // Remove any existing dialog
     const existingDialog = document.querySelector('div[style*="position: fixed"][style*="z-index: 1000"]');
     if (existingDialog) existingDialog.remove();
+
     const dialog = document.createElement('div');
     dialog.style.position = 'fixed';
     dialog.style.top = '50%';
@@ -327,14 +329,15 @@ function editObjective(item) {
     dialog.style.transform = 'translate(-50%, -50%)';
     dialog.style.backgroundColor = 'white';
     dialog.style.padding = '20px';
-    dialog.style.borderRadius = '5px';
-    dialog.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
+    dialog.style.borderRadius = '8px';
+    dialog.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
     dialog.style.zIndex = '1000';
     dialog.style.textAlign = 'center';
-    dialog.style.lineHeight = '1.3';
-    dialog.style.width = '400px';
+    dialog.style.width = '420px';
+    dialog.style.maxWidth = '90%';
+
     const suggestions = cls.sampleObjectives.map(obj => `
-        <a href="#" style="font-size: 0.85em; text-decoration: none; display: block; margin: 2px 0;"
+        <a href="#" style="font-size: 0.85em; text-decoration: none; display: block; margin: 4px 0; padding: 4px;"
            onclick="
                document.querySelector('#objectiveList li:nth-child(${index + 1})').textContent = '${obj}';
                saveObjectives('${cls.objectivesKey}');
@@ -344,57 +347,72 @@ function editObjective(item) {
             ${obj}
         </a>
     `).join('');
+
     dialog.innerHTML = `
         <h3>Edit Objective</h3>
-        <input type="text" id="objectiveInput" value="${currentItem}" style="width: 80%; padding: 5px;" data-original-value="${currentItem}">
-        <p style="text-align: left; margin-left: 33px; margin-top: 10px;">${suggestions}</p>
-        <button onclick="
-            const input = document.getElementById('objectiveInput');
-            if (input.value.trim() !== '') {
-                document.querySelector('#objectiveList li:nth-child(${index + 1})').textContent = input.value.trim();
-                saveObjectives('${cls.objectivesKey}');
-            }
-            this.closest('div').remove();
-            window.isObjectiveInputFocused = false;">
-            Save
-        </button>
-        <button onclick="this.closest('div').remove(); window.isObjectiveInputFocused = false;">Cancel</button>
+        <input type="text" id="objectiveInput" value="${currentItem.replace(/"/g, '&quot;')}" 
+               style="width: 100%; padding: 10px; font-size: 1.1em; box-sizing: border-box;" 
+               data-original-value="${currentItem}">
+        <p style="text-align: left; margin: 20px 0 10px 0; font-size: 0.9em;">Suggestions:</p>
+        <div style="max-height: 200px; overflow-y: auto; text-align: left;">${suggestions}</div>
+        <div style="margin-top: 20px;">
+            <button id="saveObjectiveBtn">Save</button>
+            <button id="cancelObjectiveBtn">Cancel</button>
+        </div>
     `;
+
     document.body.appendChild(dialog);
+
     const input = document.getElementById('objectiveInput');
+
+    const closeDialog = () => {
+        dialog.remove();
+        window.isObjectiveInputFocused = false;
+    };
+
+    // Focus input
     setTimeout(() => {
         input.focus();
         input.select();
         window.isObjectiveInputFocused = true;
-    }, 0);
-    input.addEventListener('focus', () => window.isObjectiveInputFocused = true);
-    input.addEventListener('blur', () => window.isObjectiveInputFocused = false);
-    const handleKeydown = (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            if (input.value.trim() !== '') {
-                document.querySelector(`#objectiveList li:nth-child(${index + 1})`).textContent = input.value.trim();
+    }, 10);
+
+    // Handle keyboard inside the input
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const newValue = input.value.trim();
+            if (newValue) {
+                document.querySelector(`#objectiveList li:nth-child(${index + 1})`).textContent = newValue;
                 saveObjectives(cls.objectivesKey);
             }
-            dialog.remove();
-            window.isObjectiveInputFocused = false;
-            document.removeEventListener('keydown', handleKeydown);
-        } else if (event.key === 'Escape') {
-            dialog.remove();
-            window.isObjectiveInputFocused = false;
-            document.removeEventListener('keydown', handleKeydown);
+            closeDialog();
+        } else if (e.key === 'Escape') {
+            closeDialog();
+        }
+    });
+
+    // Save button
+    document.getElementById('saveObjectiveBtn').onclick = () => {
+        const newValue = input.value.trim();
+        if (newValue) {
+            document.querySelector(`#objectiveList li:nth-child(${index + 1})`).textContent = newValue;
+            saveObjectives(cls.objectivesKey);
+        }
+        closeDialog();
+    };
+
+    // Cancel button
+    document.getElementById('cancelObjectiveBtn').onclick = closeDialog;
+
+    // Click outside to cancel
+    const outsideClickHandler = (e) => {
+        if (!dialog.contains(e.target)) {
+            closeDialog();
+            document.removeEventListener('click', outsideClickHandler);
         }
     };
-    document.addEventListener('keydown', handleKeydown);
-    const handleOutsideClick = (event) => {
-        if (!dialog.contains(event.target)) {
-            dialog.remove();
-            window.isObjectiveInputFocused = false;
-            document.removeEventListener('click', handleOutsideClick);
-            document.removeEventListener('keydown', handleKeydown);
-        }
-    };
-    setTimeout(() => document.addEventListener('click', handleOutsideClick), 0);
+    setTimeout(() => document.addEventListener('click', outsideClickHandler), 50);
 }
 
 let menuStack = [];

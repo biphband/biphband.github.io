@@ -5,6 +5,8 @@ const hotkeys = [
     { key: "←", description: "Previous student." },
     { key: "↑", description: "Increase participation by 10." },
     { key: "↓", description: "Decrease participation by 10." },
+    { key: "Cmd + →", description: "Cycle to next class." },
+    { key: "Cmd + ←", description: "Cycle to previous class." },
     { key: "r", description: "Call a random student." },
     { key: "?", description: "Show hotkeys menu." }
 ];
@@ -225,29 +227,212 @@ function displayStudentName(name) {
     }, 3000);
 }
 
+function cycleClass(direction) {
+    currentClassIndex = (currentClassIndex + direction + classes.length) % classes.length;
+    calledStudents = []; // Reset called students when class changes
+    updateClassDisplay();
+}
 
-// Add global Esc listener just for this dialog
-const escListener = (e) => {
-    if (e.key === 'Escape') {
-        dialog.remove();
-        isTitleInputFocused = false;
-        document.removeEventListener('keydown', escListener);
-    }
-};
-document.addEventListener('keydown', escListener);
+function handleGlobalHotkeys(event) {
+    // === NEW: Unified input protection ===
+    const isEditingText = window.isObjectiveInputFocused || 
+                         window.isTitleInputFocused || 
+                         document.activeElement.tagName === 'INPUT' || 
+                         document.activeElement.tagName === 'TEXTAREA';
 
-// Also add to the input itself if you want Enter to save
-input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        // your save logic here, e.g.:
-        const newTitle = input.value.trim();
-        if (newTitle) {
-            document.querySelector('#title h1').textContent = newTitle;
-            localStorage.setItem('rehearsalTitle', newTitle);
+    if (isEditingText) {
+        // Allow normal text editing keys + common shortcuts
+        if (['Control', 'Meta', 'Alt', 'Shift'].includes(event.key)) return;
+
+        // Allow standard browser shortcuts (select all, copy, paste, cut, undo, redo, refresh)
+        if (event.metaKey || event.ctrlKey) {
+            const allowed = ['a', 'c', 'v', 'x', 'z', 'y', 'r']; // r = Cmd/Ctrl+R refresh
+            if (allowed.includes(event.key.toLowerCase())) return;
         }
-        dialog.remove();
-        isTitleInputFocused = false;
-        document.removeEventListener('keydown', escListener);
+
+        // Allow all navigation and editing keys
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+             'Home', 'End', 'Backspace', 'Delete', 'Tab',
+             'Enter', 'Escape'].includes(event.key)) {
+            return;
+        }
+
+        // Allow any printable character
+        if (event.key.length === 1) return;
+
+        // Block everything else
+        event.preventDefault();
+        return;
     }
-});
+
+    // === Rest of your normal hotkey logic (unchanged) ===
+    if (event.key === 'Escape' && menuStack.length > 0) {
+        closeTopMenu();
+        event.preventDefault();
+        return;
+    }
+
+    if ((event.key === '?' || (event.altKey && event.key === '/')) && currentMode === MODES.GLOBAL) {
+        toggleOverlay();
+        event.preventDefault();
+        return;
+    }
+
+    if (event.key === '/' && currentMode === MODES.GLOBAL) {
+        if (!document.getElementById('search-box')) {
+            createSearchBox();
+            event.preventDefault();
+        }
+        return;
+    }
+
+    const isProductionTech = classes[currentClassIndex].name === "Production Tech";
+    const floatingMenu = document.getElementById('floating-menu');
+    const teacherMode = document.getElementById('teacher-mode');
+
+    const validKeys = ['t', 'a', isProductionTech ? 'd' : 's', isProductionTech ? 'e' : 'i', 'r', isProductionTech ? 'p' : 'e', '/', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'h', '=', '+', '?'];
+
+    if (!validKeys.includes(event.key) && !(event.metaKey && ['ArrowLeft', 'ArrowRight'].includes(event.key))) {
+        return;
+    }
+
+    if (event.key === 'r' && currentMode === MODES.GLOBAL && menuStack.length === 0 && !event.metaKey && !event.ctrlKey) {
+        // Filter students who are not marked as "EX" or "Absent" and not yet called
+        let eligibleStudents = students.filter(student => 
+            student.attendance !== "EX" && student.attendance !== "Absent" && !calledStudents.includes(student.name)
+        );
+
+        // If no eligible students are left, reset the called students list
+        if (eligibleStudents.length === 0) {
+            calledStudents = [];
+            // Repopulate with all students who are not "EX" or "Absent"
+            eligibleStudents = students.filter(student => 
+                student.attendance !== "EX" && student.attendance !== "Absent"
+            );
+        }
+
+        // Select a random student from eligible students
+        if (eligibleStudents.length > 0) {
+            const randomIndex = Math.floor(Math.random() * eligibleStudents.length);
+            const randomStudent = eligibleStudents[randomIndex];
+            if (randomStudent && randomStudent.name) {
+                // Add student to calledStudents *before* displaying to prevent re-selection
+                calledStudents.push(randomStudent.name);
+                const masterStudent = masterList.find(s => s.name === randomStudent.name);
+                const displayText = randomStudent.name; // Display the name field
+                const speechText = masterStudent && masterStudent.altName ? masterStudent.altName : randomStudent.name; // Speak the altName
+                displayStudentName(displayText);
+                const utterance = new SpeechSynthesisUtterance(speechText);
+                utterance.volume = 1.0;
+                utterance.rate = 1.25;
+                utterance.pitch = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+        event.preventDefault();
+        return;
+    }
+
+
+    switch (event.key) {
+        case 'h':
+            if (currentStudentIndex !== -1 || floatingMenu.style.display === 'block') {
+                toggleHouseShield();
+                event.preventDefault();
+            }
+            break;
+        case 't':
+            if (teacherMode.style.display === 'block') {
+                exitTeacherMode();
+            } else {
+                enterTeacherMode();
+            }
+            event.preventDefault();
+            break;
+        case '/':
+            if (!document.getElementById('search-box')) {
+                event.preventDefault();
+                createSearchBox();
+            }
+            break;
+        case 'ArrowRight':
+            if (event.metaKey) {
+                cycleClass(1); // Cmd + Right Arrow cycles to next class
+                event.preventDefault();
+            } else {
+                navigateStudentMenu(1); // Right Arrow navigates to next student
+                event.preventDefault();
+            }
+            break;
+        case 'ArrowLeft':
+            if (event.metaKey) {
+                cycleClass(-1); // Cmd + Left Arrow cycles to previous class
+                event.preventDefault();
+            } else {
+                navigateStudentMenu(-1); // Left Arrow navigates to previous student
+                event.preventDefault();
+            }
+            break;
+        case 'ArrowUp':
+            if (floatingMenu.style.display === 'block') {
+                const studentName = floatingMenu.querySelector('h3').textContent;
+                if (event.altKey) {
+                    updateHousePoints(studentName, 10);
+                } else {
+                    updateScore(studentName, 10);
+                }
+                event.preventDefault();
+            }
+            break;
+        case 'ArrowDown':
+            if (floatingMenu.style.display === 'block') {
+                const studentName = floatingMenu.querySelector('h3').textContent;
+                if (event.altKey) {
+                    updateHousePoints(studentName, -10);
+                } else {
+                    updateScore(studentName, -10);
+                }
+                event.preventDefault();
+            }
+            break;
+        case 'a':
+        case 'd':
+        case 's':
+        case 'e':
+        case 'i':
+        case 'r':
+        case 'p':
+            if (floatingMenu.style.display === 'block') {
+                const studentName = floatingMenu.querySelector('h3').textContent;
+                handleFloatingMenuHotkeys(event, studentName);
+                event.preventDefault();
+            } else if (teacherMode.style.display === 'block') {
+                switch (event.key) {
+                    case 'a':
+                        cycleAttendance();
+                        break;
+                    case isProductionTech ? 'd' : 's':
+                        toggleAllCheckboxes(isProductionTech ? 'devices' : 'stands');
+                        break;
+                    case isProductionTech ? 'e' : 'i':
+                        toggleAllCheckboxes(isProductionTech ? 'engagement' : 'intonation');
+                        break;
+                    case 'r':
+                        toggleAllCheckboxes(isProductionTech ? 'review' : 'returned');
+                        break;
+                    case isProductionTech ? 'p' : 'e':
+                        toggleAllCheckboxes(isProductionTech ? 'progress' : 'engagement');
+                        break;
+                }
+                event.preventDefault();
+            }
+            break;
+        case '=':
+        case '+':
+            if (event.shiftKey && !event.ctrlKey && !event.metaKey) {
+                toggleAddStudentMode();
+                event.preventDefault();
+            }
+            break;
+    }
+}
