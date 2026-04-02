@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Launchpad Color Editor - 8x8</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        
+        :root {
+            --bg: #0a0a0f;
+            --panel: #16161f;
+            --accent: #ffffff;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: #eee;
+            font-family: 'Inter', system_ui, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: #111115;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #333;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 1.45rem;
+            font-weight: 600;
+        }
+        
+        .status {
+            font-size: 0.92rem;
+            padding: 6px 14px;
+            background: #1f1f28;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .dot {
+            width: 9px;
+            height: 9px;
+            background: #00ff9d;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .main {
+            flex: 1;
+            display: flex;
+            gap: 24px;
+            padding: 24px;
+            overflow: hidden;
+        }
+        
+        .launchpad-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #111115;
+            border-radius: 20px;
+            position: relative;
+        }
+        
+        .launchpad {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 9px;
+            width: 560px;
+            height: 560px;
+            background: #0c0c12;
+            padding: 28px;
+            border-radius: 24px;
+            box-shadow: 0 0 0 14px #1a1a22,
+                        inset 0 0 80px rgba(0,0,0,0.9);
+        }
+        
+        .pad {
+            width: 100%;
+            height: 100%;
+            background: #1a1a22;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: inset 0 6px 16px rgba(0,0,0,0.7),
+                        0 4px 10px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: rgba(255,255,255,0.25);
+            user-select: none;
+            position: relative;
+        }
+        
+        .pad:hover {
+            transform: scale(1.08);
+        }
+        
+        .pad.selected {
+            transform: scale(0.92);
+            z-index: 10;
+        }
+        
+        .pad.selected::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 3.5px solid var(--accent);
+            border-radius: 10px;
+            opacity: 0.75;
+            pointer-events: none;
+        }
+        
+        .coords {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: rgba(0,0,0,0.7);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        
+        .sidebar {
+            width: 340px;
+            background: var(--panel);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        
+        .section {
+            background: #111115;
+            border-radius: 14px;
+            padding: 18px;
+        }
+        
+        .color-swatch {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+            gap: 3px;
+            justify-content: center; 
+        }
+        
+        .swatch {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+        }
+        
+        .swatch:hover {
+            transform: scale(1.18);
+        }
+        
+        .swatch.selected {
+            box-shadow: 0 0 0 4px #fff, 0 0 0 7px var(--accent);
+        }
+        
+        .hotkeys {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        
+        .key {
+            background: #22222a;
+            padding: 12px 8px;
+            text-align: center;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        
+        .key:hover {
+            background: #33333a;
+        }
+        
+        button {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 9999px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        
+        button:hover {
+            background: #00ffaa;
+            transform: translateY(-1px);
+        }
+        
+        .log {
+            background: #0a0a0f;
+            border-radius: 10px;
+            padding: 14px;
+            height: 140px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.82rem;
+            color: #0f0;
+            line-height: 1.4;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🚀 Launchpad Color Editor (8x8)</h1>
+        <div class="status">
+            <span class="dot"></span>
+            <span id="midi-status">Web MIDI ready — connect your Launchpad</span>
+        </div>
+    </header>
+
+    <div class="main">
+        <div class="launchpad-container">
+            <div class="coords" id="coords">Selected: 0 pads</div>
+            <div class="launchpad" id="launchpad"></div>
+        </div>
+
+        <div class="sidebar">
+            <div class="section">
+                <h3>MIDI Connection</h3>
+                <button onclick="requestMIDIAccess()" style="width:100%; margin-top:8px;">
+                    Connect to Launchpad
+                </button>
+                <p style="margin:12px 0 0 0; font-size:0.85rem; opacity:0.75;">
+                    Put your Launchpad in <strong>Programmer Mode</strong> before connecting.
+                </p>
+            </div>
+
+            <div class="section">
+                <h3>Color Palette</h3>
+                <div class="color-swatch" id="swatches"></div>
+                
+                <div style="margin-top:16px;">
+                    <label style="font-size:0.85rem;">Velocity: <span id="velocity-value">64</span></label>
+                    <input type="range" id="velocity-slider" min="0" max="127" value="64" 
+                           style="width:100%; accent-color:#00ff9d;">
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Hotkeys (apply to all selected pads)</h3>
+                <div class="hotkeys">
+                    <div class="key" title="Red">R</div>
+                    <div class="key" title="Orange">O</div>
+                    <div class="key" title="Yellow">Y</div>
+                    <div class="key" title="Green">G</div>
+                    <div class="key" title="Blue">B</div>
+                    <div class="key" title="Purple">P</div>
+                    <div class="key" title="Warm White">W</div>
+                    <div class="key" title="Off">0</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <button onclick="clearSelected()" style="width:100%; background:#555;">Clear Selected</button>
+                <button onclick="clearAll()" style="width:100%; margin-top:8px; background:#f33;">Clear All Pads</button>
+                <button onclick="applyCustomRainbow()" style="width:100%; margin-top:8px; background:#ff8800;">Load Custom Rainbow</button>
+            </div>
+
+            <div class="section">
+                <h3>Activity Log</h3>
+                <div id="log" class="log"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MIDI_CHANNEL = 1;
+        
+        function getNote(row, col) {
+            return 36 + (row * 8) + col;
+        }
+
+        const customRainbow = [3, 5, 9, 13, 19, 21, 40, 80];
+
+        const colorPalette = [
+            {v: 0,  hex: "#1a1a22"},
+            {v: 3,  hex: "#ff0000"},
+            {v: 5,  hex: "#ff4400"},
+            {v: 9,  hex: "#ffdd00"},
+            {v: 13, hex: "#00ff00"},
+            {v: 19, hex: "#0066ff"},
+            {v: 21, hex: "#8800ff"},
+            {v: 40, hex: "#ffffff"},
+            {v: 80, hex: "#ffccaa"}
+        ];
+
+        function generatePalette() {
+            let pal = [...colorPalette];
+            for (let v = 0; v <= 127; v += 4) {
+                if (!pal.some(c => c.v === v)) {
+                    const hue = (v * 3.2) % 360;
+                    const hex = hslToHex(hue, 95, Math.max(25, Math.min(92, 15 + v/1.8)));
+                    pal.push({v, hex});
+                }
+            }
+            return pal.sort((a,b) => a.v - b.v);
+        }
+
+        const fullPalette = generatePalette();
+
+        let midiAccess = null;
+        let output = null;
+        let input = null;
+        let selectedPads = new Set();
+        let currentVelocity = 64;
+        let padStates = {};
+
+        let launchpadEl, swatchesEl, logEl, velocitySlider, velocityValueEl, coordsEl;
+
+        function hslToHex(h, s, l) {
+            h /= 360; s /= 100; l /= 100;
+            let r, g, b;
+            if (s === 0) r = g = b = l;
+            else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1; if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+            return "#" + [r,g,b].map(x => Math.round(x*255).toString(16).padStart(2,'0')).join('');
+        }
+
+        function log(msg, type = "info") {
+            const entry = document.createElement("div");
+            entry.textContent = `> ${msg}`;
+            if (type === "success") entry.style.color = "#0f0";
+            if (type === "error") entry.style.color = "#f66";
+            logEl.appendChild(entry);
+            logEl.scrollTop = logEl.scrollHeight;
+            if (logEl.children.length > 40) logEl.removeChild(logEl.firstChild);
+        }
+
+        async function requestMIDIAccess() {
+            if (!navigator.requestMIDIAccess) {
+                alert("Web MIDI not supported. Please use Chrome or Edge.");
+                return;
+            }
+            try {
+                midiAccess = await navigator.requestMIDIAccess({sysex: false});
+                log("MIDI access granted", "success");
+
+                const outputs = Array.from(midiAccess.outputs.values());
+                const inputs = Array.from(midiAccess.inputs.values());
+
+                document.getElementById("midi-status").textContent = `MIDI ready • ${outputs.length} outputs`;
+
+                output = outputs.find(o => o.name.toLowerCase().includes("launchpad")) || outputs[0];
+                if (output) log(`Output: ${output.name}`);
+
+                input = inputs.find(i => i.name.toLowerCase().includes("launchpad")) || inputs[0];
+                if (input) {
+                    input.onmidimessage = handleMIDIMessage;
+                    log(`Input: ${input.name}`);
+                }
+            } catch (err) {
+                log("MIDI access failed: " + err.message, "error");
+            }
+        }
+
+        function sendNoteOn(note, velocity) {
+            if (!output) return false;
+            try {
+                output.send([0x90 | (MIDI_CHANNEL - 1), note, velocity]);
+                return true;
+            } catch (e) {
+                console.error(e);
+                return false;
+            }
+        }
+
+        function updatePadVisual(row, col, velocity) {
+            const pad = document.querySelector(`.pad[data-row="${row}"][data-col="${col}"]`);
+            if (!pad) return;
+
+            const match = fullPalette.reduce((prev, curr) => 
+                Math.abs(curr.v - velocity) < Math.abs(prev.v - velocity) ? curr : prev
+            );
+
+            pad.style.backgroundColor = match.hex;
+            pad.style.boxShadow = `inset 0 6px 16px rgba(0,0,0,0.8), 0 0 25px ${match.hex}33`;
+            padStates[getNote(row, col)] = velocity;
+        }
+
+        function createLaunchpad() {
+            launchpadEl = document.getElementById("launchpad");
+            launchpadEl.innerHTML = "";
+
+            // 8x8 grid - rows from bottom to top (standard Launchpad layout)
+            for (let row = 7; row >= 0; row--) {
+                for (let col = 0; col < 8; col++) {
+                    const pad = document.createElement("div");
+                    pad.className = "pad";
+                    pad.dataset.row = row;
+                    pad.dataset.col = col;
+                    pad.textContent = `${row},${col}`;
+
+                    pad.addEventListener("click", (e) => handlePadClick(row, col, e));
+
+                    updatePadVisual(row, col, 0);
+                    launchpadEl.appendChild(pad);
+                }
+            }
+        }
+
+        function handlePadClick(row, col, e) {
+            const note = getNote(row, col);
+            const isMulti = e.ctrlKey || e.metaKey;
+
+            if (isMulti) {
+                const exists = Array.from(selectedPads).some(p => p.row === row && p.col === col);
+                if (exists) {
+                    selectedPads = new Set(Array.from(selectedPads).filter(p => !(p.row === row && p.col === col)));
+                } else {
+                    selectedPads.add({row, col, note});
+                }
+            } else {
+                selectedPads.clear();
+                selectedPads.add({row, col, note});
+            }
+
+            refreshSelectionVisuals();
+            updateSelectionInfo();
+        }
+
+        function refreshSelectionVisuals() {
+            document.querySelectorAll('.pad').forEach(pad => {
+                const r = parseInt(pad.dataset.row);
+                const c = parseInt(pad.dataset.col);
+                const isSelected = Array.from(selectedPads).some(s => s.row === r && s.col === c);
+                pad.classList.toggle('selected', isSelected);
+            });
+        }
+
+        function updateSelectionInfo() {
+            coordsEl.textContent = `Selected: ${selectedPads.size} pad${selectedPads.size === 1 ? '' : 's'}`;
+        }
+
+        function applyColorToSelected(velocity) {
+            if (selectedPads.size === 0) return;
+            
+            selectedPads.forEach(({row, col, note}) => {
+                updatePadVisual(row, col, velocity);
+                sendNoteOn(note, velocity);
+            });
+            
+            log(`Applied velocity ${velocity} to ${selectedPads.size} pad${selectedPads.size === 1 ? '' : 's'}`);
+            refreshSelectionVisuals();
+        }
+
+        function clearSelected() {
+            if (selectedPads.size === 0) return;
+            
+            selectedPads.forEach(({row, col, note}) => {
+                updatePadVisual(row, col, 0);
+                sendNoteOn(note, 0);
+            });
+            
+            log(`Cleared ${selectedPads.size} selected pad${selectedPads.size === 1 ? '' : 's'}`);
+            selectedPads.clear();
+            refreshSelectionVisuals();
+            updateSelectionInfo();
+        }
+
+        function clearAll() {
+            if (!confirm("Clear ALL 64 pads?")) return;
+            
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    updatePadVisual(r, c, 0);
+                    sendNoteOn(getNote(r, c), 0);
+                }
+            }
+            
+            selectedPads.clear();
+            refreshSelectionVisuals();
+            updateSelectionInfo();
+            log("All 64 pads cleared", "success");
+        }
+
+        function applyCustomRainbow() {
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const velocity = customRainbow[col % customRainbow.length];
+                    updatePadVisual(row, col, velocity);
+                    sendNoteOn(getNote(row, col), velocity);
+                }
+            }
+            
+            selectedPads.clear();
+            refreshSelectionVisuals();
+            updateSelectionInfo();
+            log("Custom rainbow loaded on 8x8 grid", "success");
+        }
+
+        function handleMIDIMessage(e) {
+            const [status, note, velocity] = e.data;
+            if ((status & 0xF0) === 0x90 && velocity > 0 && note >= 36 && note <= 99) {
+                const offset = note - 36;
+                const row = Math.floor(offset / 8);
+                const col = offset % 8;
+                
+                selectedPads.clear();
+                selectedPads.add({row, col, note});
+                refreshSelectionVisuals();
+                updateSelectionInfo();
+                
+                log(`Hardware pad [${row},${col}] pressed`);
+            }
+        }
+
+        function handleKeyboard(e) {
+            if (e.key === "Escape") {
+                selectedPads.clear();
+                refreshSelectionVisuals();
+                updateSelectionInfo();
+                log("Selection cleared");
+                return;
+            }
+
+            if (selectedPads.size === 0) return;
+
+            const k = e.key.toLowerCase();
+            let vel = null;
+
+            if (k === 'r') vel = 3;
+            else if (k === 'o') vel = 5;
+            else if (k === 'y') vel = 9;
+            else if (k === 'g') vel = 13;
+            else if (k === 'b') vel = 19;
+            else if (k === 'p') vel = 21;
+            else if (k === 'w') vel = 80;
+            else if (k === '0') vel = 0;
+
+            if (vel !== null) {
+                currentVelocity = vel;
+                velocitySlider.value = vel;
+                velocityValueEl.textContent = vel;
+                applyColorToSelected(vel);
+            }
+        }
+
+        function createSwatches() {
+            swatchesEl = document.getElementById("swatches");
+            swatchesEl.innerHTML = "";
+
+            fullPalette.slice(0, 64).forEach(c => {
+                const sw = document.createElement("div");
+                sw.className = "swatch";
+                sw.style.backgroundColor = c.hex;
+                sw.title = `Velocity ${c.v}`;
+
+                sw.addEventListener("click", () => {
+                    currentVelocity = c.v;
+                    velocitySlider.value = currentVelocity;
+                    velocityValueEl.textContent = currentVelocity;
+                    applyColorToSelected(currentVelocity);
+                });
+                swatchesEl.appendChild(sw);
+            });
+        }
+
+        function init() {
+            createLaunchpad();
+            createSwatches();
+
+            logEl = document.getElementById("log");
+            velocitySlider = document.getElementById("velocity-slider");
+            velocityValueEl = document.getElementById("velocity-value");
+            coordsEl = document.getElementById("coords");
+
+            velocitySlider.addEventListener("input", () => {
+                currentVelocity = parseInt(velocitySlider.value);
+                velocityValueEl.textContent = currentVelocity;
+                if (selectedPads.size > 0) applyColorToSelected(currentVelocity);
+            });
+
+            document.addEventListener("keydown", handleKeyboard);
+
+            log("8x8 Launchpad Color Editor ready");
+            log("• Ctrl/Cmd + Click to multi-select / toggle");
+            log("• Escape to deselect all");
+            log("• Selected pads show bright accent border");
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
