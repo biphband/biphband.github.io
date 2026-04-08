@@ -86,7 +86,8 @@ function playRandomSound(soundArray) {
 
 const classes = [
     {
-        name: "Dress Rehearsal",
+        name: "Showtime!",
+        // name: "Dress Rehearsal",
         days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], // Always active
         timeRange: "7:00pm - 8:30pm",
         startTime: { hours: 19, minutes: 0 },
@@ -109,10 +110,17 @@ const classes = [
         teacherModeOrder: expectedList.map(s => s.name),
         objectivesKey: "awardsObjectives",
         defaultObjectives: [
-            'Independent Review',
-            'Run-through',
-            'Announcements'
+            'Concert Attire Check',
+            'Warm up and Tune',
+            'Mental preparation'
         ],
+
+        // defaultObjectives: [
+        //     'Independent Review',
+        //     'Run-through',
+        //     'Announcements'
+        // ],
+
         sampleObjectives: [
             'Warm-up',
             'Act I Run-through',
