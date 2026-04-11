@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Room Checks, Wuhan</title>
+  <style>
+    :root {
+      --primary-color: #1e3a8a;   
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #ffffff;
+      color: #1e2937;
+      min-height: 100vh;
+      padding: 20px 12px;
+      line-height: 1.4;
+    }
+
+    .container {
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 1.05rem;
+      color: #64748b;
+    }
+
+
+
+.item {
+      display: flex;
+      align-items: center;
+      padding: 14px 18px;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      border: 2px solid rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      margin: 6px 8px;                 
+    }
+
+    .item:last-child {
+      border-bottom: none;
+    }
+
+    .item.checked {
+      opacity: 0.25;
+      filter: grayscale(1);
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    input[type="checkbox"] {
+      display: none;
+    }
+
+    .checkbox {
+      width: 22px;
+      height: 22px;
+      border: 2px solid #cbd5e1;
+      border-radius: 6px;
+      margin-right: 14px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      transition: all 0.2s ease;
+    }
+
+    input[type="checkbox"]:checked + .checkbox {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    input[type="checkbox"]:checked + .checkbox::after {
+      content: '✓';
+      color: white;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .item-text {
+      font-size: 1.08rem;
+      flex: 1;
+    }
+
+    .item.checked .item-text {
+      text-decoration: line-through;
+      color: #475569;
+    }
+
+    .subtext {
+      font-size: 0.88rem;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    .item.checked .subtext {
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 id="main-title"></h1>
+      <p class="subtitle" id="subtitle"></p>
+    </header>
+
+    <div class="checklist" id="checklist"></div>
+  </div>
+
+  <script>
+    
+    const config = {
+      primaryColor: "#1e3a8a",       
+      
+      mainTitle: "Band Network Festival",
+      subtitle: "Wuhan 2026",
+      
+      items: [
+        {
+          text: "Jacky",
+          // subtext: "",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+                {
+          text: "Oscar",
+          // subtext: "Shine, Francis",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+                {
+          text: "Matthew",
+          // subtext: "",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+            {
+          text: "Nancy",
+          // subtext: "",
+          bgColor: "#f3e8ff",     
+          hoverColor: "#e9d5ff"
+        },
+              {
+          text: "Grace X",
+          // subtext: "",
+          bgColor: "#f3e8ff",     
+          hoverColor: "#e9d5ff"
+        },
+                {
+          text: "Stella Y",
+          // subtext: "",
+          bgColor: "#f3e8ff",     
+          hoverColor: "#e9d5ff"
+        },
+                {
+          text: "Grant",
+          // subtext: "",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd"
+        },
+                {
+          text: "Anne",
+          // subtext: "",
+          bgColor: "#f3e8ff",     
+          hoverColor: "#e9d5ff"
+        },
+                {
+          text: "Hannah C",
+          // subtext: "",
+          bgColor: "#f3e8ff",     
+          hoverColor: "#e9d5ff"
+        },
+                        {
+          text: "Rebecca",
+          // subtext: "Jacky, Grant",
+          bgColor: "#f3e8ff",     
+          hoverColor: "#e9d5ff"
+        },
+                {
+          text: "Shine",
+          // subtext: "Grace N, Stella S",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+                        {
+          text: "Andy",
+          // subtext: "Steven, Leo",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd"
+        },
+                {
+          text: "Sophie",
+          // subtext: "",
+          bgColor: "#f3e8ff",     
+          hoverColor: "#e9d5ff"
+        },
+            {
+          text: "Jacob",
+          // subtext: "",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd"
+        },
+                                {
+          text: "Owen",
+          // subtext: "Tubbs",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+        {
+          text: "Tyler",
+          // subtext: "",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+                {
+          text: "Francis",
+          // subtext: "",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+                {
+          text: "Grace N",
+          // subtext: "",
+          bgColor: "#f3e8ff",     
+          hoverColor: "#e9d5ff"
+        },
+{
+          text: "June",
+          // subtext: "Tubbs",
+          bgColor: "#f3e8ff",     
+          hoverColor: "#e9d5ff"
+        },
+        {
+          text: "Stella S",
+          // subtext: "",
+          bgColor: "#f3e8ff",     
+          hoverColor: "#e9d5ff"
+        },
+                {
+          text: "Kyla",
+          // subtext: "",
+          bgColor: "#f3e8ff",     
+          hoverColor: "#e9d5ff"
+        },
+                {
+          text: "Celine",
+          // subtext: "",
+          bgColor: "#f3e8ff",     
+          hoverColor: "#e9d5ff"
+        },
+        {
+          text: "Rene",
+          // subtext: "Tubbs",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+        {
+          text: "Austen",
+          // subtext: "",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+                {
+          text: "Zach",
+          // subtext: "",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+                {
+          text: "Aurora",
+          // subtext: "",
+          bgColor: "#f3e8ff",     
+          hoverColor: "#e9d5ff"
+        },
+                {
+          text: "Tiger",
+          // subtext: "Tubbs",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+        {
+          text: "Leo",
+          // subtext: "",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+                {
+          text: "Steven",
+          // subtext: "",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+                {
+          text: "Henry",
+          // subtext: "",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+                {
+          text: "Calvin",
+          // subtext: "",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+                {
+          text: "Jim",
+          // subtext: "",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+                {
+          text: "Jason",
+          // subtext: "",
+          bgColor: "#e0f2fe",     
+          hoverColor: "#afddfd",
+        },
+      ]
+    };
+
+    // Apply global settings
+    document.documentElement.style.setProperty('--primary-color', config.primaryColor);
+    document.getElementById('main-title').textContent = config.mainTitle;
+    document.getElementById('subtitle').textContent = config.subtitle;
+
+    // Create checklist with per-item colors
+    function createChecklist() {
+      const checklist = document.getElementById('checklist');
+      checklist.innerHTML = '';
+
+      config.items.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'item';
+        
+        // Set custom background and hover colors
+        itemDiv.style.backgroundColor = item.bgColor;
+        
+        // Add hover effect via inline style + event listeners
+        itemDiv.addEventListener('mouseenter', () => {
+          if (!itemDiv.classList.contains('checked')) {
+            itemDiv.style.backgroundColor = item.hoverColor;
+          }
+        });
+        
+        itemDiv.addEventListener('mouseleave', () => {
+          if (!itemDiv.classList.contains('checked')) {
+            itemDiv.style.backgroundColor = item.bgColor;
+          }
+        });
+
+        itemDiv.innerHTML = `
+          <label>
+            <input type="checkbox" id="check-${index}">
+            <div class="checkbox"></div>
+            <div style="flex: 1;">
+              <div class="item-text">${item.text}</div>
+              ${item.subtext ? `<div class="subtext">${item.subtext}</div>` : ''}
+            </div>
+          </label>
+        `;
+
+        // Handle check/uncheck behavior
+        const checkbox = itemDiv.querySelector('input');
+        checkbox.addEventListener('change', () => {
+          if (checkbox.checked) {
+            itemDiv.classList.add('checked');
+            // Keep the original bgColor but make it look grayed out via opacity + filter
+          } else {
+            itemDiv.classList.remove('checked');
+            itemDiv.style.backgroundColor = item.bgColor;
+          }
+        });
+
+        checklist.appendChild(itemDiv);
+      });
+    }
+
+    // Initialize
+    window.onload = createChecklist;
+  </script>
+</body>
+</html>
