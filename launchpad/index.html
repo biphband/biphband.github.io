@@ -10,7 +10,7 @@
         :root {
             --bg: #0a0a0f;
             --panel: #16161f;
-            --accent: #00ff9d; /* Changed accent color to a bright green for visibility */
+            --accent: #00ff9d; 
         }
         
         body {
@@ -23,37 +23,37 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            user-select: none; /* Disable text selection for the entire page */
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE10+ */
+            user-select: none; 
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
         
         header {
             background: #111115;
-            padding: 12px 24px; /* Slightly reduced padding */
+            padding: 12px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid #333;
-            position: relative; /* Added for menu positioning */
+            position: relative;
         }
         
         .header-left {
             display: flex;
             align-items: center;
-            gap: 15px; /* Space between menu and title */
+            gap: 15px;
         }
 
         h1 {
             margin: 0;
-            font-size: 1.3rem; /* Slightly reduced font size */
+            font-size: 1.3rem;
             font-weight: 600;
         }
         
         .status {
-            font-size: 0.7rem; /* Slightly reduced font size */
-            padding: 5px 12px; /* Slightly reduced padding */
+            font-size: 0.7rem;
+            padding: 5px 12px;
             background: #1f1f28;
             border-radius: 9999px;
             display: flex;
@@ -72,9 +72,9 @@
         .main {
             flex: 1;
             display: flex;
-            gap: 20px; /* Reduced gap */
-            padding: 20px; /* Reduced padding */
-            overflow: hidden; /* Added to prevent main content scroll */
+            gap: 20px;
+            padding: 20px;
+            overflow: hidden;
         }
         
         .launchpad-container {
@@ -141,85 +141,86 @@
         }
         
         .sidebar {
-            width: 300px; /* Slightly reduced width */
+            width: 300px;
             background: var(--panel);
             border-radius: 20px;
-            padding: 16px; /* Reduced padding */
+            padding: 166x;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 5px; /* Reduced gap */
-            overflow-y: auto; /* Keep overflow on sidebar itself */
-            flex-shrink: 0; /* Prevent sidebar from shrinking */
+            gap: 5px;
+            overflow-y: auto;
+            flex-shrink: 0;
         }
         
         .section {
             background: #111115;
             border-radius: 14px;
-            padding: 14px; /* Reduced padding */
+            padding: 14px;
         }
         
         .section h3 {
-            margin-top: -5px; /* Reduced top margin */
-            margin-bottom: 5px; /* Adjusted bottom margin */
+            margin-top: -5px;
+            margin-bottom: 5px;
             font-size: 1.1rem;
             display: flex;
             align-items: center;
         }
 
         .color-swatch-container {
-            max-height: 130px; /* Roughly 3 rows of 42px swatches + gaps */
+            max-height: 280px;
             overflow: auto;
             transition: max-height 0.3s ease-out;
-            padding-bottom: 5px; /* Add some padding at the bottom */
+            padding-bottom: 5px;
         }
         
         .color-swatch-container.expanded {
-            max-height: 500px; /* Large enough to show all colors */
+            max-height: 500px;
         }
 
         .color-swatch {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(38px, 1fr)); /* Slightly smaller swatches */
+            grid-template-columns: repeat(auto-fit, minmax(38px, 1fr));
             gap: 3px;
             justify-content: center; 
         }
         
         .swatch {
-            width: 38px; /* Slightly smaller swatches */
-            height: 38px; /* Slightly smaller swatches */
-            border-radius: 8px; /* Slightly smaller border radius */
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.6); /* Adjusted shadow */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
         }
         
         .swatch:hover {
-            transform: scale(1.15); /* Slightly smaller hover scale */
+            transform: scale(1.15);
         }
         
         .swatch.selected {
-            box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--accent); /* Adjusted shadow */
+            box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--accent);
         }
         
         .hotkeys {
-            padding: 8px 12px; /* Added some padding for the block */
-            background: #22222a; /* Give it a background similar to the old key items */
-            border-radius: 8px; /* Rounded corners */
-            line-height: 1.4; /* Improve readability */
-            font-size: 0.85rem; /* Base font size */
-            color: #eee; /* Default text color */
+            padding: 8px 12px;
+            background: #22222a;
+            border-radius: 8px;
+            line-height: 1.4;
+            font-size: 0.85rem;
+            color: #eee;
         }
         
         button {
             background: var(--accent);
             color: #000;
             border: none;
-            padding: 12px 18px; /* Slightly reduced padding */
+            padding: 12px 18px;
             border-radius: 9999px;
             font-weight: 600;
             margin-top: -5px;
             cursor: pointer;
-            font-size: 0.9rem; /* Slightly reduced font size */
+            font-size: 0.9rem;
             transition: background 0.2s, transform 0.2s;
         }
         
@@ -231,8 +232,8 @@
         .velocity-controls {
             display: flex;
             align-items: center;
-            margin-top: 10px; /* Reduced margin */
-            gap: 8px; /* Reduced gap */
+            margin-top: 10px;
+            gap: 8px;
         }
 
         .velocity-controls label {
@@ -242,9 +243,9 @@
         }
 
         .velocity-controls button {
-            padding: 6px 10px; /* Smaller buttons */
-            font-size: 1.1em; /* Adjusted font size */
-            border-radius: 6px; /* Smaller border radius */
+            padding: 6px 10px;
+            font-size: 1.1em;
+            border-radius: 6px;
             background: #333;
             color: #eee;
         }
@@ -254,17 +255,17 @@
         }
 
         .velocity-value-editable {
-            padding: 6px 10px; /* Smaller padding */
-            border-radius: 6px; /* Smaller border radius */
+            padding: 6px 10px;
+            border-radius: 6px;
             background-color: #1f1f28;
             border: 1px solid #333;
             color: #eee;
-            font-size: 0.9em; /* Adjusted font size */
+            font-size: 0.9em;
             outline: none;
             text-align: center;
-            min-width: 35px; /* Ensure enough space */
+            min-width: 35px;
             cursor: text;
-            flex-grow: 1; /* Allow it to grow */
+            flex-grow: 1;
         }
         
         @keyframes pulse {
@@ -272,7 +273,6 @@
             50% { opacity: 0.5; }
         }
 
-        /* Modal styles */
         .modal {
             display: none;
             position: fixed;
@@ -338,7 +338,6 @@
             border: 1px solid rgba(255,255,255,0.2);
         }
 
-        /* Hamburger menu styles */
         .hamburger-menu {
             width: 24px;
             height: 20px;
@@ -360,28 +359,30 @@
 
         .menu-modal {
             display: none;
-            position: absolute; /* Position relative to header */
-            top: 55px; /* Below the header */
+            position: absolute;
+            top: 55px;
             left: 15px;
             background-color: var(--panel);
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.4);
             z-index: 100;
-            padding: 10px 0;
-            width: 200px;
+            padding: 15px 0;
+            width: 230px;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px;
         }
 
         .menu-modal button {
             width: calc(100% - 20px);
             margin: 0 10px;
-            padding: 10px;
+            padding: 12px;
             background: #22222a;
             color: #eee;
             font-weight: 500;
             border-radius: 8px;
             font-size: 0.9em;
+            text-align: left;
+            transition: background 0.2s;
         }
 
         .menu-modal button:hover {
@@ -390,8 +391,9 @@
         }
 
         .menu-modal input[type="file"] {
-            display: none; /* Hide the default file input */
+            display: none;
         }
+
     </style>
 </head>
 <body>
@@ -409,82 +411,89 @@
             <span id="midi-status">Connecting to Web MIDI...</span>
         </div>
 
-        <!-- Hamburger Menu Modal -->
         <div id="menuModal" class="menu-modal">
-            <button id="savePresetBtn">Save Preset</button>
+            <button id="savePresetBtn">💾 Save Preset</button>
             <input type="file" id="uploadPresetInput" accept=".json">
-            <button id="uploadPresetBtn">Upload Custom Preset</button>
-            <button id="pushToLaunchpadBtn" style="margin-top: 10px; background: #007bff;">Push changes to Launchpad</button>
+            <button id="uploadPresetBtn">📁 Upload Custom Preset</button>
+            <button id="pushToLaunchpadBtn">⚡ Push changes to Launchpad</button>
+            <button id="clearAllPadsBtn">🗑️ Clear All Pads</button>
         </div>
     </header>
 
     <div class="main" id="main-content">
-    <div class="launchpad-container" id="launchpad-container">
-        <div class="launchpad" id="launchpad"></div>
-    </div>
-
-    <div class="sidebar">
-        <div class="section">
-            <h3>Color Palette <button id="togglePalette" style="padding: 4px 10px; font-size: 0.8em; margin-left: 10px;">Show All</button></h3>
-            <div class="color-swatch-container" id="swatch-container">
-                <div class="color-swatch" id="swatches"></div>
-            </div>
-            
-            <div class="velocity-controls">
-                <button id="velocity-down">-</button>
-                <label style="font-size:0.85rem;">Velocity: 
-                    <span id="velocity-value" contenteditable="true" class="velocity-value-editable"></span>
-                </label>
-                <button id="velocity-up">+</button>
-            </div>
+        <div class="launchpad-container" id="launchpad-container">
+            <div class="launchpad" id="launchpad"></div>
         </div>
 
-        <div class="section">
-            <h3>Quick Color Hotkeys<br><span style="font-size: 0.8em; opacity: 0.7;">Press 'c' for more</span></h3>
-            <div class="hotkeys" id="hotkeys-display">
-                <!-- Hotkeys will be dynamically added here -->
+        <div class="sidebar">
+            <div class="section">
+                <h3>Color Palette <button id="togglePalette" style="padding: 4px 10px; font-size: 0.8em; margin-left: 10px;">Show All</button></h3>
+                <div class="color-swatch-container" id="swatch-container">
+                    <div class="color-swatch" id="swatches"></div>
+                </div>
+                
+                <div class="velocity-controls">
+                    <button id="velocity-down">-</button>
+                    <label style="font-size:0.85rem;">Velocity: 
+                        <span id="velocity-value" contenteditable="true" class="velocity-value-editable"></span>
+                    </label>
+                    <button id="velocity-up">+</button>
+                </div>
             </div>
-        </div>
 
-        <div class="section">
-            <button onclick="clearSelected()" style="width:100%; background:#555;">Clear Selected</button>
-            <button onclick="clearAll()" style="width:100%; margin-top:8px; background:#f33;">Clear All Pads</button>
-            <button onclick="applyCustomRainbow()" style="width:100%; margin-top:8px; background:#ff8800;">Load Custom Rainbow</button>
+            <div class="section">
+                <h3>Quick Color Hotkeys<br><span style="font-size: 0.8em; opacity: 0.7;">Press 'c' for more</span></h3>
+                <div class="hotkeys" id="hotkeys-display"></div>
+            </div>
+
         </div>
     </div>
-</div>
 
-<!-- Color Search Modal -->
-<div id="colorModal" class="modal">
-    <div class="modal-content">
-        <input type="text" id="colorSearchInput" placeholder="Search color name..." autofocus>
-        <div id="colorList" class="color-list"></div>
+    <div id="colorModal" class="modal">
+        <div class="modal-content">
+            <input type="text" id="colorSearchInput" placeholder="Search color name..." autofocus>
+            <div id="colorList" class="color-list"></div>
+        </div>
     </div>
-</div>
 
 <script>
     const MIDI_CHANNEL = 1;
     
     function getNote(row, col) {
-        // Converts 0-7, 0-7 to 11-88
-        // Row 0, Col 0 is 11. Row 7, Col 7 is 88.
         return (row + 1) * 10 + (col + 1);
     }
 
-    // Convert MIDI note (11-88) back to 0-7, 0-7 row/col
     function getRowColFromNote(note) {
         const row = Math.floor(note / 10) - 1;
         const col = (note % 10) - 1;
         return { row, col };
     }
 
-    const customRainbow = [3, 5, 9, 13, 19, 21, 40, 80]; // Example rainbow velocities
+    function hexToHsl(hex) {
+        let r = parseInt(hex.slice(1, 3), 16) / 255;
+        let g = parseInt(hex.slice(3, 5), 16) / 255;
+        let b = parseInt(hex.slice(5, 7), 16) / 255;
+        let max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+        if (max == min) {
+            h = s = 0;
+        } else {
+            let d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return [h * 360, s * 100, l * 100];
+    }
 
-    // New expanded color palette with more precise hex values, sorted by similarity
-    const colorPalette = [
+    const customRainbow = [3, 5, 9, 13, 19, 21, 40, 80];
+
+    let colorPalette = [
         {v: 0,  hex: "#1a1a22", name: "Off"}, 
-
-        // Whites & Grays
         {v: 3,  hex: "#f8f8f8", name: "Brightest White"}, 
         {v: 2,  hex: "#ffffff", name: "Brighter White"},
         {v: 1,  hex: "#e0e0e0", name: "White"},
@@ -501,9 +510,6 @@
         {v: 71, hex: "#808080", name: "Gray"},
         {v: 117, hex: "#e0e0a0", name: "Gray Yellow"},
         {v: 112, hex: "#8090a0", name: "Gray Blue"},
-
-
-        // Reds & Pinks
         {v: 106, hex: "#ff2b00", name: "Blood Red"},
         {v: 72, hex: "#8B0000", name: "Deep Red"},
         {v: 120, hex: "#ff2b00", name: "Crimson"},
@@ -524,8 +530,6 @@
         {v: 82, hex: "#ff69b4", name: "Easter Bunny"},
         {v: 116, hex: "#ffebf0", name: "Pink White"},
         {v: 56, hex: "#ff7f50", name: "Coral"},
-        
-        // Oranges & Browns
         {v: 127, hex: "#cc5500", name: "Dark Orange"},
         {v: 60, hex: "#cc5500", name: "Burnt Orange"},
         {v: 11, hex: "#b36000", name: "Darkest Orange"},
@@ -533,8 +537,6 @@
         {v: 9,  hex: "#ff8c00", name: "Orange"},
         {v: 83, hex: "#FFBF00", name: "Amber"},
         {v: 84, hex: "#ff8c00", name: "Cheddar"}, 
-        
-        // Yellows
         {v: 96, hex: "#ffd700", name: "Gold"},
         {v: 12, hex: "#ffe97a", name: "Sand"},        
         {v: 107, hex: "#ff976b", name: "Peach"},
@@ -552,10 +554,8 @@
         {v: 15, hex: "#999900", name: "Darkest Highlighter Yellow"},
         {v: 14, hex: "#cccc00", name: "Darker Highlighter Yellow"},
         {v: 13, hex: "#ffff00", name: "Highlighter Yellow"},
-        {v: 85, hex: "#CCFF00", name: "Highlighter Yellow (duplicate)"}, /* Changed */
+        {v: 85, hex: "#CCFF00", name: "Highlighter Yellow (duplicate)"},
         {v: 97, hex: "#e0e060", name: "Yellowish"},
-        
-        // Greens
         {v: 16, hex: "#00ff00", name: "Lime"},
         {v: 86, hex: "#7CFC00", name: "Limer"},
         {v: 76, hex: "#00FF00", name: "Greener"},
@@ -574,8 +574,6 @@
         {v: 64, hex: "#228B22", name: "Cool Green"},
         {v: 122, hex: "#006400", name: "Christmas Green"},
         {v: 123, hex: "#3a5f0b", name: "Cedar Green"},
-
-        // Teals
         {v: 20, hex: "#3eb489", name: "Mint"},
         {v: 27, hex: "#00583a", name: "Darkest Emerald"},
         {v: 26, hex: "#007a4b", name: "Darker Emerald"},
@@ -596,8 +594,6 @@
         {v: 35, hex: "#009999", name: "Darkest Aqua"},
         {v: 34, hex: "#00cccc", name: "Darker Aqua"},
         {v: 33, hex: "#00ffff", name: "Aqua"},
-        
-        // Blues
         {v: 103, hex: "#a0b0c0", name: "Ghostly Blue"},
         {v: 104, hex: "#80b0d0", name: "Cool Blue"},
         {v: 90, hex: "#E0FFFF", name: "Lightest Blue"},
@@ -615,8 +611,6 @@
         {v: 45, hex: "#4169e1", name: "Royal Blue"},
         {v: 80, hex: "#191970", name: "Midnight"},
         {v: 69, hex: "#191970", name: "Dark Midnight"},
-
-        // Purples
         {v: 67, hex: "#004272", name: "Indigo"},
         {v: 66, hex: "#0094c6", name: "Dark Periwinkle"},
         {v: 79, hex: "#1e8bb7", name: "Periwinkle"},
@@ -625,45 +619,29 @@
         {v: 50, hex: "#8760d7", name: "Darker Light Purple"},
         {v: 49, hex: "#7870db", name: "Light Purple"}, 
         {v: 44, hex: "#809cea", name: "Lilac"},
-
-        // Special / Neutrals
         {v: 105, hex: "#d2b48c", name: "Tan"},
-    ].sort((a, b) => {
-        // Simple sorting by color groups and then by hex value within groups
-        const colorGroupOrder = {
-            "Off": 0, "White": 1, "Brighter White": 1, "Brightest White": 1, "White (duplicate)": 1, "Egg White": 1, "Off White": 1, "Cream": 1, "Yellow White": 1, "Light Blue White": 1, "Blue White": 1, "Pink White": 1, "Purple White": 1, "Gray": 2, "Gray Yellow": 2, "Gray Blue": 2,
-            "Blood Red": 3, "Deep Red": 3, "Crimson": 3, "Dark Crimson": 3, "Red": 3, "Darker Red": 3, "Darkest Red": 3, "Darkest Neon Pink": 3, "Darker Neon Pink": 3, "Neon Pink": 3, "Dragon Fruit": 3, "Darkest Hot Pink": 3, "Darker Hot Pink": 3, "Hot Pink": 3, "Pink": 3, "Baby Pink": 3, "Easter Bunny": 3, "Pink White": 3, "Coral": 3,
-            "Dark Orange": 4, "Burnt Orange": 4, "Darkest Orange": 4, "Darker Orange": 4, "Orange": 4, "Amber": 4, "Cheddar": 4,
-            "Gold": 5, "Disco Gold": 5, "Warm Gold": 5, "Yellow": 5, "Yellower": 5, "Sunflower Yellow": 5, "Dark Sunflower Yellow": 5, "Golden": 5, "Underripe Yellow": 5, "Mellow Yellow": 5, "Darker Mellow Yellow": 5, "Pastel Yellow": 5, "Macaroni and Cheese": 5, "Darkest Highlighter Yellow": 5, "Darker Highlighter Yellow": 5, "Highlighter Yellow": 5, "Highlighter Yellow (duplicate)": 5, "Yellowish": 5,
-            "Lime": 6, "Limer": 6, "Greener": 6, "Greeeen": 6, "Cucumber Green": 6, "Lettuce Pray": 6, "Celery": 6, "Dark Lime": 6, "Highlighter Green": 6, "Green": 6, "Darker Green": 6, "Darkest Green": 6, "Darkest Leaf": 6, "Darker Leaf": 6, "Leaf": 6, "Cool Green": 6, "Christmas Green": 6, "Cedar Green": 6,
-            "Mint": 7, "Darkest Emerald": 7, "Darker Emerald": 7, "Emerald": 7, "Medium Emerald": 7, "Light Emerald": 7, "Jade": 7, "Dark Teal": 7, "Darkest Turquoise": 7, "Darker Turquoise": 7, "Turquoise": 7, "Light Teal": 7, "Tealish": 7, "Highlighter Teal": 7, "Teal White": 7, "Glass": 7, "Teal": 7, "Darkest Aqua": 7, "Darker Aqua": 7, "Aqua": 7,
-            "Ghostly Blue": 8, "Cool Blue": 8, "Lightest Blue": 8, "Cool Glass": 8, "Baby Blue": 8, "Darkest Light Blue": 8, "Darker Light Blue": 8, "Light Blue": 8, "Darkest Sky Blue": 8, "Darker Sky Blue": 8, "Sky Blue": 8, "Cool White": 8, "Darkest Royal Blue": 8, "Darker Royal Blue": 8, "Royal Blue": 8, "Midnight": 8, "Dark Midnight": 8,
-            "Indigo": 9, "Black Periwinkle": 9, "Periwinkle": 9, "Pastel Purple": 9, "Darkest Light Purple": 9, "Darker Light Purple": 9, "Light Purple": 9, "Lilac": 9,
-            "Tan": 10, // Special/Other
-        };
+    ];
 
-        const groupA = colorGroupOrder[a.name];
-        const groupB = colorGroupOrder[b.name];
-
-        if (groupA !== groupB) {
-            return groupA - groupB;
-        }
-        // If in the same group, sort by velocity for consistency, or by hex string
-        // Sorting by velocity for now as hex string might not give intuitive color order for similar hues
-        return a.v - b.v;
+    colorPalette.sort((a, b) => {
+        if (a.v === 0) return -1;
+        if (b.v === 0) return 1;
+        const hslA = hexToHsl(a.hex);
+        const hslB = hexToHsl(b.hex);
+        if (hslA[2] > 90 && hslB[2] < 90) return -1;
+        if (hslB[2] > 90 && hslA[2] < 90) return 1;
+        if (hslA[1] < 10 && hslB[1] > 10) return -1;
+        if (hslB[1] < 10 && hslA[1] > 10) return 1;
+        if (Math.abs(hslA[0] - hslB[0]) > 2) return hslA[0] - hslB[0];
+        return hslB[2] - hslA[2];
     });
 
-
     const velocityToColorMap = new Map(colorPalette.map(c => [c.v, c]));
-    const allPads = []; // To store references to all pad elements in order
+    const allPads = []; 
 
     function getColorByVelocity(velocity) {
-        // Find exact match or closest known color for visual consistency
         if (velocityToColorMap.has(velocity)) {
             return velocityToColorMap.get(velocity);
         }
-        
-        // Fallback for velocities not explicitly defined: find the closest velocity with a defined color
         const sortedVelocities = Array.from(velocityToColorMap.keys()).sort((a, b) => a - b);
         let closest = sortedVelocities[0];
         for (const v of sortedVelocities) {
@@ -679,49 +657,41 @@
     let input = null;
     let selectedPads = new Set();
     let currentVelocity = 64;
-    let padStates = {}; // Stores the last known velocity for each pad
+    let padStates = {}; 
 
-    let launchpadEl, swatchesEl, hotkeysDisplayEl, velocityDownButton, velocityUpButton, velocityValueEl;
+    let launchpadEl, swatchesEl, hotkeysDisplayEl, velocityValueEl;
     let colorModal, colorSearchInput, colorList;
     let filteredColors = [];
     let selectedColorIndex = -1;
-    let lastClickedPad = null; // For shift-click range selection
+    let lastClickedPad = null; 
     let swatchContainer;
     let togglePaletteButton;
     let midiStatusEl;
-    let hamburgerMenu, menuModal, savePresetBtn, uploadPresetInput, uploadPresetBtn;
-    let pushToLaunchpadBtn;
-
-
-    function log(msg, type = "info") {
-        // Activity log removed, but keeping this function as a placeholder if needed later.
-        // console.log(`[${type.toUpperCase()}] ${msg}`);
-    }
+    let hamburgerMenu, menuModal, savePresetBtn, uploadPresetInput, uploadPresetBtn, pushToLaunchpadBtn;
 
     async function requestMIDIAccess() {
         if (!navigator.requestMIDIAccess) {
-            midiStatusEl.textContent = "Web MIDI not supported. Please use Chrome or Edge.";
+            midiStatusEl.textContent = "Web MIDI not supported.";
             return;
         }
         try {
             midiAccess = await navigator.requestMIDIAccess({sysex: false});
-            
-            const outputs = Array.from(midiAccess.outputs.values());
-            const inputs = Array.from(midiAccess.inputs.values());
-
-            output = outputs.find(o => o.name.toLowerCase().includes("launchpad")) || outputs[0];
-            input = inputs.find(i => i.name.toLowerCase().includes("launchpad")) || inputs[0];
-
-            let statusText = "MIDI ready";
-            if (output) statusText += ` • Out: ${output.name}`;
-            if (input) {
-                statusText += ` • In: ${input.name}`;
-                input.onmidimessage = handleMIDIMessage;
-            }
-            if (!output && !input) statusText += " (No Launchpad found)";
-            
-            midiStatusEl.textContent = statusText;
-
+            const updatePorts = () => {
+                const outputs = Array.from(midiAccess.outputs.values());
+                const inputs = Array.from(midiAccess.inputs.values());
+                output = outputs.find(o => o.name.toLowerCase().includes("launchpad")) || outputs[0];
+                input = inputs.find(i => i.name.toLowerCase().includes("launchpad")) || inputs[0];
+                
+                let statusText = "MIDI ready";
+                if (output) statusText += ` • Out: ${output.name}`;
+                if (input) {
+                    statusText += ` • In: ${input.name}`;
+                    input.onmidimessage = handleMIDIMessage;
+                }
+                midiStatusEl.textContent = statusText;
+            };
+            midiAccess.onstatechange = updatePorts;
+            updatePorts();
         } catch (err) {
             midiStatusEl.textContent = `MIDI Error: ${err.message}`;
         }
@@ -733,19 +703,30 @@
             output.send([0x90 | (MIDI_CHANNEL - 1), note, velocity]);
             return true;
         } catch (e) {
-            console.error(e);
             return false;
         }
+    }
+
+    function pushAllToLaunchpad() {
+        if (!output) {
+            alert("No MIDI Output detected.");
+            return;
+        }
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                const note = getNote(r, c);
+                const velocity = padStates[note] || 0;
+                sendNoteOn(note, velocity);
+            }
+        }
+        hideMenuModal();
     }
 
     function updatePadVisual(row, col, velocity) {
         const pad = document.querySelector(`.pad[data-row="${row}"][data-col="${col}"]`);
         if (!pad) return;
-
         const color = getColorByVelocity(velocity);
-        
         pad.style.backgroundColor = color.hex;
-        // Adjust box shadow for black (0 velocity) pads
         if (velocity === 0) {
             pad.style.boxShadow = `inset 0 6px 16px rgba(0,0,0,0.7), 0 4px 10px rgba(0,0,0,0.5)`;
             pad.querySelector('.pad-label').style.color = 'rgba(255,255,255,0.25)';
@@ -759,23 +740,19 @@
     function createLaunchpad() {
         launchpadEl = document.getElementById("launchpad");
         launchpadEl.innerHTML = "";
-        allPads.length = 0; // Clear previous pads
-
-        for (let row = 7; row >= 0; row--) { // Rows 7 down to 0
-            for (let col = 0; col < 8; col++) { // Cols 0 to 7
+        allPads.length = 0;
+        for (let row = 7; row >= 0; row--) {
+            for (let col = 0; col < 8; col++) {
                 const pad = document.createElement("div");
                 pad.className = "pad";
                 pad.dataset.row = row;
                 pad.dataset.col = col;
-
                 const label = document.createElement("span");
                 label.className = "pad-label";
                 label.textContent = getNote(row, col);
                 pad.appendChild(label);
-
                 pad.addEventListener("click", (e) => handlePadClick(row, col, e));
-
-                updatePadVisual(row, col, 0); // Initialize with black
+                updatePadVisual(row, col, 0); 
                 launchpadEl.appendChild(pad);
                 allPads.push({ element: pad, row, col, note: getNote(row, col) });
             }
@@ -785,8 +762,7 @@
     function handlePadClick(row, col, e) {
         const note = getNote(row, col);
         const currentPad = {row, col, note};
-
-        if (e.ctrlKey || e.metaKey) { // Multi-selection/toggle
+        if (e.ctrlKey || e.metaKey) {
             const exists = Array.from(selectedPads).some(p => p.row === row && p.col === col);
             if (exists) {
                 selectedPads = new Set(Array.from(selectedPads).filter(p => !(p.row === row && p.col === col)));
@@ -794,63 +770,20 @@
                 selectedPads.add(currentPad);
             }
             lastClickedPad = currentPad;
-        } else if (e.shiftKey && lastClickedPad) { // Range selection in order
+        } else if (e.shiftKey && lastClickedPad) {
             const startIdx = allPads.findIndex(p => p.row === lastClickedPad.row && p.col === lastClickedPad.col);
             const endIdx = allPads.findIndex(p => p.row === row && p.col === col);
-
             if (startIdx !== -1 && endIdx !== -1) {
-                // Find the current min/max indices of selected pads for extending
-                // If no pads selected, treat lastClickedPad as the only anchor
-                let currentMinIdx = startIdx; 
-                let currentMaxIdx = startIdx;
-
-                if (selectedPads.size > 0) {
-                    const currentSelectedNotes = Array.from(selectedPads).map(p => p.note);
-                    const sortedSelectedIndices = Array.from(selectedPads).map(p => allPads.findIndex(ap => ap.note === p.note)).sort((a,b) => a-b);
-                    currentMinIdx = sortedSelectedIndices[0];
-                    currentMaxIdx = sortedSelectedIndices[sortedSelectedIndices.length - 1];
-                }
-
-                let newMinIdx = currentMinIdx;
-                let newMaxIdx = currentMaxIdx;
-
-                // Extend based on the direction of movement from the 'last clicked' pad
-                if (endIdx < currentMinIdx) { // Moving left/up from current selection
-                    newMinIdx = Math.min(endIdx, startIdx); // Also consider startIdx if it's new
-                    newMaxIdx = Math.max(currentMaxIdx, startIdx);
-                } else if (endIdx > currentMaxIdx) { // Moving right/down from current selection
-                    newMinIdx = Math.min(currentMinIdx, startIdx);
-                    newMaxIdx = Math.max(endIdx, startIdx);
-                } else { // Target is within or overlaps existing selection
-                    // This complex case is simplified for user experience:
-                    // If moving within the existing range, or starting a new range with shift,
-                    // re-calculate based on lastClickedPad and target.
-                    // For a clean extension, if moving beyond current min/max, extend.
-                    // If moving within, re-anchor from the closest of the two ends.
-                    const absDiffToMin = Math.abs(endIdx - currentMinIdx);
-                    const absDiffToMax = Math.abs(endIdx - currentMaxIdx);
-
-                    if (absDiffToMin < absDiffToMax) { // Target is closer to min, extend/contract from min
-                        newMinIdx = endIdx;
-                        newMaxIdx = currentMaxIdx;
-                    } else { // Target is closer to max, extend/contract from max
-                        newMinIdx = currentMinIdx;
-                        newMaxIdx = endIdx;
-                    }
-                }
-
+                const min = Math.min(startIdx, endIdx);
+                const max = Math.max(startIdx, endIdx);
                 selectedPads.clear();
-                for (let i = Math.min(newMinIdx, newMaxIdx); i <= Math.max(newMinIdx, newMaxIdx); i++) {
-                    selectedPads.add(allPads[i]);
-                }
+                for (let i = min; i <= max; i++) selectedPads.add(allPads[i]);
             }
-            lastClickedPad = currentPad; // Update last clicked for potential chaining
-        } else { // Single selection
+        } else {
             selectedPads.clear();
             selectedPads.add(currentPad);
             lastClickedPad = currentPad;
         }
-
         refreshSelectionVisuals();
         updateVelocityDisplayForSelected();
     }
@@ -859,16 +792,11 @@
         selectedPads.clear();
         lastClickedPad = null;
         refreshSelectionVisuals();
-        updateVelocityDisplayForSelected(); // Update velocity display
+        updateVelocityDisplayForSelected();
     }
 
-    // Dedicated handler for clicks on the container background
     function deselectAllOnContainerClick(e) {
-        // Check if the click target is the container itself or the launchpad grid, but not a pad
-        const isClickOnContainer = e.target.id === 'launchpad-container' || e.target.id === 'launchpad';
-        const isClickOnPad = e.target.closest('.pad'); // Check if click is inside a pad
-
-        if (isClickOnContainer && !isClickOnPad && e.button === 0) { // Only deselect on left-click
+        if ((e.target.id === 'launchpad-container' || e.target.id === 'launchpad') && e.button === 0) {
             deselectAllPads();
         }
     }
@@ -879,377 +807,227 @@
             const c = parseInt(pad.dataset.col);
             const isSelected = Array.from(selectedPads).some(s => s.row === r && s.col === c);
             pad.classList.toggle('selected', isSelected);
-
-            // Update label color for blacked out pads
-            const currentPadNote = getNote(r, c);
-            const currentVel = padStates[currentPadNote] || 0;
-            pad.querySelector('.pad-label').style.color = (currentVel === 0) ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.75)';
         });
     }
 
     function updateVelocityDisplayForSelected() {
-        if (selectedPads.size === 1) {
-            const { note } = Array.from(selectedPads)[0];
-            const velocity = padStates[note] || 0;
-            currentVelocity = velocity;
-            velocityValueEl.textContent = currentVelocity;
-        } else if (selectedPads.size > 0) { // If multiple pads are selected, display the velocity of the first selected
-            const firstSelectedNote = Array.from(selectedPads)[0].note;
-            currentVelocity = padStates[firstSelectedNote] || 0;
+        if (selectedPads.size > 0) {
+            const first = Array.from(selectedPads)[0];
+            currentVelocity = padStates[first.note] || 0;
             velocityValueEl.textContent = currentVelocity;
         } else {
-            currentVelocity = 0; // Set to 0 or blank when no pads are selected
-            velocityValueEl.textContent = ''; // Blank when nothing is selected
+            velocityValueEl.textContent = '';
         }
     }
 
     function applyColorToSelected(velocity) {
         if (selectedPads.size === 0) return;
-        
         selectedPads.forEach(({row, col, note}) => {
             updatePadVisual(row, col, velocity);
             sendNoteOn(note, velocity);
         });
     }
 
-    function clearSelected() {
-        if (selectedPads.size === 0) return;
-        
-        selectedPads.forEach(({row, col, note}) => {
-            updatePadVisual(row, col, 0);
-            sendNoteOn(note, 0);
-        });
-        
-        deselectAllPads(); // Clear selection after clearing pads
-    }
-
     function clearAll() {
         if (!confirm("Clear ALL 64 pads?")) return;
-        
         for (let r = 0; r < 8; r++) {
             for (let c = 0; c < 8; c++) {
                 updatePadVisual(r, c, 0);
                 sendNoteOn(getNote(r, c), 0);
             }
         }
-        
-        deselectAllPads(); // Clear selection after clearing all pads
+        deselectAllPads();
     }
 
-    function applyCustomRainbow() {
-        for (let row = 0; row < 8; row++) {
-            for (let col = 0; col < 8; col++) {
-                const velocity = customRainbow[col % customRainbow.length];
-                updatePadVisual(row, col, velocity);
-                sendNoteOn(getNote(row, col), velocity);
-            }
-        }
-        
-        deselectAllPads(); // Clear selection after applying rainbow
-    }
 
     function handleMIDIMessage(e) {
         const [status, note, velocity] = e.data;
-        // Pad notes 11-18, 21-28, ..., 81-88
-        const isPadNote = (note >= 11 && note <= 18) || 
-                         (note >= 21 && note <= 28) || 
-                         (note >= 31 && note <= 38) || 
-                         (note >= 41 && note <= 48) || 
-                         (note >= 51 && note <= 58) || 
-                         (note >= 61 && note <= 68) || 
-                         (note >= 71 && note <= 78) || 
-                         (note >= 81 && note <= 88);
-
-        if ((status & 0xF0) === 0x90 && isPadNote) { // Only note on/off for actual pads
+        const isPadNote = (note >= 11 && note <= 88) && (note % 10 !== 0) && (note % 10 !== 9);
+        if ((status & 0xF0) === 0x90 && isPadNote) {
             const { row, col } = getRowColFromNote(note);
-            
-            if (velocity > 0) { // Note On
+            if (velocity > 0) {
                 selectedPads.clear();
                 selectedPads.add({row, col, note});
                 lastClickedPad = {row, col, note};
                 refreshSelectionVisuals();
-                updateVelocityDisplayForSelected(); // Update velocity from hardware input
-            } else { // Note Off
-                // If you want to clear selection on note off, add logic here.
-                // For now, it remains selected until another action.
+                updateVelocityDisplayForSelected();
             }
         }
     }
 
     function handleKeyboard(e) {
-        if (colorModal.style.display === 'flex') {
-            handleModalKeyboard(e);
-            return;
-        }
-
-        if (menuModal.style.display === 'flex') { // Check if menu is open
-            handleMenuModalKeyboard(e);
-            return;
-        }
-
-        if (e.key === "Escape") {
-            deselectAllPads();
-            return;
-        }
-
-        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'a') {
-            e.preventDefault();
-            selectedPads.clear();
-            allPads.forEach(pad => selectedPads.add(pad));
-            lastClickedPad = allPads[allPads.length - 1]; // Set last clicked to the last pad
-            refreshSelectionVisuals();
-            updateVelocityDisplayForSelected();
-            return;
-        }
-
-        if (e.key.toLowerCase() === 'c') {
-            e.preventDefault(); // Prevent 'c' from being typed into search bar
-            showColorModal();
-            return;
-        }
-
-        if (e.key.toLowerCase() === 'v') {
-            e.preventDefault();
-            velocityValueEl.focus();
-            return;
-        }
-
-
-        if (selectedPads.size === 0) {
-            // If no pads selected, allow arrow keys to select the first pad
-            if (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight") {
-                e.preventDefault();
-                if (allPads.length > 0) {
-                    selectedPads.add(allPads[0]); // Select the first pad (row 7, col 0)
-                    lastClickedPad = allPads[0];
-                    refreshSelectionVisuals();
-                    updateVelocityDisplayForSelected();
-                }
-            }
-            return; // Prevent further actions if no pads are selected, unless it's a selection action
-        }
-
-        const k = e.key.toLowerCase();
-        let vel = null;
-        let currentPad = Array.from(selectedPads)[0]; // Use the first selected pad for navigation basis
-        let newRow = currentPad.row;
-        let newCol = currentPad.col;
-        let targetPad = null;
-        let changedSelection = false;
-
-        if (e.metaKey || e.ctrlKey) { // Command/Ctrl key for velocity changes
-            if (e.key === "ArrowUp") {
-                e.preventDefault();
-                currentVelocity = Math.min(127, currentVelocity + 1);
-                velocityValueEl.textContent = currentVelocity;
-                applyColorToSelected(currentVelocity);
-                return;
-            } else if (e.key === "ArrowDown") {
-                e.preventDefault();
-                currentVelocity = Math.max(0, currentVelocity - 1);
-                velocityValueEl.textContent = currentVelocity;
-                applyColorToSelected(currentVelocity);
-                return;
-            }
-        }
-
-        // Arrow key navigation and Shift-selection
-        if (e.key === "ArrowLeft") {
-            e.preventDefault();
-            newCol = Math.max(0, currentPad.col - 1);
-            targetPad = allPads.find(p => p.row === newRow && p.col === newCol);
-            changedSelection = true;
-        } else if (e.key === "ArrowRight") {
-            e.preventDefault();
-            newCol = Math.min(7, currentPad.col + 1);
-            targetPad = allPads.find(p => p.row === newRow && p.col === newCol);
-            changedSelection = true;
-        } else if (e.key === "ArrowUp") {
-            e.preventDefault();
-            newRow = Math.min(7, currentPad.row + 1); // Launchpad rows go up
-            targetPad = allPads.find(p => p.row === newRow && p.col === newCol);
-            changedSelection = true;
-        } else if (e.key === "ArrowDown") {
-            e.preventDefault();
-            newRow = Math.max(0, currentPad.row - 1); // Launchpad rows go down
-            targetPad = allPads.find(p => p.row === newRow && p.col === newCol);
-            changedSelection = true;
-        }
-
-        if (changedSelection && targetPad) {
-            if (e.shiftKey) {
-                const startIdx = allPads.findIndex(p => p.row === lastClickedPad.row && p.col === lastClickedPad.col);
-                const endIdx = allPads.findIndex(p => p.row === targetPad.row && p.col === targetPad.col);
-
-                if (startIdx !== -1 && endIdx !== -1) {
-                    const currentMinNote = Math.min(...Array.from(selectedPads).map(p => p.note));
-                    const currentMaxNote = Math.max(...Array.from(selectedPads).map(p => p.note));
-                    const currentMinIdx = allPads.findIndex(p => p.note === currentMinNote);
-                    const currentMaxIdx = allPads.findIndex(p => p.note === currentMaxNote);
-
-                    let newMinIdx, newMaxIdx;
-
-                    // Logic to extend selection:
-                    // If the target is outside the current range, extend the range to include it.
-                    // If the target is inside the current range, adjust the end closest to the target.
-                    if (endIdx < currentMinIdx) { // Moving left/up beyond current selection
-                        newMinIdx = endIdx;
-                        newMaxIdx = currentMaxIdx;
-                    } else if (endIdx > currentMaxIdx) { // Moving right/down beyond current selection
-                        newMinIdx = currentMinIdx;
-                        newMaxIdx = endIdx;
-                    } else { // Target is within the current selection. Adjust the end closest to the target.
-                        if (Math.abs(endIdx - currentMinIdx) < Math.abs(endIdx - currentMaxIdx)) {
-                            newMinIdx = endIdx; // Target is closer to min, so extend/contract from min side
-                            newMaxIdx = currentMaxIdx;
-                        } else {
-                            newMinIdx = currentMinIdx; // Target is closer to max, so extend/contract from max side
-                            newMaxIdx = endIdx;
-                        }
-                    }
-
-                    selectedPads.clear();
-                    for (let i = Math.min(newMinIdx, newMaxIdx); i <= Math.max(newMinIdx, newMaxIdx); i++) {
-                        selectedPads.add(allPads[i]);
-                    }
-                }
-                lastClickedPad = targetPad; 
-            } else {
-                selectedPads.clear();
-                selectedPads.add(targetPad);
-                lastClickedPad = targetPad;
-            }
-            refreshSelectionVisuals();
-            updateVelocityDisplayForSelected();
-            return;
-        }
-
-
-        // Hotkeys based on new palette
-        if (k === 'w') vel = 8; // Warm White
-        else if (k === 'r') vel = 5; // Red
-        else if (k === 'o') vel = 9; // Orange
-        else if (k === 'y') vel = 62; // Yellow
-        else if (k === 'g') vel = 21; // Green
-        else if (k === 'b') vel = 37; // Sky Blue
-        else if (k === 'p') vel = 49; // Light Purple
-        else if (k === '0') vel = 0; // Off
-
-        if (vel !== null) {
-            currentVelocity = vel;
-            velocityValueEl.textContent = currentVelocity;
-            applyColorToSelected(currentVelocity);
-        }
+    // If the color modal is open, use the modal-specific keyboard handler
+    if (colorModal.style.display === 'flex') { 
+        handleModalKeyboard(e); 
+        return; 
     }
+    
+    // If we are typing in the velocity box or menu is open, ignore global shortcuts
+    if (document.activeElement === velocityValueEl || menuModal.style.display === 'flex') return;
+
+    if (e.key === "Escape") { 
+        deselectAllPads(); 
+        return; 
+    }
+
+    // Ctrl/Cmd + A to select all
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        selectedPads.clear();
+        allPads.forEach(pad => selectedPads.add(pad));
+        refreshSelectionVisuals();
+        updateVelocityDisplayForSelected();
+        return;
+    }
+
+    // 'C' to open Color Search Modal
+    if (e.key.toLowerCase() === 'c') {
+        e.preventDefault(); // Prevents 'c' from being entered into the search input after focus
+        showColorModal();
+        return;
+    }
+
+    // 'V' to focus velocity
+    if (e.key.toLowerCase() === 'v') {
+        e.preventDefault();
+        velocityValueEl.focus();
+        return;
+    }
+
+    // Navigation and Shift-Selection Logic
+    if (e.key.startsWith("Arrow")) {
+        if (selectedPads.size === 0) {
+            // Select the first pad if nothing is selected
+            selectedPads.add(allPads[0]);
+            lastClickedPad = allPads[0];
+        } else {
+            e.preventDefault();
+            const currentPad = Array.from(selectedPads)[selectedPads.size - 1];
+            let newRow = currentPad.row;
+            let newCol = currentPad.col;
+
+            if (e.key === "ArrowLeft") newCol = Math.max(0, currentPad.col - 1);
+            else if (e.key === "ArrowRight") newCol = Math.min(7, currentPad.col + 1);
+            else if (e.key === "ArrowUp") newRow = Math.min(7, currentPad.row + 1);
+            else if (e.key === "ArrowDown") newRow = Math.max(0, currentPad.row - 1);
+
+            const targetPad = allPads.find(p => p.row === newRow && p.col === newCol);
+
+            if (targetPad) {
+                if (e.shiftKey && lastClickedPad) {
+                    const startIdx = allPads.findIndex(p => p.note === lastClickedPad.note);
+                    const endIdx = allPads.findIndex(p => p.note === targetPad.note);
+                    const min = Math.min(startIdx, endIdx);
+                    const max = Math.max(startIdx, endIdx);
+                    selectedPads.clear();
+                    for (let i = min; i <= max; i++) selectedPads.add(allPads[i]);
+                } else {
+                    selectedPads.clear();
+                    selectedPads.add(targetPad);
+                    lastClickedPad = targetPad;
+                }
+            }
+        }
+        refreshSelectionVisuals();
+        updateVelocityDisplayForSelected();
+        return;
+    }
+
+    // Hotkeys (W, R, O, Y, G, B, P, 0)
+    const k = e.key.toLowerCase();
+    let vel = null;
+    const hotkeyMap = { 'w': 8, 'r': 5, 'o': 9, 'y': 62, 'g': 21, 'b': 37, 'p': 49, '0': 0 };
+    
+    if (hotkeyMap.hasOwnProperty(k)) {
+        vel = hotkeyMap[k];
+        currentVelocity = vel;
+        velocityValueEl.textContent = currentVelocity;
+        applyColorToSelected(currentVelocity);
+    }
+}
 
     function createSwatches() {
         swatchesEl = document.getElementById("swatches");
         swatchesEl.innerHTML = "";
-
         colorPalette.filter(c => c.v !== 0).forEach(c => {
             const sw = document.createElement("div");
             sw.className = "swatch";
             sw.style.backgroundColor = c.hex;
-            sw.title = `Velocity ${c.v}: ${c.name}`;
-
-            sw.addEventListener("click", () => {
+            sw.title = `${c.name} (v${c.v})`;
+            sw.onclick = () => {
                 currentVelocity = c.v;
                 velocityValueEl.textContent = currentVelocity;
                 applyColorToSelected(currentVelocity);
-            });
+            };
             swatchesEl.appendChild(sw);
         });
     }
 
     function createHotkeysDisplay() {
         hotkeysDisplayEl = document.getElementById("hotkeys-display");
-        hotkeysDisplayEl.innerHTML = ""; // Clear existing
-
-        const hotkeysData = [ // Renamed for clarity, same data
-            { key: 'W', name: 'White' },
-            { key: 'R', name: 'Red' },
-            { key: 'O', name: 'Orange' },
-            { key: 'Y', name: 'Yellow' },
-            { key: 'G', name: 'Green' },
-            { key: 'B', name: 'Blue' },
-            { key: 'P', name: 'Purple' },
-            { key: '0', name: 'Off' }
+        const hotkeysData = [
+            { key: 'W', name: 'White' }, { key: 'R', name: 'Red' },
+            { key: 'O', name: 'Orange' }, { key: 'Y', name: 'Yellow' },
+            { key: 'G', name: 'Green' }, { key: 'B', name: 'Blue' },
+            { key: 'P', name: 'Purple' }, { key: '0', name: 'Off' }
         ];
-
-        // Build a single string for the hotkeys text block
-        const hotkeysText = hotkeysData.map(hk => `${hk.key} - ${hk.name}`).join('<br>');
-
-        const textBlock = document.createElement("div");
-        textBlock.className = "hotkeys-text-block"; // New class for styling
-        textBlock.innerHTML = hotkeysText; // Insert the combined text
-        hotkeysDisplayEl.appendChild(textBlock); // Append the single block
+        hotkeysDisplayEl.innerHTML = hotkeysData.map(hk => `${hk.key} - ${hk.name}`).join('<br>');
     }
 
-    // Color Search Modal Functions
     function showColorModal() {
-        colorModal.style.display = 'flex';
-        colorSearchInput.value = '';
-        filterColors();
+    colorModal.style.display = 'flex';
+    colorSearchInput.value = '';
+    filteredColors = [...colorPalette]; // Start with all colors
+    selectedColorIndex = 0;
+    renderColorList();
+    
+    // Use a slight timeout to ensure focus doesn't capture the triggering 'c'
+    setTimeout(() => {
         colorSearchInput.focus();
-        selectedColorIndex = (filteredColors.length > 0) ? 0 : -1; // Select first item by default
-        renderColorList();
-    }
+    }, 10);
+}
 
-    function hideColorModal() {
-        colorModal.style.display = 'none';
-        selectedColorIndex = -1;
-    }
+
+    function hideColorModal() { colorModal.style.display = 'none'; }
 
     function filterColors() {
-        const query = colorSearchInput.value.toLowerCase();
+    const query = colorSearchInput.value.toLowerCase().trim();
+    if (query === "") {
+        filteredColors = [...colorPalette];
+    } else {
         filteredColors = colorPalette.filter(c => 
-            c.name.toLowerCase().includes(query) || c.v.toString().includes(query)
+            c.name.toLowerCase().includes(query) || 
+            c.v.toString() === query
         );
-        selectedColorIndex = (filteredColors.length > 0) ? 0 : -1; // Select first item if any, otherwise -1
-        renderColorList();
     }
+    selectedColorIndex = filteredColors.length > 0 ? 0 : -1;
+    renderColorList();
+}
+
 
     function renderColorList() {
-        colorList.innerHTML = '';
-        if (filteredColors.length === 0) {
-            const noResults = document.createElement('div');
-            noResults.textContent = 'No matching colors.';
-            noResults.style.padding = '10px';
-            noResults.style.opacity = '0.7';
-            colorList.appendChild(noResults);
-            return;
-        }
-
-        filteredColors.forEach((color, index) => {
-            const item = document.createElement('div');
-            item.className = 'color-list-item';
-            if (index === selectedColorIndex) {
-                item.classList.add('selected');
-            }
-            item.dataset.velocity = color.v;
-
-            const preview = document.createElement('div');
-            preview.className = 'color-preview';
-            preview.style.backgroundColor = color.hex;
-            item.appendChild(preview);
-
-            const text = document.createElement('span');
-            text.textContent = `${color.name} (v${color.v})`;
-            item.appendChild(text);
-
-            item.addEventListener('click', () => {
-                selectColorFromModal(color.v);
-            });
-            colorList.appendChild(item);
-        });
-
-        if (selectedColorIndex >= 0 && filteredColors[selectedColorIndex]) {
-            const selectedElement = colorList.children[selectedColorIndex];
-            if (selectedElement) {
-                selectedElement.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-            }
-        }
+    colorList.innerHTML = '';
+    if (filteredColors.length === 0) {
+        colorList.innerHTML = '<div style="padding:10px; opacity:0.5;">No colors found...</div>';
+        return;
     }
+
+    filteredColors.forEach((color, index) => {
+        const item = document.createElement('div');
+        item.className = 'color-list-item' + (index === selectedColorIndex ? ' selected' : '');
+        item.innerHTML = `
+            <div class="color-preview" style="background:${color.hex}"></div>
+            <span>${color.name} <small style="opacity:0.5">(v${color.v})</small></span>
+        `;
+        item.onclick = () => selectColorFromModal(color.v);
+        colorList.appendChild(item);
+    });
+    
+    // Ensure the selected item is visible
+    const activeItem = colorList.children[selectedColorIndex];
+    if (activeItem) activeItem.scrollIntoView({ block: 'nearest' });
+}
+
 
     function selectColorFromModal(velocity) {
         currentVelocity = velocity;
@@ -1259,49 +1037,31 @@
     }
 
     function handleModalKeyboard(e) {
-        if (e.key === "Escape") {
-            hideColorModal();
-            e.preventDefault();
-        } else if (e.key === "ArrowDown") {
+        if (e.key === "Escape") hideColorModal();
+        else if (e.key === "ArrowDown") {
             e.preventDefault();
             selectedColorIndex = (selectedColorIndex + 1) % filteredColors.length;
-            if (selectedColorIndex < 0) selectedColorIndex = filteredColors.length - 1; // Wrap around upwards
             renderColorList();
+            colorList.children[selectedColorIndex]?.scrollIntoView({ block: 'nearest' });
         } else if (e.key === "ArrowUp") {
             e.preventDefault();
             selectedColorIndex = (selectedColorIndex - 1 + filteredColors.length) % filteredColors.length;
-            if (selectedColorIndex < 0) selectedColorIndex = filteredColors.length - 1; // Wrap around downwards
             renderColorList();
-        } else if (e.key === "Enter") {
-            e.preventDefault();
-            if (selectedColorIndex >= 0 && filteredColors.length > 0) {
-                selectColorFromModal(filteredColors[selectedColorIndex].v);
-            }
+            colorList.children[selectedColorIndex]?.scrollIntoView({ block: 'nearest' });
+        } else if (e.key === "Enter" && selectedColorIndex >= 0) {
+            selectColorFromModal(filteredColors[selectedColorIndex].v);
         }
-    }
-
-    // New: Hamburger Menu Functions
-    function toggleMenuModal() {
-        menuModal.style.display = menuModal.style.display === 'flex' ? 'none' : 'flex';
     }
 
     function savePreset() {
-        const presetData = {};
-        for (let r = 0; r < 8; r++) {
-            for (let c = 0; c < 8; c++) {
-                const note = getNote(r, c);
-                presetData[note] = padStates[note] || 0;
-            }
-        }
-        const jsonString = JSON.stringify(presetData, null, 2);
-        const blob = new Blob([jsonString], { type: "application/json" });
+        const name = prompt("Enter a name for your preset:", "my_preset");
+        if (name === null) return;
+        const blob = new Blob([JSON.stringify(padStates, null, 2)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "launchpad_preset.json";
-        document.body.appendChild(a);
+        a.download = `${name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
         a.click();
-        document.body.removeChild(a);
         URL.revokeObjectURL(url);
         hideMenuModal();
     }
@@ -1309,47 +1069,24 @@
     function uploadPreset(event) {
         const file = event.target.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
-                const presetData = JSON.parse(e.target.result);
-                // Validate presetData structure (optional but recommended)
-                if (typeof presetData !== 'object' || Object.keys(presetData).length === 0) {
-                    alert("Invalid preset file. Please upload a JSON object.");
-                    return;
-                }
-
-                // Apply the preset to all pads
-                for (let r = 0; r < 8; r++) {
-                    for (let c = 0; c < 8; c++) {
-                        const note = getNote(r, c);
-                        const velocity = presetData[note] !== undefined ? presetData[note] : 0; // Default to 0 if not in preset
-                        updatePadVisual(r, c, velocity);
-                        sendNoteOn(note, velocity);
-                    }
-                }
-                deselectAllPads(); // Clear selection after applying new preset
-            } catch (error) {
-                alert("Error parsing preset file: " + error.message);
-            }
+                const data = JSON.parse(e.target.result);
+                Object.keys(data).forEach(note => {
+                    const {row, col} = getRowColFromNote(parseInt(note));
+                    updatePadVisual(row, col, data[note]);
+                    sendNoteOn(parseInt(note), data[note]);
+                });
+                deselectAllPads();
+            } catch (err) { alert("Invalid preset file."); }
         };
         reader.readAsText(file);
         hideMenuModal();
     }
 
-    function hideMenuModal() {
-        menuModal.style.display = 'none';
-    }
-
-    function handleMenuModalKeyboard(e) {
-        if (e.key === "Escape") {
-            hideMenuModal();
-            e.preventDefault();
-        }
-        // Add more keyboard navigation for menu items if desired
-    }
-
+    function toggleMenuModal() { menuModal.style.display = menuModal.style.display === 'flex' ? 'none' : 'flex'; }
+    function hideMenuModal() { menuModal.style.display = 'none'; }
 
     function init() {
         createLaunchpad();
@@ -1357,117 +1094,59 @@
         createHotkeysDisplay();
 
         midiStatusEl = document.getElementById("midi-status");
-        velocityDownButton = document.getElementById("velocity-down");
-        velocityUpButton = document.getElementById("velocity-up");
         velocityValueEl = document.getElementById("velocity-value");
         swatchContainer = document.getElementById("swatch-container");
         togglePaletteButton = document.getElementById("togglePalette");
-        
         colorModal = document.getElementById("colorModal");
         colorSearchInput = document.getElementById("colorSearchInput");
         colorList = document.getElementById("colorList");
-        const launchpadContainer = document.getElementById('launchpad-container');
-
-        // New menu elements
         hamburgerMenu = document.getElementById("hamburgerMenu");
         menuModal = document.getElementById("menuModal");
         savePresetBtn = document.getElementById("savePresetBtn");
         uploadPresetInput = document.getElementById("uploadPresetInput");
         uploadPresetBtn = document.getElementById("uploadPresetBtn");
-
-        // Event Listeners for new menu
-        hamburgerMenu.addEventListener('click', toggleMenuModal);
-        savePresetBtn.addEventListener('click', savePreset);
-        uploadPresetBtn.addEventListener('click', () => uploadPresetInput.click()); // Trigger hidden input click
-        uploadPresetInput.addEventListener('change', uploadPreset);
-        // Close menu if clicked outside
-        document.addEventListener('click', (e) => {
-            if (!menuModal.contains(e.target) && !hamburgerMenu.contains(e.target) && menuModal.style.display === 'flex') {
-                hideMenuModal();
-            }
-        });
-
-
-        // Velocity value editing
-        velocityValueEl.addEventListener('focus', (e) => {
-            // If it's blank, don't clear. If it has a value, select it for easy overwriting.
-            if (e.target.textContent !== '') {
-                document.execCommand('selectAll', false, null);
-            }
-        });
-        velocityValueEl.addEventListener('keydown', (e) => {
-            const textContent = e.target.textContent;
-
-            // Allow numbers, backspace, delete, and arrow keys
-            if (
-                !/[0-9]/.test(e.key) && // Not a number
-                e.key !== 'Backspace' &&
-                e.key !== 'Delete' &&
-                !e.key.startsWith('Arrow') &&
-                e.key !== 'Enter' // Allow Enter to submit
-            ) {
-                e.preventDefault(); // Prevent non-numeric characters
-            }
-
-            // Prevent more than X digits, unless it's backspace/delete
-            // CHANGE THIS LINE:
-            if (textContent.length >= 4 && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-                e.preventDefault();
-            }
-
-            if (e.key === "Enter") {
-                e.preventDefault();
-                e.target.blur(); // Trigger blur to save
-            }
-        });
-        
-velocityValueEl.addEventListener('blur', (e) => {
-            let newVel = parseInt(e.target.textContent);
-            if (!isNaN(newVel) && newVel >= 0 && newVel <= 127) { // This line still enforces 0-127
-                currentVelocity = newVel;
-                e.target.textContent = currentVelocity; 
-                applyColorToSelected(currentVelocity);
-            } else if (e.target.textContent === '') { 
-                currentVelocity = 0; 
-                applyColorToSelected(currentVelocity);
-            }
-            else {
-                e.target.textContent = selectedPads.size > 0 ? currentVelocity : ''; 
-            }
-            updateVelocityDisplayForSelected();
-        });
-
-
+        pushToLaunchpadBtn = document.getElementById("pushToLaunchpadBtn");
         colorSearchInput.addEventListener('input', filterColors);
-        colorModal.addEventListener('click', (e) => {
-            if (e.target === colorModal) { // Clicked outside modal content
-                hideColorModal();
-            }
-        });
 
-        velocityDownButton.addEventListener("click", () => {
+
+        hamburgerMenu.onclick = toggleMenuModal;
+        savePresetBtn.onclick = savePreset;
+        uploadPresetBtn.onclick = () => uploadPresetInput.click();
+        uploadPresetInput.onchange = uploadPreset;
+        pushToLaunchpadBtn.onclick = pushAllToLaunchpad;
+
+        document.getElementById("velocity-down").onclick = () => {
             currentVelocity = Math.max(0, currentVelocity - 1);
             velocityValueEl.textContent = currentVelocity;
-            if (selectedPads.size > 0) applyColorToSelected(currentVelocity);
-        });
-
-        velocityUpButton.addEventListener("click", () => {
+            applyColorToSelected(currentVelocity);
+        };
+        document.getElementById("velocity-up").onclick = () => {
             currentVelocity = Math.min(127, currentVelocity + 1);
             velocityValueEl.textContent = currentVelocity;
-            if (selectedPads.size > 0) applyColorToSelected(currentVelocity);
-        });
+            applyColorToSelected(currentVelocity);
+        };
 
-        togglePaletteButton.addEventListener("click", () => {
+        togglePaletteButton.onclick = () => {
             swatchContainer.classList.toggle("expanded");
             togglePaletteButton.textContent = swatchContainer.classList.contains("expanded") ? "Hide" : "Show All";
-        });
+        };
+
+        velocityValueEl.onblur = (e) => {
+            let v = parseInt(e.target.textContent);
+            if (!isNaN(v) && v >= 0 && v <= 127) {
+                currentVelocity = v;
+                applyColorToSelected(v);
+            }
+            updateVelocityDisplayForSelected();
+        };
 
         document.addEventListener("keydown", handleKeyboard);
-        launchpadContainer.addEventListener('click', deselectAllOnContainerClick); // Re-added here for initial setup
-        document.body.addEventListener('click', deselectAllOnContainerClick); // Also listen on body for general background click
+        document.addEventListener('click', (e) => {
+            if (!menuModal.contains(e.target) && !hamburgerMenu.contains(e.target)) hideMenuModal();
+            if (!colorModal.contains(e.target) && e.target !== colorModal) { /* modal click handled separately */ }
+        });
 
-        requestMIDIAccess(); // Auto-connect on load
-        updateVelocityDisplayForSelected(); // Initialize velocity display correctly on load (blank)
+        requestMIDIAccess();
     }
 
     window.onload = init;
