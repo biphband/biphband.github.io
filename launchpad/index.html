@@ -36,8 +36,15 @@
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid #333;
+            position: relative; /* Added for menu positioning */
         }
         
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Space between menu and title */
+        }
+
         h1 {
             margin: 0;
             font-size: 1.3rem; /* Slightly reduced font size */
@@ -285,6 +292,7 @@
             border-radius: 15px;
             width: 350px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            position: relative;
         }
 
         .modal-content input[type="text"] {
@@ -329,14 +337,84 @@
             border-radius: 5px;
             border: 1px solid rgba(255,255,255,0.2);
         }
+
+        /* Hamburger menu styles */
+        .hamburger-menu {
+            width: 24px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .hamburger-menu span {
+            display: block;
+            width: 100%;
+            height: 2px;
+            background: #eee;
+            border-radius: 2px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .menu-modal {
+            display: none;
+            position: absolute; /* Position relative to header */
+            top: 55px; /* Below the header */
+            left: 15px;
+            background-color: var(--panel);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            z-index: 100;
+            padding: 10px 0;
+            width: 200px;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .menu-modal button {
+            width: calc(100% - 20px);
+            margin: 0 10px;
+            padding: 10px;
+            background: #22222a;
+            color: #eee;
+            font-weight: 500;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+
+        .menu-modal button:hover {
+            background: #33333d;
+            transform: none;
+        }
+
+        .menu-modal input[type="file"] {
+            display: none; /* Hide the default file input */
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>🚀 Launchpad Color Editor</h1>
+        <div class="header-left">
+            <div class="hamburger-menu" id="hamburgerMenu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <h1>🚀 Launchpad Color Editor</h1>
+        </div>
         <div class="status">
             <span class="dot"></span>
             <span id="midi-status">Connecting to Web MIDI...</span>
+        </div>
+
+        <!-- Hamburger Menu Modal -->
+        <div id="menuModal" class="menu-modal">
+            <button id="savePresetBtn">Save Preset</button>
+            <input type="file" id="uploadPresetInput" accept=".json">
+            <button id="uploadPresetBtn">Upload Custom Preset</button>
+            <button id="pushToLaunchpadBtn" style="margin-top: 10px; background: #007bff;">Push changes to Launchpad</button>
         </div>
     </header>
 
@@ -611,6 +689,8 @@
     let swatchContainer;
     let togglePaletteButton;
     let midiStatusEl;
+    let hamburgerMenu, menuModal, savePresetBtn, uploadPresetInput, uploadPresetBtn;
+    let pushToLaunchpadBtn;
 
 
     function log(msg, type = "info") {
@@ -899,6 +979,11 @@
     function handleKeyboard(e) {
         if (colorModal.style.display === 'flex') {
             handleModalKeyboard(e);
+            return;
+        }
+
+        if (menuModal.style.display === 'flex') { // Check if menu is open
+            handleMenuModalKeyboard(e);
             return;
         }
 
@@ -1195,6 +1280,77 @@
         }
     }
 
+    // New: Hamburger Menu Functions
+    function toggleMenuModal() {
+        menuModal.style.display = menuModal.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function savePreset() {
+        const presetData = {};
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                const note = getNote(r, c);
+                presetData[note] = padStates[note] || 0;
+            }
+        }
+        const jsonString = JSON.stringify(presetData, null, 2);
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "launchpad_preset.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        hideMenuModal();
+    }
+
+    function uploadPreset(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const presetData = JSON.parse(e.target.result);
+                // Validate presetData structure (optional but recommended)
+                if (typeof presetData !== 'object' || Object.keys(presetData).length === 0) {
+                    alert("Invalid preset file. Please upload a JSON object.");
+                    return;
+                }
+
+                // Apply the preset to all pads
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        const note = getNote(r, c);
+                        const velocity = presetData[note] !== undefined ? presetData[note] : 0; // Default to 0 if not in preset
+                        updatePadVisual(r, c, velocity);
+                        sendNoteOn(note, velocity);
+                    }
+                }
+                deselectAllPads(); // Clear selection after applying new preset
+            } catch (error) {
+                alert("Error parsing preset file: " + error.message);
+            }
+        };
+        reader.readAsText(file);
+        hideMenuModal();
+    }
+
+    function hideMenuModal() {
+        menuModal.style.display = 'none';
+    }
+
+    function handleMenuModalKeyboard(e) {
+        if (e.key === "Escape") {
+            hideMenuModal();
+            e.preventDefault();
+        }
+        // Add more keyboard navigation for menu items if desired
+    }
+
+
     function init() {
         createLaunchpad();
         createSwatches();
@@ -1211,6 +1367,26 @@
         colorSearchInput = document.getElementById("colorSearchInput");
         colorList = document.getElementById("colorList");
         const launchpadContainer = document.getElementById('launchpad-container');
+
+        // New menu elements
+        hamburgerMenu = document.getElementById("hamburgerMenu");
+        menuModal = document.getElementById("menuModal");
+        savePresetBtn = document.getElementById("savePresetBtn");
+        uploadPresetInput = document.getElementById("uploadPresetInput");
+        uploadPresetBtn = document.getElementById("uploadPresetBtn");
+
+        // Event Listeners for new menu
+        hamburgerMenu.addEventListener('click', toggleMenuModal);
+        savePresetBtn.addEventListener('click', savePreset);
+        uploadPresetBtn.addEventListener('click', () => uploadPresetInput.click()); // Trigger hidden input click
+        uploadPresetInput.addEventListener('change', uploadPreset);
+        // Close menu if clicked outside
+        document.addEventListener('click', (e) => {
+            if (!menuModal.contains(e.target) && !hamburgerMenu.contains(e.target) && menuModal.style.display === 'flex') {
+                hideMenuModal();
+            }
+        });
+
 
         // Velocity value editing
         velocityValueEl.addEventListener('focus', (e) => {
