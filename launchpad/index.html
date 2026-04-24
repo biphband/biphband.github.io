@@ -673,6 +673,9 @@
     let togglePaletteButton;
     let midiStatusEl;
     let hamburgerMenu, menuModal, savePresetBtn, uploadPresetInput, uploadPresetBtn, pushToLaunchpadBtn;
+    let history = [];
+    let historyPointer = -1;
+    const MAX_HISTORY_STEPS = 50; // Limit history to prevent excessive memory usage
 
     async function requestMIDIAccess() {
         if (!navigator.requestMIDIAccess) {
@@ -767,7 +770,8 @@
     function handlePadClick(row, col, e) {
         const note = getNote(row, col);
         const currentPad = {row, col, note};
-        if (e.ctrlKey || e.metaKey) {
+
+        if (e.ctrlKey || e.metaKey) { // Multi-selection/toggle
             const exists = Array.from(selectedPads).some(p => p.row === row && p.col === col);
             if (exists) {
                 selectedPads = new Set(Array.from(selectedPads).filter(p => !(p.row === row && p.col === col)));
@@ -775,23 +779,67 @@
                 selectedPads.add(currentPad);
             }
             lastClickedPad = currentPad;
-        } else if (e.shiftKey && lastClickedPad) {
+        } else if (e.shiftKey && lastClickedPad) { // Range selection in order
             const startIdx = allPads.findIndex(p => p.row === lastClickedPad.row && p.col === lastClickedPad.col);
             const endIdx = allPads.findIndex(p => p.row === row && p.col === col);
+
             if (startIdx !== -1 && endIdx !== -1) {
-                const min = Math.min(startIdx, endIdx);
-                const max = Math.max(startIdx, endIdx);
+                // Find the current min/max indices of selected pads for extending
+                // If no pads selected, treat lastClickedPad as the only anchor
+                let currentMinIdx = startIdx; 
+                let currentMaxIdx = startIdx;
+
+                if (selectedPads.size > 0) {
+                    const currentSelectedNotes = Array.from(selectedPads).map(p => p.note);
+                    const sortedSelectedIndices = Array.from(selectedPads).map(p => allPads.findIndex(ap => ap.note === p.note)).sort((a,b) => a-b);
+                    currentMinIdx = sortedSelectedIndices[0];
+                    currentMaxIdx = sortedSelectedIndices[sortedSelectedIndices.length - 1];
+                }
+
+                let newMinIdx = currentMinIdx;
+                let newMaxIdx = currentMaxIdx;
+
+                // Extend based on the direction of movement from the 'last clicked' pad
+                if (endIdx < currentMinIdx) { // Moving left/up from current selection
+                    newMinIdx = Math.min(endIdx, startIdx); // Also consider startIdx if it's new
+                    newMaxIdx = Math.max(currentMaxIdx, startIdx);
+                } else if (endIdx > currentMaxIdx) { // Moving right/down from current selection
+                    newMinIdx = Math.min(currentMinIdx, startIdx);
+                    newMaxIdx = Math.max(endIdx, startIdx);
+                } else { // Target is within or overlaps existing selection
+                    // This complex case is simplified for user experience:
+                    // If moving within the existing range, or starting a new range with shift,
+                    // re-calculate based on lastClickedPad and target.
+                    // For a clean extension, if moving beyond current min/max, extend.
+                    // If moving within, re-anchor from the closest of the two ends.
+                    const absDiffToMin = Math.abs(endIdx - currentMinIdx);
+                    const absDiffToMax = Math.abs(endIdx - currentMaxIdx);
+
+                    if (absDiffToMin < absDiffToMax) { // Target is closer to min, extend/contract from min
+                        newMinIdx = endIdx;
+                        newMaxIdx = currentMaxIdx;
+                    } else { // Target is closer to max, extend/contract from max
+                        newMinIdx = currentMinIdx;
+                        newMaxIdx = endIdx;
+                    }
+                }
+
                 selectedPads.clear();
-                for (let i = min; i <= max; i++) selectedPads.add(allPads[i]);
+                for (let i = Math.min(newMinIdx, newMaxIdx); i <= Math.max(newMinIdx, newMaxIdx); i++) {
+                    selectedPads.add(allPads[i]);
+                }
             }
-        } else {
+            lastClickedPad = currentPad; // Update last clicked for potential chaining
+        } else { // Single selection
             selectedPads.clear();
             selectedPads.add(currentPad);
             lastClickedPad = currentPad;
         }
+
         refreshSelectionVisuals();
         updateVelocityDisplayForSelected();
     }
+
 
     function deselectAllPads() {
         selectedPads.clear();
@@ -825,21 +873,45 @@
         }
     }
 
-    function applyColorToSelected(velocity) {
+    function applyColorToSelected(velocity, recordUndo = false) {
         if (selectedPads.size === 0) return;
+
+        if (recordUndo) { // Only record if explicitly requested (e.g., from hotkeys)
+            const changes = Array.from(selectedPads).map(({ note }) => ({
+                note,
+                oldVelocity: padStates[note] || 0,
+                newVelocity: velocity
+            }));
+            recordHistory(changes);
+        }
+
         selectedPads.forEach(({row, col, note}) => {
             updatePadVisual(row, col, velocity);
             sendNoteOn(note, velocity);
         });
+        // Keep pads selected after color change
+        refreshSelectionVisuals();
+        updateVelocityDisplayForSelected(); // Keep this here to ensure the display matches
     }
 
-    function clearAll() {
+
+function clearAll() {
         if (!confirm("Clear ALL 64 pads?")) return;
+
+        const changes = [];
         for (let r = 0; r < 8; r++) {
             for (let c = 0; c < 8; c++) {
+                const note = getNote(r, c);
+                const oldVelocity = padStates[note] || 0;
+                if (oldVelocity !== 0) { // Only record if it was actually changed
+                    changes.push({ note, oldVelocity, newVelocity: 0 });
+                }
                 updatePadVisual(r, c, 0);
                 sendNoteOn(getNote(r, c), 0);
             }
+        }
+        if (changes.length > 0) {
+            recordHistory(changes);
         }
         deselectAllPads();
     }
@@ -873,12 +945,42 @@
         return; 
     }
     
-    // If we are typing in the velocity box or menu is open, ignore global shortcuts
-    if (document.activeElement === velocityValueEl || menuModal.style.display === 'flex') return;
+    // If the menu is open, ignore global shortcuts except for closing it
+    if (menuModal.style.display === 'flex') {
+        if (e.key === "Escape") {
+            hideMenuModal();
+        }
+        return;
+    }
+
+    // Handle Enter key for velocity input
+    if (document.activeElement === velocityValueEl && e.key === "Enter") {
+        e.preventDefault(); // Prevent new line
+        velocityValueEl.blur(); // Trigger the onblur event to save changes
+        return;
+    }
+
+    // If we are typing in the velocity box, ignore global shortcuts (except Enter, handled above)
+    if (document.activeElement === velocityValueEl) return;
+
 
     if (e.key === "Escape") { 
         deselectAllPads(); 
         return; 
+    }
+
+    // Ctrl/Cmd + Z for undo
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        undo();
+        return;
+    }
+
+    // Ctrl/Cmd + Shift + Z or Ctrl/Cmd + Y for redo
+    if (((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'z') || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'y')) {
+        e.preventDefault();
+        redo();
+        return;
     }
 
     // Ctrl/Cmd + A to select all
@@ -953,7 +1055,7 @@
         vel = hotkeyMap[k];
         currentVelocity = vel;
         velocityValueEl.textContent = currentVelocity;
-        applyColorToSelected(currentVelocity);
+        applyColorToSelected(currentVelocity, true); // Pass true to record undo state
     }
 }
 
@@ -966,6 +1068,14 @@
             sw.style.backgroundColor = c.hex;
             sw.title = `${c.name} (v${c.v})`;
             sw.onclick = () => {
+                if (selectedPads.size > 0) {
+                    const changes = Array.from(selectedPads).map(({ note }) => ({
+                        note,
+                        oldVelocity: padStates[note] || 0,
+                        newVelocity: c.v
+                    }));
+                    recordHistory(changes);
+                }
                 currentVelocity = c.v;
                 velocityValueEl.textContent = currentVelocity;
                 applyColorToSelected(currentVelocity);
@@ -1039,11 +1149,29 @@
     if (activeItem) activeItem.scrollIntoView({ block: 'nearest' });
 }
 
+function selectAllVelocityText() {
+        if (velocityValueEl) {
+            const range = document.createRange();
+            const selection = window.getSelection();
+            range.selectNodeContents(velocityValueEl);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    }
 
-    function selectColorFromModal(velocity) {
+
+function selectColorFromModal(velocity) {
+        if (selectedPads.size > 0) {
+            const changes = Array.from(selectedPads).map(({ note }) => ({
+                note,
+                oldVelocity: padStates[note] || 0,
+                newVelocity: velocity
+            }));
+            recordHistory(changes);
+        }
         currentVelocity = velocity;
         velocityValueEl.textContent = currentVelocity;
-        applyColorToSelected(currentVelocity);
+        applyColorToSelected(currentVelocity); // This call already applies to selected
         hideColorModal();
     }
 
@@ -1096,6 +1224,85 @@
         hideMenuModal();
     }
 
+    function recordHistory(changes) {
+        // Clear any redo history if a new action is performed
+        if (historyPointer < history.length - 1) {
+            history = history.slice(0, historyPointer + 1);
+        }
+
+        history.push(changes);
+        historyPointer++;
+
+        // Trim history if it exceeds MAX_HISTORY_STEPS
+        if (history.length > MAX_HISTORY_STEPS) {
+            history.shift();
+            historyPointer--;
+        }
+    }
+
+function undo() {
+        if (historyPointer < 0) return;
+
+        const changes = history[historyPointer];
+        changes.forEach(({ note, oldVelocity }) => {
+            const { row, col } = getRowColFromNote(note);
+            updatePadVisual(row, col, oldVelocity);
+            sendNoteOn(note, oldVelocity);
+        });
+        historyPointer--;
+        
+        // Re-select pads that were part of the undo action
+        selectedPads.clear();
+        changes.forEach(({note}) => {
+            const {row, col} = getRowColFromNote(note);
+            selectedPads.add({row, col, note});
+        });
+        refreshSelectionVisuals();
+        updateVelocityDisplayForSelected(); // This will set currentVelocity and display
+    }
+
+    function redo() {
+        if (historyPointer >= history.length - 1) return;
+
+        historyPointer++;
+        const changes = history[historyPointer];
+        changes.forEach(({ note, newVelocity }) => {
+            const { row, col } = getRowColFromNote(note);
+            updatePadVisual(row, col, newVelocity);
+            sendNoteOn(note, newVelocity);
+        });
+        
+        // Re-select pads that were part of the redo action
+        selectedPads.clear();
+        changes.forEach(({note}) => {
+            const {row, col} = getRowColFromNote(note);
+            selectedPads.add({row, col, note});
+        });
+        refreshSelectionVisuals();
+        updateVelocityDisplayForSelected(); // This will set currentVelocity and display
+    }
+
+
+    function redo() {
+        if (historyPointer >= history.length - 1) return;
+
+        historyPointer++;
+        const changes = history[historyPointer];
+        changes.forEach(({ note, newVelocity }) => {
+            const { row, col } = getRowColFromNote(note);
+            updatePadVisual(row, col, newVelocity);
+            sendNoteOn(note, newVelocity);
+        });
+        // Re-select pads that were part of the redo action (optional, for better UX)
+        selectedPads.clear();
+        changes.forEach(({note}) => {
+            const {row, col} = getRowColFromNote(note);
+            selectedPads.add({row, col, note});
+        });
+        refreshSelectionVisuals();
+        updateVelocityDisplayForSelected();
+    }
+
     function toggleMenuModal() { menuModal.style.display = menuModal.style.display === 'flex' ? 'none' : 'flex'; }
     function hideMenuModal() { menuModal.style.display = 'none'; }
 
@@ -1128,13 +1335,31 @@
         pushToLaunchpadBtn.onclick = pushAllToLaunchpad;
 
         document.getElementById("velocity-down").onclick = () => {
+            const oldVelocity = currentVelocity;
             currentVelocity = Math.max(0, currentVelocity - 1);
             velocityValueEl.textContent = currentVelocity;
+            if (oldVelocity !== currentVelocity && selectedPads.size > 0) {
+                const changes = Array.from(selectedPads).map(({ note }) => ({
+                    note,
+                    oldVelocity: padStates[note] || 0,
+                    newVelocity: currentVelocity
+                }));
+                recordHistory(changes);
+            }
             applyColorToSelected(currentVelocity);
         };
         document.getElementById("velocity-up").onclick = () => {
+            const oldVelocity = currentVelocity;
             currentVelocity = Math.min(127, currentVelocity + 1);
             velocityValueEl.textContent = currentVelocity;
+            if (oldVelocity !== currentVelocity && selectedPads.size > 0) {
+                const changes = Array.from(selectedPads).map(({ note }) => ({
+                    note,
+                    oldVelocity: padStates[note] || 0,
+                    newVelocity: currentVelocity
+                }));
+                recordHistory(changes);
+            }
             applyColorToSelected(currentVelocity);
         };
 
@@ -1146,11 +1371,26 @@
         velocityValueEl.onblur = (e) => {
             let v = parseInt(e.target.textContent);
             if (!isNaN(v) && v >= 0 && v <= 127) {
+                // Only record if the value actually changed
+                if (currentVelocity !== v && selectedPads.size > 0) {
+                    const changes = Array.from(selectedPads).map(({ note }) => ({
+                        note,
+                        oldVelocity: padStates[note] || 0,
+                        newVelocity: v
+                    }));
+                    recordHistory(changes);
+                }
                 currentVelocity = v;
-                applyColorToSelected(v);
+                applyColorToSelected(v, false); // No need to record again
+            } else {
+                // If invalid, revert to previous valid value
+                e.target.textContent = currentVelocity;
             }
             updateVelocityDisplayForSelected();
         };
+
+        velocityValueEl.addEventListener('focus', selectAllVelocityText);
+
 
         document.addEventListener("keydown", handleKeyboard);
         document.addEventListener('click', (e) => {
