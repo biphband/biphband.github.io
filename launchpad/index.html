@@ -873,26 +873,27 @@
         }
     }
 
-    function applyColorToSelected(velocity, recordUndo = false) {
-        if (selectedPads.size === 0) return;
+function applyColorToSelected(velocity, recordUndo = false) {
+    if (selectedPads.size === 0) return;
 
-        if (recordUndo) { // Only record if explicitly requested (e.g., from hotkeys)
-            const changes = Array.from(selectedPads).map(({ note }) => ({
-                note,
-                oldVelocity: padStates[note] || 0,
-                newVelocity: velocity
-            }));
-            recordHistory(changes);
-        }
-
-        selectedPads.forEach(({row, col, note}) => {
-            updatePadVisual(row, col, velocity);
-            sendNoteOn(note, velocity);
-        });
-        // Keep pads selected after color change
-        refreshSelectionVisuals();
-        updateVelocityDisplayForSelected(); // Keep this here to ensure the display matches
+    if (recordUndo) {
+        const changes = Array.from(selectedPads).map(({ note }) => ({
+            note,
+            oldVelocity: padStates[note] || 0,
+            newVelocity: velocity
+        }));
+        recordHistory(changes);
     }
+
+    selectedPads.forEach(({row, col, note}) => {
+        updatePadVisual(row, col, velocity);
+        sendNoteOn(note, velocity);
+    });
+
+    // Ensure visuals reflect that these pads are STILL selected
+    refreshSelectionVisuals();
+    updateVelocityDisplayForSelected();
+}
 
 
 function clearAll() {
@@ -937,106 +938,123 @@ function clearAll() {
     }
     });
 
-    function handleKeyboard(e) {
-    // If the color modal is open, use the modal-specific keyboard handler
+function handleKeyboard(e) {
+    // 1. Guard: If the color search modal is open, use its specific keyboard logic
     if (colorModal.style.display === 'flex') { 
         handleModalKeyboard(e); 
         return; 
     }
     
-    // If the menu is open, ignore global shortcuts except for closing it
+    // 2. Guard: If the hamburger menu is open, only allow Escape to close it
     if (menuModal.style.display === 'flex') {
-        if (e.key === "Escape") {
-            hideMenuModal();
+        if (e.key === "Escape") hideMenuModal();
+        return;
+    }
+
+    // 3. Guard: Handle velocity input box focus
+    if (document.activeElement === velocityValueEl) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            velocityValueEl.blur();
         }
         return;
     }
 
-    // Handle Enter key for velocity input
-    if (document.activeElement === velocityValueEl && e.key === "Enter") {
-        e.preventDefault(); // Prevent new line
-        velocityValueEl.blur(); // Trigger the onblur event to save changes
-        return;
-    }
-
-    // If we are typing in the velocity box, ignore global shortcuts (except Enter, handled above)
-    if (document.activeElement === velocityValueEl) return;
-
-
+    // 4. Utility: Escape to deselect everything
     if (e.key === "Escape") { 
         deselectAllPads(); 
         return; 
     }
 
-    // Ctrl/Cmd + Z for undo
+    // 5. Shortuct: Cmd/Ctrl + Arrow Up/Down to adjust velocity of selected pads
+    if ((e.metaKey || e.ctrlKey) && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+        e.preventDefault();
+        const direction = e.key === "ArrowUp" ? 1 : -1;
+        const oldVelocity = currentVelocity;
+        currentVelocity = Math.max(0, Math.min(127, currentVelocity + direction));
+        velocityValueEl.textContent = currentVelocity;
+        
+        // Apply change to hardware and record history if something is selected
+        if (oldVelocity !== currentVelocity && selectedPads.size > 0) {
+             applyColorToSelected(currentVelocity, true);
+        }
+        return;
+    }
+
+    // 6. Shortcut: Undo / Redo / Select All
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
         e.preventDefault();
         undo();
         return;
     }
-
-    // Ctrl/Cmd + Shift + Z or Ctrl/Cmd + Y for redo
     if (((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'z') || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'y')) {
         e.preventDefault();
         redo();
         return;
     }
-
-    // Ctrl/Cmd + A to select all
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'a') {
         e.preventDefault();
         selectedPads.clear();
         allPads.forEach(pad => selectedPads.add(pad));
+        anchorPad = allPads[0];
+        cursorPad = allPads[allPads.length - 1];
         refreshSelectionVisuals();
         updateVelocityDisplayForSelected();
         return;
     }
 
-    // 'C' to open Color Search Modal
+    // 7. Shortcut: 'C' for Color Search, 'V' for Velocity focus
     if (e.key.toLowerCase() === 'c') {
-        e.preventDefault(); // Prevents 'c' from being entered into the search input after focus
+        e.preventDefault();
         showColorModal();
         return;
     }
-
-    // 'V' to focus velocity
     if (e.key.toLowerCase() === 'v') {
         e.preventDefault();
         velocityValueEl.focus();
         return;
     }
 
-    // Navigation and Shift-Selection Logic
+    // 8. Navigation and Range Selection (Arrows + Shift)
     if (e.key.startsWith("Arrow")) {
-        if (selectedPads.size === 0) {
-            // Select the first pad if nothing is selected
-            selectedPads.add(allPads[0]);
-            lastClickedPad = allPads[0];
+        e.preventDefault();
+        
+        // If nothing is selected, start navigation from the first pad
+        if (selectedPads.size === 0 || !cursorPad) {
+            const first = allPads[0];
+            selectedPads.add(first);
+            anchorPad = first;
+            cursorPad = first;
         } else {
-            e.preventDefault();
-            const currentPad = Array.from(selectedPads)[selectedPads.size - 1];
-            let newRow = currentPad.row;
-            let newCol = currentPad.col;
+            let newRow = cursorPad.row;
+            let newCol = cursorPad.col;
 
-            if (e.key === "ArrowLeft") newCol = Math.max(0, currentPad.col - 1);
-            else if (e.key === "ArrowRight") newCol = Math.min(7, currentPad.col + 1);
-            else if (e.key === "ArrowUp") newRow = Math.min(7, currentPad.row + 1);
-            else if (e.key === "ArrowDown") newRow = Math.max(0, currentPad.row - 1);
+            if (e.key === "ArrowLeft") newCol = Math.max(0, cursorPad.col - 1);
+            else if (e.key === "ArrowRight") newCol = Math.min(7, cursorPad.col + 1);
+            else if (e.key === "ArrowUp") newRow = Math.min(7, cursorPad.row + 1);
+            else if (e.key === "ArrowDown") newRow = Math.max(0, cursorPad.row - 1);
 
             const targetPad = allPads.find(p => p.row === newRow && p.col === newCol);
 
             if (targetPad) {
-                if (e.shiftKey && lastClickedPad) {
-                    const startIdx = allPads.findIndex(p => p.note === lastClickedPad.note);
+                cursorPad = targetPad; // Move the cursor to the new position
+                
+                if (e.shiftKey && anchorPad) {
+                    // Selection range between the fixed anchor and the moving cursor
+                    const startIdx = allPads.findIndex(p => p.note === anchorPad.note);
                     const endIdx = allPads.findIndex(p => p.note === targetPad.note);
                     const min = Math.min(startIdx, endIdx);
                     const max = Math.max(startIdx, endIdx);
+                    
                     selectedPads.clear();
-                    for (let i = min; i <= max; i++) selectedPads.add(allPads[i]);
+                    for (let i = min; i <= max; i++) {
+                        selectedPads.add(allPads[i]);
+                    }
                 } else {
+                    // Move single selection (anchor moves with cursor)
                     selectedPads.clear();
                     selectedPads.add(targetPad);
-                    lastClickedPad = targetPad;
+                    anchorPad = targetPad;
                 }
             }
         }
@@ -1045,16 +1063,13 @@ function clearAll() {
         return;
     }
 
-    // Hotkeys (W, R, O, Y, G, B, P, 0)
+    // 9. Hotkeys: Quick colors
     const k = e.key.toLowerCase();
-    let vel = null;
     const hotkeyMap = { 'w': 8, 'r': 5, 'o': 9, 'y': 62, 'g': 21, 'b': 37, 'p': 49, '0': 0 };
-    
     if (hotkeyMap.hasOwnProperty(k)) {
-        vel = hotkeyMap[k];
-        currentVelocity = vel;
+        currentVelocity = hotkeyMap[k];
         velocityValueEl.textContent = currentVelocity;
-        applyColorToSelected(currentVelocity, true); // Pass true to record undo state
+        applyColorToSelected(currentVelocity, true);
     }
 }
 
