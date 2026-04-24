@@ -82,7 +82,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #111115;
+            background: #4B4B4B;
+            background: radial-gradient(at center top, #313e51, #242424);
             border-radius: 20px;
             position: relative;
         }
@@ -107,9 +108,9 @@
             background: #1a1a22;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.15s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: inset 0 6px 16px rgba(0,0,0,0.7),
                         0 4px 10px rgba(0,0,0,0.5);
+            border: 1px solid rgba(200, 200, 200, 0); 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -119,6 +120,10 @@
             position: relative;
         }
         
+        .pad:hover {
+        border: 1px solid rgba(200, 200, 200, 0.35); 
+        }
+
         .pad.selected {
             transform: scale(0.92);
             z-index: 10;
@@ -854,6 +859,12 @@
             }
         }
     }
+
+    document.querySelector('.launchpad-container').addEventListener('click', (e) => {
+    if (!e.target.closest('.pad')) {
+        deselectAllPads();
+    }
+    });
 
     function handleKeyboard(e) {
     // If the color modal is open, use the modal-specific keyboard handler
