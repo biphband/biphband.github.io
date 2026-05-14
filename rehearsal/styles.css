@@ -696,3 +696,17 @@ transition: transform 0.3s ease;
 .hover-float:hover {
 transform: translateY(-5px);
 }
+
+.time-option {
+    padding: 12px;
+    margin: 4px 0;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.time-option:hover {
+    background-color: #f0f8ff;
+    border-color: #4a90e2;
+}

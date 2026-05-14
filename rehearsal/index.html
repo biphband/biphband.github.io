@@ -12,12 +12,12 @@
     <div class="menu-icon" onclick="toggleTeacherMode()">☰</div>
     <div id="header">
         <div id="objective">
-            <h3>Objectives:</h3>
+            <h3>Objective:</h3>
             <ul id="objectiveList"></ul>
         </div>
         <div id="title">
             <h1 onclick="editRehearsalTitle()">Class Name</h1>
-            <h2 id="timeRange">Time Range</h2>
+            <h2 id="timeRange" onclick="editTimeRange()">Time Range</h2>
             <div id="countdowns"></div>
         </div>
         <div id="date">
@@ -123,12 +123,6 @@ const classes = [
 
         sampleObjectives: [
             'Warm-up',
-            'Act I Run-through',
-            'Act II Run-through',
-            'Snow Scene',
-            'Waltz of the Flowers',
-            'Sugar Plum Fairy',
-            'Fight Scene',
             'Costume Check',
             'Props Check',
             'Announcements',
@@ -147,9 +141,122 @@ let isAddingStudent = false;
 let lastExportDate = null;
 
 
+function editTimeRange() {
+    const timeRangeElement = document.getElementById('timeRange');
+    const currentTimeRange = timeRangeElement.textContent.trim();
+
+    // Remove any existing dialog
+    const existing = document.querySelector('div[style*="position: fixed"][style*="z-index: 1000"]');
+    if (existing) existing.remove();
+
+    const predefinedRanges = [
+        { display: "3:30pm - 5:30pm", start: { hours: 15, minutes: 30 }, end: { hours: 17, minutes: 30 } },
+        { display: "7:00pm - 8:30pm", start: { hours: 19, minutes: 0 },  end: { hours: 20, minutes: 30 } },
+        { display: "7:15pm - 8:30pm", start: { hours: 19, minutes: 15 }, end: { hours: 20, minutes: 30 } },
+        { display: "7:15pm - 8:00pm", start: { hours: 19, minutes: 15 }, end: { hours: 20, minutes: 0 } }
+    ];
+
+    let optionsHTML = '';
+    predefinedRanges.forEach(range => {
+        const isSelected = range.display === currentTimeRange ? 'style="background-color: #e0f0ff; font-weight: bold;"' : '';
+        optionsHTML += `
+            <div class="time-option" data-display="${range.display}" 
+                 onclick="selectTimeRange('${range.display}', ${range.start.hours}, ${range.start.minutes}, ${range.end.hours}, ${range.end.minutes})"
+                 ${isSelected}>
+                ${range.display}
+            </div>
+        `;
+    });
+
+    const dialog = document.createElement('div');
+    dialog.style.cssText = `
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: white; padding: 25px; border-radius: 10px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.25); z-index: 1000;
+        text-align: center; width: 380px; max-width: 90%;
+    `;
+
+    dialog.innerHTML = `
+        <h3>Select Rehearsal Time</h3>
+        <div style="margin: 15px 0; display: flex; flex-direction: column; gap: 8px;">
+            ${optionsHTML}
+        </div>
+        <div style="margin-top: 20px;">
+            <button id="cancelTimeBtn">Cancel</button>
+        </div>
+    `;
+
+    document.body.appendChild(dialog);
+
+    const closeDialog = () => {
+        dialog.remove();
+    };
+
+    // Cancel button
+    document.getElementById('cancelTimeBtn').onclick = closeDialog;
+
+    // Escape key support
+    const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+            closeDialog();
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
+
+    // Click outside to cancel
+    const outsideClick = (e) => {
+        if (!dialog.contains(e.target)) {
+            closeDialog();
+            document.removeEventListener('click', outsideClick);
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    setTimeout(() => document.addEventListener('click', outsideClick), 50);
+}
+
+function selectTimeRange(displayText, startHours, startMinutes, endHours, endMinutes) {
+    const cls = classes[0];
+    
+    // Update class data
+    cls.timeRange = displayText;
+    cls.startTime = { hours: startHours, minutes: startMinutes };
+    cls.endTime = { hours: endHours, minutes: endMinutes };
+
+    // Update display
+    document.getElementById('timeRange').textContent = displayText;
+
+    // Persist to localStorage
+    localStorage.setItem('rehearsalTimeRange', JSON.stringify({
+        display: displayText,
+        start: cls.startTime,
+        end: cls.endTime
+    }));
+
+    // Refresh countdowns immediately
+    updateCountdowns();
+
+    // Close all dialogs
+    const dialogs = document.querySelectorAll('div[style*="position: fixed"][style*="z-index: 1000"]');
+    dialogs.forEach(d => d.remove());
+}
+
 function updateClassDisplay() {
     const cls = classes[0];
+    
+    // Load saved time range if exists
+    const savedTime = localStorage.getItem('rehearsalTimeRange');
+    if (savedTime) {
+        try {
+            const parsed = JSON.parse(savedTime);
+            cls.timeRange = parsed.display;
+            cls.startTime = parsed.start;
+            cls.endTime = parsed.end;
+        } catch (e) {}
+    }
+
     document.querySelector('#timeRange').textContent = cls.timeRange;
+    
     students = cls.students;
     teacherModeOrder = cls.teacherModeOrder;
     currentCriteria = cls.criteria;
