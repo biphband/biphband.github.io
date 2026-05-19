@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>BIPH Band</title>
+    
+    <!-- iOS Fullscreen Web App Settings -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BIPH Band">
+    <link rel="apple-touch-icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
+    
+    <link rel="icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
+    
+    <style>
+        @font-face {
+            font-family: 'Zapfino';
+            src: url('https://biphband.github.io/fonts/Zapfino.ttf') format('truetype');
+        }
+        
+        body {
+            background-color: rgba(45, 70, 119);
+            font-family: 'Andika', sans-serif;
+            color: #ffffff;
+            margin: 0;
+            padding: 0; /* Changed from 20px for true fullscreen */
+            line-height: 1.6;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Prevent scrolling artifacts */
+        }
+
+        .background {
+            position: fixed;
+            opacity: 0.05;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('backgroundimage.png');
+            background-size: 140% auto; 
+            background-position: center center; 
+            background-repeat: no-repeat;
+            z-index: -3;
+        }
+        .blue-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(45, 70, 119, 0.25), rgba(9, 32, 79, 0.25));
+            z-index: -2;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 70%, #303f6c 0%, transparent 50%),
+                        radial-gradient(circle at 70% 30%, #236693 0%, transparent 50%);
+            mix-blend-mode: overlay;
+            opacity: 0.5;
+            z-index: -1;
+            animation: pulse 1.5s infinite alternate;
+        }
+        .overlay2 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 70% 70%, #ffffff 0%, transparent 50%),
+                        radial-gradient(circle at 30% 30%, #b8b8b8 0%, transparent 50%);
+            mix-blend-mode: overlay;
+            opacity: 0.5;
+            z-index: -1;
+            animation: pulse 2s infinite alternate;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        .logocontainer {
+            min-height: 10vh;
+            padding-bottom: 10px;
+        }
+
+        .logo {
+            position: fixed;
+            right: 10px;
+            bottom: 10px;
+            width: 25vh;
+            height: auto;
+            z-index: 10; 
+        }
+
+        .Title {
+            font-family: 'Andika', sans-serif;
+            font-size: 3rem;
+            font-weight: 300;
+            text-align: center;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            padding-top: env(safe-area-inset-top); /* Respect notch/dynamic island */
+        }
+
+        .Subtitle {
+            font-family: 'Zapfino', sans-serif;
+            color: white;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-top: -5px;
+            padding-top: 0.5em;
+        }
+
+        .time-info {
+            font-size: 1.4rem;
+            margin: 20px 0;
+            padding: 15px 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            display: inline-block;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            flex-grow: 1;
+            padding: 20px; /* Internal padding only */
+        }
+
+        .button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 18px 40px;
+            font-family: 'Andika', sans-serif;
+            font-size: 1.6rem;
+            color: white;
+            text-decoration: none;
+            background: linear-gradient(135deg, rgba(35, 102, 147, 0.9), rgba(48, 63, 108, 0.9));
+            border: 2px solid #ffffff;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            min-width: 380px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .button:hover {
+            background: linear-gradient(135deg, rgba(48, 63, 108, 1), rgba(35, 102, 147, 1));
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .button-icon {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            transition: all 0.3s ease;
+        }
+
+        .button:hover .button-icon {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="blue-overlay"></div>
+    <div class="overlay"></div>
+    <div class="overlay2"></div>
+
+    <h1 class="Title">BIPH</h1>
+    <h1 class="Subtitle" style="font-size: 34px; margin: 0px 0;">Band and Orchestra</h1>
+
+    <div class="container" id="main-content">
+        <!-- Content injected by JavaScript -->
+    </div>
+
+    <div class="logocontainer">        
+        <img src="logo.png" alt="BASIS Logo" class="logo">
+    </div>
+
+    <script>
+        // Your existing script remains unchanged
+        function getHongKongTime() {
+            const now = new Date();
+            const hkTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Hong_Kong" }));
+            return hkTime;
+        }
+
+        function isSpecialTime() {
+            const time = getHongKongTime();
+            const day = time.getDay();      // 0=Sun, 1-5=Mon-Fri
+            const hour = time.getHours();
+            const minute = time.getMinutes();
+
+            if (day < 1 || day > 5) return false; // Weekdays only
+
+            // 9:00 AM to 11:45 AM inclusive
+            if (hour === 9 || hour === 10 || (hour === 11 && minute <= 45)) {
+                return true;
+            }
+            return false;
+        }
+
+        function formatCurrentTime() {
+            const time = getHongKongTime();
+            return time.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true 
+            });
+        }
+
+        function createSpecialPage() {
+            const container = document.getElementById('main-content');
+            const timeStr = formatCurrentTime();
+
+            container.innerHTML = `
+                <div class="time-info">
+                    <strong>The time is now ${timeStr}</strong><br>
+                </div>
+
+                <a href="https://biphmusic.github.io/" class="button">
+                    <img src="icons/ap-logo.png" alt="Theory" class="button-icon">
+                    <span>AP Music Theory Homepage</span>
+                </a>
+
+                <a href="https://biphband.github.io/graduation/" class="button">
+                    <img src="https://biphband.github.io/sheetmusic.png" alt="Graduation" class="button-icon">
+                    <span>Graduation Music</span>
+                </a>
+            `;
+        }
+
+        function createNormalPage() {
+            const container = document.getElementById('main-content');
+            container.innerHTML = `
+                <p style="font-size: 1.4rem; margin: 30px 0 20px;">Redirecting to...</p>
+                
+                <a href="https://biphband.github.io/graduation/" class="button">
+                    <img src="https://biphband.github.io/sheetmusic.png" alt="Graduation" class="button-icon">
+                    <span>Graduation Music</span>
+                </a>
+
+                <p style="margin-top: 30px; opacity: 0.8;">
+                    If you are not redirected automatically, 
+                    <a href="https://biphband.github.io/graduation/" style="color: #a0d8ff;">click here</a>.
+                </p>
+            `;
+
+            // Auto redirect
+            setTimeout(() => {
+                window.location.href = "https://biphband.github.io/graduation/";
+            }, 1600);
+        }
+
+        // Initialize
+        window.onload = function() {
+            if (isSpecialTime()) {
+                createSpecialPage();
+            } else {
+                createNormalPage();
+            }
+        };
+    </script>
+</body>
+</html>
