@@ -21,7 +21,7 @@
 
     body {
       background: linear-gradient(to bottom, #e6e6fa, #f0f8ff);
-      background-image: url('background1.png');
+      background-image: url('background1.webp');
       background-attachment: fixed;
       background-size: cover; 
       background-position: center;
@@ -51,7 +51,7 @@
 
     .title-image {
       display: block;
-      margin: -10px auto -50px;
+      margin: 0 auto -50px;
       max-width: 90%;
       height: auto;
       cursor: default;
@@ -77,80 +77,62 @@
     }
 
     .btn { 
+      position: relative;
       transition: all 0.2s ease; 
-      background:
-        radial-gradient(ellipse 120% 80% at 18% 22%, rgba(255, 245, 180, 0.85) 0%, transparent 42%),
-        radial-gradient(ellipse 90% 60% at 78% 18%, rgba(255, 230, 140, 0.55) 0%, transparent 38%),
-        radial-gradient(ellipse 70% 90% at 62% 78%, rgba(255, 210, 90, 0.4) 0%, transparent 45%),
-        radial-gradient(ellipse 100% 50% at 30% 85%, rgba(255, 200, 60, 0.3) 0%, transparent 40%),
-        linear-gradient(
-          152deg,
-          #f3d56a 0%,
-          #e8c34e 18%,
-          #d9b03a 38%,
-          #c79a2c 58%,
-          #b07f1e 78%,
-          #8f6412 100%
-        );
+      background: transparent;
       color: #fff8e0;
-      border: 1px solid #7a5c10;
-      border-radius: 6px; 
-      padding: 12px 20px; 
+      border: none;
+      border-radius: 8px; 
+      padding: 14px 18px; 
       font-size: clamp(0.9rem, 2.5vw, 1.1rem);
       font-weight: 600;
       touch-action: manipulation;
       flex: 1; 
       min-width: 80px; 
+      min-height: 52px;
       text-align: center;
       display: flex;
       align-items: center;
       justify-content: center;
       text-shadow: 
-        0 1px 1px rgba(0, 0, 0, 0.55),
-        0 0 6px rgba(255, 220, 100, 0.25);
-      box-shadow:
-        0 5px 10px rgba(0, 0, 0, 0.28),
-        0 2px 3px rgba(0, 0, 0, 0.18),
-        inset 0 1px 0 rgba(255, 250, 200, 0.7),
-        inset 1px 0 0 rgba(255, 240, 160, 0.25),
-        inset 0 -3px 5px rgba(90, 55, 0, 0.35),
-        inset -2px -1px 4px rgba(70, 40, 0, 0.2),
-        inset 3px 2px 6px rgba(255, 230, 120, 0.15);
+        0 1px 2px rgb(39, 22, 0),
+        0 0 6px rgb(78, 78, 78);
+      overflow: hidden;
+      z-index: 1;
     }
 
+    .btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-position: center;
+      border-radius: 8px;
+      z-index: -1;
+      filter: opacity(0.85) contrast(1.15);
+      transition: filter 0.2s ease;
+    }
+
+    .btn.small::before  { background-image: url('small-button.webp'); }
+    .btn.medium::before { background-image: url('medium-button.webp'); }
+    .btn.long::before   { background-image: url('long-button.webp'); }
+
     .btn:hover { 
-      background:
-        radial-gradient(ellipse 120% 80% at 18% 22%, rgba(255, 250, 200, 0.95) 0%, transparent 42%),
-        radial-gradient(ellipse 90% 60% at 78% 18%, rgba(255, 240, 160, 0.7) 0%, transparent 38%),
-        radial-gradient(ellipse 70% 90% at 62% 78%, rgba(255, 220, 100, 0.5) 0%, transparent 45%),
-        radial-gradient(ellipse 100% 50% at 30% 85%, rgba(255, 210, 80, 0.4) 0%, transparent 40%),
-        linear-gradient(
-          152deg,
-          #f8e078 0%,
-          #f0d05a 18%,
-          #e4c040 38%,
-          #d4ab32 58%,
-          #c09022 78%,
-          #a07815 100%
-        );
       cursor: pointer;
-      transform: translateY(-1px);
-      box-shadow:
-        0 7px 14px rgba(0, 0, 0, 0.32),
-        0 3px 5px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 220, 0.85),
-        inset 1px 0 0 rgba(255, 245, 180, 0.35),
-        inset 0 -3px 5px rgba(90, 55, 0, 0.28),
-        inset -2px -1px 4px rgba(70, 40, 0, 0.15),
-        inset 3px 2px 6px rgba(255, 240, 140, 0.25);
+      transform: scale(1.01);
+    }
+
+    .btn:hover::before {
+      filter: brightness(1.05);
     }
 
     .btn:active {
       transform: translateY(1px);
-      box-shadow:
-        0 2px 4px rgba(0, 0, 0, 0.25),
-        inset 0 3px 6px rgba(70, 40, 0, 0.4),
-        inset 0 -1px 0 rgba(255, 230, 120, 0.2);
+    }
+
+    .btn:active::before {
+      filter: brightness(0.95);
     }
 
     :root {
@@ -170,7 +152,7 @@
       margin-bottom: 16px;
       display: flex;
       flex-wrap: nowrap; 
-      gap: 16px; 
+      gap: 12px; 
       padding: 8px; 
       overflow-x: auto; 
     }
@@ -319,7 +301,7 @@
 </div>
 
   <div class="container mx-auto flex flex-col justify-center min-h-screen">
-    <img src="alice-title.png" alt="Alice Title" class="title-image" id="title-image">
+    <img src="alice-title.webp" alt="Alice Title" class="title-image" id="title-image">
 
     <div id="instrument-selection" class="space-y-6 mb-8"></div>
     <img src="Full logo original.png" class="logo">
@@ -367,9 +349,16 @@
         groups.forEach((instruments) => {
           const groupDiv = document.createElement('div');
           groupDiv.className = 'instrument-group';
+
+          // Choose button size based on how many are in this row
+          let sizeClass = 'medium';
+          if (instruments.length === 1) sizeClass = 'long';
+          else if (instruments.length === 3) sizeClass = 'small';
+          else if (instruments.length === 2) sizeClass = 'medium';
+
           instruments.forEach(file => {
             let displayName = file
-              .replace('BIPH_Graduation_2026_', '')
+              .replace('Alice_', '')
               .replace('_Parts.pdf', '')
               .replace(/_/g, ' ');
 
@@ -377,8 +366,8 @@
             if (displayName === 'Alto Saxophone 1') displayName = 'Alto Sax 1';
             if (displayName === 'Alto Saxophone 2') displayName = 'Alto Sax 2';
             if (displayName === 'Tenor Saxophone') displayName = 'Tenor Sax';
-            if (file === 'BIPH_Graduation_2026_Seating_Chart.pdf') displayName = 'Seating Chart';
-            if (file === 'BIPH_Graduation_2026_Conductor_Parts.pdf') displayName = 'Conductor';
+            if (file === 'Alice_Seating_Chart.pdf') displayName = 'Seating Chart';
+            if (file === 'Alice_Conductor_Parts.pdf') displayName = 'Conductor';
 
             // Capitalize properly
             displayName = displayName.split(' ')
@@ -386,7 +375,7 @@
               .join(' ');
 
             const btn = document.createElement('button');
-            btn.className = 'btn';
+            btn.className = `btn ${sizeClass}`;
             btn.textContent = displayName;
 
             ['click', 'touchstart'].forEach(eventType => {
@@ -406,10 +395,10 @@
     function displayContent(file) {
       let filePath;
 
-          if (file === 'BIPH_Graduation_2026_Seating_Chart.pdf') {
+      if (file === 'Alice_Seating_Chart.pdf') {
         filePath = file;                    // load from root directory
       } else {
-        filePath = `BIPH_Graduation_2026_Parts/${file}`;
+        filePath = `Alice_Parts/${file}`;
       }
 
       window.location.href = filePath;
@@ -438,16 +427,20 @@
       }
     });
 
-    // Hidden background toggle on title click
-    let usingAltBackground = false;
-    const titleImage = document.getElementById('title-image');
+    // Automatic day / night background based on device clock
+    function updateBackground() {
+      const hour = new Date().getHours();          // 0–23
+      // Daytime (light mode): 6:00 – 17:59
+      // Nighttime (dark mode): 18:00 – 5:59
+      if (hour >= 6 && hour < 18) {
+        document.body.style.backgroundImage = "url('background1.webp')";
+      } else {
+        document.body.style.backgroundImage = "url('background2.webp')";
+      }
+    }
 
-    titleImage.addEventListener('click', () => {
-      usingAltBackground = !usingAltBackground;
-      document.body.style.backgroundImage = usingAltBackground
-        ? "url('background2.png')"
-        : "url('background1.png')";
-    });
+    updateBackground();                             // set on page load
+    setInterval(updateBackground, 5 * 60 * 1000);   // re-check every 5 minutes
 
     showInstrumentSelection();
   </script>
