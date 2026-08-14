@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMIS Auditions 2026-2027</title>
+     
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AMIS Auditions">
+  <link rel="apple-touch-icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
+  
+  <link rel="icon" href="../icons/BGicon.png">
+  <link href="/tailwind.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'Zapfino';
+      src: url('../fonts/Zapfino.ttf') format('truetype');
+    }
+
+    body {
+      background-color: #113299;
+      font-family: 'Roboto', sans-serif;
+      min-height: 100vh; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      overflow-y: auto;
+      margin: 0;
+      padding: 20px;
+      position: relative;
+    }
+
+    body.level-select-mode {
+      overflow-y: hidden;
+    }
+
+    .container {
+      width: 80%;
+      max-width: 800px; 
+      background-color: rgba(255, 255, 255, 0.92); 
+      border-radius: 12px;
+      padding: 26px;
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between; 
+      padding-top: 10px; 
+      padding-bottom: 40px;
+      position: relative; 
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    }
+
+    .title-image {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      margin: 20px auto -25px;
+      object-fit: contain;
+    }
+
+    .family-section { 
+      background: rgba(255, 255, 255, 0.7); 
+      border-radius: 8px; 
+      margin-top: 20px; 
+      padding: 16px; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08); 
+      position: relative; 
+    }
+
+    .family-title { 
+      font-size: 1.25rem; 
+      font-weight: 700; 
+      margin-top: 2px; 
+      margin-bottom: 12px; 
+      color: #1f2937; 
+    }
+
+    .btn { 
+      transition: all 0.2s ease; 
+      background-color: #2563eb; 
+      color: rgb(255, 255, 255); 
+      border: 1px solid #1e40af; 
+      border-radius: 6px; 
+      padding: 12px 20px; 
+      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+      touch-action: manipulation;
+      flex: 1; 
+      min-width: 80px; 
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn:hover { 
+      background-color: #1e40af; 
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15); 
+    }
+
+    .level-btn {
+      background-color: #113299;
+      border-color: #0d2470;
+      font-size: 1.25rem;
+      padding: 18px 32px;
+      min-width: 180px;
+    }
+
+    .level-btn:hover {
+      background-color: #0d2470;
+    }
+
+    .instrument-group {
+      margin-bottom: 16px;
+      display: flex;
+      flex-wrap: nowrap; 
+      gap: 16px; 
+      padding: 8px; 
+      overflow-x: auto; 
+    }
+
+    .instrument-group:has(:only-child) .btn {
+      width: 100%;
+      margin-right: 0; 
+    }
+
+    #level-selection {
+      text-align: center;
+      padding: 40px 20px;
+      margin-bottom: -30px;
+    }
+
+    #level-selection h2 {
+      color: #1f2937;
+      font-size: 1.5rem;
+      margin-bottom: 30px;
+    }
+
+    .level-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .instructions-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
+    .change-level {
+      display: inline-block;
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #113299;
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    .change-level:hover {
+      color: #0d2470;
+    }
+
+    .logocontainer {
+      min-height: 10vh;
+      padding-bottom: 50px;
+    }
+
+    .logo {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      width: 25vh;
+      height: auto;
+      z-index: 10;
+    }
+
+    .hamburger-menu {
+      position: fixed;
+      top: 20px;
+      left: 13px;
+      z-index: 10002;
+    }
+
+    .menu-toggle {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      width: 30px;
+      height: 25px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 10003;
+    }
+
+    .menu-toggle span {
+      width: 30px;
+      height: 3px;
+      background: white;
+      border-radius: 10px;
+      transition: all 0.3s linear;
+    }
+
+    .menu-toggle.open span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .menu-toggle.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-toggle.open span:nth-child(3) {
+      transform: rotate(-45deg) translate(7px, -7px);
+    }
+
+    .menu-items {
+      position: fixed;
+      top: 60px;
+      left: -250px;
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(30, 30, 30, 0.85));
+      border-radius: 5px;
+      width: 250px;
+      max-height: calc(100dvh - 70px);
+      overflow-y: auto;
+      padding-top: 20px;
+      padding-bottom: 60px;
+      transition: left 0.3s ease-in-out, opacity 0.3s ease-in-out;
+      opacity: 0;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      z-index: 10002;
+    }
+
+    .menu-items.show {
+      left: 0;
+      opacity: 1;
+    }
+
+    .menu-items a {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 22px;
+      color: white;
+      text-decoration: none;
+      font-size: 1rem;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+      white-space: nowrap;
+    }
+
+    .menu-items.show a {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .menu-items a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .menu-items a:nth-child(1) { transition-delay: 0.1s; }
+    .menu-items a:nth-child(2) { transition-delay: 0.2s; }
+    .menu-items a:nth-child(3) { transition-delay: 0.3s; }
+    .menu-items a:nth-child(4) { transition-delay: 0.4s; }
+    .menu-items a:nth-child(5) { transition-delay: 0.5s; }
+    .menu-items a:nth-child(6) { transition-delay: 0.6s; }
+    .menu-items a:nth-child(7) { transition-delay: 0.7s; }
+    .menu-items a:nth-child(8) { transition-delay: 0.8s; }
+    .menu-items a:nth-child(9) { transition-delay: 0.9s; }
+    .menu-items a:nth-child(10) { transition-delay: 1.0s; }
+    .menu-items a:nth-child(11) { transition-delay: 1.1s; }
+
+    .menu-title {
+      text-align: center;
+      color: white;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .menu-footer {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 12px;
+    }
+
+    .qr-image {
+      display: block;
+      margin: 0 auto 5px;
+      width: 130px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="logocontainer">        
+    <img src="../icons/Full Logo White on Transparent.png" class="logo">
+  </div>
+
+  <div class="hamburger-menu">
+    <button class="menu-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="menu-items" id="menu-items">
+      <div class="menu-title">BIPH Band</div>
+      <a href="https://biphband.github.io/">Home</a>
+      <a href="https://biphband.github.io/graduation/">Graduation</a>
+      <a href="https://biphband.github.io/tuner/">Tuner</a>
+      <a href="https://biphband.github.io/camera">Video Recorder</a>
+      <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
+      <div class="menu-footer"><img src="../qr.png" alt="QR Code" class="qr-image">© Garrison Tubbs 2026</div>
+    </div>
+  </div>
+
+  <div class="container mx-auto flex flex-col justify-center min-h-screen">
+    <img src="title.png" alt="AMIS Auditions 2026-2027" class="title-image">
+
+    <div id="level-selection">
+      <div class="level-buttons">
+        <button class="btn level-btn" id="btn-middle-school">Middle School</button>
+        <button class="btn level-btn" id="btn-high-school">High School</button>
+      </div>
+      <div class="instructions-row">
+        <button class="btn level-btn" id="btn-instructions">Audition Instructions</button>
+      </div>
+    </div>
+
+    <div id="instrument-selection" class="space-y-6 mb-8" style="display: none;"></div>
+
+    <button id="change-level-btn" class="change-level" style="display: none;">← Change level (High School / Middle School)</button>
+  </div>
+
+  <script>
+    const pdfFilesHS = {
+      Strings: [
+        ['HS-Violin.pdf', 'HS-Viola.pdf'],
+        ['HS-Cello.pdf', 'HS-Contrabass.pdf']
+      ],
+      Woodwind: [
+        ['HS-Piccolo.pdf', 'HS-Flute.pdf', 'HS-Oboe.pdf'],
+        ['HS-Clarinet.pdf', 'HS-Bass-Clarinet.pdf', 'HS-Bassoon.pdf'],
+        ['HS-Alto-Sax.pdf', 'HS-Tenor-Sax.pdf']
+      ],
+      Brass: [
+        ['HS-Trumpet.pdf', 'HS-Horn.pdf'],
+        ['HS-Trombone.pdf', 'HS-Bass-Trombone.pdf'],
+        ['HS-Euphonium.pdf', 'HS-Tuba.pdf']
+      ],
+      Percussion: [
+        ['HS-Percussion.pdf']
+      ]
+    };
+
+    const pdfFilesMS = {
+      Strings: [
+        ['MS-Violin.pdf', 'MS-Viola.pdf'],
+        ['MS-Cello.pdf', 'MS-Contrabass.pdf']
+      ],
+      Woodwind: [
+        ['MS-Piccolo.pdf', 'MS-Flute.pdf', 'MS-Oboe.pdf'],
+        ['MS-Clarinet.pdf', 'MS-Bass-Clarinet.pdf', 'MS-Bassoon.pdf'],
+        ['MS-Alto-Sax.pdf', 'MS-Tenor-Sax.pdf']
+      ],
+      Brass: [
+        ['MS-Trumpet.pdf', 'MS-Horn.pdf'],
+        ['MS-Trombone.pdf'],
+        ['MS-Euphonium.pdf', 'MS-Tuba.pdf']
+      ],
+      Percussion: [
+        ['MS-Percussion.pdf']
+      ]
+    };
+
+    const familyDisplayNames = {
+      Strings: 'Strings',
+      Woodwind: 'Woodwinds',
+      Brass: 'Brass',
+      Percussion: 'Percussion'
+    };
+
+    let currentLevel = null;
+    const instrumentSelection = document.getElementById('instrument-selection');
+    const levelSelection = document.getElementById('level-selection');
+    const changeLevelBtn = document.getElementById('change-level-btn');
+
+    function getPdfFiles() {
+      return currentLevel === 'HS' ? pdfFilesHS : pdfFilesMS;
+    }
+
+    function getLevelLabel() {
+      return currentLevel === 'HS' ? 'High School' : 'Middle School';
+    }
+
+    function cleanDisplayName(file) {
+      let name = file
+        .replace(/^(HS|MS)-/, '')
+        .replace(/\.pdf$/, '')
+        .replace(/-/g, ' ');
+
+      if (name === 'Alto Sax') name = 'Alto Sax';
+      if (name === 'Tenor Sax') name = 'Tenor Sax';
+      if (name === 'Bass Clarinet') name = 'Bass Clarinet';
+      if (name === 'Bass Trombone') name = 'Bass Trombone';
+
+      return name.split(' ')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+        .join(' ');
+    }
+
+    function setLevelSelectMode(isLevelSelect) {
+      document.body.classList.toggle('level-select-mode', isLevelSelect);
+    }
+
+    function snapToTop() {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+
+    function showLevelSelection() {
+      currentLevel = null;
+      instrumentSelection.style.display = 'none';
+      changeLevelBtn.style.display = 'none';
+      levelSelection.style.display = 'block';
+      setLevelSelectMode(true);
+      snapToTop();
+    }
+
+    function showInstrumentSelection() {
+      const pdfFiles = getPdfFiles();
+      const levelLabel = getLevelLabel();
+      instrumentSelection.innerHTML = '';
+
+      for (const [family, groups] of Object.entries(pdfFiles)) {
+        if (groups.flat().length === 0) continue;
+
+        const familyDiv = document.createElement('div');
+        familyDiv.className = 'family-section';
+        const displayFamily = familyDisplayNames[family] || family;
+        familyDiv.innerHTML = `<h3 class="family-title">${levelLabel} ${displayFamily}</h3>`;
+
+        groups.forEach((instruments) => {
+          const groupDiv = document.createElement('div');
+          groupDiv.className = 'instrument-group';
+
+          instruments.forEach(file => {
+            const btn = document.createElement('button');
+            btn.className = 'btn';
+            btn.textContent = cleanDisplayName(file);
+
+            ['click', 'touchstart'].forEach(eventType => {
+              btn.addEventListener(eventType, (e) => {
+                e.preventDefault();
+                displayContent(file);
+              });
+            });
+
+            groupDiv.appendChild(btn);
+          });
+
+          familyDiv.appendChild(groupDiv);
+        });
+
+        instrumentSelection.appendChild(familyDiv);
+      }
+
+      levelSelection.style.display = 'none';
+      instrumentSelection.style.display = 'block';
+      changeLevelBtn.style.display = 'inline-block';
+      setLevelSelectMode(false);
+      snapToTop();
+    }
+
+    function displayContent(file) {
+      window.location.href = `parts/${file}`;
+    }
+
+    function selectLevel(level) {
+      currentLevel = level;
+      history.pushState({ view: 'instruments', level: level }, '', window.location.pathname);
+      showInstrumentSelection();
+    }
+
+    document.getElementById('btn-high-school').addEventListener('click', () => selectLevel('HS'));
+    document.getElementById('btn-middle-school').addEventListener('click', () => selectLevel('MS'));
+
+    document.getElementById('btn-instructions').addEventListener('click', () => {
+      window.location.href = 'parts/Audition instructions 2026.pdf';
+    });
+
+    changeLevelBtn.addEventListener('click', () => {
+      history.back();
+    });
+
+    window.addEventListener('popstate', (event) => {
+      if (event.state && event.state.view === 'instruments') {
+        currentLevel = event.state.level;
+        showInstrumentSelection();
+      } else {
+        showLevelSelection();
+      }
+    });
+
+    history.replaceState({ view: 'level' }, '', window.location.pathname);
+    showLevelSelection();
+
+    const menuToggle = document.querySelector('.menu-toggle');
+    const menuItems = document.querySelector('.menu-items');
+
+    menuToggle.addEventListener('click', () => {
+      menuToggle.classList.toggle('open');
+      menuItems.classList.toggle('show');
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
+        menuToggle.classList.remove('open');
+        menuItems.classList.remove('show');
+      }
+    });
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        menuToggle.classList.remove('open');
+        menuItems.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>
