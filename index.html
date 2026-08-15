@@ -4,28 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BIPH Band</title>
-       
+   
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="BIPH Band">
     <link rel="apple-touch-icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
     
     <link rel="icon" href="../icons/BGicon.png">
+
+    <!-- Preconnect + load Andika early (was previously undefined) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Preload custom Zapfino font so it starts downloading immediately -->
+    <link rel="preload" href="https://biphband.github.io/fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin>
+
     <style>
         @font-face {
             font-family: 'Zapfino';
-            src: url('../fonts/Zapfino.ttf') format('truetype');
+            src: url('https://biphband.github.io/fonts/Zapfino.ttf') format('truetype');
+            font-display: swap; /* Show fallback instantly, swap when ready */
         }
         
         body {
             background-color: rgba(45, 70, 119);
-            font-family: 'Andika', sans-serif;
+            font-family: 'Andika', system-ui, -apple-system, sans-serif;
             color: #ffffff;
             margin: 0;
             padding: 20px;
             line-height: 1.6;
-            align-items: center; 
-            text-align: center; 
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .background {
@@ -97,7 +109,7 @@
         }
 
         .Title {
-            font-family: 'Andika', sans-serif;
+            font-family: 'Andika', system-ui, -apple-system, sans-serif;
             font-size: 3rem;
             font-weight: 300;
             text-align: center;
@@ -106,17 +118,12 @@
         }
 
         .Subtitle {
-            font-family: 'Zapfino', sans-serif;
+            font-family: 'Zapfino', 'Brush Script MT', 'Segoe Script', cursive, sans-serif;
             color: white;
             font-size: 2.5rem;
             text-align: center;
             margin-top: -5px;
             padding-top: 0.5em;
-        }
-
-        @media screen and (min-width: 1200px) {
-            .Title { margin-bottom: 20px; }
-            .Subtitle { padding-top: 0.8em; }
         }
 
         /* Hamburger Menu */
@@ -137,7 +144,7 @@
             background: transparent;
             border: none;
             cursor: pointer;
-            padding: 20;
+            padding: 0;
             z-index: 1001;
         }
 
@@ -153,19 +160,19 @@
         .menu-toggle.open span:nth-child(2) { opacity: 0; }
         .menu-toggle.open span:nth-child(3) { transform: rotate(-45deg) translate(7px, -7px); }
 
-    .menu-items {
-      position: absolute;
-      top: 25px;
-      left: -250px;
-      background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(30, 30, 30, 0.8));
-      border-radius: 5px;
-      width: 250px;
-      height: 90vh;
-      padding-top: 20px;
-      transition: all 0.3s ease-in-out;
-      opacity: 0;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    }
+        .menu-items {
+            position: absolute;
+            top: 25px;
+            left: -250px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(30, 30, 30, 0.8));
+            border-radius: 5px;
+            width: 250px;
+            height: 90vh;
+            padding-top: 20px;
+            transition: all 0.3s ease-in-out;
+            opacity: 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
 
         .menu-items.show {
             left: 0;
@@ -188,18 +195,10 @@
 
         .menu-items.show a { opacity: 1; transform: translateX(0); }
 
-            .menu-items a:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-        .menu-icon {
-            width: 22px;
-            height: 22px;
-            object-fit: contain;
-            flex-shrink: 0;
+        .menu-items a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* Delays for slide-in */
         .menu-items a:nth-child(1) { transition-delay: 0.1s; }
         .menu-items a:nth-child(2) { transition-delay: 0.2s; }
         .menu-items a:nth-child(3) { transition-delay: 0.3s; }
@@ -232,61 +231,51 @@
             height: auto;
         }
 
-        /* Main Buttons Container */
         .container {
             max-width: 800px;
-            margin: -80px auto 0;
+            margin: 40px auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            min-height: 60vh;
-            gap: 18px;
+            gap: 20px;
+            flex-grow: 1;
         }
 
-        /* Main Button with Icon (full hover effects) */
         .button {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 16px;
-            padding: 16px 32px;
-            font-family: 'Andika', sans-serif;
-            font-size: 1.5rem;
+            padding: 18px 40px;
+            font-family: 'Andika', system-ui, -apple-system, sans-serif;
+            font-size: 1.6rem;
             color: white;
             text-decoration: none;
-            background: linear-gradient(135deg, rgba(35, 102, 147, 0.8), rgba(48, 63, 108, 0.8));
+            background: linear-gradient(135deg, rgba(35, 102, 147, 0.9), rgba(48, 63, 108, 0.9));
             border: 2px solid #ffffff;
             border-radius: 25px;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            min-width: 340px;
+            min-width: 380px;
             position: relative;
             overflow: hidden;
         }
 
         .button:hover {
             background: linear-gradient(135deg, rgba(48, 63, 108, 1), rgba(35, 102, 147, 1));
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-        }
-
-        .button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
         .button-icon {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             object-fit: contain;
             transition: all 0.3s ease;
-            filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));
         }
 
         .button:hover .button-icon {
-            transform: scale(1.18);
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
+            transform: scale(1.2);
         }
     </style>
 </head>
@@ -296,48 +285,48 @@
     <div class="overlay"></div>
     <div class="overlay2"></div>
 
-     <div class="hamburger-menu">
+    <!-- Hamburger Menu -->
+    <div class="hamburger-menu">
         <button class="menu-toggle" onclick="toggleMenu()">
             <span></span>
             <span></span>
             <span></span>
         </button>
 
-      <div class="menu-items" id="menu-items">
+        <div class="menu-items" id="menu-items">
             <div class="menu-title">BIPH Music</div>
             <a href="https://biphband.github.io/">Home</a>
-            <a href="https://biphband.github.io/awardsceremony/">Mid-Year Awards Ceremony</a>
-            <a href="https://biphband.github.io/broadwayepics/">Broadway Epics</a>
+            <a href="https://biphband.github.io/amis">AMIS Audition Music</a>
+            <a href="https://biphband.github.io/alice/">Alice in Wonderland</a>
             <a href="https://biphband.github.io/tuner/">Tuner</a>
             <a href="https://biphband.github.io/camera/">Video Recorder</a>
             <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
-            <div class="menu-footer"><img src="qr.png" alt="QR Code" class="qr-image">© Garrison Tubbs 2026</div>
-        </div>
+            <div class="menu-footer">
+                <img src="qr.png" alt="QR Code" class="qr-image">
+                © Garrison Tubbs 2026
+            </div>
         </div>
     </div>
 
     <h1 class="Title">BIPH</h1>
     <h1 class="Subtitle" style="font-size: 34px; margin: 0px 0;">Band and Orchestra</h1>
-    
 
-
-    <div class="container">
-        <a href="https://biphband.github.io/graduation/" class="button">
-            <img src="sheetmusic.png" alt="Sheet Music" class="button-icon">
-            <span>Graduation 2026</span>
+    <!-- Buttons are now in the static HTML so they appear immediately (no JS injection delay) -->
+    <div class="container" id="main-content">
+        <a href="https://biphband.github.io/amis" class="button">
+            <img src="sheetmusic.png" alt="AMIS" class="button-icon">
+            <span>AMIS Audition Music</span>
         </a>
 
-        <a href="https://biphmusic.github.io/" class="button">
-            <img src="icons/ap-logo.png" alt="Theory" class="button-icon">
-            <span>AP Music Theory</span>
+        <a href="https://biphband.github.io/alice/" class="button">
+            <img src="sheetmusic.png" alt="Alice" class="button-icon">
+            <span>Alice in Wonderland</span>
         </a>
     </div>
 
     <div class="logocontainer">        
         <img src="logo.png" alt="BASIS Logo" class="logo">
     </div>
-
-
 
     <script>
         function toggleMenu() {
@@ -356,7 +345,38 @@
             }
         });
 
+        function getHongKongTime() {
+            const now = new Date();
+            return new Date(now.toLocaleString("en-US", { timeZone: "Asia/Hong_Kong" }));
+        }
 
+        function isSpecialTime() {
+            const time = getHongKongTime();
+            const day = time.getDay();      // 0=Sun, 1-5=Mon-Fri
+            const hour = time.getHours();
+            const minute = time.getMinutes();
+
+            // Weekdays only
+            if (day < 1 || day > 5) return false;
+
+            // 10:00 AM to 11:45 AM inclusive
+            if (hour === 10 || (hour === 11 && minute <= 45)) {
+                return true;
+            }
+            return false;
+        }
+
+        function redirectToTheory() {
+            window.location.href = "https://biphmusic.github.io";
+        }
+
+        // Runs as soon as the HTML is parsed — does NOT wait for images, fonts, or other resources
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isSpecialTime()) {
+                redirectToTheory();
+            }
+            // else: buttons are already in the HTML and visible immediately
+        });
     </script>
 </body>
-</html> 
+</html>
