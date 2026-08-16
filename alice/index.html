@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alice 2026</title>
+  <title>Alice in Wonderland 2026</title>
      
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -311,30 +311,30 @@
   <script>
     const pdfFiles = {
       Strings: [
-        ['Alice_Violin_1_Parts.pdf', 'Alice_Violin_2_Parts.pdf', 'Alice_Violin_3_Parts.pdf'],
-        ['Alice_Cello_1_Parts.pdf', 'Alice_Cello_2_Parts.pdf'],
-        ['Alice_Contrabass_Parts.pdf']
+        ["Alice's Theme-Violin_1.pdf", "Alice's Theme-Violin_2.pdf", "Alice's Theme-Violin_3.pdf"],
+        ["Alice's Theme-Cello_1.pdf", "Alice's Theme-Cello_2.pdf"],
+        ["Alice's Theme-Contrabass.pdf"]
       ],
       Woodwind: [
-        ['Alice_Flute_1_Parts.pdf', 'Alice_Flute_2_Parts.pdf', 'Alice_Flute_3_Parts.pdf'],
-        ['Alice_Clarinet_1_Parts.pdf', 'Alice_Clarinet_2_Parts.pdf', 'Alice_Clarinet_3_Parts.pdf'],
-        ['Alice_Bass_Clarinet_Parts.pdf', 'Alice_Bassoon_Parts.pdf'],
-        ['Alice_Alto_Saxophone_1_Parts.pdf', 'Alice_Alto_Saxophone_2_Parts.pdf', 'Alice_Tenor_Saxophone_Parts.pdf']
+        ["Alice's Theme-Flute_1.pdf", "Alice's Theme-Flute_2.pdf", "Alice's Theme-Flute_3.pdf"],
+        ["Alice's Theme-Clarinet_1.pdf", "Alice's Theme-Clarinet_2.pdf", "Alice's Theme-Clarinet_3.pdf"],
+        ["Alice's Theme-Bass_Clarinet.pdf", "Alice's Theme-Bassoon.pdf"],
+        ["Alice's Theme-Alto_Saxophone_1.pdf", "Alice's Theme-Alto_Saxophone_2.pdf", "Alice's Theme-Tenor_Saxophone.pdf"]
       ],
       Brass: [
-        ['Alice_Trumpet_1_Parts.pdf', 'Alice_Trumpet_2_Parts.pdf', 'Alice_Trumpet_3_Parts.pdf'],
-        ['Alice_Horn_1_Parts.pdf', 'Alice_Horn_2_Parts.pdf'],
-        ['Alice_Trombone_Parts.pdf', 'Alice_Euphonium_Parts.pdf'],
-        ['Alice_Tuba_Parts.pdf']
+        ["Alice's Theme-Trumpet_1.pdf", "Alice's Theme-Trumpet_2.pdf", "Alice's Theme-Trumpet_3.pdf"],
+        ["Alice's Theme-Horn_1.pdf", "Alice's Theme-Horn_2.pdf"],
+        ["Alice's Theme-Trombone.pdf", "Alice's Theme-Euphonium.pdf"],
+        ["Alice's Theme-Tuba.pdf"]
       ],
       Percussion: [
-        ['Alice_Percussion_1_Parts.pdf', 'Alice_Marimba_Parts.pdf'],
-        ['Alice_Drum_Kit_Parts.pdf'],        
-        ['Alice_Timpani_Parts.pdf', 'Alice_Piano_Parts.pdf']
+        ["Alice's Theme-Percussion_1.pdf", "Alice's Theme-Marimba.pdf"],
+        ["Alice's Theme-Drum_Kit.pdf"],
+        ["Alice's Theme-Timpani.pdf", "Alice's Theme-Piano.pdf"]
       ],
       Other: [
-        ['Alice_Conductor_Parts.pdf'],
-        ['Alice_Seating_Chart.pdf']
+        ["Alice's Theme-Conductor.pdf"],
+        ["Alice_Seating_Chart.pdf"]          // keep this one as-is if it really has no "Alice's Theme-"
       ]
     };
 
@@ -359,16 +359,16 @@
 
           instruments.forEach(file => {
             let displayName = file
-              .replace('Alice_', '')
-              .replace('_Parts.pdf', '')
-              .replace(/_/g, ' ');
+              .replace("Alice's Theme-", "")
+              .replace(".pdf", "")
+              .replace(/_/g, " ");
 
             // Special short names
-            if (displayName === 'Alto Saxophone 1') displayName = 'Alto Sax 1';
-            if (displayName === 'Alto Saxophone 2') displayName = 'Alto Sax 2';
-            if (displayName === 'Tenor Saxophone') displayName = 'Tenor Sax';
-            if (file === 'Alice_Seating_Chart.pdf') displayName = 'Seating Chart';
-            if (file === 'Alice_Conductor_Parts.pdf') displayName = 'Conductor';
+            if (displayName === "Alto Saxophone 1") displayName = "Alto Sax 1";
+            if (displayName === "Alto Saxophone 2") displayName = "Alto Sax 2";
+            if (displayName === "Tenor Saxophone")  displayName = "Tenor Sax";
+            if (file === "Alice_Seating_Chart.pdf") displayName = "Seating Chart";
+            if (file === "Alice's Theme-Conductor.pdf") displayName = "Conductor";
 
             // Capitalize properly
             displayName = displayName.split(' ')
