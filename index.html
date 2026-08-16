@@ -5,18 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BIPH Band</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <!-- <meta name="apple-mobile-web-app-status-bar-style" content="black"> -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="BIPH Band">
-    <link rel="apple-touch-icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
+    <link rel="apple-touch-icon" href="icons/BGicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     
-    <link rel="icon" href="../icons/BGicon.png">
+    <link rel="icon" href="icons/BGicon.png">
 
-    <!-- Preconnect + load Andika early (was previously undefined) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- Preload custom Zapfino font so it starts downloading immediately -->
     <link rel="preload" href="https://biphband.github.io/fonts/Zapfino.ttf" as="font" type="font/ttf" crossorigin>
 
     <style>
@@ -31,13 +30,13 @@
             font-family: 'Andika', system-ui, -apple-system, sans-serif;
             color: #ffffff;
             margin: 0;
-            padding: 20px;
             line-height: 1.6;
             text-align: center;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            padding-top: env(safe-area-inset-top);
         }
 
         .background {
@@ -130,6 +129,7 @@
         /* Hamburger Menu */
         .hamburger-menu {
             position: absolute;
+            top: calc(20px + env(safe-area-inset-top));
             margin-left: 7px;
             top: 20px;
             left: 13px;
@@ -371,12 +371,16 @@
             window.location.href = "https://biphmusic.github.io";
         }
 
-        // Runs as soon as the HTML is parsed — does NOT wait for images, fonts, or other resources
+        window.addEventListener('pageshow', function (event) {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             if (isSpecialTime()) {
                 redirectToTheory();
             }
-            // else: buttons are already in the HTML and visible immediately
         });
     </script>
 </body>
