@@ -6,9 +6,10 @@
   <title>Alice in Wonderland 2026</title>
      
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="BIPH Band">
-    <link rel="apple-touch-icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
+    <link rel="apple-touch-icon" href="../icons/BGicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     
     <link rel="icon" href="../icons/BGicon.png">
   <link href="/tailwind.css" rel="stylesheet">
@@ -32,9 +33,11 @@
       align-items: center;
       overflow-x: hidden;
       overflow-y: auto;
+      padding-top: env(safe-area-inset-top);
     }
 
     .container {
+      margin-top: 13px;
       width: 80%;
       max-width: 800px; 
       background-color: rgba(255, 255, 255, 0.639); 
@@ -164,8 +167,8 @@
     }
 
     .hamburger-menu {
-      position: fixed;
-      top: 20px;
+      position: absolute;
+      top: calc(20px + env(safe-area-inset-top));
       left: 13px;
       z-index: 10002;
     }
@@ -322,8 +325,8 @@
         ["Alice's Theme-Alto_Saxophone_1.pdf", "Alice's Theme-Alto_Saxophone_2.pdf", "Alice's Theme-Tenor_Saxophone.pdf"]
       ],
       Brass: [
-        ["Alice's Theme-Trumpet_1.pdf", "Alice's Theme-Trumpet_2.pdf", "Alice's Theme-Trumpet_3.pdf"],
-        ["Alice's Theme-Horn_1.pdf", "Alice's Theme-Horn_2.pdf"],
+        ["Alice's Theme-Trumpet_1.pdf", "Alice's Theme-Trumpet_2.pdf"],
+        ["Alice's Theme-Horn.pdf"],
         ["Alice's Theme-Trombone.pdf", "Alice's Theme-Euphonium.pdf"],
         ["Alice's Theme-Tuba.pdf"]
       ],
@@ -413,6 +416,13 @@
       menuToggle.classList.toggle('open');
       menuItems.classList.toggle('show');
     });
+
+    window.addEventListener('pageshow', function (event) {
+    // Always reset scroll, especially important after bfcache restore
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+});
 
     document.addEventListener('click', (event) => {
       if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
