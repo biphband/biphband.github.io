@@ -381,12 +381,10 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-    if (isSpecialTime()) {
-        if (confirm("Now navigating to AP Music Theory homepage. Continue?")) {
-            redirectToTheory();
-        }
-    }
-});
+            if (isSpecialTime()) {
+                redirectToTheory();
+            }
+        });
     </script>
 </body>
 </html>
