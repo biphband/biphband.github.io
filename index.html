@@ -364,7 +364,7 @@
             if (day < 1 || day > 5) return false;
 
             // 10:00 AM to 11:45 AM inclusive
-            if (hour === 10 || (hour === 11 && minute <= 45)) {
+            if (hour === 10 || (hour === 11 && minute <= 30)) {
                 return true;
             }
             return false;
@@ -381,10 +381,12 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            if (isSpecialTime()) {
-                redirectToTheory();
-            }
-        });
+    if (isSpecialTime()) {
+        if (confirm("Now navigating to AP Music Theory homepage. Continue?")) {
+            redirectToTheory();
+        }
+    }
+});
     </script>
 </body>
 </html>
