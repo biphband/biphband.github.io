@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>AMIS Audition Recorder</title>
+  <style>
+    :root {
+      --accent: #1a4a8a;
+      --record: #c0392b;
+      --success: #27ae60;
+      --idle: #2980b9;
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #222;
+      --muted: #666;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+      padding-bottom: 140px;
+    }
+    header {
+      background: var(--accent);
+      color: white;
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    header h1 { font-size: 1.15rem; font-weight: 600; }
+    header p { font-size: 0.8rem; opacity: 0.9; margin-top: 2px; }
+
+    #chooser {
+      max-width: 720px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+    #chooser h2 {
+      font-size: 1.15rem;
+      margin: 20px 0 12px;
+      color: var(--accent);
+      border-bottom: 2px solid #dde3ee;
+      padding-bottom: 6px;
+    }
+    .inst-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 480px) {
+      .inst-grid { grid-template-columns: 1fr; }
+    }
+    .inst-card {
+      background: white;
+      border-radius: 10px;
+      padding: 14px 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      border: 2px solid transparent;
+      text-align: center;
+    }
+    .inst-card:active { transform: scale(0.97); }
+    .inst-card:hover { border-color: var(--accent); }
+    .inst-card h3 { font-size: 1rem; color: var(--accent); margin-bottom: 2px; }
+    .inst-card p { font-size: 0.78rem; color: var(--muted); }
+
+    #recorder-view { display: none; }
+    #recorder-view.active { display: block; }
+    #chooser.hidden { display: none; }
+
+    .back-link {
+      display: inline-block;
+      margin: 10px 16px;
+      color: var(--accent);
+      font-size: 0.9rem;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .page-container {
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto 24px;
+      background: white;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .page-container img {
+      display: block;
+      width: 100%;
+      height: auto;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .overlay-btn {
+      position: absolute;
+      left: 1.2%;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 20;
+      transition: transform 0.15s, background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      color: white;
+    }
+    .overlay-btn:active { transform: scale(0.92); }
+    .overlay-btn.idle { background: var(--idle); }
+    .overlay-btn.recording {
+      background: var(--record);
+      animation: pulse 1s infinite;
+    }
+    .overlay-btn.done { background: var(--success); }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.55); }
+      50% { box-shadow: 0 0 0 12px rgba(192,57,43,0); }
+    }
+
+    #control-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 1px solid #ddd;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
+      padding: 12px 16px 22px;
+      z-index: 90;
+      transform: translateY(100%);
+      transition: transform 0.25s ease;
+    }
+    #control-panel.visible { transform: translateY(0); }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .panel-header h2 { font-size: 1rem; color: var(--accent); }
+    .close-panel {
+      background: none; border: none; font-size: 1.4rem; color: #888; cursor: pointer; padding: 4px 8px;
+    }
+    .tempo-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .tempo-row label { font-size: 0.9rem; color: var(--muted); white-space: nowrap; }
+    .tempo-row input[type="range"] { flex: 1; min-width: 120px; }
+    .tempo-val { font-weight: 600; min-width: 48px; text-align: right; }
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      flex: 1;
+      min-width: 90px;
+      padding: 12px 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-record { background: var(--record); color: white; }
+    .btn-stop { background: #333; color: white; }
+    .btn-play { background: #2980b9; color: white; }
+    .btn-play:disabled, .btn-stop:disabled, .btn-record:disabled { opacity: 0.45; cursor: not-allowed; }
+    .status-line {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 8px;
+      min-height: 1.2em;
+    }
+    .rec-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--record);
+      font-weight: 600;
+    }
+    .rec-dot {
+      width: 10px; height: 10px; border-radius: 50%; background: var(--record);
+      animation: blink 1s infinite;
+    }
+    @keyframes blink { 50% { opacity: 0.3; } }
+
+    #summary {
+      max-width: 900px;
+      margin: 0 auto 40px;
+      padding: 0 12px;
+    }
+    #summary h2 {
+      font-size: 1.2rem;
+      margin-bottom: 12px;
+      color: var(--accent);
+    }
+    .track-card {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+    .track-card .label { font-weight: 600; min-width: 70px; }
+    .track-card .status { font-size: 0.9rem; color: var(--muted); flex: 1; }
+    .track-card .status.ready { color: var(--success); font-weight: 600; }
+    .track-card .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .track-card button {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #f8f8f8;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .global-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .global-actions .btn {
+      flex: 1;
+      min-width: 140px;
+      padding: 14px;
+    }
+    .btn-download { background: var(--accent); color: white; }
+    .btn-share { background: #8e44ad; color: white; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .mic-warning {
+      background: #fff3cd;
+      color: #856404;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin: 12px;
+      font-size: 0.9rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="header-title">AMIS Audition Recorder</h1>
+    <p id="header-sub">Choose your instrument to begin.</p>
+  </header>
+
+  <div id="chooser">
+    <h2>Middle School – Honor Band</h2>
+    <div class="inst-grid">
+      <div class="inst-card" data-group="MS" data-key="altosax"><h3>Alto Sax</h3><p>3 tracks</p></div>
+      <div class="inst-card" data-group="MS" data-key="flute"><h3>Flute</h3><p>3 tracks</p></div>
+      <div class="inst-card" data-group="MS" data-key="trumpet"><h3>Trumpet</h3><p>3 tracks</p></div>
+    </div>
+
+    <h2>Middle School – Honor Orchestra</h2>
+    <div class="inst-grid">
+      <div class="inst-card" data-group="MS" data-key="violin"><h3>Violin</h3><p>4 tracks</p></div>
+      <div class="inst-card" data-group="MS" data-key="viola"><h3>Viola</h3><p>4 tracks</p></div>
+      <div class="inst-card" data-group="MS" data-key="cello"><h3>Cello</h3><p>4 tracks</p></div>
+      <div class="inst-card" data-group="MS" data-key="bass"><h3>Bass</h3><p>4 tracks</p></div>
+    </div>
+
+    <h2>High School – Honor Band</h2>
+    <div class="inst-grid">
+      <div class="inst-card" data-group="HS" data-key="clarinet"><h3>Clarinet</h3><p>5 tracks</p></div>
+      <div class="inst-card" data-group="HS" data-key="flute"><h3>Flute</h3><p>5 tracks</p></div>
+      <div class="inst-card" data-group="HS" data-key="horn"><h3>Horn</h3><p>5 tracks</p></div>
+      <div class="inst-card" data-group="HS" data-key="trumpet"><h3>Trumpet</h3><p>5 tracks</p></div>
+      <div class="inst-card" data-group="HS" data-key="euphonium"><h3>Euphonium</h3><p>5 tracks</p></div>
+      <div class="inst-card" data-group="HS" data-key="tuba"><h3>Tuba</h3><p>5 tracks</p></div>
+      <div class="inst-card" data-group="HS" data-key="percussion"><h3>Percussion</h3><p>3 tracks</p></div>
+    </div>
+
+    <h2>High School – Honor Orchestra</h2>
+    <div class="inst-grid">
+      <div class="inst-card" data-group="HS" data-key="violin"><h3>Violin</h3><p>4 tracks</p></div>
+      <div class="inst-card" data-group="HS" data-key="cello"><h3>Cello</h3><p>4 tracks</p></div>
+    </div>
+  </div>
+
+  <div id="recorder-view">
+    <a href="#" class="back-link" id="back-to-chooser">← Choose another instrument</a>
+    <div id="mic-warning" class="mic-warning">
+      Microphone access is required. Please allow the browser permission when prompted.
+    </div>
+    <div id="pages-root"></div>
+
+    <div id="control-panel">
+      <div class="panel-header">
+        <h2 id="panel-title">Track 1</h2>
+        <button class="close-panel" id="close-panel" aria-label="Close">×</button>
+      </div>
+      <div class="tempo-row" id="tempo-row" style="display:none;">
+        <label id="tempo-label">Tempo (♩ = )</label>
+        <input type="range" id="tempo-slider" min="60" max="140" value="120" />
+        <span class="tempo-val" id="tempo-val">120</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-record" id="btn-start-rec">● Record</button>
+        <button class="btn btn-stop" id="btn-stop-rec" disabled>■ Stop</button>
+        <button class="btn btn-play" id="btn-play" disabled>▶ Play</button>
+      </div>
+      <div class="status-line" id="status-line">Ready</div>
+    </div>
+
+    <section id="summary">
+      <h2>Recording Checklist</h2>
+      <div id="track-list"></div>
+      <div class="global-actions">
+        <button class="btn btn-download" id="btn-download-all" disabled>⬇ Download All</button>
+        <button class="btn btn-share" id="btn-share" disabled>↗ Share</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
+  <script src="recorder-core.js"></script>
+  <script src="MSinstruments.js"></script>
+  <script src="HSinstruments.js"></script>
+  <script>
+    const chooser = document.getElementById("chooser");
+    const recorderView = document.getElementById("recorder-view");
+
+    document.querySelectorAll(".inst-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        const group = card.dataset.group;
+        const key = card.dataset.key;
+        let cfg = null;
+        if (group === "MS") cfg = window.MSInstruments[key];
+        else if (group === "HS") cfg = window.HSInstruments[key];
+        if (!cfg) {
+          alert("Config not found for " + key);
+          return;
+        }
+        chooser.classList.add("hidden");
+        recorderView.classList.add("active");
+        window.AuditionRecorder.init(cfg);
+        window.scrollTo(0, 0);
+      });
+    });
+
+    document.getElementById("back-to-chooser").addEventListener("click", (e) => {
+      e.preventDefault();
+      recorderView.classList.remove("active");
+      chooser.classList.remove("hidden");
+      document.getElementById("header-title").textContent = "AMIS Audition Recorder";
+      document.getElementById("header-sub").textContent = "Choose your instrument to begin.";
+    });
+  </script>
+</body>
+</html>
