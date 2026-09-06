@@ -3,6 +3,33 @@
  */
 window.HSInstruments = {
 
+  flute: {
+    headerTitle: "AMIS HSHB Flute – Set 1",
+    headerSub: "Tap a numbered circle next to each “Record the following…” line.",
+    filePrefix: "HS_Flute",
+    zipName: "AMIS_HSHB_Flute_Set1",
+    shareTitle: "AMIS HSHB Flute Audition – Set 1",
+    shareText: "My flute audition recordings",
+    pages: [
+      { image: "parts/HS-Flute-1.jpg", alt: "Flute scales / arpeggio",
+        buttons: [ { track: 1, top: "30%" }, { track: 2, top: "48%" }, { track: 3, top: "66%" } ] },
+      { image: "parts/HS-Flute-2.jpg", alt: "Flute etudes",
+        buttons: [ { track: 4, top: "25%" }, { track: 5, top: "72%" } ] }
+    ],
+    tracks: {
+      1: { title: "Track 1 – Scale", tempoFixed: 144, tempoMin: 144, tempoMax: 144, tempoLabel: "♩ =", metronome: true,
+           note: "♩ = 144. Metronome clearly audible throughout." },
+      2: { title: "Track 2 – Expressive Arpeggio", tempoFixed: 60, tempoMin: 60, tempoMax: 60, tempoLabel: "♩ =", metronome: true,
+           note: "♩ = 60. Play with expression (vibrato). Metronome clearly audible." },
+      3: { title: "Track 3 – Scale", tempoFixed: null, tempoMin: 100, tempoMax: 132, defaultTempo: 116, tempoLabel: "♩ =", metronome: true,
+           note: "♩ = 100–132. Metronome clearly audible throughout." },
+      4: { title: "Track 4 – Etude / Excerpt", tempoFixed: 146, tempoLabel: "♩ = 146", metronome: false,
+           note: "No metronome on the recording. ♩ = 146" },
+      5: { title: "Track 5 – Etude / Excerpt", tempoFixed: null, tempoMin: 60, tempoMax: 90, defaultTempo: 72, tempoLabel: "♩ =", metronome: false,
+           note: "No metronome on the recording." }
+    }
+  },
+
   clarinet: {
     headerTitle: "AMIS HSHB Clarinet – Set 1",
     headerSub: "Tap a numbered circle next to each “Record the following…” line.",
@@ -23,37 +50,39 @@ window.HSInstruments = {
            note: "Quarter note = 72 bpm. Metronome clearly audible throughout." },
       3: { title: "Track 3 – Scale", tempoFixed: null, tempoMin: 100, tempoMax: 120, defaultTempo: 110, tempoLabel: "dotted ♩ =", metronome: true,
            note: "Dotted quarter = 100–120 bpm. Metronome clearly audible throughout." },
-      4: { title: "Track 4 – Toccata Marziale (Vaughan Williams)", tempoFixed: null, tempoMin: 90, tempoMax: 94, defaultTempo: 92, tempoLabel: "♩ =", metronome: false,
+      4: { title: "Track 4 – Toccata Marziale (Vaughan Williams)", tempoFixed: null, tempoMin: 90, tempoMax: 94, defaultTempo: 92, tempoLabel: "♩ =", metronome: false, countInBeats: 3,
            note: "Allegro maestoso. Do NOT use a metronome." },
       5: { title: "Track 5 – Danzón No. 2 (Márquez)", tempoFixed: null, tempoMin: 90, tempoMax: 94, defaultTempo: 92, tempoLabel: "♩ =", metronome: false,
            note: "Do NOT use a metronome." }
     }
   },
 
-  flute: {
-    headerTitle: "AMIS HSHB Flute – Set 1",
-    headerSub: "Tap a numbered circle next to each “Record the following…” line.",
-    filePrefix: "HS_Flute",
-    zipName: "AMIS_HSHB_Flute_Set1",
-    shareTitle: "AMIS HSHB Flute Audition – Set 1",
-    shareText: "My flute audition recordings",
+    trumpet: {
+    headerTitle: "AMIS HSHB Trumpet – Set 1",
+    headerSub: "Tap a numbered circle next to each scale or excerpt.",
+    filePrefix: "HS_Trumpet",
+    zipName: "AMIS_HSHB_Trumpet_Set1",
+    shareTitle: "AMIS HSHB Trumpet Audition – Set 1",
+    shareText: "My trumpet audition recordings",
     pages: [
-      { image: "parts/HS-Flute-1.jpg", alt: "Flute scales / arpeggio",
-        buttons: [ { track: 1, top: "18%" }, { track: 2, top: "40%" }, { track: 3, top: "58%" } ] },
-      { image: "parts/HS-Flute-2.jpg", alt: "Flute etudes",
-        buttons: [ { track: 4, top: "14%" }, { track: 5, top: "50%" } ] }
+      { image: "parts/HS-Trumpet-1.jpg", alt: "Trumpet scales",
+        buttons: [ { track: 1, top: "16%" }, { track: 2, top: "40%" }, { track: 3, top: "62%" } ] },
+      { image: "parts/HS-Trumpet-2.jpg", alt: "Trumpet excerpt (Arutunian)",
+        buttons: [ { track: 4, top: "14%" } ] },
+      { image: "parts/HS-Trumpet-3.jpg", alt: "Trumpet excerpt 2",
+        buttons: [ { track: 5, top: "14%" } ] }
     ],
     tracks: {
       1: { title: "Track 1 – Scale", tempoFixed: 144, tempoMin: 144, tempoMax: 144, tempoLabel: "♩ =", metronome: true,
            note: "♩ = 144. Metronome clearly audible throughout." },
-      2: { title: "Track 2 – Expressive Arpeggio", tempoFixed: 60, tempoMin: 60, tempoMax: 60, tempoLabel: "♩ =", metronome: true,
-           note: "♩ = 60. Play with expression (vibrato). Metronome clearly audible." },
-      3: { title: "Track 3 – Scale", tempoFixed: null, tempoMin: 100, tempoMax: 132, defaultTempo: 116, tempoLabel: "♩ =", metronome: true,
-           note: "♩ = 100–132. Metronome clearly audible throughout." },
-      4: { title: "Track 4 – Etude / Excerpt", tempoFixed: null, tempoMin: 80, tempoMax: 120, defaultTempo: 100, tempoLabel: "♩ =", metronome: false,
-           note: "No metronome on the recording." },
-      5: { title: "Track 5 – Etude / Excerpt", tempoFixed: null, tempoMin: 60, tempoMax: 90, defaultTempo: 72, tempoLabel: "♩ =", metronome: false,
-           note: "No metronome on the recording." }
+      2: { title: "Track 2 – Scale", tempoFixed: 72, tempoMin: 72, tempoMax: 72, tempoLabel: "♩ =", metronome: true,
+           note: "♩ = 72. Metronome clearly audible throughout." },
+      3: { title: "Track 3 – Scale", tempoFixed: null, tempoMin: 100, tempoMax: 120, defaultTempo: 110, tempoLabel: "♩ =", metronome: true,
+           note: "♩ = 100–120. Metronome clearly audible throughout." },
+      4: { title: "Track 4 – Arutunian Concerto (excerpt)", tempoFixed: null, tempoMin: 70, tempoMax: 85, defaultTempo: 78, tempoLabel: "♩ =", metronome: false,
+           note: "Andante maestoso. Do NOT use a metronome." },
+      5: { title: "Track 5 – Excerpt 2", tempoFixed: null, tempoMin: 76, tempoMax: 86, defaultTempo: 81, tempoLabel: "♩ =", metronome: false, countInBeats: 6,
+           note: "Do NOT use a metronome." }
     }
   },
 
@@ -77,39 +106,10 @@ window.HSInstruments = {
            note: "Quarter note = 72 bpm. Metronome clearly audible throughout." },
       3: { title: "Track 3 – Scale", tempoFixed: null, tempoMin: 80, tempoMax: 100, defaultTempo: 90, tempoLabel: "dotted ♩ =", metronome: true,
            note: "Dotted quarter = 80–100 bpm. Metronome clearly audible throughout." },
-      4: { title: "Track 4 – Etude / Excerpt", tempoFixed: null, tempoMin: 80, tempoMax: 120, defaultTempo: 100, tempoLabel: "♩ =", metronome: false,
+      4: { title: "Track 4 – Etude / Excerpt", tempoFixed: null, tempoMin: 72, tempoMax: 76, defaultTempo: 74, tempoLabel: "♩ =", metronome: false, countInBeats: 3,
            note: "No metronome on the recording." },
-      5: { title: "Track 5 – Etude / Excerpt", tempoFixed: null, tempoMin: 60, tempoMax: 90, defaultTempo: 72, tempoLabel: "♩ =", metronome: false,
+      5: { title: "Track 5 – Etude / Excerpt", tempoFixed: null, tempoMin: 66, tempoMax: 76, defaultTempo: 71, tempoLabel: "♩ =", metronome: false,
            note: "No metronome on the recording." }
-    }
-  },
-
-  trumpet: {
-    headerTitle: "AMIS HSHB Trumpet – Set 1",
-    headerSub: "Tap a numbered circle next to each scale or excerpt.",
-    filePrefix: "HS_Trumpet",
-    zipName: "AMIS_HSHB_Trumpet_Set1",
-    shareTitle: "AMIS HSHB Trumpet Audition – Set 1",
-    shareText: "My trumpet audition recordings",
-    pages: [
-      { image: "parts/HS-Trumpet-1.jpg", alt: "Trumpet scales",
-        buttons: [ { track: 1, top: "16%" }, { track: 2, top: "40%" }, { track: 3, top: "62%" } ] },
-      { image: "parts/HS-Trumpet-2.jpg", alt: "Trumpet excerpt (Arutunian)",
-        buttons: [ { track: 4, top: "14%" } ] },
-      { image: "parts/HS-Trumpet-3.jpg", alt: "Trumpet excerpt 2",
-        buttons: [ { track: 5, top: "14%" } ] }
-    ],
-    tracks: {
-      1: { title: "Track 1 – Scale", tempoFixed: 144, tempoMin: 144, tempoMax: 144, tempoLabel: "♩ =", metronome: true,
-           note: "♩ = 144. Metronome clearly audible throughout." },
-      2: { title: "Track 2 – Scale", tempoFixed: 72, tempoMin: 72, tempoMax: 72, tempoLabel: "♩ =", metronome: true,
-           note: "♩ = 72. Metronome clearly audible throughout." },
-      3: { title: "Track 3 – Scale", tempoFixed: null, tempoMin: 100, tempoMax: 120, defaultTempo: 110, tempoLabel: "♩ =", metronome: true,
-           note: "♩ = 100–120. Metronome clearly audible throughout." },
-      4: { title: "Track 4 – Arutunian Concerto (excerpt)", tempoFixed: null, tempoMin: 60, tempoMax: 90, defaultTempo: 72, tempoLabel: "♩ =", metronome: false,
-           note: "Andante maestoso. Do NOT use a metronome." },
-      5: { title: "Track 5 – Excerpt 2", tempoFixed: null, tempoMin: 80, tempoMax: 120, defaultTempo: 100, tempoLabel: "♩ =", metronome: false,
-           note: "Do NOT use a metronome." }
     }
   },
 
@@ -133,9 +133,9 @@ window.HSInstruments = {
            note: "Quarter note = 72 bpm. Metronome clearly audible throughout." },
       3: { title: "Track 3 – Scale", tempoFixed: null, tempoMin: 100, tempoMax: 120, defaultTempo: 110, tempoLabel: "dotted ♩ =", metronome: true,
            note: "Dotted quarter = 100–120 bpm. Metronome clearly audible throughout." },
-      4: { title: "Track 4 – Etude / Excerpt", tempoFixed: null, tempoMin: 80, tempoMax: 120, defaultTempo: 100, tempoLabel: "♩ =", metronome: false,
+      4: { title: "Track 4 – Etude / Excerpt", tempoFixed: null, tempoMin: 152, tempoMax: 164, defaultTempo: 158, tempoLabel: "♩ =", metronome: false,
            note: "No metronome on the recording." },
-      5: { title: "Track 5 – Etude / Excerpt", tempoFixed: null, tempoMin: 60, tempoMax: 90, defaultTempo: 72, tempoLabel: "♩ =", metronome: false,
+      5: { title: "Track 5 – Etude / Excerpt", tempoFixed: null, tempoMin: 232, tempoMax: 252, defaultTempo: 243, tempoLabel: "♩ =", metronome: false,
            note: "No metronome on the recording." }
     }
   },

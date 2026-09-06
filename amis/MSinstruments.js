@@ -262,7 +262,7 @@ window.MSInstruments = {
       4: {
         title: "Track 4 – Vivaldi Sonata (Allegro con spirito)",
         tempoFixed: 80, tempoMin: 80, tempoMax: 80,
-        tempoLabel: "♩ =", metronome: true, metroStopAfterBeats: 12,
+        tempoLabel: "♩ =", metronome: true, metroStopAfterBeats: 18,
         note: "♩ = 80. Metronome 1 bar before + continuing for 2 bars only."
       }
     }
@@ -316,7 +316,7 @@ window.MSInstruments = {
       4: {
         title: "Track 4 – Träumerei (Schumann)",
         tempoFixed: 63, tempoMin: 63, tempoMax: 63,
-        tempoLabel: "♩ =", metronome: true, metroStopAfterBeats: 10,
+        tempoLabel: "♩ =", metronome: true, metroStopAfterBeats: 12,
         note: "♩ = 63. Metronome a few beats before + 2 bars only."
       }
     }
@@ -370,7 +370,7 @@ window.MSInstruments = {
       4: {
         title: "Track 4 – Grand March from Aida",
         tempoFixed: 100, tempoMin: 100, tempoMax: 100,
-        tempoLabel: "♩ =", metronome: true, metroStopAfterBeats: 12,
+        tempoLabel: "♩ =", metronome: true, metroStopAfterBeats: 11,
         note: "♩ = 100. Metronome 1 bar before + continuing for 2 bars only."
       }
     }

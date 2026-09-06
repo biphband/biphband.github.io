@@ -242,16 +242,15 @@ window.AuditionRecorder = (() => {
         mediaRecorder.start(200);
       } else {
         // No metronome on the recording → play a silent 4-beat count-in first
-        setStatus("Count-in… (4 beats)");
-        startMetronome(bpm); // will run freely
+        setStatus("Count-in… then begin!");
+        const countInBeats = t.countInBeats || 4;
+        startMetronome(bpm);
         const beatMs = (60 / bpm) * 1000;
-        // wait for 4 full beats, then stop metro and start recording
-        await new Promise((r) => setTimeout(r, beatMs * 3 + 40));
+        await new Promise((r) => setTimeout(r, beatMs * (countInBeats - 1) + 40));
         stopMetronome();
-        // tiny gap so the last click isn't clipped into the recording
-        await new Promise((r) => setTimeout(r, 30));
+        await new Promise((r) => setTimeout(r, beatMs));
         recordStartTime = performance.now();
-        mediaRecorder.start(200);
+        mediaRecorder.start(225);
       }
 
       isRecording = true;
