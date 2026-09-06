@@ -208,7 +208,7 @@ window.MSInstruments = {
       4: {
         title: "Track 4 – Sicilienne",
         tempoFixed: 80, tempoMin: 80, tempoMax: 80,
-        tempoLabel: "♩ =", metronome: true, metroStopAfterBeats: 10,
+        tempoLabel: "♩ =", metronome: true, metroStopAfterBeats: 18,
         note: "♩ = 80. Metronome a few beats before + 2 bars only."
       }
     }
