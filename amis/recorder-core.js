@@ -133,7 +133,7 @@ window.AuditionRecorder = (() => {
         audio: {
           echoCancellation: false,
           noiseSuppression: false,
-          autoGainControl: false
+          autoGainControl: true
         }
       });
       micWarning.style.display = "none";
@@ -153,12 +153,13 @@ window.AuditionRecorder = (() => {
 
     // Mix down to mono for smaller files / simpler encoding
     const samples = audioBuf.getChannelData(0);
+    const gain = 0.5; // -6 dB
     const sampleRate = audioBuf.sampleRate;
 
     // lamejs expects Int16 samples
     const int16 = new Int16Array(samples.length);
     for (let i = 0; i < samples.length; i++) {
-      const s = Math.max(-1, Math.min(1, samples[i]));
+      const s = Math.max(-1, Math.min(1, samples[i] * gain));
       int16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
     }
 
