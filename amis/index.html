@@ -173,12 +173,10 @@ body.level-select-mode {
   display:none;
   padding:20px 0 10px;
 }
-#instructions-content iframe {
+#instructions-content img {
   display:block;
   width:100%;
-  height:75vh;
-  min-height:500px;
-  border:none;
+  height:auto;
   border-radius:8px;
   background:white;
   box-shadow:0 2px 8px rgba(0,0,0,0.08);
@@ -650,7 +648,7 @@ body.recorder-page .title-image {
   <div id="content-selection">
     <div id="instrument-selection"></div>
     <div id="instructions-content">
-      <iframe src="parts/Audition instructions 2026.pdf" title="Audition Instructions"></iframe>
+      <img src="parts/Audition instructions 2026.jpg" alt="Audition Instructions 2026">
     </div>
   </div>
 
@@ -719,8 +717,16 @@ const middleSchoolBtn=document.getElementById('btn-middle-school');
 const highSchoolBtn=document.getElementById('btn-high-school');
 const instructionsBtn=document.getElementById('btn-instructions');
 
+const MS_HEIGHT=500;
+const HS_HEIGHT=500;
+const INSTRUCTIONS_HEIGHT=500;
+const COLLAPSE_HEIGHT=0;
+
+history.scrollRestoration='manual';
+
 let currentLevel=null;
 let currentView=null;
+let scrollAnimation=null;
 
 const instrumentData={
   MS:{
@@ -759,40 +765,35 @@ const instrumentData={
   }
 };
 
-function snapToTop(){
+
+function scrollToHeight(targetHeight){
+  const duration=1000; // Total scroll time in milliseconds
   const startTime=performance.now();
-  const duration=1000;
   const startY=window.scrollY;
 
-  function scrollUp(now){
-    const progress=Math.min((now-startTime)/duration,1);
+  function animateScroll(now){
+    const elapsed=now-startTime;
+    const progress=Math.min(elapsed/duration,1);
     const eased=1-Math.pow(1-progress,3);
+
     const maxY=Math.max(0,document.documentElement.scrollHeight-window.innerHeight);
-    const targetY=Math.min(0,maxY);
+    const targetY=Math.min(targetHeight,maxY);
     const y=startY+(targetY-startY)*eased;
 
     window.scrollTo(0,y);
 
-    if(progress<1) requestAnimationFrame(scrollUp);
+    if(progress<1){
+      requestAnimationFrame(animateScroll);
+    }else{
+      // One final attempt after the expansion has had time to finish.
+      const finalMaxY=Math.max(0,document.documentElement.scrollHeight-window.innerHeight);
+      window.scrollTo(0,Math.min(targetHeight,finalMaxY));
+    }
   }
 
-  requestAnimationFrame(scrollUp);
+  requestAnimationFrame(animateScroll);
 }
 
-function snapToContent(){
-  const start=performance.now();
-  const duration=1800;
-  const speed=1000;
-
-  function scrollDown(now){
-    const elapsed=now-start;
-    if(elapsed>=duration) return;
-    window.scrollBy(0,speed/60);
-    requestAnimationFrame(scrollDown);
-  }
-
-  requestAnimationFrame(scrollDown);
-}
 
 function setActiveButton(button){
   [middleSchoolBtn,highSchoolBtn,instructionsBtn].forEach(btn=>{
@@ -841,7 +842,12 @@ function expandSelection(level){
   buildInstrumentSelection(level);
   contentSelection.classList.add('expanded');
   setActiveButton(level==='MS'?middleSchoolBtn:highSchoolBtn);
-  snapToContent();
+
+  if(level==='MS'){
+    scrollToHeight(MS_HEIGHT);
+  }else if(level==='HS'){
+    scrollToHeight(HS_HEIGHT);
+  }
 }
 
 function expandInstructions(){
@@ -851,7 +857,7 @@ function expandInstructions(){
   instructionsContent.style.display='block';
   contentSelection.classList.add('expanded');
   setActiveButton(instructionsBtn);
-  snapToContent();
+  scrollToHeight(INSTRUCTIONS_HEIGHT);
 }
 
 function collapseSelection(){
@@ -859,8 +865,9 @@ function collapseSelection(){
   currentView=null;
   contentSelection.classList.remove('expanded');
   setActiveButton(null);
+
   requestAnimationFrame(()=>{
-    snapToTop();
+    scrollToHeight(COLLAPSE_HEIGHT);
   });
 }
 
@@ -894,6 +901,8 @@ function openRecorder(group,key){
     return;
   }
 
+  history.scrollRestoration='manual';
+
   document.body.classList.add('recorder-page');
   mainContainer.classList.add('recorder-mode');
 
@@ -902,10 +911,15 @@ function openRecorder(group,key){
   recorderView.classList.add('active');
 
   window.AuditionRecorder.init(cfg);
+
+  history.pushState({recorder:true},'',window.location.href);
+
   window.scrollTo(0,0);
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
 }
 
-function closeRecorder(){
+function restoreChooser(){
   recorderView.classList.remove('active');
   document.body.classList.remove('recorder-page');
   mainContainer.classList.remove('recorder-mode');
@@ -918,19 +932,30 @@ function closeRecorder(){
     instrumentSelection.style.display='block';
     instructionsContent.style.display='none';
     setActiveButton(currentLevel==='MS'?middleSchoolBtn:highSchoolBtn);
+    requestAnimationFrame(()=>{
+      snapToInstrumentSelection();
+    });
   }else if(currentView==='instructions'){
     contentSelection.classList.add('expanded');
     instrumentSelection.style.display='none';
     instructionsContent.style.display='block';
     setActiveButton(instructionsBtn);
+    snapToTop();
   }else{
     contentSelection.classList.remove('expanded');
     instrumentSelection.style.display='none';
     instructionsContent.style.display='none';
     setActiveButton(null);
+    snapToTop();
   }
+}
 
-  snapToTop();
+function closeRecorder(){
+  if(history.state&&history.state.recorder){
+    history.back();
+  }else{
+    restoreChooser();
+  }
 }
 
 middleSchoolBtn.addEventListener('click',()=>{
@@ -967,6 +992,17 @@ document.addEventListener('keydown',(event)=>{
     menuToggle.classList.remove('open');
     menuItems.classList.remove('show');
   }
+});
+
+window.addEventListener('popstate',()=>{
+  if(document.body.classList.contains('recorder-page')){
+    restoreChooser();
+  }
+});
+
+document.getElementById('back-to-chooser').addEventListener('click',(e)=>{
+  e.preventDefault();
+  closeRecorder();
 });
 
 currentLevel=null;
