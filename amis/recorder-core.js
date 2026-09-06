@@ -31,7 +31,7 @@ window.AuditionRecorder = (() => {
   let panel, panelTitle, tempoRow, tempoLabel, tempoSlider, tempoVal;
   let btnStart, btnStop, btnPlay, statusLine, trackList;
   let btnDownloadAll, btnShare, micWarning, closePanelBtn, overlayBtns;
-  let headerTitle, headerSub;
+  let headerSub;
 
   // ---------- Helpers ----------
   function formatTime(sec) {
@@ -473,10 +473,6 @@ window.AuditionRecorder = (() => {
   function init(cfg) {
     config = cfg;
 
-    // Build the page content from config
-    headerTitle.textContent = cfg.headerTitle;
-    headerSub.textContent = cfg.headerSub || "Tap a numbered circle next to each scale/excerpt to record.";
-
     // Clear previous pages
     const pagesRoot = document.getElementById("pages-root");
     pagesRoot.innerHTML = "";
@@ -544,8 +540,6 @@ window.AuditionRecorder = (() => {
     btnShare = document.getElementById("btn-share");
     micWarning = document.getElementById("mic-warning");
     closePanelBtn = document.getElementById("close-panel");
-    headerTitle = document.getElementById("header-title");
-    headerSub = document.getElementById("header-sub");
     overlayBtns = {};
 
     tempoSlider.addEventListener("input", () => {

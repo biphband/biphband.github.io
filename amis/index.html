@@ -16,7 +16,6 @@
   font-family:'Zapfino';
   src:url('../fonts/Zapfino.ttf') format('truetype');
 }
-
 :root {
   --accent:#1a4a8a;
   --record:#c0392b;
@@ -27,11 +26,9 @@
   --text:#222;
   --muted:#666;
 }
-
 * {
   box-sizing:border-box;
 }
-
 body {
   background:linear-gradient(145deg,#0d2470 0%,#113299 45%,#1e3a8a 100%);
   font-family:'Roboto',system-ui,-apple-system,sans-serif;
@@ -45,11 +42,9 @@ body {
   padding:24px;
   position:relative;
 }
-
 body.level-select-mode {
   overflow-y:hidden;
 }
-
 .container {
   width:80%;
   max-width:800px;
@@ -64,8 +59,8 @@ body.level-select-mode {
   position:relative;
   overflow:hidden;
   box-shadow:0 8px 32px rgba(0,0,0,0.25);
+  margin:auto;
 }
-
 .title-image {
   display:block;
   width:100%;
@@ -74,7 +69,6 @@ body.level-select-mode {
   margin:20px auto -25px;
   object-fit:contain;
 }
-
 .family-section {
   background:rgba(255,255,255,0.7);
   border-radius:8px;
@@ -83,7 +77,6 @@ body.level-select-mode {
   box-shadow:0 2px 4px rgba(0,0,0,0.08);
   position:relative;
 }
-
 .family-title {
   font-size:1.25rem;
   font-weight:700;
@@ -92,11 +85,12 @@ body.level-select-mode {
   color:#1f2937;
 }
 
+/* Shared landing-page button style */
 .btn {
   transition:all 0.2s ease;
-  background-color:#1a58b0;
-  color:rgb(255,255,255);
-  border:1px solid #1e40af;
+  background-color:#1a58b0 !important;
+  color:rgb(255,255,255) !important;
+  border:1px solid #0d2470 !important;
   border-radius:6px;
   padding:12px 20px;
   font-size:clamp(0.9rem,2.5vw,1.1rem);
@@ -110,38 +104,58 @@ body.level-select-mode {
 }
 
 .btn:hover {
-  background-color:#1c4293;
+  background-color:#1c4293 !important;
   cursor:pointer;
   box-shadow:0 2px 4px rgba(0,0,0,0.15);
 }
 
+/* All level-selection and instrument buttons use exactly the same blue */
 .level-btn {
-  background-color:#1a58b0;
-  border-color:#0d2470;
+  background-color:#1a58b0 !important;
+  color:#fff !important;
+  border:1px solid #0d2470 !important;
   font-size:1.25rem;
   padding:18px 32px;
   min-width:180px;
 }
 
 .level-btn:hover {
-  background-color:#1c4293;
+  background-color:#1c4293 !important;
+}
+
+.level-buttons {
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.instructions-row {
+  display:flex;
+  justify-content:center;
+  margin-top:24px;
+}
+
+.instructions-row .btn {
+  width:100%;
+  max-width:100%;
 }
 
 .instrument-group {
-  margin-bottom:16px;
   display:flex;
-  flex-wrap:nowrap;
-  gap:16px;
-  padding:8px;
-  overflow-x:auto;
+  gap:12px;
+  flex-wrap:wrap;
 }
 
-.instrument-group:has(:only-child) .btn {
+.instrument-group .level-btn {
+  flex:1 1 180px;
+}
+
+.instrument-group:has(:only-child) .level-btn {
   width:100%;
   margin-right:0;
 }
 
-/* Main landing-page unfurl/collapse animation */
 #instrument-selection {
   max-height:0;
   opacity:0;
@@ -162,19 +176,6 @@ body.level-select-mode {
   text-align:center;
   padding:40px 20px;
   margin-bottom:-30px;
-}
-
-.level-buttons {
-  display:flex;
-  justify-content:center;
-  gap:24px;
-  flex-wrap:wrap;
-}
-
-.instructions-row {
-  display:flex;
-  justify-content:center;
-  margin-top:24px;
 }
 
 .logocontainer {
@@ -315,10 +316,7 @@ body.level-select-mode {
   filter:brightness(0) saturate(100%) invert(14%) sepia(60%) saturate(2500%) hue-rotate(215deg) brightness(95%) contrast(105%);
 }
 
-/* ============================================================
-   ORIGINAL AUDITION RECORDER INTERFACE
-   ============================================================ */
-
+/* Recorder */
 #recorder-view {
   display:none;
 }
@@ -351,6 +349,11 @@ body.recorder-page .container {
 body.recorder-page .logocontainer,
 body.recorder-page .hamburger-menu,
 body.recorder-page .title-image {
+  display:none;
+}
+
+/* Required by recorder-core.js, but the visible recorder header is intentionally removed. */
+.recorder-meta {
   display:none;
 }
 
@@ -671,6 +674,7 @@ body.recorder-page .title-image {
     <span></span>
     <span></span>
   </button>
+
   <div class="menu-items" id="menu-items">
     <div class="menu-title">BIPH Band</div>
     <a href="https://biphband.github.io/">Home</a>
@@ -679,6 +683,7 @@ body.recorder-page .title-image {
     <a href="https://biphband.github.io/tuner/">Tuner</a>
     <a href="https://biphband.github.io/camera">Video Recorder</a>
     <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
+
     <div class="menu-footer">
       <img src="../qr.png" alt="QR Code" class="qr-image">
       © Garrison Tubbs 2026
@@ -691,6 +696,7 @@ body.recorder-page .title-image {
   <img src="title.png" alt="AMIS Auditions 2026-2027" class="title-image">
 
   <div id="level-selection">
+
     <div class="level-buttons">
       <button class="btn level-btn" id="btn-middle-school">Middle School</button>
       <button class="btn level-btn" id="btn-high-school">High School</button>
@@ -699,11 +705,17 @@ body.recorder-page .title-image {
     <div class="instructions-row">
       <button class="btn level-btn" id="btn-instructions">Audition Instructions</button>
     </div>
+
   </div>
 
   <div id="instrument-selection"></div>
 
   <div id="recorder-view">
+
+    <div class="recorder-meta">
+      <h1 id="header-title"></h1>
+      <p id="header-sub"></p>
+    </div>
 
     <a href="#" class="back-link" id="back-to-chooser">← Choose another instrument</a>
 
@@ -756,17 +768,17 @@ body.recorder-page .title-image {
 <script src="HSinstruments.js"></script>
 
 <script>
-const levelSelection = document.getElementById('level-selection');
-const instrumentSelection = document.getElementById('instrument-selection');
-const recorderView = document.getElementById('recorder-view');
-const mainContainer = document.getElementById('main-container');
-const menuToggle = document.querySelector('.menu-toggle');
-const menuItems = document.querySelector('.menu-items');
+const levelSelection=document.getElementById('level-selection');
+const instrumentSelection=document.getElementById('instrument-selection');
+const recorderView=document.getElementById('recorder-view');
+const mainContainer=document.getElementById('main-container');
+const menuToggle=document.querySelector('.menu-toggle');
+const menuItems=document.querySelector('.menu-items');
 
-let currentLevel = null;
+let currentLevel=null;
 
-const instrumentData = {
-  MS: {
+const instrumentData={
+  MS:{
     Strings:[
       {key:'violin',name:'Violin'},
       {key:'viola',name:'Viola'},
@@ -781,7 +793,7 @@ const instrumentData = {
       {key:'trumpet',name:'Trumpet'}
     ]
   },
-  HS: {
+  HS:{
     Strings:[
       {key:'violin',name:'Violin'},
       {key:'cello',name:'Cello'}
@@ -802,19 +814,18 @@ const instrumentData = {
   }
 };
 
-function snapToTop() {
+function snapToTop(){
   window.scrollTo(0,0);
   document.documentElement.scrollTop=0;
   document.body.scrollTop=0;
 }
 
-function buildInstrumentSelection(level) {
+function buildInstrumentSelection(level){
   instrumentSelection.innerHTML='';
-
   const groups=instrumentData[level];
   const levelLabel=level==='HS'?'High School':'Middle School';
 
-  Object.entries(groups).forEach(([family,instruments]) => {
+  Object.entries(groups).forEach(([family,instruments])=>{
     const familyDiv=document.createElement('div');
     familyDiv.className='family-section';
 
@@ -826,12 +837,15 @@ function buildInstrumentSelection(level) {
     const groupDiv=document.createElement('div');
     groupDiv.className='instrument-group';
 
-    instruments.forEach(instrument => {
+    instruments.forEach(instrument=>{
       const btn=document.createElement('button');
-      btn.className='btn';
+
+      /* Same class as the three main buttons */
+      btn.className='btn level-btn';
+
       btn.textContent=instrument.name;
 
-      btn.addEventListener('click',() => {
+      btn.addEventListener('click',()=>{
         openRecorder(level,instrument.key);
       });
 
@@ -843,48 +857,46 @@ function buildInstrumentSelection(level) {
   });
 }
 
-function expandSelection(level) {
+function expandSelection(level){
   currentLevel=level;
   buildInstrumentSelection(level);
-
   instrumentSelection.classList.add('expanded');
   snapToTop();
 }
 
-function collapseSelection() {
+function collapseSelection(){
   currentLevel=null;
   instrumentSelection.classList.remove('expanded');
   snapToTop();
 }
 
-function toggleLevel(level) {
-  if (currentLevel===level) {
+function toggleLevel(level){
+  if(currentLevel===level){
     collapseSelection();
     return;
   }
 
-  if (currentLevel===null) {
+  if(currentLevel===null){
     expandSelection(level);
     return;
   }
 
-  /* Switching directly between Middle School and High School. */
   currentLevel=level;
   buildInstrumentSelection(level);
   instrumentSelection.classList.add('expanded');
   snapToTop();
 }
 
-function openRecorder(group,key) {
+function openRecorder(group,key){
   let cfg=null;
 
-  if (group==='MS') {
+  if(group==='MS'){
     cfg=window.MSInstruments[key];
-  } else if (group==='HS') {
+  }else if(group==='HS'){
     cfg=window.HSInstruments[key];
   }
 
-  if (!cfg) {
+  if(!cfg){
     alert('Config not found for '+key);
     return;
   }
@@ -896,69 +908,64 @@ function openRecorder(group,key) {
   instrumentSelection.style.display='none';
   recorderView.classList.add('active');
 
-  /*
-   * Exact original recorder initialization call.
-   */
   window.AuditionRecorder.init(cfg);
 
   window.scrollTo(0,0);
 }
 
-function closeRecorder() {
+function closeRecorder(){
   recorderView.classList.remove('active');
   document.body.classList.remove('recorder-page');
   mainContainer.classList.remove('recorder-mode');
 
   levelSelection.style.display='block';
+  instrumentSelection.style.display='block';
 
-  if (currentLevel!==null) {
-    instrumentSelection.style.display='block';
+  if(currentLevel!==null){
     instrumentSelection.classList.add('expanded');
-  } else {
-    instrumentSelection.style.display='block';
+  }else{
     instrumentSelection.classList.remove('expanded');
   }
 
   snapToTop();
 }
 
-document.getElementById('btn-middle-school').addEventListener('click',() => {
+document.getElementById('btn-middle-school').addEventListener('click',()=>{
   toggleLevel('MS');
 });
 
-document.getElementById('btn-high-school').addEventListener('click',() => {
+document.getElementById('btn-high-school').addEventListener('click',()=>{
   toggleLevel('HS');
 });
 
-document.getElementById('btn-instructions').addEventListener('click',() => {
+document.getElementById('btn-instructions').addEventListener('click',()=>{
   window.location.href='parts/Audition instructions 2026.pdf';
 });
 
-document.getElementById('back-to-chooser').addEventListener('click',(e) => {
+document.getElementById('back-to-chooser').addEventListener('click',(e)=>{
   e.preventDefault();
   closeRecorder();
 });
 
-menuToggle.addEventListener('click',() => {
+menuToggle.addEventListener('click',()=>{
   menuToggle.classList.toggle('open');
   menuItems.classList.toggle('show');
 });
 
-document.addEventListener('click',(event) => {
-  if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
+document.addEventListener('click',(event)=>{
+  if(!menuToggle.contains(event.target)&&!menuItems.contains(event.target)){
     menuToggle.classList.remove('open');
     menuItems.classList.remove('show');
   }
 });
 
-document.addEventListener('keydown',(event) => {
-  if (event.key==='Escape') {
+document.addEventListener('keydown',(event)=>{
+  if(event.key==='Escape'){
     menuToggle.classList.remove('open');
     menuItems.classList.remove('show');
   }
 });
 
-/* Initial landing-page state. */
 currentLevel=null;
 levelSelection.style.display='block';
 instrumentSelection.style.display='block';
