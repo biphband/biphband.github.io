@@ -173,12 +173,18 @@ body.level-select-mode {
   display:none;
   padding:20px 0 10px;
 }
-#instructions-content img {
+
+#pdf-container {
+  width:100%;
+}
+
+.pdf-page {
   display:block;
   width:100%;
   height:auto;
-  border-radius:8px;
+  margin:0 auto 16px;
   background:white;
+  border-radius:8px;
   box-shadow:0 2px 8px rgba(0,0,0,0.08);
 }
 #level-selection {
@@ -648,7 +654,7 @@ body.recorder-page .title-image {
   <div id="content-selection">
     <div id="instrument-selection"></div>
     <div id="instructions-content">
-      <img src="parts/Audition instructions 2026.jpg" alt="Audition Instructions 2026">
+      <div id="pdf-container"></div>
     </div>
   </div>
 
@@ -698,6 +704,7 @@ body.recorder-page .title-image {
   </div>
 </div>
 
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs" type="module"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
 <script src="recorder-core.js"></script>
@@ -727,6 +734,53 @@ history.scrollRestoration='manual';
 let currentLevel=null;
 let currentView=null;
 let scrollAnimation=null;
+let pdfLoaded=false;
+
+async function loadInstructionsPDF(){
+  if(pdfLoaded) return;
+
+  const container=document.getElementById('pdf-container');
+  container.innerHTML='';
+
+  const pdfjsLib=await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs');
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc=
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
+
+  const pdf=await pdfjsLib.getDocument('parts/Audition instructions 2026.pdf').promise;
+
+  const outputScale=Math.max(window.devicePixelRatio||1,3);
+
+  for(let pageNumber=1;pageNumber<=pdf.numPages;pageNumber++){
+    const page=await pdf.getPage(pageNumber);
+
+    const containerWidth=container.clientWidth;
+    const unscaledViewport=page.getViewport({scale:1});
+    const displayScale=containerWidth/unscaledViewport.width;
+    const viewport=page.getViewport({scale:displayScale});
+
+    const canvas=document.createElement('canvas');
+    canvas.className='pdf-page';
+
+    const context=canvas.getContext('2d');
+
+    canvas.width=Math.floor(viewport.width*outputScale);
+    canvas.height=Math.floor(viewport.height*outputScale);
+
+    canvas.style.width=Math.floor(viewport.width)+'px';
+    canvas.style.height=Math.floor(viewport.height)+'px';
+
+    await page.render({
+      canvasContext:context,
+      viewport:viewport,
+      transform:outputScale!==1?[outputScale,0,0,outputScale,0,0]:null
+    }).promise;
+
+    container.appendChild(canvas);
+  }
+
+  pdfLoaded=true;
+}
 
 const instrumentData={
   MS:{
@@ -850,13 +904,18 @@ function expandSelection(level){
   }
 }
 
-function expandInstructions(){
+async function expandInstructions(){
   currentLevel=null;
   currentView='instructions';
   instrumentSelection.style.display='none';
   instructionsContent.style.display='block';
   contentSelection.classList.add('expanded');
   setActiveButton(instructionsBtn);
+
+  await new Promise(resolve=>requestAnimationFrame(resolve));
+
+  await loadInstructionsPDF();
+
   scrollToHeight(INSTRUCTIONS_HEIGHT);
 }
 
