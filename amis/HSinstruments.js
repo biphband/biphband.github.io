@@ -178,17 +178,19 @@ window.HSInstruments = {
       { image: "parts/HS-Percussion-1.jpg", alt: "Snare Drum etude",
         buttons: [ { track: 1, top: "18%" } ] },
       { image: "parts/HS-Percussion-2.jpg", alt: "Mallets / keyboard",
-        buttons: [ { track: 2, top: "14%" } ] },
+        buttons: [ { track: 2, top: "15%" }, { track: 3, top: "67%" } ] },
       { image: "parts/HS-Percussion-3.jpg", alt: "Timpani",
-        buttons: [ { track: 3, top: "14%" } ] }
+        buttons: [ { track: 4, top: "14%" } ] }
     ],
     tracks: {
       1: { title: "Track 1 – Snare Drum Etude", tempoFixed: null, tempoMin: 112, tempoMax: 120, defaultTempo: 116, tempoLabel: "♩ =", metronome: false,
            note: "Playfully ♩ = 112–120. No audible metronome on the recording." },
-      2: { title: "Track 2 – Mallets / Keyboard", tempoFixed: null, tempoMin: 80, tempoMax: 120, defaultTempo: 100, tempoLabel: "♩ =", metronome: false,
-           note: "No audible metronome (unless the sheet specifically requires it)." },
-      3: { title: "Track 3 – Timpani", tempoFixed: null, tempoMin: 80, tempoMax: 120, defaultTempo: 100, tempoLabel: "♩ =", metronome: false,
-           note: "No audible metronome (unless the sheet specifically requires it)." }
+      2: { title: "Track 2 – Mallets / Keyboard", tempoFixed: 160, tempoLabel: "♩ =", metronome: true,
+           note: "No audible metronome." },
+      3: { title: "Track 3 – Mallets / Keyboard", tempoFixed: null, tempoMin: 96, tempoMax: 110, defaultTempo: 100, tempoLabel: "♩ =", metronome: false,
+           note: "No audible metronome." },
+      4: { title: "Track 4 – Timpani", tempoFixed: null, tempoMin: 80, tempoMax: 120, defaultTempo: 100, tempoLabel: "♩ =", metronome: false,
+           note: "No audible metronome." },
     }
   },
 
