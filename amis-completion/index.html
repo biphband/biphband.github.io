@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AMIS Completion Rings</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BIPH Band">
+
+    <link rel="apple-touch-icon" href="https://cdn.glitch.global/bed65df6-4eb8-4247-853c-e198a6399561/icons%2FBGicon.png">
+    <link rel="icon" href="../icons/BGicon.png">
+    <link rel="stylesheet" href="../common-styles.css">
+
+    <style>
+        body {
+            user-select: none;
+        }
+
+        /* ==================== BOARD ==================== */
+
+        .checklist {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px 14px;
+            padding: 20px;
+        }
+
+        .student {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+
+            border: 2px solid rgba(255, 255, 255, 0);
+            padding: 16px 12px 14px;
+
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+
+            background: rgba(255,255,255,0.04);
+
+            transition:
+                opacity 0.3s,
+                transform 0.25s,
+                background 0.25s,
+                box-shadow 0.25s;
+        }
+
+        .student:hover {
+            background: rgba(255,255,255,0.09);
+        }
+
+        .student.highlight {
+            color: #154565;
+            background-color: #f0f8ff56;
+            border: 2px solid white;
+            transform: scale(1.04);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+
+        .student.found-all {
+            background: rgba(255,255,255,0.92);
+            color: #154565;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+        }
+
+        .student.absent {
+            opacity: 0.4;
+            text-decoration: line-through;
+            color: #888;
+            pointer-events: none;
+        }
+
+        .student-name {
+            font-size: 0.95em;
+            text-align: center;
+            line-height: 1.25;
+            max-width: 100%;
+            word-break: break-word;
+        }
+
+        /* ==================== RINGS ==================== */
+
+        .rings-wrap {
+            position: relative;
+            width: 76px;
+            height: 76px;
+        }
+
+        .ring-svg {
+            width: 76px;
+            height: 76px;
+            transform: rotate(-90deg);
+        }
+
+        .ring-bg {
+            fill: none;
+            stroke: rgba(255,255,255,0.15);
+            stroke-width: 5;
+        }
+
+        .ring-progress {
+            fill: none;
+            stroke-width: 5.5;
+            stroke-linecap: round;
+            stroke-dashoffset: 157;
+            transition:
+                stroke-dashoffset 0.55s
+                cubic-bezier(0.34, 1.4, 0.64, 1);
+        }
+
+        .ring-1 { stroke: #FF6384; }
+        .ring-2 { stroke: #36A2EB; }
+        .ring-3 { stroke: #4BC0C0; }
+        .ring-4 { stroke: #FFCD56; }
+        .ring-5 { stroke: #9966FF; }
+
+        .center-check {
+            position: absolute;
+            inset: 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 20px;
+            color: #4CAF50;
+
+            opacity: 0;
+            transform: scale(0.4);
+
+            transition:
+                all 0.45s
+                cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+            pointer-events: none;
+        }
+
+        .student.found-all .center-check {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ==================== TRACK LEGEND ==================== */
+
+        .task-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            width: 100%;
+            margin-top: 2px;
+        }
+
+        .task-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 3px 6px;
+            border-radius: 8px;
+
+            cursor: pointer;
+
+            transition: background 0.2s;
+
+            font-size: 0.72em;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.2;
+        }
+
+        .student.highlight .task-row,
+        .student.found-all .task-row {
+            color: #154565;
+        }
+
+        .task-row:hover {
+            background: rgba(255,255,255,0.12);
+        }
+
+        .student.found-all .task-row:hover {
+            background: rgba(21,69,101,0.1);
+        }
+
+        .task-dot {
+            width: 9px;
+            height: 9px;
+
+            border-radius: 50%;
+
+            background: rgba(255,255,255,0.2);
+
+            flex-shrink: 0;
+
+            transition:
+                background 0.3s,
+                transform 0.3s;
+        }
+
+        .task-dot.on-1 {
+            background: #FF6384;
+            transform: scale(1.2);
+        }
+
+        .task-dot.on-2 {
+            background: #36A2EB;
+            transform: scale(1.2);
+        }
+
+        .task-dot.on-3 {
+            background: #4BC0C0;
+            transform: scale(1.2);
+        }
+
+        .task-dot.on-4 {
+            background: #FFCD56;
+            transform: scale(1.2);
+        }
+
+        .task-dot.on-5 {
+            background: #9966FF;
+            transform: scale(1.2);
+        }
+
+        .task-label {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ==================== SCHOOL SWITCHER ==================== */
+
+        .Title {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .Title:hover {
+            opacity: 0.8;
+        }
+
+        /* ==================== SEARCH ==================== */
+
+        .search-container {
+            position: relative;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        #search-bar {
+            width: 100%;
+            padding: 15px;
+
+            font-size: 16px;
+
+            border: 2px dotted rgba(104,169,255,0.543);
+            border-radius: 8px;
+
+            outline: none;
+
+            transition: border-color 0.3s;
+
+            background-color: rgba(255,255,255,0.079);
+            color: #fbfbfbde;
+        }
+
+        #search-bar:focus {
+            border-color: #ffffff;
+        }
+
+        #search-bar::placeholder {
+            color: rgba(255,255,255,0.85);
+        }
+
+        .clear-button {
+            position: absolute;
+            right: -10px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            cursor: pointer;
+
+            color: rgba(255,255,255,0.637);
+
+            font-size: 18px;
+
+            background: none;
+            border: none;
+        }
+
+        /* ==================== POPUP ==================== */
+
+        .popup {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+
+            transform: translateX(-50%) scale(0);
+
+            background: #009688;
+            color: white;
+
+            padding: 20px 40px;
+            border-radius: 50px;
+
+            display: flex;
+            align-items: center;
+
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+
+            transition:
+                transform 0.5s
+                cubic-bezier(0.175,0.885,0.32,1.275);
+
+            z-index: 1001;
+        }
+
+        .popup.show {
+            transform: translateX(-50%) scale(1);
+        }
+
+        .popup .check-circle {
+            width: 30px;
+            height: 30px;
+
+            background: white;
+            border-radius: 50%;
+
+            margin-left: 15px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup .check-mark {
+            color: #009688;
+            font-size: 18px;
+        }
+
+        /* ==================== EDIT PANEL ==================== */
+
+        .edit-btn {
+            position: fixed;
+            top: 65px;
+            left: 20px;
+
+            font-size: 1.35em;
+
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+
+            border-radius: 50%;
+
+            width: 45px;
+            height: 45px;
+
+            cursor: pointer;
+            z-index: 999;
+
+            transition: all 0.3s;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.1);
+        }
+
+        #editPanel {
+            position: fixed;
+
+            top: 50%;
+            left: 50%;
+
+            transform: translate(-50%, -50%);
+
+            background: rgba(255,255,255,0.09);
+            backdrop-filter: blur(12px);
+
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 20px;
+
+            padding: 25px 30px;
+
+            width: 92%;
+            max-width: 420px;
+            max-height: 85vh;
+
+            overflow-y: auto;
+
+            display: none;
+
+            z-index: 2000;
+
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        #editPanel h3 {
+            margin: 0 0 20px 0;
+
+            text-align: center;
+
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .student-list {
+            max-height: 58vh;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 12px 16px;
+            margin-bottom: 8px;
+
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+
+            border: 1px solid rgba(255,255,255,0.1);
+
+            transition: all 0.2s ease;
+        }
+
+        .student-item span {
+            color: white;
+            font-size: 1.05em;
+        }
+
+        .student-item:hover {
+            background: rgba(255,255,255,0.16);
+        }
+
+        .remove-btn {
+            background: rgba(255,70,70,0.524);
+
+            color: white;
+
+            border: none;
+
+            padding: 7px 16px;
+            border-radius: 30px;
+
+            cursor: pointer;
+            font-size: 0.95em;
+
+            transition: all 0.2s;
+        }
+
+        .remove-btn:hover {
+            background: rgba(255,70,70,0.828);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+
+            padding: 14px;
+
+            font-size: 1.1em;
+
+            border-radius: 50px;
+            border: none;
+
+            background: rgba(255,255,255,0.135);
+
+            color: white;
+
+            cursor: pointer;
+
+            transition: all 0.3s;
+        }
+
+        .modal-buttons button:hover {
+            background: rgba(255,255,255,0.404);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="shared-menu"></div>
+    <script src="../menu.js"></script>
+
+    <button onclick="toggleEditPanel()" class="edit-btn">✏️</button>
+
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <div class="overlay2"></div>
+
+    <!-- CLICK THIS TO SWITCH BETWEEN MS AND HS -->
+    <h1 class="Title" id="schoolTitle">BIPH MS Band</h1>
+
+    <h1 class="Subtitle">Completion Rings</h1>
+
+    <div class="search-container">
+        <input
+            type="text"
+            id="search-bar"
+            placeholder="Search..."
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+        >
+
+        <button
+            class="clear-button"
+            onclick="clearSearch()"
+        >
+            ×
+        </button>
+    </div>
+
+    <div class="checklist" id="checklist"></div>
+
+    <div class="popup" id="popup">
+        All complete!
+
+        <div class="check-circle">
+            <div class="check-mark">✓</div>
+        </div>
+    </div>
+
+    <!-- ==================== EDIT PANEL ==================== -->
+
+    <div id="editPanel">
+
+        <h3>Edit Roster</h3>
+
+        <div class="student-list" id="studentList"></div>
+
+        <div class="modal-buttons">
+            <button onclick="toggleEditPanel()">
+                Done
+            </button>
+
+            <button onclick="resetToFullRoster()">
+                Reset Full Roster
+            </button>
+        </div>
+
+    </div>
+
+    <!-- ==================== LOGO ==================== -->
+
+    <div class="logocontainer">
+        <img
+            src="../icons/Full Logo White on Transparent.png"
+            alt="BASIS Logo"
+            class="logo"
+        >
+    </div>
+
+    <script>
+
+        const MS_ROSTER = [
+            { name: "Jacky", tracks: 4 },
+            { name: "Rebecca", tracks: 4 },
+            { name: "Shine", tracks: 4 },
+            { name: "Oscar", tracks: 4 },
+            { name: "Matthew", tracks: 4 },
+            { name: "Francis", tracks: 3 },
+            { name: "Jefferey", tracks: 3 },
+            { name: "Stella", tracks: 4 },
+            { name: "Kyla", tracks: 4 },
+            { name: "Rene", tracks: 4 },
+            { name: "Austen", tracks: 4 },
+            { name: "Zachary", tracks: 3 },
+            { name: "Grant", tracks: 4 },
+        ];
+
+        const HS_ROSTER = [
+            { name: "Anne", tracks: 5 },
+            { name: "Sophie", tracks: 5 },
+            { name: "Tyler", tracks: 5 },
+            { name: "Kerry", tracks: 5 },
+            { name: "Steven", tracks: 5 },
+            { name: "June", tracks: 5 },
+            { name: "Jesse", tracks: 4 },
+            { name: "Calvin", tracks: 5 },
+        ];
+
+
+        // ============================================================
+        // STATE
+        // ============================================================
+
+        let isHS = false;
+
+        let currentStudents = [];
+        let allStudents = [];
+
+        const completion = new Map();
+        const absentStudents = new Set();
+
+        const TOTAL_TRACKS = 5;
+
+
+        // ============================================================
+        // AUDIO
+        // ============================================================
+
+        function playChime() {
+            try {
+                const a = new Audio("audio/chime.mp3");
+                a.volume = 0.1;
+                a.play().catch(() => {});
+            } catch (e) {}
+        }
+
+        function playMultiChime() {
+            try {
+                const a = new Audio("audio/multichime.mp3");
+                a.volume = 0.15;
+                a.play().catch(() => {});
+            } catch (e) {}
+        }
+
+        function playYesSound() {
+            try {
+                const a = new Audio("audio/yes.mp3");
+                a.volume = 0.5;
+                a.play().catch(() => {});
+            } catch (e) {}
+        }
+
+        function playResetSound() {
+            try {
+                const a = new Audio("audio/reset.mp3");
+                a.volume = 0.2;
+                a.play().catch(() => {});
+            } catch (e) {}
+        }
+
+
+        // ============================================================
+        // SCHOOL SWITCHING
+        // ============================================================
+
+        const schoolTitle = document.getElementById("schoolTitle");
+
+        schoolTitle.addEventListener("click", () => {
+
+            isHS = !isHS;
+
+            schoolTitle.textContent =
+                isHS ? "BIPH HS Band" : "BIPH MS Band";
+
+            // Clear current board state when switching bands
+            completion.clear();
+            absentStudents.clear();
+
+            loadRoster();
+
+            clearSearch();
+
+        });
+
+
+        // ============================================================
+        // ROSTER MANAGEMENT
+        // ============================================================
+
+        function getActiveRoster() {
+            return isHS ? HS_ROSTER : MS_ROSTER;
+        }
+
+
+        function loadRoster() {
+
+            currentStudents = getActiveRoster().map(student => ({
+                name: student.name,
+                tracks: student.tracks
+            }));
+
+            allStudents = currentStudents.map(student => student.name);
+
+            allStudents.forEach(name => {
+
+                if (!completion.has(name)) {
+
+                    const student = currentStudents.find(
+                        s => s.name === name
+                    );
+
+                    completion.set(name, createCompletionState(
+                        student ? student.tracks : 3
+                    ));
+                }
+
+            });
+
+            loadCompletion();
+            initializeChecklist();
+        }
+
+
+        function createCompletionState(trackCount) {
+
+            const state = {
+                tracks: trackCount
+            };
+
+            for (let i = 1; i <= TOTAL_TRACKS; i++) {
+                state[i] = false;
+            }
+
+            return state;
+        }
+
+
+        function getStudent(name) {
+            return currentStudents.find(
+                student => student.name === name
+            );
+        }
+
+
+        function getStudentId(name) {
+
+            return "student-" +
+                name
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-");
+        }
+
+
+        // ============================================================
+        // COMPLETION
+        // ============================================================
+
+        function isComplete(name) {
+
+            const c = completion.get(name);
+
+            if (!c) return false;
+
+            for (let i = 1; i <= c.tracks; i++) {
+
+                if (!c[i]) {
+                    return false;
+                }
+
+            }
+
+            return true;
+        }
+
+
+        function setTask(name, track, on = true) {
+
+            if (absentStudents.has(name)) {
+                return;
+            }
+
+            const c = completion.get(name);
+
+            if (!c) {
+                return;
+            }
+
+            // Don't allow tracks beyond what this student needs
+            if (track > c.tracks) {
+                return;
+            }
+
+            if (c[track] === on) {
+                return;
+            }
+
+            const wasComplete = isComplete(name);
+
+            c[track] = on;
+            saveCompletion();
+
+            const el = document.getElementById(
+                getStudentId(name)
+            );
+
+            if (el) {
+
+                updateVisual(el, name);
+
+                if (on) {
+
+                    if (!wasComplete && isComplete(name)) {
+                        playMultiChime();
+                    } else {
+                        playChime();
+                    }
+
+                }
+
+            }
+
+            checkAllComplete();
+        }
+
+
+        function saveCompletion() {
+            const data = Object.fromEntries(completion);
+            localStorage.setItem(
+                isHS ? "biphHSCompletion" : "biphMSCompletion",
+                JSON.stringify(data)
+            );
+        }
+
+        function loadCompletion() {
+            const key = isHS
+                ? "biphHSCompletion"
+                : "biphMSCompletion";
+
+            const saved = localStorage.getItem(key);
+
+            if (!saved) return;
+
+            try {
+                const data = JSON.parse(saved);
+
+                Object.entries(data).forEach(([name, state]) => {
+                    completion.set(name, state);
+                });
+            } catch (e) {
+                console.warn("Could not load saved completion:", e);
+            }
+        }
+
+        // ============================================================
+        // NEXT TRACK
+        // ============================================================
+
+        function cycleNextTrack(name) {
+
+            const c = completion.get(name);
+
+            if (!c) {
+                return;
+            }
+
+            for (let i = 1; i <= c.tracks; i++) {
+
+                if (!c[i]) {
+
+                    setTask(name, i, true);
+
+                    return;
+                }
+
+            }
+
+        }
+
+
+        // ============================================================
+        // CREATE STUDENT CARD
+        // ============================================================
+
+        function createStudentElement(name) {
+
+            const student = getStudent(name);
+
+            if (!student) {
+                return null;
+            }
+
+            const trackCount = student.tracks;
+
+            const div = document.createElement("div");
+
+            div.className = "student";
+
+            div.id = getStudentId(name);
+
+            div.dataset.name = name;
+
+
+            // --------------------------------------------------------
+            // Rings
+            // --------------------------------------------------------
+
+            const wrap = document.createElement("div");
+
+            wrap.className = "rings-wrap";
+
+
+            let ringsHTML = `
+                <svg
+                    class="ring-svg"
+                    viewBox="0 0 76 76"
+                >
+            `;
+
+
+            // Five possible rings.
+            // Only the number the student needs are created.
+
+            for (let i = 1; i <= trackCount; i++) {
+
+                const radii = {
+                    1: 31,
+                    2: 25,
+                    3: 19,
+                    4: 13,
+                    5: 7
+                };
+
+                const r = radii[i];
+
+                ringsHTML += `
+                    <circle
+                        class="ring-bg"
+                        cx="38"
+                        cy="38"
+                        r="${r}"
+                    />
+
+                    <circle
+                        class="ring-progress ring-${i}"
+                        cx="38"
+                        cy="38"
+                        r="${r}"
+                        data-track="${i}"
+                    />
+                `;
+            }
+
+
+            ringsHTML += `
+                </svg>
+
+                <div class="center-check">
+                    ✓
+                </div>
+            `;
+
+
+            wrap.innerHTML = ringsHTML;
+
+            div.appendChild(wrap);
+
+
+            // --------------------------------------------------------
+            // Student name
+            // --------------------------------------------------------
+
+            const nameEl = document.createElement("div");
+
+            nameEl.className = "student-name";
+
+            nameEl.textContent = name;
+
+            div.appendChild(nameEl);
+
+
+            // --------------------------------------------------------
+            // Track legend
+            // --------------------------------------------------------
+
+            const legend = document.createElement("div");
+
+            legend.className = "task-legend";
+
+
+            for (let i = 1; i <= trackCount; i++) {
+
+                const row = document.createElement("div");
+
+                row.className = "task-row";
+
+                row.dataset.track = i;
+
+                row.title = `Toggle Track ${i}`;
+
+                row.innerHTML = `
+                    <div
+                        class="task-dot"
+                        data-track="${i}"
+                    ></div>
+
+                    <span class="task-label">
+                        Track ${i}
+                    </span>
+                `;
+
+
+                row.addEventListener("click", (e) => {
+
+                    e.stopPropagation();
+
+                    if (absentStudents.has(name)) {
+                        return;
+                    }
+
+                    const c = completion.get(name);
+
+                    if (!c) {
+                        return;
+                    }
+
+                    setTask(
+                        name,
+                        i,
+                        !c[i]
+                    );
+
+                });
+
+
+                legend.appendChild(row);
+
+            }
+
+
+            div.appendChild(legend);
+
+
+            // --------------------------------------------------------
+            // Card click
+            // --------------------------------------------------------
+
+            div.addEventListener("click", () => {
+
+                if (absentStudents.has(name)) {
+                    return;
+                }
+
+                cycleNextTrack(name);
+
+            });
+
+
+            updateVisual(div, name);
+
+            return div;
+        }
+
+
+        // ============================================================
+        // UPDATE VISUAL
+        // ============================================================
+
+        function updateVisual(el, name) {
+
+            const c = completion.get(name);
+
+            if (!c) {
+                return;
+            }
+
+
+            // Update rings
+
+            const svg = el.querySelector(".ring-svg");
+
+            for (let i = 1; i <= c.tracks; i++) {
+
+                const circle = svg.querySelector(
+                    `.ring-progress[data-track="${i}"]`
+                );
+
+                if (!circle) {
+                    continue;
+                }
+
+                const r = parseFloat(
+                    circle.getAttribute("r")
+                );
+
+                const circumference =
+                    2 * Math.PI * r;
+
+                circle.style.strokeDasharray =
+                    circumference;
+
+                circle.style.strokeDashoffset =
+                    c[i] ? 0 : circumference;
+
+            }
+
+
+            // Update dots
+
+            el.querySelectorAll(".task-dot").forEach(dot => {
+
+                const track = Number(
+                    dot.dataset.track
+                );
+
+                dot.className =
+                    "task-dot" +
+                    (c[track]
+                        ? ` on-${track}`
+                        : "");
+
+            });
+
+
+            // Completed appearance
+
+            if (isComplete(name)) {
+
+                el.classList.add("found-all");
+
+            } else {
+
+                el.classList.remove("found-all");
+
+            }
+
+        }
+
+
+        // ============================================================
+        // BUILD BOARD
+        // ============================================================
+
+        function initializeChecklist() {
+
+            const checklist =
+                document.getElementById("checklist");
+
+            checklist.innerHTML = "";
+
+
+            allStudents.forEach(name => {
+
+                if (absentStudents.has(name)) {
+                    return;
+                }
+
+                const element =
+                    createStudentElement(name);
+
+                if (element) {
+                    checklist.appendChild(element);
+                }
+
+            });
+
+        }
+
+
+        function refreshChecklist() {
+            initializeChecklist();
+        }
+
+
+        // ============================================================
+        // ALL COMPLETE
+        // ============================================================
+
+        function checkAllComplete() {
+
+            const visible =
+                Array.from(
+                    document.querySelectorAll(
+                        ".student:not(.absent)"
+                    )
+                );
+
+
+            const allDone =
+                visible.length > 0 &&
+                visible.every(
+                    el => isComplete(
+                        el.dataset.name
+                    )
+                );
+
+
+            const popup =
+                document.getElementById("popup");
+
+
+            if (allDone) {
+
+                popup.classList.add("show");
+
+                playYesSound();
+
+
+                setTimeout(() => {
+
+                    popup.classList.remove("show");
+
+                    resetAll();
+
+                }, 2200);
+
+            } else {
+
+                popup.classList.remove("show");
+
+            }
+
+        }
+
+
+        // ============================================================
+        // RESET
+        // ============================================================
+
+        function resetAll() {
+
+            allStudents.forEach(name => {
+
+                const student =
+                    getStudent(name);
+
+                if (!student) {
+                    return;
+                }
+
+                completion.set(
+                    name,
+                    createCompletionState(
+                        student.tracks
+                    )
+                );
+
+            });
+
+            saveCompletion();
+
+            document
+                .querySelectorAll(".student")
+                .forEach(el => {
+
+                    updateVisual(
+                        el,
+                        el.dataset.name
+                    );
+
+                });
+
+
+            clearSearch();
+
+            playResetSound();
+
+        }
+
+
+        // ============================================================
+        // EDIT PANEL
+        // ============================================================
+
+        function toggleEditPanel() {
+
+            const panel =
+                document.getElementById(
+                    "editPanel"
+                );
+
+
+            if (panel.style.display === "block") {
+
+                panel.style.display = "none";
+
+            } else {
+
+                refreshStudentList();
+
+                panel.style.display = "block";
+
+            }
+
+        }
+
+
+        function refreshStudentList() {
+
+            const list =
+                document.getElementById(
+                    "studentList"
+                );
+
+            list.innerHTML = "";
+
+
+            currentStudents.forEach(
+                (student, index) => {
+
+                    const div =
+                        document.createElement("div");
+
+                    div.className =
+                        "student-item";
+
+
+                    const span =
+                        document.createElement("span");
+
+                    span.textContent =
+                        `${student.name} (${student.tracks} tracks)`;
+
+
+                    const removeBtn =
+                        document.createElement("button");
+
+                    removeBtn.className =
+                        "remove-btn";
+
+                    removeBtn.textContent =
+                        "Remove";
+
+
+                    removeBtn.addEventListener(
+                        "click",
+                        function(e) {
+
+                            e.stopImmediatePropagation();
+
+                            removeStudent(index);
+
+                        }
+                    );
+
+
+                    div.appendChild(span);
+
+                    div.appendChild(removeBtn);
+
+                    list.appendChild(div);
+
+                }
+            );
+
+        }
+
+
+        function removeStudent(index) {
+
+            if (
+                index < 0 ||
+                index >= currentStudents.length
+            ) {
+                return;
+            }
+
+
+            const name =
+                currentStudents[index].name;
+
+
+            currentStudents.splice(index, 1);
+
+            allStudents =
+                currentStudents.map(
+                    student => student.name
+                );
+
+
+            completion.delete(name);
+
+            refreshStudentList();
+
+            refreshChecklist();
+
+        }
+
+
+        function resetToFullRoster() {
+
+            completion.clear();
+
+            absentStudents.clear();
+
+            loadRoster();
+
+            refreshStudentList();
+
+        }
+
+
+        // Close edit panel when clicking outside
+
+        document.addEventListener(
+            "click",
+            function(event) {
+
+                const panel =
+                    document.getElementById(
+                        "editPanel"
+                    );
+
+
+                if (
+                    panel.style.display === "block" &&
+                    !panel.contains(event.target) &&
+                    !event.target.closest(".edit-btn")
+                ) {
+
+                    toggleEditPanel();
+
+                }
+
+            }
+        );
+
+
+        // ============================================================
+        // SEARCH
+        // ============================================================
+
+        const searchBar =
+            document.getElementById(
+                "search-bar"
+            );
+
+
+        searchBar.addEventListener(
+            "input",
+            () => {
+
+                filterStudents(
+                    searchBar.value
+                );
+
+            }
+        );
+
+
+        function getVisibleStudents() {
+
+            return Array.from(
+                document.querySelectorAll(
+                    ".student:not(.absent)"
+                )
+            );
+
+        }
+
+
+        function filterStudents(query) {
+
+            const items =
+                getVisibleStudents();
+
+
+            const lowerQuery =
+                query.toLowerCase().trim();
+
+
+            items.forEach(el => {
+
+                const name =
+                    el.dataset.name.toLowerCase();
+
+
+                if (!lowerQuery) {
+
+                    el.style.opacity = "1";
+
+                } else if (
+                    name.includes(lowerQuery)
+                ) {
+
+                    el.style.opacity = "1";
+
+                } else {
+
+                    el.style.opacity = "0.18";
+
+                }
+
+            });
+
+        }
+
+
+        function clearSearch() {
+
+            searchBar.value = "";
+
+            getVisibleStudents().forEach(
+                el => {
+                    el.style.opacity = "1";
+                }
+            );
+
+            searchBar.blur();
+
+        }
+
+
+        // ============================================================
+        // INITIALIZE
+        // ============================================================
+
+        window.onload = () => {
+
+            loadRoster();
+
+        };
+
+    </script>
+
+</body>
+</html>
