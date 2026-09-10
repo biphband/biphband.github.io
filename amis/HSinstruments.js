@@ -187,9 +187,9 @@ window.HSInstruments = {
            note: "Playfully ♩ = 112–120. No audible metronome on the recording." },
       2: { title: "Track 2 – Mallets / Keyboard", tempoFixed: 160, tempoLabel: "♩ =", metronome: true,
            note: "No audible metronome." },
-      3: { title: "Track 3 – Mallets / Keyboard", tempoFixed: null, tempoMin: 96, tempoMax: 110, defaultTempo: 100, tempoLabel: "♩ =", metronome: false,
+      3: { title: "Track 3 – Mallets / Keyboard", tempoFixed: null, tempoMin: 96, tempoMax: 110, defaultTempo: 100, tempoLabel: "♩ =", metronome: false, countInBeats: 4,
            note: "No audible metronome." },
-      4: { title: "Track 4 – Timpani", tempoFixed: null, tempoMin: 80, tempoMax: 120, defaultTempo: 100, tempoLabel: "♩ =", metronome: false,
+      4: { title: "Track 4 – Timpani", tempoFixed: 90, tempoLabel: "♪ =", metronome: false, countInBeats: 3,
            note: "No audible metronome." },
     }
   },
