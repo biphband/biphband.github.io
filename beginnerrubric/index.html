@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Performance Rubric</title>
+<link rel="icon" href="../icons/BGicon.png">
+<style>
+  :root {
+    --ink: #1f2937;
+    --muted: #64748b;
+    --line: #cbd5e1;
+    --header: #172554;
+    --header-soft: #eef2ff;
+    --score-1: #fef2f2;
+    --score-2: #fff7ed;
+    --score-3: #fffbeb;
+    --score-4: #f0fdf4;
+    --score-5: #ecfdf5;
+    --paper: #ffffff;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    padding: 40px 24px;
+    background: #f1f5f9;
+    overflow-x: hidden;
+    color: var(--ink);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .rubric-wrap {
+    width: min(1500px, 100%);
+
+    margin: 0 auto;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  col.criteria {
+    width: 18%;
+  }
+
+  col.score {
+    width: 16.4%;
+  }
+
+  th,
+  td {
+    border: 1px solid var(--line);
+  }
+
+  thead th {
+    height: 112px;
+    padding: 18px 16px;
+    vertical-align: middle;
+  }
+
+  .title-cell {
+    background: var(--header);
+    color: white;
+    text-align: left;
+    padding: 20px 22px;
+  }
+
+  .title {
+    display: block;
+    font-size: clamp(18px, 2vw, 25px);
+    line-height: 1.08;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    display: block;
+    margin-top: 9px;
+    color: #c7d2fe;
+    font-size: clamp(10px, 1vw, 13px);
+    line-height: 1.35;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .score-head {
+    color: var(--ink);
+    text-align: center;
+    background: var(--header-soft);
+  }
+
+  .score-number {
+    display: block;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .score-label {
+    display: block;
+    font-size: 13px;
+    line-height: 1.2;
+    font-weight: 600;
+  }
+
+  .score-1 { background: var(--score-1); }
+  .score-2 { background: var(--score-2); }
+  .score-3 { background: var(--score-3); }
+  .score-4 { background: var(--score-4); }
+  .score-5 { background: var(--score-5); }
+
+  tbody tr {
+    height: 108px;
+  }
+
+  tbody tr:first-child {
+    height: 112px;
+  }
+
+  tbody tr.total-row {
+    height: 48px;
+  }
+
+  .total-label,
+  .total-score {
+    height: 48px;
+    padding: 8px 14px;
+    vertical-align: middle;
+  }
+
+  .total-label {
+    text-align: right;
+    background: #f8fafc;
+    font-weight: 700;
+  }
+
+  .total-score {
+    background: var(--header);
+    color: white;
+    text-align: center;
+    font-size: 19px;
+    font-weight: 700;
+  }
+
+  .total-score .total-percentage {
+    display: block;
+    line-height: 1;
+  }
+
+  .criterion {
+    padding: 18px 20px;
+    background: #f8fafc;
+    vertical-align: middle;
+    text-align: left;
+    font-size: 15px;
+    line-height: 1.35;
+    font-weight: 700;
+  }
+
+  .criterion small {
+    display: block;
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .entry {
+    min-height: 100%;
+    padding: 16px;
+    background: white;
+    vertical-align: top;
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .entry:focus {
+    outline: 3px solid #c7d2fe;
+    outline-offset: -3px;
+  }
+
+  .entry[contenteditable="true"]:empty::before {
+    content: "";
+  }
+
+
+  .score-choice {
+    cursor: pointer;
+    transition: box-shadow 0.12s ease, background 0.12s ease;
+    user-select: none;
+  }
+
+  .score-choice:hover {
+    box-shadow: inset 0 0 0 3px #94a3b8;
+  }
+
+  .score-choice.selected {
+    box-shadow: inset 0 0 0 4px #1d4ed8;
+    position: relative;
+  }
+
+  .score-choice.selected::after {
+    content: "✓";
+    position: absolute;
+    top: 7px;
+    right: 9px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #1d4ed8;
+    color: white;
+    font-size: 14px;
+    line-height: 22px;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  .page-changed .total-score {
+    box-shadow: inset 0 0 0 2px #c7d2fe;
+  }
+
+  @media (min-width: 1000px) {
+    .rubric-wrap {
+      min-height: 0;
+    }
+  }
+
+  @media (max-width: 700px) {
+    body {
+      padding: 12px;
+    }
+
+    .rubric-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      min-width: 760px;
+    }
+
+    thead th {
+      height: 96px;
+      padding: 12px;
+    }
+
+    tbody tr,
+    tbody tr:first-child {
+      height: 105px;
+    }
+
+    .criterion {
+      padding: 12px;
+      font-size: 13px;
+    }
+
+    .entry {
+      padding: 12px;
+    }
+  }
+
+
+  .student-name-input {
+    width: 100%;
+    display: block;
+    margin: 0;
+    padding: 8px 10px;
+    border: 1px solid rgba(255,255,255,0.65);
+    border-radius: 4px;
+    background: rgba(255,255,255,0.12);
+    color: white;
+    font: inherit;
+    font-size: clamp(18px, 2vw, 25px);
+    line-height: 1.08;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .student-name-input::placeholder {
+    color: rgba(255,255,255,0.72);
+  }
+
+  .student-name-input:focus {
+    outline: 3px solid #c7d2fe;
+    outline-offset: -3px;
+    background: rgba(255,255,255,0.18);
+  }
+
+  .entry {
+    position: relative;
+    cursor: pointer;
+    transition: box-shadow 0.12s ease, background 0.12s ease;
+  }
+
+  .entry.selected {
+    box-shadow: inset 0 0 0 4px #2563eb;
+    background: #dbeafe !important;
+  }
+
+  .entry.selected::after {
+    content: "✓";
+    position: absolute;
+    top: 7px;
+    right: 9px;
+    font-size: 18px;
+    line-height: 1;
+    font-weight: 800;
+    color: #1d4ed8;
+  }
+
+  .first-page .entry {
+    cursor: text;
+  }
+
+  .first-page .entry:not(.selected) {
+    background: white;
+  }
+
+  .total-row .criterion,
+  .total-row .total-cell {
+    background: #e2e8f0;
+    font-weight: 700;
+  }
+
+  .total-cell {
+    text-align: center;
+    vertical-align: middle;
+    padding: 14px 10px;
+    font-size: 18px;
+  }
+
+  .final-score-cell {
+    background: var(--header) !important;
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 24px;
+    font-weight: 800;
+    padding: 12px;
+    min-width: 120px;
+  }
+
+  .final-score-label {
+    display: block;
+    font-size: 11px;
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #c7d2fe;
+    margin-bottom: 4px;
+  }
+
+  .final-score-value {
+    display: block;
+    font-size: clamp(24px, 2.4vw, 32px);
+    line-height: 1;
+  }
+
+  .total-score-text {
+    font-size: 13px;
+    color: #475569;
+    font-weight: 600;
+  }
+
+  @media print {
+    .rubric-page {
+      margin: 0;
+      padding: 0;
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .rubric-page.print-hidden {
+      display: none !important;
+    }
+
+    .rubric-page.print-target {
+      display: block !important;
+    }
+
+    .rubric-page.print-target:last-of-type {
+      page-break-after: auto;
+      break-after: auto;
+    }
+
+    .student-name-input {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: white;
+    }
+
+    .entry.selected {
+      box-shadow: inset 0 0 0 2px #2563eb;
+    }
+
+    .entry.selected::after {
+      display: none;
+    }
+  }
+
+  @media print {
+    .page-nav { display: none; }
+
+    @page {
+      size: letter landscape;
+      margin: 0.35in;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: auto;
+    }
+
+    body {
+      padding: 0;
+      margin: 0;
+      background: white;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .rubric-wrap {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      border: 1px solid #9ca3af;
+      box-shadow: none;
+      overflow: visible;
+    }
+
+    table {
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: collapse;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    col.criteria {
+      width: 18%;
+    }
+
+    col.score {
+      width: 16.4%;
+    }
+
+    thead {
+      display: table-header-group;
+    }
+
+    thead tr {
+      height: 78px;
+    }
+
+    thead th {
+      height: 78px;
+      padding: 10px 12px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .title-cell {
+      padding: 12px 14px;
+      background: var(--header);
+      color: white;
+    }
+
+    .title {
+      font-size: 22px;
+    }
+
+    .subtitle {
+      font-size: 9px;
+      color: #c7d2fe;
+    }
+
+    .score-head {
+      background: var(--header-soft);
+    }
+
+    .score-number {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .score-label {
+      font-size: 11px;
+    }
+
+    tbody {
+      display: table-row-group;
+    }
+
+    tbody tr,
+    tbody tr:first-child {
+      height: 76px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    tbody tr:first-child {
+      height: 78px;
+    }
+
+    .criterion {
+      padding: 8px 10px;
+      font-size: 12px;
+      background: #f8fafc;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .criterion small {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .entry {
+      padding: 8px;
+      font-size: 13px;
+      background: white;
+    }
+
+    .score-1,
+    .score-2,
+    .score-3,
+    .score-4,
+    .score-5 {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .total-cell {
+      padding: 7px 8px;
+      font-size: 12px;
+    }
+
+    .final-score-cell {
+      padding: 7px;
+      font-size: 18px;
+    }
+
+    .final-score-label {
+      font-size: 8px;
+      margin-bottom: 2px;
+    }
+
+    .final-score-value {
+      font-size: 22px;
+    }
+
+    th,
+    td {
+      border: 1px solid #9ca3af;
+    }
+  }
+
+  /* Student-page navigation and student-specific rubric pages */
+  .page-nav {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+
+  .stepper {
+    pointer-events: auto;
+    width: 44px;
+    height: 44px;
+    border: 1px solid #94a3b8;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.94);
+    color: #172554;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(15,23,42,0.12);
+  }
+
+  .stepper:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .rubric-page {
+    display: none;
+  }
+
+  .rubric-page.active {
+    display: block;
+  }
+
+  .student-page .student-name {
+    display: inline-block;
+    min-width: 90px;
+    font-size: clamp(18px, 2vw, 25px);
+    line-height: 1.08;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    cursor: text;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: inherit;
+    padding: 0;
+  }
+
+  .student-page .student-name:focus {
+    outline: none;
+  }
+
+  .student-page .entry { cursor: pointer; }
+
+  .student-page .entry[contenteditable="true"]:empty::before {
+    content: "";
+  }
+
+
+</style>
+</head>
+<body>
+  <nav class="page-nav" aria-label="Rubric page navigation">
+    <button class="stepper" id="prev-page" type="button" aria-label="Previous rubric page">‹</button>
+    <button class="stepper" id="next-page" type="button" aria-label="Next rubric page">›</button>
+  </nav>
+
+  <!-- PAGE 1: Original rubric, preserved as the starting page -->
+  <section class="rubric-page first-page active" data-page="0">
+    <main class="rubric-wrap">
+      <table>
+        <colgroup>
+          <col class="criteria">
+          <col class="score">
+          <col class="score">
+          <col class="score">
+          <col class="score">
+          <col class="score">
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="title-cell">
+              <input class="student-name-input" id="custom-student-name" type="text" placeholder="Name" aria-label="Student name">
+              <span class="subtitle">Performance Rubric</span>
+            </th>
+            <th class="score-head score-1"><span class="score-number">1</span><span class="score-label">Poor</span></th>
+            <th class="score-head score-2"><span class="score-number">2</span><span class="score-label">Needs<br>Improvement</span></th>
+            <th class="score-head score-3"><span class="score-number">3</span><span class="score-label">Passable</span></th>
+            <th class="score-head score-4"><span class="score-number">4</span><span class="score-label">Good</span></th>
+            <th class="score-head score-5"><span class="score-number">5</span><span class="score-label">Excellent</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th class="criterion">Holding instrument properly</th>
+            <td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td>
+          </tr>
+          <tr>
+            <th class="criterion">Sustained Long notes</th>
+            <td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td>
+          </tr>
+          <tr>
+            <th class="criterion">Posture</th>
+            <td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td>
+          </tr>
+          <tr>
+            <th class="criterion">Pitch accuracy</th>
+            <td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td>
+          </tr>
+          <tr>
+            <th class="criterion">Rhythm accuracy</th>
+            <td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td><td class="entry" contenteditable="true"></td>
+          </tr>
+          <tr class="total-row">
+            <th class="criterion">Total</th>
+            <td class="total-cell" colspan="4"><span class="total-score-text">0 / 25</span></td>
+            <td class="final-score-cell" id="first-final-score"><span class="final-score-label">Final Score</span><span class="final-score-value">0%</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
+  </section>
+
+  <!-- Student-specific pages are generated below from the JS data. -->
+  <div id="student-pages"></div>
+
+  <script>
+    /*
+      STUDENT ROSTER
+      Replace these placeholder names with your actual students.
+      Instrument controls which comments are loaded on that student's page.
+    */
+    const STUDENTS = [
+      { name: "Anton",   instrument: "trumpet" },
+      { name: "Daniel",    instrument: "trumpet" },
+      { name: "Jason",  instrument: "flute" },
+      { name: "Kyra", instrument: "viola" },
+      { name: "Coco", instrument: "cello" },
+      { name: "Felix", instrument: "cello" }
+    ];
+
+    /*
+      Each row contains comments for scores 1–5.
+      These are deliberately written in teacher voice: instructional,
+      constructive, and specific to the instrument.
+    */
+    const COMMENTS = {
+      trumpet: {
+        "Holding instrument properly": [
+          "Student needs to establish the correct two-hand grip before playing; Student should keep the instrument supported securely and avoid letting either hand drift from its assigned position.",
+          "Student needs to demonstrate a more consistent two-hand hold; Student should keep Student's fingers and thumbs in the correct pinky/thumb supports and keep the valve fingers positioned naturally.",
+          "Student's basic trumpet hold is in place; Student should continue keeping both hands secure and the fingers ready over the valves while Student plays.",
+          "Student holds the trumpet securely and consistently, with the fingers and thumbs placed correctly and the valve fingers ready to move.",
+          "Student holds the trumpet with excellent control; both hands are secure, the fingers and thumbs use the correct supports, and the valve fingers remain naturally positioned and ready to play."
+        ],
+        "Long notes": [
+          "Student needs to sustain each note for the full value while maintaining a steady, supported sound; Student should focus on keeping the air moving throughout the note.",
+          "Student's notes are beginning to sustain, but the sound and air support are not yet consistent from beginning to end.",
+          "Student can sustain the assigned notes for the expected duration; Student should continue working toward a steadier air stream and more consistent tone.",
+          "Student sustains notes with good control and a generally steady tone; Student should keep the air support consistent all the way through each note.",
+          "Student sustains long notes with excellent breath support and a centered, steady trumpet tone from the beginning of the note through its full value."
+        ],
+        "Posture": [
+          "Student needs to sit or stand taller and keep the shoulders relaxed so that Student's breathing and instrument position are not restricted.",
+          "Student's posture is developing, but Student needs to correct slouching and keep the shoulders and arms relaxed while playing.",
+          "Student's playing posture is functional; Student should continue keeping Student's back comfortably tall, shoulders relaxed, and head in a natural position.",
+          "Student maintains good playing posture with a tall, relaxed body position that supports comfortable breathing and consistent playing.",
+          "Student maintains excellent posture throughout playing; Student's body is balanced and relaxed, allowing free breathing and efficient trumpet technique."
+        ],
+        "Pitch accuracy": [
+          "Student needs to slow down and listen carefully to each pitch; Student should use the instrument's response and Student's ear to make deliberate corrections.",
+          "Student is beginning to match some pitches, but Student needs to listen more carefully and make quicker adjustments when a note is out of tune.",
+          "Most pitches are recognizable and generally accurate; Student should continue listening closely to the center of each note and correcting small adjustments.",
+          "Student plays pitches accurately and consistently, with only occasional adjustments needed; Student should continue using Student's ear to center each note.",
+          "Student demonstrates excellent pitch awareness and consistently center notes with accurate listening and controlled trumpet technique."
+        ],
+        "Rhythm accuracy": [
+          "Student needs to keep a steady pulse and count the full values before changing notes; practice slowly with the beat.",
+          "Student's rhythm is developing, but Student sometimes rush or hold notes too long; count carefully and stay connected to the pulse.",
+          "Student maintains the basic rhythmic pattern; Student should continue counting internally so entrances, releases, and note values stay consistent.",
+          "Student performs the rhythms accurately with a steady pulse and clear note values; Student should continue maintaining that consistency at faster tempos.",
+          "Student demonstrates excellent rhythmic control, keeping a steady pulse and executing note values and entrances precisely."
+        ]
+      },
+
+      flute: {
+        "Holding instrument properly": [
+          "Student needs to keep the fingers close to the keys and the hands relaxed; Student should avoid letting the fingers collapse or drift away from their playing positions.",
+          "Student's hand position is developing, but keep each finger resting directly over its assigned key so it is ready to play without unnecessary movement.",
+          "Student's basic flute hand position is established; Student should continue keeping the fingers directly over the keys, even when those fingers are not currently playing.",
+          "Student maintains a secure, relaxed flute position with the fingers consistently poised directly over the keys and ready to play.",
+          "Student holds the flute with excellent control; both hands remain relaxed and every finger stays directly over its key, ready for immediate movement."
+        ],
+        "Long notes": [
+          "Student needs to support each note with a steady airstream and sustain the full value without the tone dropping away.",
+          "Student's notes are starting to sustain, but the airstream and tone become uneven; Student should focus on continuous, supported air.",
+          "Student sustains the assigned notes for the expected duration; Student should continue developing an even airstream and stable tone.",
+          "Student sustains notes with good breath support and a steady, focused tone throughout most of the note.",
+          "Student sustains long notes with excellent breath control, producing a steady, focused tone from the beginning through the full value."
+        ],
+        "Posture": [
+          "Student needs to sit or stand taller, keep the shoulders relaxed, and bring the flute to a comfortable position rather than leaning toward it.",
+          "Student's posture is improving, but continue correcting slouching and unnecessary tension in the shoulders, neck, and arms.",
+          "Student's posture supports playing adequately; Student should continue keeping the spine comfortably tall and the shoulders relaxed.",
+          "Student maintains good flute posture with a balanced body position, relaxed shoulders, and a comfortable instrument angle.",
+          "Student maintains excellent, relaxed posture throughout playing, allowing free breathing and efficient movement of the hands and fingers."
+        ],
+        "Pitch accuracy": [
+          "Student needs to listen carefully to the center of each pitch and use steady air support before attempting to correct individual notes.",
+          "Some pitches are accurate, but Student needs to listen more closely and make consistent adjustments when notes are sharp or flat.",
+          "Student produces generally accurate pitches; Student should continue listening for the center of each note and making small corrections when needed.",
+          "Student plays with good pitch accuracy and make appropriate adjustments when necessary; Student should continue developing a consistent, centered sound.",
+          "Student demonstrates excellent pitch awareness, consistently producing centered pitches with careful listening and controlled air support."
+        ],
+        "Rhythm accuracy": [
+          "Student needs to keep a steady pulse and count each note value carefully so that entrances and releases happen in the correct place.",
+          "Student's rhythm is developing, but Student sometimes rush or lose the pulse; count steadily and keep Student's fingers moving with the beat.",
+          "Student follows the basic rhythmic pattern and maintain the pulse most of the time; Student should continue counting through rests and longer notes.",
+          "Student perform rhythms accurately with a steady pulse and clear coordination between the fingers, tongue, and beat.",
+          "Student demonstrates excellent rhythmic accuracy, maintaining a steady pulse and coordinating fingers, articulation, and note values precisely."
+        ]
+      },
+
+      viola: {
+        "Holding instrument properly": [
+          "Student needs to establish a stable violin-family setup: keep the viola supported securely, the bow balanced in the right hand, and the left hand free rather than gripping the neck.",
+          "Student's setup is developing, but continue relaxing the left hand and maintaining a balanced bow hold while keeping the viola securely supported.",
+          "Student maintains a functional viola position; Student should continue keeping the instrument stable while allowing both hands to remain relaxed and ready to move.",
+          "Student holds the viola securely and comfortably, with a balanced bow hand and a relaxed left hand that supports accurate finger placement.",
+          "Student demonstrates excellent instrument setup; the viola is securely supported, the bow hand is balanced, and the left hand remains relaxed and independent."
+        ],
+        "Long notes": [
+          "Student needs to draw the bow for the full value of each note while maintaining steady contact and an even tone.",
+          "Student's bow strokes are beginning to sustain, but the sound becomes uneven; Student should focus on consistent bow speed, contact, and pressure.",
+          "Student sustains the assigned notes for the expected duration; Student should continue working toward an even bow stroke and stable tone.",
+          "Student sustains long notes with good bow control, maintaining a generally even tone and consistent contact with the string.",
+          "Student sustains long notes with excellent bow control, producing a full, even tone through the entire bow stroke."
+        ],
+        "Posture": [
+          "Student needs to keep the body balanced and relaxed, with the shoulders free and the viola supported without raising or tightening the left shoulder.",
+          "Student's posture is developing, but continue releasing shoulder tension and keeping the head, torso, and arms comfortably aligned.",
+          "Student's playing posture is functional; Student should continue maintaining a balanced stance and relaxed shoulders while keeping the viola stable.",
+          "Student maintains good viola posture with a balanced stance, relaxed shoulders, and comfortable alignment of the arms and instrument.",
+          "Student maintains excellent posture throughout playing; the body stays balanced and relaxed, supporting free movement and efficient technique."
+        ],
+        "Pitch accuracy": [
+          "Student needs to listen closely to each pitch and check left-hand finger placement before moving on; slow practice will help establish reliable intonation.",
+          "Student is finding some pitches accurately, but the left hand needs more consistent placement; Student should listen carefully and adjust each finger as needed.",
+          "Most pitches are generally accurate; Student should continue refining left-hand placement and listening for the center of each note.",
+          "Student plays with good intonation and make appropriate left-hand adjustments; Student should continue listening carefully for small pitch differences.",
+          "Student demonstrates excellent pitch awareness and consistent left-hand placement, producing centered and reliable intonation."
+        ],
+        "Rhythm accuracy": [
+          "Student needs to count steadily and coordinate each bow change with the pulse; practice slowly enough to keep the beat consistent.",
+          "Student's rhythm is developing, but bow changes and note lengths sometimes interrupt the pulse; Student should keep counting while Student plays.",
+          "Student follow the basic rhythm and maintain the pulse most of the time; Student should continue coordinating bow distribution with the beat.",
+          "Student perform rhythms accurately with a steady pulse and well-coordinated bow changes and note values.",
+          "Student demonstrates excellent rhythmic control, maintaining a steady pulse and coordinating bow distribution, finger changes, and note values precisely."
+        ]
+      },
+
+      cello: {
+        "Holding instrument properly": [
+          "Student needs to establish a stable cello setup: keep the instrument securely supported, maintain a balanced bow hold, and avoid gripping the neck with the left hand.",
+          "Student's setup is developing, but continue relaxing the left hand and keeping the bow hand balanced while keeping the cello securely supported against the body.",
+          "Student maintains a functional cello position; Student should continue keeping the instrument stable while both hands stay relaxed and ready to move.",
+          "Student holds and support the cello securely, with a balanced bow hand and a relaxed left hand that allows accurate finger placement.",
+          "Student demonstrates excellent cello setup; the instrument is securely supported, the bow hold is balanced, and the left hand remains relaxed and independent."
+        ],
+        "Long notes": [
+          "Student needs to use the bow for the full value of each note and maintain steady contact with the string from beginning to end.",
+          "Student's bow strokes are beginning to sustain, but the tone becomes uneven; Student should focus on consistent bow speed, contact, and pressure.",
+          "Student sustains the assigned notes for the expected duration; Student should continue developing an even bow stroke and stable, resonant tone.",
+          "Student sustains long notes with good bow control, maintaining consistent contact and a generally even cello tone.",
+          "Student sustains long notes with excellent bow control and a full, resonant tone that remains even throughout the complete bow stroke."
+        ],
+        "Posture": [
+          "Student needs to sit with a balanced, upright position and keep the shoulders relaxed so the cello and bow arm can move freely.",
+          "Student's posture is developing, but continue correcting slouching and releasing tension in the shoulders, neck, and arms.",
+          "Student's playing posture is functional; Student should continue sitting tall and balanced while keeping the shoulders relaxed.",
+          "Student maintains good cello posture with a balanced seated position, relaxed shoulders, and comfortable alignment of the instrument and arms.",
+          "Student maintains excellent posture throughout playing; Student's seated position is balanced and relaxed, supporting free movement and efficient cello technique."
+        ],
+        "Pitch accuracy": [
+          "Student needs to slow down and check each left-hand finger placement carefully while listening for the center of every pitch.",
+          "Student is finding some pitches accurately, but the left hand needs more consistent placement; Student should listen closely and make deliberate adjustments.",
+          "Most pitches are generally accurate; Student should continue refining left-hand placement and listening carefully for small intonation adjustments.",
+          "Student plays with good intonation and consistent left-hand technique, making appropriate adjustments when needed.",
+          "Student demonstrates excellent pitch awareness and reliable left-hand technique, producing accurate and centered intonation."
+        ],
+        "Rhythm accuracy": [
+          "Student needs to count steadily and coordinate each bow stroke with the pulse so that entrances, releases, and note values are secure.",
+          "Student's rhythm is developing, but bow changes and note lengths sometimes affect the pulse; Student should continue counting while Student plays.",
+          "Student follows the basic rhythmic pattern and maintain the pulse most of the time; Student should continue coordinating bow distribution with the beat.",
+          "Student perform rhythms accurately with a steady pulse and well-coordinated bow changes, finger changes, and note values.",
+          "Student demonstrates excellent rhythmic control, maintaining a steady pulse and coordinating bow distribution, left-hand changes, and note values precisely."
+        ]
+      }
+    };
+
+    const CRITERIA = [
+      "Holding instrument properly",
+      "Long notes",
+      "Posture",
+      "Pitch accuracy",
+      "Rhythm accuracy"
+    ];
+
+    const SCORE_LABELS = [
+      ["1", "Poor"],
+      ["2", "Needs<br>Improvement"],
+      ["3", "Passable"],
+      ["4", "Good"],
+      ["5", "Excellent"]
+    ];
+
+    const studentPages = document.getElementById("student-pages");
+    const firstPage = document.querySelector(".first-page");
+    const firstNameInput = document.getElementById("custom-student-name");
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function buildTotalRow(idPrefix = "") {
+      return `
+        <tr class="total-row">
+          <th class="criterion">Total</th>
+          <td class="total-cell" colspan="4"><span class="total-score-text">0 / 25</span></td>
+          <td class="final-score-cell" id="${idPrefix}final-score">
+            <span class="final-score-label">Final Score</span>
+            <span class="final-score-value">0%</span>
+          </td>
+        </tr>
+      `;
+    }
+
+    function updatePageScore(page) {
+      const rows = Array.from(page.querySelectorAll("tbody tr:not(.total-row)"));
+      let total = 0;
+
+      rows.forEach(row => {
+        const selected = row.querySelector(".entry.selected");
+        if (selected) total += Number(selected.dataset.score || 0);
+      });
+
+      const totalText = page.querySelector(".total-score-text");
+      const scoreValue = page.querySelector(".final-score-value");
+      if (totalText) totalText.textContent = `${total} / 25`;
+      if (scoreValue) scoreValue.textContent = `${Math.round((total / 25) * 100)}%`;
+
+      return total;
+    }
+
+    function markPageChanged(page) {
+      page.dataset.changed = "true";
+      updatePageScore(page);
+    }
+
+    function selectScoreCell(cell) {
+      const row = cell.closest("tr");
+      const page = cell.closest(".rubric-page");
+      if (!row || !page) return;
+
+      row.querySelectorAll(".entry").forEach(entry => entry.classList.remove("selected"));
+      cell.classList.add("selected");
+      markPageChanged(page);
+    }
+
+    function setupFirstPage() {
+      const entries = Array.from(firstPage.querySelectorAll(".entry"));
+
+      entries.forEach((entry, index) => {
+        entry.dataset.score = String((index % 5) + 1);
+
+        entry.addEventListener("input", () => {
+          const row = entry.closest("tr");
+
+          // Typing a comment selects this score and clears the other score boxes
+          // for that criterion, so one row always represents one chosen score.
+          if (entry.textContent.trim()) {
+            row.querySelectorAll(".entry").forEach(other => {
+              if (other !== entry) other.textContent = "";
+              other.classList.remove("selected");
+            });
+            entry.classList.add("selected");
+          } else {
+            entry.classList.remove("selected");
+          }
+
+          markPageChanged(firstPage);
+        });
+
+        entry.addEventListener("click", () => {
+          // Clicking an empty first-page box simply makes it the active score.
+          // The user can then type their comment into that box.
+          selectScoreCell(entry);
+          markPageChanged(firstPage);
+        });
+      });
+
+      firstNameInput.addEventListener("input", () => {
+        markPageChanged(firstPage);
+      });
+    }
+
+    function buildStudentPage(student, index) {
+      const section = document.createElement("section");
+      section.className = "rubric-page student-page";
+      section.dataset.page = String(index + 1);
+      section.dataset.changed = "false";
+
+      const rows = CRITERIA.map((criterion) => {
+        const comments = COMMENTS[student.instrument][criterion];
+        return `
+          <tr>
+            <th class="criterion">${criterion}${criterion === "Holding instrument properly" ? "<small>(both hands)</small>" : criterion === "Long notes" ? "<small>(sustained with good tone)</small>" : ""}</th>
+            ${comments.map((comment, scoreIndex) => `
+              <td class="entry" data-score="${scoreIndex + 1}" tabindex="0" aria-label="${scoreIndex + 1} points: ${escapeHtml(comment)}">${escapeHtml(comment)}</td>
+            `).join("")}
+          </tr>
+        `;
+      }).join("");
+
+      section.innerHTML = `
+        <main class="rubric-wrap">
+          <table>
+            <colgroup>
+              <col class="criteria">
+              <col class="score"><col class="score"><col class="score"><col class="score"><col class="score">
+            </colgroup>
+            <thead>
+              <tr>
+                <th class="title-cell">
+                  <span class="student-name">${escapeHtml(student.name)}</span>
+                  <span class="subtitle">Performance Rubric • ${escapeHtml(student.instrument)}</span>
+                </th>
+                ${SCORE_LABELS.map(([number, label], i) => `
+                  <th class="score-head score-${i + 1}">
+                    <span class="score-number">${number}</span>
+                    <span class="score-label">${label}</span>
+                  </th>
+                `).join("")}
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+              ${buildTotalRow(`student-${index + 1}-`)}
+            </tbody>
+          </table>
+        </main>
+      `;
+
+      section.querySelectorAll(".entry").forEach(entry => {
+        entry.addEventListener("click", () => selectScoreCell(entry));
+        entry.addEventListener("keydown", event => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            selectScoreCell(entry);
+          }
+        });
+      });
+
+      return section;
+    }
+
+    STUDENTS.forEach((student, index) => {
+      studentPages.appendChild(buildStudentPage(student, index));
+    });
+
+    // First page gets its score structure wired after the static HTML is in place.
+    setupFirstPage();
+    updatePageScore(firstPage);
+
+    const pages = Array.from(document.querySelectorAll(".rubric-page"));
+    const prevButton = document.getElementById("prev-page");
+    const nextButton = document.getElementById("next-page");
+    let currentPage = 0;
+
+    function getSelectedScores(page) {
+      return Array.from(page.querySelectorAll("tbody tr:not(.total-row)")).map(row => {
+        const selected = row.querySelector(".score-choice.selected, .entry.selected");
+        return selected ? Number(selected.dataset.score || 0) : 0;
+      });
+    }
+
+    function updateTotal(page) {
+      const scores = getSelectedScores(page);
+      const total = scores.reduce((sum, score) => sum + score, 0);
+      const percentage = Math.round((total / 25) * 100);
+      const totalCell = page.querySelector(".total-percentage");
+      if (totalCell) totalCell.textContent = `${percentage}%`;
+      return total;
+    }
+
+    function markChanged(page) {
+      page.classList.add("page-changed");
+    }
+
+    function selectScore(cell) {
+      const row = cell.closest("tr");
+      if (!row || row.classList.contains("total-row")) return;
+
+      row.querySelectorAll(".score-choice, .entry").forEach(other => {
+        if (other !== cell) other.classList.remove("selected");
+      });
+
+      cell.classList.add("selected");
+      const page = cell.closest(".rubric-page");
+      markChanged(page);
+      updateTotal(page);
+    }
+
+    function initializePage(page, isFirstPage = false) {
+      if (isFirstPage) {
+        const name = page.querySelector("#custom-student-name");
+        if (name) {
+          name.addEventListener("input", () => {
+            markChanged(page);
+          });
+
+          name.addEventListener("keydown", event => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              name.blur();
+            }
+          });
+        }
+
+        page.querySelectorAll(".entry").forEach(cell => {
+          cell.addEventListener("input", () => {
+            // The first non-empty comment in a criterion determines its score.
+            const row = cell.closest("tr");
+            row.querySelectorAll(".entry").forEach(other => {
+              if (other !== cell) other.classList.remove("selected");
+            });
+
+            if (cell.textContent.trim()) {
+              cell.classList.add("selected");
+            } else {
+              cell.classList.remove("selected");
+            }
+
+            markChanged(page);
+            updateTotal(page);
+          });
+
+          cell.addEventListener("focus", () => {
+            cell.classList.add("editing");
+          });
+
+          cell.addEventListener("blur", () => {
+            cell.classList.remove("editing");
+          });
+        });
+      } else {
+        page.querySelectorAll(".score-choice").forEach(cell => {
+          cell.addEventListener("click", () => selectScore(cell));
+          cell.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              selectScore(cell);
+            }
+          });
+        });
+      }
+
+      updateTotal(page);
+    }
+
+    pages.forEach((page, index) => initializePage(page, index === 0));
+
+    function showPage(pageIndex) {
+      currentPage = Math.max(0, Math.min(pageIndex, pages.length - 1));
+      pages.forEach((page, index) => page.classList.toggle("active", index === currentPage));
+      prevButton.disabled = currentPage === 0;
+      nextButton.disabled = currentPage === pages.length - 1;
+      document.title = currentPage === 0
+        ? "Performance Rubric"
+        : `${STUDENTS[currentPage - 1].name} • Performance Rubric`;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    prevButton.addEventListener("click", () => showPage(currentPage - 1));
+    nextButton.addEventListener("click", () => showPage(currentPage + 1));
+
+    document.addEventListener("keydown", (event) => {
+      if (!event.metaKey || (event.key !== "ArrowLeft" && event.key !== "ArrowRight")) return;
+
+      event.preventDefault();
+      showPage(currentPage + (event.key === "ArrowRight" ? 1 : -1));
+    });
+
+    // Print only rubrics that have actually been changed.
+    window.addEventListener("beforeprint", () => {
+      pages.forEach(page => {
+        page.classList.toggle("print-enabled", page.classList.contains("page-changed"));
+      });
+    });
+
+    window.addEventListener("afterprint", () => {
+      pages.forEach(page => page.classList.remove("print-enabled"));
+    });
+  </script>
+</body>
+</html>
