@@ -101,14 +101,15 @@
             padding-bottom: 10px;
         }
 
-        .logo {
-            position: fixed;
-            right: 10px;
-            bottom: 10px;
-            width: 25vh;
-            height: auto;
-            z-index: 10; 
-        }
+.logo {
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    width: 25vh;
+    height: auto;
+    z-index: 10;
+    cursor: default;
+}
 
         .Title {
             font-family: 'Andika', system-ui, -apple-system, sans-serif;
@@ -329,8 +330,10 @@
     </a>
 </div>
 
-    <div class="logocontainer">        
-        <img src="logo.png" alt="BASIS Logo" class="logo">
+    <div class="logocontainer">
+        <a href="https://biphmusic.github.io" aria-label="Visit BIPH Music">
+            <img src="logo.png" alt="BASIS Logo" class="logo">
+        </a>
     </div>
 
     <script>
@@ -365,7 +368,7 @@
             if (day < 1 || day > 5) return false;
 
             // 10:00 AM to 11:45 AM inclusive
-            if (hour === 6 || (hour === 11 && minute <= 30)) {
+            if (hour === 10 || (hour === 11 && minute <= 30)) {
                 return true;
             }
             return false;
@@ -379,12 +382,6 @@
             window.scrollTo(0, 0);
             document.documentElement.scrollTop = 0;
             document.body.scrollTop = 0;
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            if (isSpecialTime()) {
-                redirectToTheory();
-            }
         });
     </script>
 </body>
