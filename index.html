@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="BIPH Band">
     <link rel="apple-touch-icon" href="icons/BGicon.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     
     <link rel="icon" href="icons/BGicon.png">
 
@@ -282,6 +282,20 @@
         .button:hover .button-icon {
             transform: scale(1.2);
         }
+
+        /* Aggressively disable browser zoom gestures */
+        html, body {
+            touch-action: pan-x pan-y;
+            overscroll-behavior: none;
+            -ms-content-zooming: none;
+            -ms-touch-action: pan-x pan-y;
+        }
+
+        /* Prevent text selection and touch callout zoom-related interactions */
+        * {
+            -webkit-text-size-adjust: 100%;
+            -webkit-touch-callout: none;
+        }
     </style>
 </head>
 <body>
@@ -382,6 +396,39 @@
             window.scrollTo(0, 0);
             document.documentElement.scrollTop = 0;
             document.body.scrollTop = 0;
+        });
+
+
+
+        // Block browser zoom keyboard shortcuts
+        document.addEventListener('keydown', function (event) {
+            if (
+                (event.ctrlKey || event.metaKey) &&
+                ['+', '-', '=', '0'].includes(event.key)
+            ) {
+                event.preventDefault();
+            }
+        });
+
+        // Block Ctrl/Cmd + mouse-wheel zoom
+        document.addEventListener('wheel', function (event) {
+            if (event.ctrlKey || event.metaKey) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        // Block common multi-touch pinch gestures
+        document.addEventListener('touchmove', function (event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        // Block Safari gesture events, including pinch gestures
+        ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (type) {
+            document.addEventListener(type, function (event) {
+                event.preventDefault();
+            }, { passive: false });
         });
     </script>
 </body>
