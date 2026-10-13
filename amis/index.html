@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +12,7 @@
 <link rel="icon" href="../icons/BGicon.png">
 <link href="/tailwind.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
 @font-face {
   font-family:'Zapfino';
@@ -26,9 +28,7 @@
   --text:#222;
   --muted:#666;
 }
-* {
-  box-sizing:border-box;
-}
+* { box-sizing:border-box; }
 body {
   background:linear-gradient(145deg,#0d2470 0%,#113299 45%,#1e3a8a 100%);
   font-family:'Roboto',system-ui,-apple-system,sans-serif;
@@ -42,9 +42,7 @@ body {
   padding:24px;
   position:relative;
 }
-body.level-select-mode {
-  overflow-y:hidden;
-}
+body.level-select-mode { overflow-y:hidden; }
 .container {
   width:80%;
   max-width:800px;
@@ -113,17 +111,13 @@ body.level-select-mode {
   padding:10px 32px;
   min-width:180px;
 }
-.level-btn:hover {
-  background-color:#1c4293 !important;
-}
+.level-btn:hover { background-color:#1c4293 !important; }
 .level-btn.active {
   background-color:#31c1ba !important;
   color:#fff !important;
   border-color:#197a75 !important;
 }
-.level-btn.active:hover {
-  background-color:#2fa7a0 !important;
-}
+.level-btn.active:hover { background-color:#2fa7a0 !important; }
 .level-buttons {
   display:flex;
   justify-content:center;
@@ -145,9 +139,7 @@ body.level-select-mode {
   gap:12px;
   flex-wrap:wrap;
 }
-.instrument-group .level-btn {
-  flex:1 1 180px;
-}
+.instrument-group .level-btn { flex:1 1 180px; }
 .instrument-group:has(:only-child) .level-btn {
   width:100%;
   margin-right:0;
@@ -166,18 +158,12 @@ body.level-select-mode {
   transform:translateY(0);
   pointer-events:auto;
 }
-#instrument-selection {
-  display:none;
-}
+#instrument-selection { display:none; }
 #instructions-content {
   display:none;
   padding:20px 0 10px;
 }
-
-#pdf-container {
-  width:100%;
-}
-
+#pdf-container { width:100%; }
 .pdf-page {
   display:block;
   width:100%;
@@ -232,9 +218,7 @@ body.level-select-mode {
 .menu-toggle.open span:nth-child(1) {
   transform:rotate(45deg) translate(5px,5px);
 }
-.menu-toggle.open span:nth-child(2) {
-  opacity:0;
-}
+.menu-toggle.open span:nth-child(2) { opacity:0; }
 .menu-toggle.open span:nth-child(3) {
   transform:rotate(-45deg) translate(7px,-7px);
 }
@@ -277,9 +261,7 @@ body.level-select-mode {
   opacity:1;
   transform:translateX(0);
 }
-.menu-items a:hover {
-  background-color:rgba(17,50,153,0.1);
-}
+.menu-items a:hover { background-color:rgba(17,50,153,0.1); }
 .menu-items a:nth-child(1) { transition-delay:0.1s; }
 .menu-items a:nth-child(2) { transition-delay:0.2s; }
 .menu-items a:nth-child(3) { transition-delay:0.3s; }
@@ -313,12 +295,8 @@ body.level-select-mode {
   height:auto;
   filter:brightness(0) saturate(100%) invert(14%) sepia(60%) saturate(2500%) hue-rotate(215deg) brightness(95%) contrast(105%);
 }
-#recorder-view {
-  display:none;
-}
-#recorder-view.active {
-  display:block;
-}
+#recorder-view { display:none; }
+#recorder-view.active { display:block; }
 body.recorder-page {
   display:block;
   background:var(--bg);
@@ -340,12 +318,8 @@ body.recorder-page .container {
 }
 body.recorder-page .logocontainer,
 body.recorder-page .hamburger-menu,
-body.recorder-page .title-image {
-  display:none;
-}
-.recorder-meta {
-  display:none;
-}
+body.recorder-page .title-image { display:none; }
+.recorder-meta { display:none; }
 .back-link {
   display:inline-block;
   margin:10px 16px;
@@ -389,26 +363,16 @@ body.recorder-page .title-image {
   -webkit-tap-highlight-color:transparent;
   color:white;
 }
-.overlay-btn:active {
-  transform:scale(0.92);
-}
-.overlay-btn.idle {
-  background:var(--idle);
-}
+.overlay-btn:active { transform:scale(0.92); }
+.overlay-btn.idle { background:var(--idle); }
 .overlay-btn.recording {
   background:var(--record);
   animation:pulse 1s infinite;
 }
-.overlay-btn.done {
-  background:var(--success);
-}
+.overlay-btn.done { background:var(--success); }
 @keyframes pulse {
-  0%,100% {
-    box-shadow:0 0 0 0 rgba(192,57,43,0.55);
-  }
-  50% {
-    box-shadow:0 0 0 12px rgba(192,57,43,0);
-  }
+  0%,100% { box-shadow:0 0 0 0 rgba(192,57,43,0.55); }
+  50% { box-shadow:0 0 0 12px rgba(192,57,43,0); }
 }
 #control-panel {
   position:fixed;
@@ -423,9 +387,7 @@ body.recorder-page .title-image {
   transform:translateY(100%);
   transition:transform 0.25s ease;
 }
-#control-panel.visible {
-  transform:translateY(0);
-}
+#control-panel.visible { transform:translateY(0); }
 .panel-header {
   display:flex;
   justify-content:space-between;
@@ -435,6 +397,7 @@ body.recorder-page .title-image {
 .panel-header h2 {
   font-size:1rem;
   color:var(--accent);
+  margin:0;
 }
 .close-panel {
   background:none;
@@ -485,18 +448,9 @@ body.recorder-page .title-image {
   gap:6px;
   -webkit-tap-highlight-color:transparent;
 }
-#recorder-view .btn-record {
-  background:var(--record);
-  color:white;
-}
-#recorder-view .btn-stop {
-  background:#333;
-  color:white;
-}
-#recorder-view .btn-play {
-  background:#2980b9;
-  color:white;
-}
+#recorder-view .btn-record { background:var(--record); color:white; }
+#recorder-view .btn-stop { background:#333; color:white; }
+#recorder-view .btn-play { background:#2980b9; color:white; }
 #recorder-view .btn-play:disabled,
 #recorder-view .btn-stop:disabled,
 #recorder-view .btn-record:disabled {
@@ -508,6 +462,58 @@ body.recorder-page .title-image {
   color:var(--muted);
   margin-top:8px;
   min-height:1.2em;
+}
+#panel-controls[hidden],
+#student-name-prompt[hidden] {
+  display:none !important;
+}
+#student-name-prompt {
+  padding:8px 4px 4px;
+  text-align:center;
+}
+#student-name-prompt h3 {
+  margin:0 0 6px;
+  color:var(--accent);
+  font-size:1.1rem;
+}
+#student-name-prompt p {
+  margin:0 auto 12px;
+  color:var(--muted);
+  max-width:34rem;
+  font-size:0.9rem;
+}
+#student-name-form {
+  width:min(420px,100%);
+  margin:0 auto;
+}
+#student-name-input {
+  display:block;
+  width:100%;
+  margin-top: -10px;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  padding:12px;
+  font:inherit;
+  background:white;
+  color:#222;
+}
+#student-name-submit {
+  margin-top:-7px;
+  width:100%;
+  border:0;
+  border-radius:8px;
+  padding:12px;
+  background:var(--accent);
+  color:#fff;
+  font:inherit;
+  font-weight:600;
+  cursor:pointer;
+}
+#student-name-error {
+  min-height:1.2em;
+  margin-top:5px;
+  color:#b42318;
+  font-size:0.85rem;
 }
 .rec-indicator {
   display:inline-flex;
@@ -523,11 +529,7 @@ body.recorder-page .title-image {
   background:var(--record);
   animation:blink 1s infinite;
 }
-@keyframes blink {
-  50% {
-    opacity:0.3;
-  }
-}
+@keyframes blink { 50% { opacity:0.3; } }
 #summary {
   max-width:900px;
   margin:0 auto 40px;
@@ -549,10 +551,7 @@ body.recorder-page .title-image {
   align-items:center;
   gap:10px;
 }
-.track-card .label {
-  font-weight:600;
-  min-width:70px;
-}
+.track-card .label { font-weight:600; min-width:70px; }
 .track-card .status {
   font-size:0.9rem;
   color:var(--muted);
@@ -617,7 +616,6 @@ body.recorder-page .title-image {
   font-size:0.95rem;
   gap:12px;
 }
-
 .pdf-spinner {
   width:42px;
   height:42px;
@@ -626,26 +624,18 @@ body.recorder-page .title-image {
   border-radius:50%;
   animation:pdf-spin 0.8s linear infinite;
 }
-
-@keyframes pdf-spin {
-  to {
-    transform:rotate(360deg);
-  }
-}
+@keyframes pdf-spin { to { transform:rotate(360deg); } }
 </style>
 </head>
 
 <body>
-
 <div class="logocontainer">
-  <img src="../icons/Full Logo White on Transparent.png" class="logo">
+  <img src="../icons/Full Logo White on Transparent.png" class="logo" alt="BIPH Band">
 </div>
 
 <div class="hamburger-menu">
   <button class="menu-toggle" aria-label="Menu">
-    <span></span>
-    <span></span>
-    <span></span>
+    <span></span><span></span><span></span>
   </button>
   <div class="menu-items" id="menu-items">
     <div class="menu-title">BIPH Band</div>
@@ -663,37 +653,35 @@ body.recorder-page .title-image {
 </div>
 
 <div class="container mx-auto flex flex-col justify-center min-h-screen" id="main-container">
-
   <img src="title.png" alt="AMIS Auditions 2026-2027" class="title-image">
 
   <div id="level-selection">
-  <div class="level-buttons">
-    <button class="btn level-btn" id="btn-middle-school">Middle School</button>
-    <button class="btn level-btn" id="btn-high-school">High School</button>
+    <div class="level-buttons">
+      <button class="btn level-btn" id="btn-middle-school">Middle School</button>
+      <button class="btn level-btn" id="btn-high-school">High School</button>
+    </div>
+    <div class="instructions-row">
+      <button class="btn level-btn" id="btn-instructions">Audition Instructions</button>
+    </div>
   </div>
-  <div class="instructions-row">
-    <button class="btn level-btn" id="btn-instructions">Audition Instructions</button>
-  </div>
-</div>
 
-<div id="content-selection">
-  <div id="instrument-selection"></div>
-
-  <div id="instructions-content">
-    <div id="pdf-container">
-      <div class="pdf-loading">
-        <div class="pdf-spinner"></div>
-        <div>Loading audition instructions…</div>
+  <div id="content-selection">
+    <div id="instrument-selection"></div>
+    <div id="instructions-content">
+      <div id="pdf-container">
+        <div class="pdf-loading">
+          <div class="pdf-spinner"></div>
+          <div>Loading audition instructions…</div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<div id="recorder-view">
-  <div class="recorder-meta">
-    <h1 id="header-title"></h1>
-    <p id="header-sub"></p>
-  </div>
+  <div id="recorder-view">
+    <div class="recorder-meta">
+      <h1 id="header-title"></h1>
+      <p id="header-sub"></p>
+    </div>
 
     <a href="#" class="back-link" id="back-to-chooser">← Choose another instrument</a>
 
@@ -709,19 +697,39 @@ body.recorder-page .title-image {
         <button class="close-panel" id="close-panel" aria-label="Close">×</button>
       </div>
 
-      <div class="tempo-row" id="tempo-row" style="display:none;">
-        <label id="tempo-label">Tempo (♩ = )</label>
-        <input type="range" id="tempo-slider" min="60" max="140" value="120">
-        <span class="tempo-val" id="tempo-val">120</span>
+      <div id="student-name-prompt" style="margin-top: -20px" hidden>
+        <p>Please enter your name.</p>
+        <form id="student-name-form">
+          <input
+            id="student-name-input"
+            name="studentName"
+            type="text"
+            autocomplete="name"
+            maxlength="100"
+            placeholder="Your full name"
+            aria-label="Your full name"
+            required
+          >
+          <div id="student-name-error" aria-live="polite"></div>
+          <button id="student-name-submit" type="submit">Continue</button>
+        </form>
       </div>
 
-      <div class="btn-row">
-        <button class="btn btn-record" id="btn-start-rec">● Record</button>
-        <button class="btn btn-stop" id="btn-stop-rec" disabled>■ Stop</button>
-        <button class="btn btn-play" id="btn-play" disabled>▶ Play</button>
-      </div>
+      <div id="panel-controls" hidden>
+        <div class="tempo-row" id="tempo-row" style="display:none;">
+          <label id="tempo-label" for="tempo-slider">Tempo (♩ = )</label>
+          <input type="range" id="tempo-slider" min="60" max="140" value="120">
+          <span class="tempo-val" id="tempo-val">120</span>
+        </div>
 
-      <div class="status-line" id="status-line">Ready</div>
+        <div class="btn-row">
+          <button class="btn btn-record" id="btn-start-rec">● Record</button>
+          <button class="btn btn-stop" id="btn-stop-rec" disabled>■ Stop</button>
+          <button class="btn btn-play" id="btn-play" disabled>▶ Play</button>
+        </div>
+
+        <div class="status-line" id="status-line">Ready</div>
+      </div>
     </div>
 
     <section id="summary">
@@ -735,10 +743,968 @@ body.recorder-page .title-image {
   </div>
 </div>
 
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs" type="module"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
-<script src="recorder-core.js"></script>
+
+<script>
+window.AuditionRecorder = (() => {
+  "use strict";
+
+  // ---------- State ----------
+  let config = null;
+  let currentTrack = null;
+  let mediaRecorder = null;
+  let audioChunks = [];
+  let recordedBlobs = {};
+  let recordedUrls = {};
+  let durations = {};
+  let isRecording = false;
+  let isPlaying = false;
+  let currentAudio = null;
+  let stream = null;
+  let recordStartTime = 0;
+
+  // Keep the name across instrument changes for this page session.
+  let studentName = window.AMISAuditionStudentName || "";
+  let nameCallbacks = [];
+  let stopProcessing = false;
+
+  // Metronome
+  let audioCtx = null;
+  let metroTimeout = null;
+  let nextClickTime = 0;
+  let metroTempo = 120;
+  let metroRunning = false;
+  let metroStopAfter = null;
+
+  // DOM refs
+  let panel, panelTitle, tempoRow, tempoLabel, tempoSlider, tempoVal;
+  let btnStart, btnStop, btnPlay, statusLine, trackList;
+  let btnDownloadAll, btnShare, micWarning, closePanelBtn, overlayBtns;
+  let panelControls, panelNamePrompt, nameForm, nameInput, nameError;
+
+  // ---------- Helpers ----------
+
+  function formatTime(sec) {
+    if (sec == null || !isFinite(sec) || isNaN(sec) || sec < 0) {
+      return "—";
+    }
+
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  }
+
+  function safeFilenamePart(value) {
+    return String(value || "")
+      .trim()
+      .replace(/[<>:"/\\|?*\x00-\x1F]/g, "")
+      .replace(/\s+/g, "_")
+      .replace(/^\.+|\.+$/g, "")
+      .replace(/_+/g, "_")
+      .slice(0, 80);
+  }
+
+  function usesNamedFiles() {
+    return !!(config && config.shareNamedMp3);
+  }
+
+  function getNamedFilename(trackId, extension) {
+    const prefix = safeFilenamePart(
+      (config && config.filePrefix) || "Recording"
+    ) || "Recording";
+
+    const name = safeFilenamePart(studentName);
+
+    if (!name) {
+      throw new Error("Please enter your name before downloading or sharing.");
+    }
+
+    return `${prefix}_${name}_Track${trackId}.${extension}`;
+  }
+
+  function updateOverlayState(trackId) {
+    const btn = overlayBtns[trackId];
+    if (!btn) return;
+
+    btn.classList.remove("recording", "done", "idle");
+
+    if (isRecording && currentTrack === +trackId) {
+      btn.classList.add("recording");
+      btn.innerHTML = "";
+    } else if (recordedBlobs[trackId]) {
+      btn.classList.add("done");
+      btn.innerHTML = "✓";
+    } else {
+      btn.classList.add("idle");
+      btn.innerHTML = String(trackId);
+    }
+  }
+
+  function updateAllOverlays() {
+    Object.keys(overlayBtns).forEach(updateOverlayState);
+  }
+
+  function setStatus(html) {
+    if (statusLine) statusLine.innerHTML = html;
+  }
+
+  function setTrackReadyStatus(trackId) {
+    const t = config && config.tracks[trackId];
+    if (!t) return;
+
+    if (recordedBlobs[trackId]) {
+      setStatus(
+        `Ready – previous recording ${formatTime(durations[trackId])}. ` +
+        "Re-record or play."
+      );
+    } else {
+      setStatus(t.note || "Ready to record.");
+    }
+  }
+
+  // ---------- Student name prompt ----------
+
+  function requestStudentName(callback) {
+    if (studentName && safeFilenamePart(studentName)) {
+      if (callback) callback(studentName);
+      return;
+    }
+
+    if (callback) nameCallbacks.push(callback);
+
+    if (!panelNamePrompt || !panelControls || !nameInput) {
+      console.error("The inline student-name prompt is missing from index.html.");
+      setStatus("Unable to display the name prompt. Please reload the page.");
+      return;
+    }
+
+    const alreadyVisible = !panelNamePrompt.hidden;
+
+    panel.classList.add("visible");
+    panelControls.hidden = true;
+    panelNamePrompt.hidden = false;
+
+    if (nameError) nameError.textContent = "";
+
+    if (!alreadyVisible) nameInput.value = "";
+
+    window.setTimeout(() => {
+      if (nameInput && panelNamePrompt && !panelNamePrompt.hidden) {
+        nameInput.focus();
+      }
+    }, 0);
+  }
+
+  function handleNameSubmit(event) {
+    event.preventDefault();
+
+    const entered = nameInput.value.trim();
+    const safe = safeFilenamePart(entered);
+
+    if (!entered || !safe) {
+      if (nameError) {
+        nameError.textContent = "Please enter a valid name to continue.";
+      }
+      nameInput.focus();
+      return;
+    }
+
+    studentName = entered;
+    window.AMISAuditionStudentName = entered;
+
+    if (nameError) nameError.textContent = "";
+
+    panelNamePrompt.hidden = true;
+    panelControls.hidden = false;
+
+    updatePanelButtons();
+
+    const callbacks = nameCallbacks.splice(0);
+    callbacks.forEach((callback) => {
+      try {
+        callback(studentName);
+      } catch (error) {
+        console.error("Name prompt callback failed:", error);
+      }
+    });
+  }
+
+  // ---------- Metronome ----------
+
+  function ensureAudioCtx() {
+    if (!audioCtx) {
+      audioCtx = new (
+        window.AudioContext || window.webkitAudioContext
+      )();
+    }
+
+    if (audioCtx.state === "suspended") {
+      audioCtx.resume();
+    }
+
+    return audioCtx;
+  }
+
+  function scheduleClick(time) {
+    const ctx = ensureAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.frequency.value = 1000;
+    gain.gain.setValueAtTime(0.45, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+
+    osc.start(time);
+    osc.stop(time + 0.06);
+  }
+
+  function metroScheduler() {
+    if (!metroRunning) return;
+
+    const ctx = ensureAudioCtx();
+
+    if (metroStopAfter && ctx.currentTime >= metroStopAfter) {
+      stopMetronome();
+      return;
+    }
+
+    while (nextClickTime < ctx.currentTime + 0.1) {
+      if (metroStopAfter && nextClickTime >= metroStopAfter) break;
+
+      scheduleClick(nextClickTime);
+      nextClickTime += 60.0 / metroTempo;
+    }
+
+    metroTimeout = window.setTimeout(metroScheduler, 50);
+  }
+
+  function startMetronome(bpm, stopAfterBeats = null) {
+    stopMetronome();
+
+    metroTempo = bpm;
+    ensureAudioCtx();
+    nextClickTime = audioCtx.currentTime + 0.05;
+    metroRunning = true;
+
+    if (stopAfterBeats != null && stopAfterBeats > 0) {
+      metroStopAfter = nextClickTime + (stopAfterBeats * 60) / bpm;
+    } else {
+      metroStopAfter = null;
+    }
+
+    metroScheduler();
+  }
+
+  function stopMetronome() {
+    metroRunning = false;
+    metroStopAfter = null;
+
+    if (metroTimeout) {
+      clearTimeout(metroTimeout);
+      metroTimeout = null;
+    }
+  }
+
+  // ---------- Microphone ----------
+
+  async function getMicStream() {
+    if (stream) return stream;
+
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: true
+        }
+      });
+
+      if (micWarning) micWarning.style.display = "none";
+      return stream;
+    } catch (err) {
+      if (micWarning) micWarning.style.display = "block";
+
+      setStatus("Microphone permission denied. Please allow access and reload.");
+      throw err;
+    }
+  }
+
+  // ---------- MP3 encoding ----------
+
+  async function blobToMp3(blob) {
+    const arrayBuf = await blob.arrayBuffer();
+    const ctx = ensureAudioCtx();
+    const audioBuf = await ctx.decodeAudioData(arrayBuf.slice(0));
+
+    const samples = audioBuf.getChannelData(0);
+    const gain = 0.5;
+    const sampleRate = audioBuf.sampleRate;
+    const int16 = new Int16Array(samples.length);
+
+    for (let i = 0; i < samples.length; i++) {
+      const s = Math.max(-1, Math.min(1, samples[i] * gain));
+      int16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+    }
+
+    const mp3enc = new lamejs.Mp3Encoder(1, sampleRate, 128);
+    const blockSize = 1152;
+    const mp3Data = [];
+
+    for (let i = 0; i < int16.length; i += blockSize) {
+      const chunk = int16.subarray(i, i + blockSize);
+      const mp3buf = mp3enc.encodeBuffer(chunk);
+      if (mp3buf.length > 0) mp3Data.push(mp3buf);
+    }
+
+    const end = mp3enc.flush();
+    if (end.length > 0) mp3Data.push(end);
+
+    return new Blob(mp3Data, { type: "audio/mpeg" });
+  }
+
+  // ---------- Recording ----------
+
+  async function startRecording(trackId) {
+    if (isRecording || stopProcessing) return;
+
+    if (usesNamedFiles() && !safeFilenamePart(studentName)) {
+      requestStudentName(() => startRecording(trackId));
+      return;
+    }
+
+    const t = config.tracks[trackId];
+    if (!t) return;
+
+    try {
+      const mic = await getMicStream();
+      if (isRecording || stopProcessing) return;
+
+      audioChunks = [];
+
+      let mime = "audio/webm;codecs=opus";
+
+      if (!MediaRecorder.isTypeSupported(mime)) {
+        mime = "audio/webm";
+        if (!MediaRecorder.isTypeSupported(mime)) {
+          mime = "audio/mp4";
+          if (!MediaRecorder.isTypeSupported(mime)) mime = "";
+        }
+      }
+
+      mediaRecorder = new MediaRecorder(
+        mic,
+        mime ? { mimeType: mime } : undefined
+      );
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) audioChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        const elapsed = Math.max(0, (performance.now() - recordStartTime) / 1000);
+        setStatus("Encoding MP3…");
+
+        try {
+          const rawBlob = new Blob(audioChunks, {
+            type: mediaRecorder.mimeType || "audio/webm"
+          });
+
+          const mp3Blob = await blobToMp3(rawBlob);
+
+          if (recordedUrls[trackId]) URL.revokeObjectURL(recordedUrls[trackId]);
+
+          recordedBlobs[trackId] = mp3Blob;
+          recordedUrls[trackId] = URL.createObjectURL(mp3Blob);
+          durations[trackId] = elapsed;
+
+          setStatus(
+            `Recorded – ${formatTime(elapsed)}. You can re-record or play back.`
+          );
+        } catch (encErr) {
+          console.error("MP3 encoding failed:", encErr);
+
+          const fallback = new Blob(audioChunks, {
+            type: mediaRecorder.mimeType || "audio/webm"
+          });
+
+          if (recordedUrls[trackId]) URL.revokeObjectURL(recordedUrls[trackId]);
+
+          recordedBlobs[trackId] = fallback;
+          recordedUrls[trackId] = URL.createObjectURL(fallback);
+          durations[trackId] = elapsed;
+
+          setStatus(`Recorded (fallback format) – ${formatTime(elapsed)}.`);
+        } finally {
+          isRecording = false;
+          stopProcessing = false;
+          updateOverlayState(trackId);
+          updatePanelButtons();
+          renderChecklist();
+        }
+      };
+
+      const bpm = getCurrentTempo();
+
+      if (t.metronome) {
+        if (t.metroStopAfterBeats) {
+          startMetronome(bpm, t.metroStopAfterBeats);
+        } else {
+          startMetronome(bpm);
+        }
+
+        await new Promise((resolve) => window.setTimeout(resolve, 60));
+
+        recordStartTime = performance.now();
+        mediaRecorder.start(200);
+      } else {
+        setStatus("Count-in… then begin!");
+
+        const countInBeats = t.countInBeats || 4;
+        startMetronome(bpm);
+
+        const beatMs = (60 / bpm) * 1000;
+
+        await new Promise((resolve) => {
+          window.setTimeout(resolve, beatMs * (countInBeats - 1) + 40);
+        });
+
+        stopMetronome();
+
+        await new Promise((resolve) => window.setTimeout(resolve, beatMs));
+
+        recordStartTime = performance.now();
+        mediaRecorder.start(225);
+      }
+
+      isRecording = true;
+      currentTrack = trackId;
+
+      updateOverlayState(trackId);
+      updatePanelButtons();
+
+      setStatus(
+        `<span class="rec-indicator"><span class="rec-dot"></span> Recording Track ${trackId}…</span>`
+      );
+    } catch (err) {
+      stopMetronome();
+      isRecording = false;
+      stopProcessing = false;
+      updatePanelButtons();
+      setStatus("Could not start recording: " + (err.message || err));
+    }
+  }
+
+  function stopRecording() {
+    if (
+      !isRecording ||
+      stopProcessing ||
+      !mediaRecorder ||
+      mediaRecorder.state === "inactive"
+    ) {
+      return;
+    }
+
+    // Stop never asks for the student's name.
+    stopProcessing = true;
+    stopMetronome();
+
+    btnStart.disabled = true;
+    btnStop.disabled = true;
+    setStatus("Stopping recording…");
+
+    try {
+      mediaRecorder.stop();
+    } catch (err) {
+      console.error("Unable to stop recording:", err);
+      stopProcessing = false;
+      updatePanelButtons();
+      setStatus("Could not stop recording. Please try again.");
+    }
+  }
+
+  // ---------- Playback ----------
+
+  function playRecording(trackId) {
+    if (isPlaying && currentTrack === trackId && currentAudio) {
+      currentAudio.pause();
+      isPlaying = false;
+      updatePanelButtons();
+      setStatus("Paused.");
+      return;
+    }
+
+    stopPlayback();
+
+    const url = recordedUrls[trackId];
+    if (!url) return;
+
+    currentAudio = new Audio(url);
+
+    currentAudio.onended = () => {
+      isPlaying = false;
+      updatePanelButtons();
+      updateOverlayState(trackId);
+      renderChecklist();
+      setStatus("Playback finished.");
+    };
+
+    currentAudio.onerror = () => {
+      isPlaying = false;
+      updatePanelButtons();
+      setStatus("Playback error.");
+    };
+
+    currentAudio.play()
+      .then(() => setStatus("Playing… (tap Pause to stop)"))
+      .catch((err) => {
+        isPlaying = false;
+        updatePanelButtons();
+        setStatus("Playback failed: " + err.message);
+      });
+
+    isPlaying = true;
+    currentTrack = trackId;
+    updatePanelButtons();
+    updateOverlayState(trackId);
+  }
+
+  function stopPlayback() {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      currentAudio = null;
+    }
+    isPlaying = false;
+  }
+
+  // ---------- Recording panel ----------
+
+  function getCurrentTempo() {
+    return parseInt(tempoSlider.value, 10);
+  }
+
+  function openPanel(trackId) {
+    if (isRecording || stopProcessing) return;
+
+    currentTrack = trackId;
+
+    const t = config.tracks[trackId];
+    if (!t) return;
+
+    panelTitle.textContent = t.title;
+
+    const hasRange = t.tempoMin !== t.tempoMax;
+
+    if (hasRange) {
+      tempoRow.style.display = "flex";
+      tempoLabel.textContent = t.tempoLabel || "♩ =";
+      tempoSlider.min = t.tempoMin;
+      tempoSlider.max = t.tempoMax;
+      tempoSlider.value = t.defaultTempo || Math.round((t.tempoMin + t.tempoMax) / 2);
+      tempoSlider.disabled = false;
+      tempoVal.textContent = tempoSlider.value;
+    } else {
+      tempoRow.style.display = "none";
+      tempoSlider.value = t.tempoFixed != null ? t.tempoFixed : t.tempoMin;
+    }
+
+    panel.classList.add("visible");
+    updateOverlayState(trackId);
+
+    if (usesNamedFiles() && !safeFilenamePart(studentName)) {
+      requestStudentName(() => {
+        panelControls.hidden = false;
+        panelNamePrompt.hidden = true;
+        updatePanelButtons();
+        setTrackReadyStatus(trackId);
+      });
+      return;
+    }
+
+    panelNamePrompt.hidden = true;
+    panelControls.hidden = false;
+    updatePanelButtons();
+    setTrackReadyStatus(trackId);
+  }
+
+  function closePanel() {
+    if (isRecording || stopProcessing) return;
+    stopPlayback();
+    panel.classList.remove("visible");
+  }
+
+  function updatePanelButtons() {
+    if (!btnStart) return;
+
+    const hasRec = currentTrack != null && !!recordedBlobs[currentTrack];
+
+    btnStart.disabled =
+      isRecording ||
+      stopProcessing ||
+      (usesNamedFiles() && !safeFilenamePart(studentName));
+
+    btnStop.disabled = !isRecording || stopProcessing;
+    btnPlay.disabled = !hasRec || isRecording || stopProcessing;
+
+    btnStart.textContent = isRecording ? "● Recording…" : "● Record";
+    btnPlay.textContent = isPlaying ? "❚❚ Pause" : "▶ Play";
+  }
+
+  // ---------- Checklist ----------
+
+  function renderChecklist() {
+    if (!trackList || !config) return;
+
+    trackList.innerHTML = "";
+
+    const ids = Object.keys(config.tracks).map(Number).sort((a, b) => a - b);
+
+    for (const id of ids) {
+      const has = !!recordedBlobs[id];
+      const card = document.createElement("div");
+      card.className = "track-card";
+
+      card.innerHTML = `
+        <span class="label">Track ${id}</span>
+        <span class="status ${has ? "ready" : ""}">
+          ${has ? "✓ Ready – " + formatTime(durations[id]) : "Not recorded"}
+        </span>
+        <div class="actions">
+          ${has ? `<button data-play="${id}">${isPlaying && currentTrack === id ? "❚❚ Pause" : "▶ Play"}</button>` : ""}
+          ${has ? `<button data-dl="${id}">⬇ Download</button>` : ""}
+          <button data-rec="${id}">${has ? "Re-record" : "Record"}</button>
+        </div>
+      `;
+
+      trackList.appendChild(card);
+    }
+
+    const any = Object.keys(recordedBlobs).length > 0;
+    btnDownloadAll.disabled = !any || stopProcessing;
+    btnShare.disabled = !any || stopProcessing;
+
+    trackList.querySelectorAll("[data-play]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const id = +button.dataset.play;
+        openPanel(id);
+
+        if (usesNamedFiles() && !safeFilenamePart(studentName)) {
+          requestStudentName(() => {
+            playRecording(id);
+            window.setTimeout(renderChecklist, 50);
+          });
+          return;
+        }
+
+        playRecording(id);
+        window.setTimeout(renderChecklist, 50);
+      });
+    });
+
+    trackList.querySelectorAll("[data-dl]").forEach((button) => {
+      button.addEventListener("click", () => downloadOne(+button.dataset.dl));
+    });
+
+    trackList.querySelectorAll("[data-rec]").forEach((button) => {
+      button.addEventListener("click", () => openPanel(+button.dataset.rec));
+    });
+  }
+
+  // ---------- Downloads ----------
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.style.display = "none";
+
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+
+    window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+  }
+
+  function getExtension(blob) {
+    const type = (blob.type || "").toLowerCase();
+
+    if (type.includes("mpeg") || type.includes("mp3")) return "mp3";
+    if (type.includes("mp4")) return "m4a";
+    return "webm";
+  }
+
+  function downloadOne(trackId) {
+    const blob = recordedBlobs[trackId];
+    if (!blob) return;
+
+    if (usesNamedFiles() && !safeFilenamePart(studentName)) {
+      requestStudentName(() => downloadOne(trackId));
+      return;
+    }
+
+    const filename = usesNamedFiles()
+      ? getNamedFilename(trackId, getExtension(blob))
+      : `${config.filePrefix}_Track${trackId}.${getExtension(blob)}`;
+
+    downloadBlob(blob, filename);
+  }
+
+  async function downloadAll() {
+    const ids = Object.keys(recordedBlobs);
+
+    if (!ids.length) {
+      alert("Please record something first.");
+      return;
+    }
+
+    if (usesNamedFiles() && !safeFilenamePart(studentName)) {
+      requestStudentName(() => downloadAll());
+      return;
+    }
+
+    try {
+      if (!window.JSZip) {
+        ids.forEach((id) => downloadOne(+id));
+        return;
+      }
+
+      const zip = new window.JSZip();
+      const baseName = safeFilenamePart(config.filePrefix || "Recording") || "Recording";
+
+      const zipName = usesNamedFiles()
+        ? `${baseName}_${safeFilenamePart(studentName)}_Recordings`
+        : (config.zipName || "Audition_Recordings");
+
+      const folder = zip.folder(zipName);
+
+      ids.forEach((id) => {
+        const blob = recordedBlobs[id];
+        const ext = getExtension(blob);
+        const filename = usesNamedFiles()
+          ? getNamedFilename(id, ext)
+          : `Track${id}.${ext}`;
+
+        folder.file(filename, blob);
+      });
+
+      const content = await zip.generateAsync({ type: "blob" });
+      downloadBlob(content, `${zipName}.zip`);
+    } catch (err) {
+      console.error("Download failed:", err);
+      alert("Download failed: " + (err.message || err));
+    }
+  }
+
+  // ---------- Sharing ----------
+
+  async function shareRecordings() {
+    const ids = Object.keys(recordedBlobs);
+
+    if (!ids.length) {
+      alert("Please record something before sharing.");
+      return;
+    }
+
+    if (usesNamedFiles() && !safeFilenamePart(studentName)) {
+      requestStudentName(() => shareRecordings());
+      return;
+    }
+
+    if (!navigator.share) {
+      alert("Sharing is not supported on this device/browser. Please use Download All instead.");
+      return;
+    }
+
+    const files = [];
+
+    for (const id of ids) {
+      const blob = recordedBlobs[id];
+      const ext = getExtension(blob);
+      const filename = usesNamedFiles()
+        ? getNamedFilename(id, ext)
+        : `Track${id}.${ext}`;
+
+      files.push(new File([blob], filename, {
+        type: blob.type || "audio/mpeg"
+      }));
+    }
+
+    const shareData = {
+      files,
+      title: config.shareTitle || "Audition Recordings",
+      text: usesNamedFiles()
+        ? `Audition recording by ${studentName}`
+        : (config.shareText || "My audition recordings")
+    };
+
+    try {
+      if (navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        alert("This browser cannot share audio files directly. Use Download All, then share from Files.");
+      }
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        alert("Share failed: " + (err.message || err));
+      }
+    }
+  }
+
+  // ---------- Public init ----------
+
+  function init(cfg) {
+    config = cfg || {};
+
+    // Reuse the student's name when switching instruments.
+    studentName = window.AMISAuditionStudentName || studentName || "";
+    nameCallbacks = [];
+    stopProcessing = false;
+
+    const pagesRoot = document.getElementById("pages-root");
+    pagesRoot.innerHTML = "";
+
+    (config.pages || []).forEach((page, pageIdx) => {
+      const container = document.createElement("div");
+      container.className = "page-container";
+      container.id = `page${pageIdx + 1}`;
+
+      const img = document.createElement("img");
+      img.src = page.image;
+      img.alt = page.alt || `Page ${pageIdx + 1}`;
+      img.draggable = false;
+      container.appendChild(img);
+
+      (page.buttons || []).forEach((b) => {
+        const btn = document.createElement("button");
+        btn.className = "overlay-btn idle";
+        btn.id = `btn-track${b.track}`;
+        btn.dataset.track = b.track;
+        btn.style.top = b.top;
+        btn.innerHTML = String(b.track);
+        btn.title = `Record Track ${b.track}`;
+        btn.setAttribute("aria-label", `Open recording controls for track ${b.track}`);
+        container.appendChild(btn);
+      });
+
+      pagesRoot.appendChild(container);
+    });
+
+    overlayBtns = {};
+
+    document.querySelectorAll(".overlay-btn").forEach((el) => {
+      const id = el.dataset.track;
+      overlayBtns[id] = el;
+      el.addEventListener("click", () => openPanel(+id));
+    });
+
+    Object.values(recordedUrls).forEach((url) => URL.revokeObjectURL(url));
+
+    recordedBlobs = {};
+    recordedUrls = {};
+    durations = {};
+    isRecording = false;
+    isPlaying = false;
+    currentTrack = null;
+    mediaRecorder = null;
+    audioChunks = [];
+
+    stopMetronome();
+    stopPlayback();
+
+    panel.classList.remove("visible");
+    panelNamePrompt.hidden = true;
+    panelControls.hidden = !!(usesNamedFiles() && !safeFilenamePart(studentName));
+
+    updatePanelButtons();
+    renderChecklist();
+    setStatus("Ready");
+  }
+
+  // ---------- DOM ready wiring ----------
+
+  function bindUI() {
+    panel = document.getElementById("control-panel");
+    panelTitle = document.getElementById("panel-title");
+    tempoRow = document.getElementById("tempo-row");
+    tempoLabel = document.getElementById("tempo-label");
+    tempoSlider = document.getElementById("tempo-slider");
+    tempoVal = document.getElementById("tempo-val");
+
+    btnStart = document.getElementById("btn-start-rec");
+    btnStop = document.getElementById("btn-stop-rec");
+    btnPlay = document.getElementById("btn-play");
+
+    statusLine = document.getElementById("status-line");
+    trackList = document.getElementById("track-list");
+
+    btnDownloadAll = document.getElementById("btn-download-all");
+    btnShare = document.getElementById("btn-share");
+
+    micWarning = document.getElementById("mic-warning");
+    closePanelBtn = document.getElementById("close-panel");
+
+    panelControls = document.getElementById("panel-controls");
+    panelNamePrompt = document.getElementById("student-name-prompt");
+    nameForm = document.getElementById("student-name-form");
+    nameInput = document.getElementById("student-name-input");
+    nameError = document.getElementById("student-name-error");
+
+    overlayBtns = {};
+
+    nameForm.addEventListener("submit", handleNameSubmit);
+
+    tempoSlider.addEventListener("input", () => {
+      tempoVal.textContent = tempoSlider.value;
+    });
+
+    btnStart.addEventListener("click", () => {
+      if (currentTrack != null) startRecording(currentTrack);
+    });
+
+    btnStop.addEventListener("click", stopRecording);
+
+    btnPlay.addEventListener("click", () => {
+      if (currentTrack != null && recordedUrls[currentTrack]) {
+        playRecording(currentTrack);
+      }
+    });
+
+    closePanelBtn.addEventListener("click", closePanel);
+    btnDownloadAll.addEventListener("click", downloadAll);
+    btnShare.addEventListener("click", shareRecordings);
+
+    window.addEventListener("beforeunload", (event) => {
+      if (isRecording) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    });
+
+    // Keep microphone warm-up behavior.
+    document.body.addEventListener("click", () => {
+      getMicStream().catch(() => {});
+    }, { once: true });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindUI);
+  } else {
+    bindUI();
+  }
+
+  return { init };
+})();
+</script>
+
+<!-- Instrument definitions remain separate because they contain the
+     instrument-specific pages, track settings, and image coordinates. -->
 <script src="MSinstruments.js"></script>
 <script src="HSinstruments.js"></script>
 
@@ -781,19 +1747,15 @@ async function loadInstructionsPDF(){
 
   try{
     const pdfjsLib=await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs');
-
-    pdfjsLib.GlobalWorkerOptions.workerSrc=
-      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
 
     const pdf=await pdfjsLib.getDocument('parts/Audition instructions 2026.pdf').promise;
-
     const outputScale=Math.max(window.devicePixelRatio||1,3);
 
     container.innerHTML='';
 
     for(let pageNumber=1;pageNumber<=pdf.numPages;pageNumber++){
       const page=await pdf.getPage(pageNumber);
-
       const containerWidth=container.clientWidth;
       const unscaledViewport=page.getViewport({scale:1});
       const displayScale=containerWidth/unscaledViewport.width;
@@ -801,37 +1763,29 @@ async function loadInstructionsPDF(){
 
       const canvas=document.createElement('canvas');
       canvas.className='pdf-page';
-
       const context=canvas.getContext('2d');
 
       canvas.width=Math.floor(viewport.width*outputScale);
       canvas.height=Math.floor(viewport.height*outputScale);
-
       canvas.style.width=Math.floor(viewport.width)+'px';
       canvas.style.height=Math.floor(viewport.height)+'px';
 
       await page.render({
         canvasContext:context,
         viewport:viewport,
-        transform:outputScale!==1?
-          [outputScale,0,0,outputScale,0,0]:
-          null
+        transform:outputScale!==1?[outputScale,0,0,outputScale,0,0]:null
       }).promise;
 
       container.appendChild(canvas);
     }
 
     pdfLoaded=true;
-
   }catch(error){
     console.error('PDF loading error:',error);
-
     container.innerHTML=`
       <div class="pdf-loading">
         <div>Unable to load the audition instructions.</div>
-        <button class="btn level-btn" onclick="loadInstructionsPDF()">
-          Try Again
-        </button>
+        <button class="btn level-btn" onclick="loadInstructionsPDF()">Try Again</button>
       </div>
     `;
   }
@@ -849,9 +1803,7 @@ const instrumentData={
       {key:'flute',name:'Flute'},
       {key:'altosax',name:'Alto Sax'}
     ],
-    Brass:[
-      {key:'trumpet',name:'Trumpet'}
-    ]
+    Brass:[{key:'trumpet',name:'Trumpet'}]
   },
   HS:{
     Strings:[
@@ -868,15 +1820,12 @@ const instrumentData={
       {key:'euphonium',name:'Euphonium'},
       {key:'tuba',name:'Tuba'}
     ],
-    Percussion:[
-      {key:'percussion',name:'Percussion'}
-    ]
+    Percussion:[{key:'percussion',name:'Percussion'}]
   }
 };
 
-
 function scrollToHeight(targetHeight){
-  const duration=1000; // Total scroll time in milliseconds
+  const duration=1000;
   const startTime=performance.now();
   const startY=window.scrollY;
 
@@ -884,7 +1833,6 @@ function scrollToHeight(targetHeight){
     const elapsed=now-startTime;
     const progress=Math.min(elapsed/duration,1);
     const eased=1-Math.pow(1-progress,3);
-
     const maxY=Math.max(0,document.documentElement.scrollHeight-window.innerHeight);
     const targetY=Math.min(targetHeight,maxY);
     const y=startY+(targetY-startY)*eased;
@@ -894,7 +1842,6 @@ function scrollToHeight(targetHeight){
     if(progress<1){
       requestAnimationFrame(animateScroll);
     }else{
-      // One final attempt after the expansion has had time to finish.
       const finalMaxY=Math.max(0,document.documentElement.scrollHeight-window.innerHeight);
       window.scrollTo(0,Math.min(targetHeight,finalMaxY));
     }
@@ -903,11 +1850,8 @@ function scrollToHeight(targetHeight){
   requestAnimationFrame(animateScroll);
 }
 
-
 function setActiveButton(button){
-  [middleSchoolBtn,highSchoolBtn,instructionsBtn].forEach(btn=>{
-    btn.classList.remove('active');
-  });
+  [middleSchoolBtn,highSchoolBtn,instructionsBtn].forEach(btn=>btn.classList.remove('active'));
   if(button) button.classList.add('active');
 }
 
@@ -932,9 +1876,7 @@ function buildInstrumentSelection(level){
       const btn=document.createElement('button');
       btn.className='btn level-btn';
       btn.textContent=instrument.name;
-      btn.addEventListener('click',()=>{
-        openRecorder(level,instrument.key);
-      });
+      btn.addEventListener('click',()=>openRecorder(level,instrument.key));
       groupDiv.appendChild(btn);
     });
 
@@ -952,11 +1894,8 @@ function expandSelection(level){
   contentSelection.classList.add('expanded');
   setActiveButton(level==='MS'?middleSchoolBtn:highSchoolBtn);
 
-  if(level==='MS'){
-    scrollToHeight(MS_HEIGHT);
-  }else if(level==='HS'){
-    scrollToHeight(HS_HEIGHT);
-  }
+  if(level==='MS') scrollToHeight(MS_HEIGHT);
+  else if(level==='HS') scrollToHeight(HS_HEIGHT);
 }
 
 async function expandInstructions(){
@@ -967,12 +1906,7 @@ async function expandInstructions(){
   contentSelection.classList.add('expanded');
   setActiveButton(instructionsBtn);
 
-  // Start the scroll independently of PDF loading
-  requestAnimationFrame(()=>{
-    scrollToHeight(INSTRUCTIONS_HEIGHT);
-  });
-
-  // Load the PDF without blocking the scrolling animation
+  requestAnimationFrame(()=>scrollToHeight(INSTRUCTIONS_HEIGHT));
   loadInstructionsPDF();
 }
 
@@ -981,10 +1915,7 @@ function collapseSelection(){
   currentView=null;
   contentSelection.classList.remove('expanded');
   setActiveButton(null);
-
-  requestAnimationFrame(()=>{
-    scrollToHeight(COLLAPSE_HEIGHT);
-  });
+  requestAnimationFrame(()=>scrollToHeight(COLLAPSE_HEIGHT));
 }
 
 function toggleLevel(level){
@@ -1006,16 +1937,18 @@ function toggleInstructions(){
 function openRecorder(group,key){
   let cfg=null;
 
-  if(group==='MS'){
-    cfg=window.MSInstruments[key];
-  }else if(group==='HS'){
-    cfg=window.HSInstruments[key];
-  }
+  if(group==='MS') cfg=window.MSInstruments[key];
+  else if(group==='HS') cfg=window.HSInstruments[key];
 
   if(!cfg){
     alert('Config not found for '+key);
     return;
   }
+
+  // Ask for the name when the first recording panel is opened.
+  // Do not prompt again when Stop is clicked.
+  cfg.namePromptOnStop=false;
+  cfg.shareNamedMp3=true;
 
   history.scrollRestoration='manual';
 
@@ -1048,9 +1981,7 @@ function restoreChooser(){
     instrumentSelection.style.display='block';
     instructionsContent.style.display='none';
     setActiveButton(currentLevel==='MS'?middleSchoolBtn:highSchoolBtn);
-    requestAnimationFrame(()=>{
-      snapToInstrumentSelection();
-    });
+    requestAnimationFrame(()=>snapToInstrumentSelection());
   }else if(currentView==='instructions'){
     contentSelection.classList.add('expanded');
     instrumentSelection.style.display='none';
@@ -1066,25 +1997,23 @@ function restoreChooser(){
   }
 }
 
-function closeRecorder(){
-  if(history.state&&history.state.recorder){
-    history.back();
-  }else{
-    restoreChooser();
-  }
+function snapToTop(){
+  window.scrollTo(0,0);
 }
 
-middleSchoolBtn.addEventListener('click',()=>{
-  toggleLevel('MS');
-});
+function snapToInstrumentSelection(){
+  const top=contentSelection.getBoundingClientRect().top+window.scrollY;
+  window.scrollTo(0,Math.max(0,top-12));
+}
 
-highSchoolBtn.addEventListener('click',()=>{
-  toggleLevel('HS');
-});
+function closeRecorder(){
+  if(history.state&&history.state.recorder) history.back();
+  else restoreChooser();
+}
 
-instructionsBtn.addEventListener('click',()=>{
-  toggleInstructions();
-});
+middleSchoolBtn.addEventListener('click',()=>toggleLevel('MS'));
+highSchoolBtn.addEventListener('click',()=>toggleLevel('HS'));
+instructionsBtn.addEventListener('click',()=>toggleInstructions());
 
 menuToggle.addEventListener('click',()=>{
   menuToggle.classList.toggle('open');
@@ -1106,9 +2035,7 @@ document.addEventListener('keydown',(event)=>{
 });
 
 window.addEventListener('popstate',()=>{
-  if(document.body.classList.contains('recorder-page')){
-    restoreChooser();
-  }
+  if(document.body.classList.contains('recorder-page')) restoreChooser();
 });
 
 document.getElementById('back-to-chooser').addEventListener('click',(e)=>{
@@ -1126,6 +2053,5 @@ contentSelection.classList.remove('expanded');
 setActiveButton(null);
 recorderView.classList.remove('active');
 </script>
-
 </body>
 </html>
