@@ -12,7 +12,7 @@
     <div class="menu-icon" onclick="toggleTeacherMode()">☰</div>
     <div id="header">
         <div id="objective">
-            <h3>Objective:</h3>
+            <h3>Objectives:</h3>
             <ul id="objectiveList"></ul>
         </div>
         <div id="title">
@@ -86,12 +86,12 @@ function playRandomSound(soundArray) {
 
 const classes = [
     {
-        name: "Showtime!",
+        name: "EEP Rehearsal #1",
         // name: "Dress Rehearsal",
         days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], // Always active
-        timeRange: "7:00pm - 8:30pm",
+        timeRange: "7:00pm - 8:00pm",
         startTime: { hours: 19, minutes: 0 },
-        endTime: { hours: 20, minutes: 30 },
+        endTime: { hours: 20, minutes: 0 },
         students: expectedList.map(s => ({
             name: s.name,
             liveschoolName: s.liveschoolName,
@@ -110,9 +110,9 @@ const classes = [
         teacherModeOrder: expectedList.map(s => s.name),
         objectivesKey: "awardsObjectives",
         defaultObjectives: [
-            'Concert Attire Check',
-            'Warm up and Tune',
-            'Mental preparation'
+            'Warm up on personal part',
+            'Housekeeping - podium, tuning',
+            'Alice - runthroughs!'
         ],
 
         // defaultObjectives: [
