@@ -62,4 +62,10 @@ const masterList = [
     {"name": "Esther", "liveschoolName": "Esther Sicong Chen", "house": "Green", "birthdate": "", "altName": "Esther", "instrumentPart": "Percussion", "chair": "6"},
     {"name": "Christi", "liveschoolName": "Christi Yawen Zhu", "house": "Yellow", "birthdate": "", "altName": "Christi", "instrumentPart": "Horn", "chair": "1"},
     {"name": "Odelia", "liveschoolName": "Odelia Yunhan Xie", "house": "Green", "birthdate": "", "altName": "Odelia", "instrumentPart": "Violin3", "chair": "3"},
+    {"name": "Yvonne", "liveschoolName": "Yvonne Yamsiu Wu", "house": "Yellow", "birthdate": "", "altName": "Yvonne", "class": "HS Band", "instrumentPart": "Cello2", "chair": "3", "addable": "Yes"},
+    {"name": "Maggie", "liveschoolName": "Maggie Gan", "house": "Red", "birthdate": "", "altName": "Maggie", "class": "HS Band", "instrumentPart": "Contrabass", "chair": "3", "addable": "Yes"},
+    {"name": "Teresa", "liveschoolName": "Teresa Mingxun Jiang", "house": "Green", "birthdate": "", "altName": "Teresa", "class": "HS Band", "instrumentPart": "Cello3", "chair": "3", "addable": "Yes"},
+    {"name": "Vanessa", "liveschoolName": "Vanessa Chen", "house": "Green", "birthdate": "", "altName": "Vanessa", "class": "HS Band", "instrumentPart": "Violin1", "chair": "4", "addable": "Yes"},
+    {"name": "Annie", "liveschoolName": "Annie Xiaoqi Feng", "house": "Blue", "birthdate": "", "altName": "Annie", "class": "HS Band", "instrumentPart": "Violin1", "chair": "5", "addable": "Yes"},
+    {"name": "Ming Hon", "liveschoolName": "Ming Hon Li", "house": "Red", "birthdate": "", "altName": "Ming Hon", "class": "HS Band", "instrumentPart": "Clarinet2", "chair": "3", "addable": "Yes"},
 ];
