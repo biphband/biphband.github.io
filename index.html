@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-title" content="BIPH Band">
     <link rel="apple-touch-icon" href="icons/BGicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    
+
     <link rel="icon" href="icons/BGicon.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,10 +21,16 @@
         @font-face {
             font-family: 'Zapfino';
             src: url('https://biphband.github.io/fonts/Zapfino.ttf') format('truetype');
-            font-display: swap; /* Show fallback instantly, swap when ready */
+            font-display: swap;
         }
-        
+
+        html {
+            touch-action: pan-x pan-y;
+            overscroll-behavior: none;
+        }
+
         body {
+            touch-action: pan-x pan-y;
             background-color: rgba(45, 70, 119);
             font-family: 'Andika', system-ui, -apple-system, sans-serif;
             color: #ffffff;
@@ -50,8 +56,8 @@
             width: 100%;
             height: 100%;
             background-image: url('backgroundimage.png');
-            background-size: 140% auto; 
-            background-position: center center; 
+            background-size: 140% auto;
+            background-position: center center;
             background-repeat: no-repeat;
             z-index: -3;
         }
@@ -101,15 +107,15 @@
             padding-bottom: 10px;
         }
 
-.logo {
-    position: fixed;
-    right: 10px;
-    bottom: 10px;
-    width: 25vh;
-    height: auto;
-    z-index: 10;
-    cursor: default;
-}
+        .logo {
+            position: fixed;
+            right: 10px;
+            bottom: 10px;
+            width: 25vh;
+            height: auto;
+            z-index: 10;
+            cursor: default;
+        }
 
         .Title {
             font-family: 'Andika', system-ui, -apple-system, sans-serif;
@@ -282,20 +288,6 @@
         .button:hover .button-icon {
             transform: scale(1.2);
         }
-
-        /* Aggressively disable browser zoom gestures */
-        html, body {
-            touch-action: pan-x pan-y;
-            overscroll-behavior: none;
-            -ms-content-zooming: none;
-            -ms-touch-action: pan-x pan-y;
-        }
-
-        /* Prevent text selection and touch callout zoom-related interactions */
-        * {
-            -webkit-text-size-adjust: 100%;
-            -webkit-touch-callout: none;
-        }
     </style>
 </head>
 <body>
@@ -315,8 +307,7 @@
         <div class="menu-items" id="menu-items">
             <div class="menu-title">BIPH Music</div>
             <a href="https://biphband.github.io/">Home</a>
-            <a href="https://biphband.github.io/amis">AMIS Audition Music</a>
-            <a href="https://biphband.github.io/alice/">Alice in Wonderland</a>
+            <a href="https://biphband.github.io/winterconcert/">Winter Concert</a>
             <a href="https://biphband.github.io/tuner/">Tuner</a>
             <a href="https://biphband.github.io/camera/">Video Recorder</a>
             <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
@@ -330,19 +321,12 @@
     <h1 class="Title">BIPH</h1>
     <h1 class="Subtitle" style="font-size: 34px; margin: 0px 0;">Band and Orchestra</h1>
 
-    <!-- Buttons are now in the static HTML so they appear immediately (no JS injection delay) -->
-<div class="container" id="main-content">
-
-    <a href="https://biphband.github.io/amis/" class="button">
-        <img src="metronome.png" alt="AMIS Auditions" class="button-icon">
-        <span>AMIS Auditions</span>
-    </a>
-
-    <a href="https://biphband.github.io/alice/" class="button">
-        <img src="sheetmusic.png" alt="Alice" class="button-icon">
-        <span>Alice in Wonderland</span>
-    </a>
-</div>
+    <div class="container" id="main-content">
+        <a href="https://biphband.github.io/winterconcert/" class="button">
+            <img src="sheetmusic.png" alt="Winter Concert" class="button-icon">
+            <span>Winter Concert</span>
+        </a>
+    </div>
 
     <div class="logocontainer">
         <a href="https://biphmusic.github.io" aria-label="Visit BIPH Music">
@@ -374,14 +358,14 @@
 
         function isSpecialTime() {
             const time = getHongKongTime();
-            const day = time.getDay();      // 0=Sun, 1-5=Mon-Fri
+            const day = time.getDay();
             const hour = time.getHours();
             const minute = time.getMinutes();
 
             // Weekdays only
             if (day < 1 || day > 5) return false;
 
-            // 10:00 AM to 11:45 AM inclusive
+            // 10:00 AM to 11:30 AM inclusive
             if (hour === 10 || (hour === 11 && minute <= 30)) {
                 return true;
             }
@@ -392,43 +376,10 @@
             window.location.href = "https://biphmusic.github.io";
         }
 
-        window.addEventListener('pageshow', function (event) {
+        window.addEventListener('pageshow', function () {
             window.scrollTo(0, 0);
             document.documentElement.scrollTop = 0;
             document.body.scrollTop = 0;
-        });
-
-
-
-        // Block browser zoom keyboard shortcuts
-        document.addEventListener('keydown', function (event) {
-            if (
-                (event.ctrlKey || event.metaKey) &&
-                ['+', '-', '=', '0'].includes(event.key)
-            ) {
-                event.preventDefault();
-            }
-        });
-
-        // Block Ctrl/Cmd + mouse-wheel zoom
-        document.addEventListener('wheel', function (event) {
-            if (event.ctrlKey || event.metaKey) {
-                event.preventDefault();
-            }
-        }, { passive: false });
-
-        // Block common multi-touch pinch gestures
-        document.addEventListener('touchmove', function (event) {
-            if (event.touches.length > 1) {
-                event.preventDefault();
-            }
-        }, { passive: false });
-
-        // Block Safari gesture events, including pinch gestures
-        ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (type) {
-            document.addEventListener(type, function (event) {
-                event.preventDefault();
-            }, { passive: false });
         });
     </script>
 </body>
