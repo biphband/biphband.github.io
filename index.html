@@ -61,6 +61,7 @@
             background-repeat: no-repeat;
             z-index: -3;
         }
+
         .blue-overlay {
             position: fixed;
             top: 0;
@@ -84,6 +85,7 @@
             z-index: -1;
             animation: pulse 1.5s infinite alternate;
         }
+
         .overlay2 {
             position: fixed;
             top: 0;
@@ -97,6 +99,7 @@
             z-index: -1;
             animation: pulse 2s infinite alternate;
         }
+
         @keyframes pulse {
             0% { opacity: 0.3; transform: scale(1); }
             100% { opacity: 0.7; transform: scale(1.1); }
@@ -167,9 +170,17 @@
             transition: all 0.3s linear;
         }
 
-        .menu-toggle.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
-        .menu-toggle.open span:nth-child(2) { opacity: 0; }
-        .menu-toggle.open span:nth-child(3) { transform: rotate(-45deg) translate(7px, -7px); }
+        .menu-toggle.open span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-toggle.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
 
         .menu-items {
             position: absolute;
@@ -204,7 +215,10 @@
             white-space: nowrap;
         }
 
-        .menu-items.show a { opacity: 1; transform: translateX(0); }
+        .menu-items.show a {
+            opacity: 1;
+            transform: translateX(0);
+        }
 
         .menu-items a:hover {
             background-color: rgba(255, 255, 255, 0.1);
@@ -288,13 +302,96 @@
         .button:hover .button-icon {
             transform: scale(1.2);
         }
+
+        /* ==========================================
+           DATE, TIME & BATTERY DISPLAY
+        ========================================== */
+
+        .status-display {
+            position: fixed;
+            top: calc(15px + env(safe-area-inset-top));
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            color: white;
+            font-family: 'Andika', sans-serif;
+            font-size: 13px;
+            line-height: 1.5;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+        }
+
+        .status-date {
+            font-size: 12px;
+            opacity: 0.85;
+        }
+
+        .status-time {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .status-battery {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .battery-icon {
+            width: 21px;
+            height: 11px;
+        }
+
+        @media (max-width: 600px) {
+            .status-display {
+                top: calc(12px + env(safe-area-inset-top));
+                right: 14px;
+            }
+
+            .status-date {
+                font-size: 10px;
+            }
+
+            .status-time {
+                font-size: 15px;
+            }
+
+            .status-battery {
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="background"></div>
     <div class="blue-overlay"></div>
     <div class="overlay"></div>
     <div class="overlay2"></div>
+
+    <!-- Date, Time & Battery Display -->
+    <div class="status-display">
+        <div class="status-date" id="status-date"></div>
+        <div class="status-time" id="status-time"></div>
+
+        <div class="status-battery">
+            <svg class="battery-icon" viewBox="0 0 28 14">
+                <rect x="1" y="1" width="22" height="12" rx="2"
+                      fill="none" stroke="white" stroke-width="1.5"/>
+                <rect x="24" y="4" width="3" height="6" rx="1"
+                      fill="white"/>
+                <rect id="battery-level" x="3" y="3" width="18"
+                      height="8" rx="1" fill="white"/>
+            </svg>
+            <span id="battery-percentage">--%</span>
+        </div>
+    </div>
 
     <!-- Hamburger Menu -->
     <div class="hamburger-menu">
@@ -311,6 +408,7 @@
             <a href="https://biphband.github.io/tuner/">Tuner</a>
             <a href="https://biphband.github.io/camera/">Video Recorder</a>
             <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
+
             <div class="menu-footer">
                 <img src="qr.png" alt="QR Code" class="qr-image">
                 © Garrison Tubbs 2026
@@ -338,6 +436,7 @@
         function toggleMenu() {
             const menuToggle = document.querySelector('.menu-toggle');
             const menuItems = document.querySelector('.menu-items');
+
             menuToggle.classList.toggle('open');
             menuItems.classList.toggle('show');
         }
@@ -345,6 +444,7 @@
         document.addEventListener('click', (event) => {
             const menuToggle = document.querySelector('.menu-toggle');
             const menuItems = document.querySelector('.menu-items');
+
             if (!menuToggle.contains(event.target) && !menuItems.contains(event.target)) {
                 menuToggle.classList.remove('open');
                 menuItems.classList.remove('show');
@@ -353,7 +453,9 @@
 
         function getHongKongTime() {
             const now = new Date();
-            return new Date(now.toLocaleString("en-US", { timeZone: "Asia/Hong_Kong" }));
+            return new Date(now.toLocaleString("en-US", {
+                timeZone: "Asia/Hong_Kong"
+            }));
         }
 
         function isSpecialTime() {
@@ -369,6 +471,7 @@
             if (hour === 10 || (hour === 11 && minute <= 30)) {
                 return true;
             }
+
             return false;
         }
 
@@ -376,10 +479,89 @@
             window.location.href = "https://biphmusic.github.io";
         }
 
+        // ==========================================
+        // DATE & TIME DISPLAY
+        // ==========================================
+
+        function updateDateTime() {
+            const now = new Date();
+
+            const date = new Intl.DateTimeFormat('en-GB', {
+                timeZone: 'Asia/Hong_Kong',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }).format(now);
+
+            const time = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Asia/Hong_Kong',
+                hour: 'numeric',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            }).format(now);
+
+            document.getElementById('status-date').textContent = date;
+            document.getElementById('status-time').textContent = time;
+        }
+
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+
+        // ==========================================
+        // BATTERY DISPLAY
+        // ==========================================
+
+        async function initializeBattery() {
+            const percentage = document.getElementById('battery-percentage');
+            const level = document.getElementById('battery-level');
+
+            if (!navigator.getBattery) {
+                percentage.textContent = 'Unavailable';
+                level.style.display = 'none';
+                return;
+            }
+
+            try {
+                const battery = await navigator.getBattery();
+
+                function updateBattery() {
+                    const percent = Math.round(battery.level * 100);
+
+                    percentage.textContent = percent + '%';
+
+                    level.setAttribute(
+                        'width',
+                        Math.max(0, 18 * battery.level)
+                    );
+
+                    level.style.display = battery.level > 0 ? 'block' : 'none';
+                }
+
+                updateBattery();
+
+                battery.addEventListener('levelchange', updateBattery);
+
+            } catch (error) {
+                percentage.textContent = 'Unavailable';
+                level.style.display = 'none';
+            }
+        }
+
+        initializeBattery();
+
+
+        // ==========================================
+        // PAGE RESTORATION
+        // ==========================================
+
         window.addEventListener('pageshow', function () {
             window.scrollTo(0, 0);
             document.documentElement.scrollTop = 0;
             document.body.scrollTop = 0;
+
+            updateDateTime();
         });
     </script>
 </body>
