@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Winter Concert</title>
+  <title>Winter Concert 2026</title>
 
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -441,7 +440,7 @@
   <div class="container mx-auto flex flex-col justify-center min-h-screen">
 
     <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">
-      Winter Concert
+      Winter Concert 2026
     </h1>
 
     <div
@@ -463,93 +462,98 @@
 
       Parts within the same array sit beside each other.
       Separate arrays create separate rows.
+
+      Each instrument name corresponds directly to the
+      filename suffix of its combined Winter Concert PDF.
     */
+
+    const PARTS_FOLDER = 'Winter_Concert_2026_Parts/';
 
     const pdfFiles = {
 
       Strings: [
         [
-          'Home Alone-Violin_1.pdf',
-          'Home Alone-Violin_2.pdf',
-          'Home Alone-Violin_3.pdf'
+          'Violin_1',
+          'Violin_2',
+          'Violin_3'
         ],
         [
-          'Home Alone-Viola_1.pdf'
+          'Viola_1'
         ],
         [
-          'Home Alone-Cello_1.pdf',
-          'Home Alone-Cello_2.pdf',
-          'Home Alone-Cello_3.pdf'
+          'Cello_1',
+          'Cello_2',
+          'Cello_3'
         ],
         [
-          'Home Alone-Contrabass.pdf'
+          'Contrabass'
         ]
       ],
 
       Woodwinds: [
         [
-          'Home Alone-Flute_1.pdf',
-          'Home Alone-Flute_2.pdf',
-          'Home Alone-Flute_3.pdf'
+          'Flute_1',
+          'Flute_2',
+          'Flute_3'
         ],
         [
-          'Home Alone-Oboe.pdf'
+          'Oboe'
         ],
         [
-          'Home Alone-Clarinet_1.pdf',
-          'Home Alone-Clarinet_2.pdf'
+          'Clarinet_1',
+          'Clarinet_2'
         ],
         [
-          'Home Alone-Bass_Clarinet.pdf'
+          'Bass_Clarinet'
         ],
         [
-          'Home Alone-Alto_Sax_1.pdf',
-          'Home Alone-Alto_Sax_2.pdf',
-          'Home Alone-Tenor_Sax.pdf'
+          'Alto_Saxophone_1',
+          'Alto_Saxophone_2',
+          'Tenor_Saxophone'
         ]
       ],
 
       Brass: [
         [
-          'Home Alone-Trumpet_1.pdf',
-          'Home Alone-Trumpet_2.pdf',
-          'Home Alone-Trumpet_3.pdf'
+          'Trumpet_1',
+          'Trumpet_2',
+          'Trumpet_3'
         ],
         [
-          'Home Alone-Horn_1.pdf',
-          'Home Alone-Horn_2.pdf'
+          'Horn_1',
+          'Horn_2'
         ],
         [
-          'Home Alone-Trombone.pdf'
+          'Trombone'
         ],
         [
-          'Home Alone-Tuba.pdf'
+          'Tuba'
         ]
       ],
 
       Percussion: [
         [
-          'Home Alone-Percussion_1.pdf',
-          'Home Alone-Aux_Percussion.pdf'
+          'Percussion_1',
+          'Aux_Percussion'
         ],
         [
-          'Home Alone-Timpani.pdf'
+          'Timpani'
         ],
         [
-          'Home Alone-Marimba.pdf',
-          'Home Alone-Glockenspiel.pdf'
+          'Marimba',
+          'Glockenspiel'
         ]
       ],
 
       Other: [
         [
-          'Home Alone-Harp.pdf'
+          'Harp'
         ],
         [
-          'Home Alone-Piano.pdf'
+          'Piano'
         ],
         [
-          'Home Alone-Conductor.pdf'
+          'Conductor'
         ]
       ]
     };
@@ -557,13 +561,14 @@
     const instrumentSelection =
       document.getElementById('instrument-selection');
 
-    function getDisplayName(file) {
-      let displayName = file
-        .replace('Home Alone-', '')
-        .replace('.pdf', '')
-        .replace(/_/g, ' ');
 
-      // Capitalize words
+    // Convert an instrument identifier into its button label.
+    function getDisplayName(instrument) {
+
+      let displayName = instrument
+        .replace(/_/g, ' ')
+        .replace(/Saxophone/g, 'Sax');
+
       displayName = displayName
         .split(' ')
         .map(word =>
@@ -575,7 +580,10 @@
       return displayName;
     }
 
+
+    // Build all instrument selection buttons.
     function showInstrumentSelection() {
+
       instrumentSelection.innerHTML = '';
 
       for (const [family, groups] of Object.entries(pdfFiles)) {
@@ -596,15 +604,16 @@
           const groupDiv = document.createElement('div');
           groupDiv.className = 'instrument-group';
 
-          instruments.forEach(file => {
+          instruments.forEach(instrument => {
 
             const btn = document.createElement('button');
             btn.className = 'btn';
             btn.type = 'button';
-            btn.textContent = getDisplayName(file);
+
+            btn.textContent = getDisplayName(instrument);
 
             btn.addEventListener('click', () => {
-              displayContent(file);
+              displayContent(instrument);
             });
 
             groupDiv.appendChild(btn);
@@ -617,11 +626,16 @@
       }
     }
 
-    function displayContent(file) {
-      const filePath = `Home_Alone_Parts/${file}`;
 
-      window.location.href = filePath;
+    // Open the combined PDF for the selected instrument.
+    function displayContent(instrument) {
+
+      const filename =
+        `Winter_Concert_2026_${instrument}_Parts.pdf`;
+
+      window.location.href = `${PARTS_FOLDER}${filename}`;
     }
+
 
     // Hamburger menu
     const menuToggle = document.querySelector('.menu-toggle');
@@ -634,6 +648,7 @@
     }
 
     menuToggle.addEventListener('click', () => {
+
       const isOpen = menuItems.classList.toggle('show');
 
       menuToggle.classList.toggle('open', isOpen);
@@ -641,6 +656,7 @@
     });
 
     document.addEventListener('click', event => {
+
       if (
         !menuToggle.contains(event.target) &&
         !menuItems.contains(event.target)
@@ -650,12 +666,14 @@
     });
 
     document.addEventListener('keydown', event => {
+
       if (event.key === 'Escape') {
         closeMenu();
       }
     });
 
-    // Build the instrument selection
+
+    // Build the instrument selection.
     showInstrumentSelection();
 
   </script>
