@@ -420,7 +420,12 @@
       <div class="menu-title">BIPH Band</div>
 
       <a href="https://biphband.github.io/">Home</a>
-      <a href="https://biphband.github.io/winterconcert/">Winter Concert</a>
+      <a
+        href="https://biphband.github.io/winterconcert/"
+        id="winter-concert-link"
+      >
+        Winter Concert
+      </a>
       <a href="https://biphband.github.io/tuner/">Tuner</a>
       <a href="https://biphband.github.io/camera">Video Recorder</a>
       <a href="mailto:garrison.tubbs-biph@basischina.com">Contact</a>
@@ -633,8 +638,29 @@
       const filename =
         `Winter_Concert_2026_${instrument}_Parts.pdf`;
 
-      window.location.href = `${PARTS_FOLDER}${filename}`;
+      const pdfURL =
+        `${PARTS_FOLDER}${filename}?refresh=${Date.now()}`;
+
+      window.location.href = pdfURL;
     }
+
+    // Force-refresh Winter Concert when selected from the menu.
+    document
+      .getElementById('winter-concert-link')
+      .addEventListener('click', event => {
+
+        event.preventDefault();
+
+        const destination =
+          'https://biphband.github.io/winterconcert/';
+
+        // Add a unique query parameter to bypass cached HTML.
+        const refreshURL =
+          `${destination}?refresh=${Date.now()}`;
+
+        window.location.replace(refreshURL);
+
+      });
 
 
     // Hamburger menu
