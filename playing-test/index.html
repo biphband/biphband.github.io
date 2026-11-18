@@ -1659,26 +1659,21 @@ function stopMetronome() {
     }
 }
 
-function playMetronomeClick(time, accent) {
+function playMetronomeClick(time, isAccent = false) {
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
 
-    const ctx = audioContext;
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(isAccent ? 1600 : 1100, time);
 
-    const oscillator = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    oscillator.type = 'sine';
-
-    oscillator.frequency.value = accent ? 1100 : 800;
-
-    gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.linearRampToValueAtTime(0.18, time + 0.003);
-    gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.055);
+    gain.gain.setValueAtTime(isAccent ? 1.0 : 0.75, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
 
     oscillator.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(audioContext.destination);
 
     oscillator.start(time);
-    oscillator.stop(time + 0.06);
+    oscillator.stop(time + 0.12);
 }
 
 function startMetronome(trackId) {
