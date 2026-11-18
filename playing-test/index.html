@@ -305,7 +305,16 @@ body.recorder-page .logocontainer {
     color: #1a4a8a;
     font-size: 1.4rem;
     font-weight: 700;
-    margin: 8px 12px 18px;
+    margin: 8px 12px 4px;
+}
+
+.signed-in-name {
+    text-align: center;
+    color: #555;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0 12px 18px;
+    min-height: 1.2em;
 }
 
 .track-legend {
@@ -581,6 +590,7 @@ body.recorder-page .logocontainer {
     display: flex;
     gap: 10px;
     margin-top: 16px;
+    flex-wrap: wrap;
 }
 
 .global-actions button {
@@ -595,9 +605,7 @@ body.recorder-page .logocontainer {
     cursor: pointer;
 }
 
-#btn-share {
-    background: #8e44ad;
-}
+#btn-share { background: #8e44ad; }
 
 .global-actions button:disabled {
     opacity: 0.45;
@@ -706,6 +714,8 @@ body.recorder-page .logocontainer {
 
         <h2 class="instrument-heading" id="instrument-heading"></h2>
 
+        <div id="signed-in-name" class="signed-in-name"></div>
+
         <div class="track-legend">
             <div class="legend-item">
                 <span class="legend-dot" style="background:var(--track-1)"></span>
@@ -731,7 +741,7 @@ body.recorder-page .logocontainer {
             <div id="track-list"></div>
 
             <div class="global-actions">
-                <button id="btn-share" disabled>↗ Share / AirDrop</button>
+                <button id="btn-share" disabled>↗ Share All</button>
             </div>
         </section>
 
@@ -787,10 +797,10 @@ body.recorder-page .logocontainer {
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
 
 <script>
-
 /* =========================================================
    INSTRUMENT SELECTION
 ========================================================= */
@@ -844,7 +854,6 @@ function getDisplayName(instrument) {
 }
 
 function showInstrumentSelection() {
-
     instrumentSelection.innerHTML = '';
 
     for (const [family, groups] of Object.entries(pdfFiles)) {
@@ -1328,6 +1337,8 @@ function displayContent(instrument) {
     document.getElementById('instrument-heading').textContent =
         getDisplayName(instrument);
 
+    updateSignedInName();
+
     const pagesRoot = document.getElementById('pages-root');
     pagesRoot.innerHTML = '';
 
@@ -1360,6 +1371,7 @@ function displayContent(instrument) {
                 `overlay-btn ${tracks[trackId].color} idle`;
 
             button.dataset.track = trackId;
+
             button.style.top = `${top}%`;
 
             button.textContent = trackId;
@@ -1426,7 +1438,6 @@ const nameError = document.getElementById('name-error');
 
 
 function safeFilenamePart(value) {
-
     return String(value || '')
         .trim()
         .replace(/[<>:"/\\|?*\x00-\x1F]/g, '')
@@ -1437,7 +1448,6 @@ function safeFilenamePart(value) {
 }
 
 function formatTime(seconds) {
-
     if (!isFinite(seconds) || seconds < 0) return '—';
 
     const minutes = Math.floor(seconds / 60);
@@ -1450,61 +1460,20 @@ function updateStatus(message) {
     statusLine.innerHTML = message;
 }
 
+function updateSignedInName() {
 
-/* =========================================================
-   CORRECT SHARED FILENAMES
-========================================================= */
+    const nameDisplay =
+        document.getElementById('signed-in-name');
 
-// Determine the correct file extension from the actual blob.
-// MP3 recordings receive .mp3; fallback recordings retain
-// their actual format and receive the corresponding extension.
+    if (!nameDisplay) return;
 
-function getExtension(blob) {
-
-    const type = (blob.type || '').toLowerCase();
-
-    if (type.includes('mpeg') || type.includes('mp3')) {
-        return 'mp3';
+    if (safeFilenamePart(studentName)) {
+        nameDisplay.textContent =
+            `Signed in as: ${studentName}`;
+    } else {
+        nameDisplay.textContent = '';
     }
-
-    if (type.includes('mp4') || type.includes('m4a')) {
-        return 'm4a';
-    }
-
-    if (type.includes('ogg')) {
-        return 'ogg';
-    }
-
-    if (type.includes('wav') || type.includes('wave')) {
-        return 'wav';
-    }
-
-    if (type.includes('webm')) {
-        return 'webm';
-    }
-
-    return 'audio';
 }
-
-
-// Every shared file gets a unique, descriptive filename.
-
-function getFilename(trackId, blob) {
-
-    const name =
-        safeFilenamePart(studentName) || 'Student';
-
-    const instrument =
-        safeFilenamePart(getDisplayName(currentInstrument)) || 'Instrument';
-
-    const trackTitle =
-        safeFilenamePart(tracks[trackId].title);
-
-    const extension = getExtension(blob);
-
-    return `Winter_Concert_2026_${name}_${instrument}_${trackTitle}.${extension}`;
-}
-
 
 function resetRecordings() {
 
@@ -1538,6 +1507,7 @@ function resetRecordings() {
 function requestStudentName(callback) {
 
     if (safeFilenamePart(studentName)) {
+        updateSignedInName();
         callback();
         return;
     }
@@ -1546,6 +1516,7 @@ function requestStudentName(callback) {
     panelControls.style.display = 'none';
 
     nameInput.value = '';
+
     nameInput.focus();
 
     nameForm.onsubmit = event => {
@@ -1562,6 +1533,8 @@ function requestStudentName(callback) {
 
         studentName = entered;
         window.WinterConcertStudentName = entered;
+
+        updateSignedInName();
 
         nameError.textContent = '';
         namePrompt.classList.remove('visible');
@@ -1592,14 +1565,11 @@ function openPanel(trackId) {
     updatePanelButtons();
 
     if (!safeFilenamePart(studentName)) {
-
         requestStudentName(() => {
             updatePanelButtons();
             updateStatus('Ready to record.');
         });
-
     } else {
-
         updateStatus(
             recordedBlobs[trackId]
                 ? `Previous recording: ${formatTime(durations[trackId])}.`
@@ -1660,20 +1630,32 @@ function stopMetronome() {
 }
 
 function playMetronomeClick(time, isAccent = false) {
+
     const oscillator = audioContext.createOscillator();
     const gain = audioContext.createGain();
 
     oscillator.type = 'square';
-    oscillator.frequency.setValueAtTime(isAccent ? 1600 : 1100, time);
 
-    gain.gain.setValueAtTime(isAccent ? 1.0 : 0.75, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+    oscillator.frequency.setValueAtTime(
+        isAccent ? 1500 : 1050,
+        time
+    );
+
+    gain.gain.setValueAtTime(
+        isAccent ? 0.62 : 0.42,
+        time
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.001,
+        time + 0.10
+    );
 
     oscillator.connect(gain);
     gain.connect(audioContext.destination);
 
     oscillator.start(time);
-    oscillator.stop(time + 0.12);
+    oscillator.stop(time + 0.10);
 }
 
 function startMetronome(trackId) {
@@ -1720,7 +1702,8 @@ function startMetronome(trackId) {
 
             scheduleBeats();
 
-            metronomeTimer = setInterval(scheduleBeats, 25);
+            metronomeTimer =
+                setInterval(scheduleBeats, 25);
 
         }).catch(error => {
             console.warn('Metronome could not start:', error);
@@ -1731,13 +1714,17 @@ function startMetronome(trackId) {
     }
 }
 
-
 async function getMicrophone() {
 
     if (stream) return stream;
 
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Microphone access is not available in this browser.');
+    if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+    ) {
+        throw new Error(
+            'Microphone access is not available in this browser.'
+        );
     }
 
     stream = await navigator.mediaDevices.getUserMedia({
@@ -1766,7 +1753,8 @@ async function blobToMp3(blob) {
 
     const ctx = ensureAudioContext();
 
-    const audioBuffer = await ctx.decodeAudioData(arrayBuffer.slice(0));
+    const audioBuffer =
+        await ctx.decodeAudioData(arrayBuffer.slice(0));
 
     const samples = audioBuffer.getChannelData(0);
     const sampleRate = audioBuffer.sampleRate;
@@ -1775,22 +1763,27 @@ async function blobToMp3(blob) {
 
     for (let i = 0; i < samples.length; i++) {
 
-        const sample = Math.max(-1, Math.min(1, samples[i] * 0.8));
+        const sample =
+            Math.max(-1, Math.min(1, samples[i] * 0.8));
 
         int16[i] = sample < 0
             ? sample * 0x8000
             : sample * 0x7fff;
     }
 
-    const encoder = new lamejs.Mp3Encoder(1, sampleRate, 128);
+    const encoder =
+        new lamejs.Mp3Encoder(1, sampleRate, 128);
 
     const blockSize = 1152;
     const mp3Data = [];
 
     for (let i = 0; i < int16.length; i += blockSize) {
 
-        const chunk = int16.subarray(i, i + blockSize);
-        const encoded = encoder.encodeBuffer(chunk);
+        const chunk =
+            int16.subarray(i, i + blockSize);
+
+        const encoded =
+            encoder.encodeBuffer(chunk);
 
         if (encoded.length > 0) {
             mp3Data.push(encoded);
@@ -1815,7 +1808,11 @@ async function blobToMp3(blob) {
 
 async function startRecording() {
 
-    if (isRecording || stopProcessing || currentTrack == null) {
+    if (
+        isRecording ||
+        stopProcessing ||
+        currentTrack == null
+    ) {
         return;
     }
 
@@ -1834,7 +1831,8 @@ async function startRecording() {
 
         audioChunks = [];
 
-        let mimeType = 'audio/webm;codecs=opus';
+        let mimeType =
+            'audio/webm;codecs=opus';
 
         if (!MediaRecorder.isTypeSupported(mimeType)) {
 
@@ -1857,7 +1855,10 @@ async function startRecording() {
 
         mediaRecorder.ondataavailable = event => {
 
-            if (event.data && event.data.size > 0) {
+            if (
+                event.data &&
+                event.data.size > 0
+            ) {
                 audioChunks.push(event.data);
             }
         };
@@ -1870,49 +1871,79 @@ async function startRecording() {
 
             const elapsed = Math.max(
                 0,
-                (performance.now() - recordStartTime) / 1000
+                (performance.now() -
+                    recordStartTime) / 1000
             );
 
             updateStatus('Converting recording…');
 
             try {
 
-                const rawBlob = new Blob(audioChunks, {
-                    type: mediaRecorder.mimeType || 'audio/webm'
-                });
+                const rawBlob = new Blob(
+                    audioChunks,
+                    {
+                        type:
+                            mediaRecorder.mimeType ||
+                            'audio/webm'
+                    }
+                );
 
-                const mp3Blob = await blobToMp3(rawBlob);
+                const mp3Blob =
+                    await blobToMp3(rawBlob);
 
                 if (recordedUrls[trackId]) {
-                    URL.revokeObjectURL(recordedUrls[trackId]);
+                    URL.revokeObjectURL(
+                        recordedUrls[trackId]
+                    );
                 }
 
                 recordedBlobs[trackId] = mp3Blob;
-                recordedUrls[trackId] = URL.createObjectURL(mp3Blob);
+
+                recordedUrls[trackId] =
+                    URL.createObjectURL(mp3Blob);
+
                 durations[trackId] = elapsed;
 
                 updateStatus(
-                    `Recording saved as MP3 – ${formatTime(elapsed)}.`
+                    `Recording saved as MP3 – ` +
+                    `${formatTime(elapsed)}.`
                 );
 
             } catch (error) {
 
-                console.error('MP3 conversion failed:', error);
+                console.error(
+                    'MP3 conversion failed:',
+                    error
+                );
 
-                const fallbackBlob = new Blob(audioChunks, {
-                    type: mediaRecorder.mimeType || 'audio/webm'
-                });
+                const fallbackBlob = new Blob(
+                    audioChunks,
+                    {
+                        type:
+                            mediaRecorder.mimeType ||
+                            'audio/webm'
+                    }
+                );
 
                 if (recordedUrls[trackId]) {
-                    URL.revokeObjectURL(recordedUrls[trackId]);
+                    URL.revokeObjectURL(
+                        recordedUrls[trackId]
+                    );
                 }
 
-                recordedBlobs[trackId] = fallbackBlob;
-                recordedUrls[trackId] = URL.createObjectURL(fallbackBlob);
+                recordedBlobs[trackId] =
+                    fallbackBlob;
+
+                recordedUrls[trackId] =
+                    URL.createObjectURL(
+                        fallbackBlob
+                    );
+
                 durations[trackId] = elapsed;
 
                 updateStatus(
-                    `Recording saved – ${formatTime(elapsed)}.`
+                    `Recording saved – ` +
+                    `${formatTime(elapsed)}.`
                 );
 
             } finally {
@@ -1960,7 +1991,6 @@ async function startRecording() {
     }
 }
 
-
 function stopRecording() {
 
     if (
@@ -1990,14 +2020,24 @@ function stopRecording() {
         console.error(error);
 
         stopProcessing = false;
+
         updatePanelButtons();
 
-        updateStatus('Could not stop recording.');
+        updateStatus(
+            'Could not stop recording.'
+        );
     }
 }
 
-btnStart.addEventListener('click', startRecording);
-btnStop.addEventListener('click', stopRecording);
+btnStart.addEventListener(
+    'click',
+    startRecording
+);
+
+btnStop.addEventListener(
+    'click',
+    stopRecording
+);
 
 
 /* =========================================================
@@ -2006,15 +2046,21 @@ btnStop.addEventListener('click', stopRecording);
 
 function playRecording(trackId) {
 
-    if (isPlaying && currentTrack === trackId && currentAudio) {
+    if (
+        isPlaying &&
+        currentTrack === trackId &&
+        currentAudio
+    ) {
 
         currentAudio.pause();
+
         isPlaying = false;
 
         updatePanelButtons();
         renderChecklist();
 
         updateStatus('Paused.');
+
         return;
     }
 
@@ -2050,14 +2096,22 @@ function playRecording(trackId) {
 
     currentAudio.play()
         .then(() => {
-            updateStatus('Playing recording…');
+
+            updateStatus(
+                'Playing recording…'
+            );
+
         })
         .catch(error => {
 
             isPlaying = false;
+
             updatePanelButtons();
 
-            updateStatus('Playback failed: ' + error.message);
+            updateStatus(
+                'Playback failed: ' +
+                error.message
+            );
         });
 
     isPlaying = true;
@@ -2069,6 +2123,7 @@ function playRecording(trackId) {
 function stopPlayback() {
 
     if (currentAudio) {
+
         currentAudio.pause();
         currentAudio.currentTime = 0;
         currentAudio = null;
@@ -2092,7 +2147,8 @@ btnPlay.addEventListener('click', () => {
 function updatePanelButtons() {
 
     const hasRecording =
-        currentTrack != null && !!recordedBlobs[currentTrack];
+        currentTrack != null &&
+        !!recordedBlobs[currentTrack];
 
     btnStart.disabled =
         isRecording ||
@@ -2108,35 +2164,55 @@ function updatePanelButtons() {
         stopProcessing;
 
     btnStart.textContent =
-        isRecording ? '● Recording…' : '● Record';
+        isRecording
+            ? '● Recording…'
+            : '● Record';
 
     btnPlay.textContent =
-        isPlaying ? '❚❚ Pause' : '▶ Play';
+        isPlaying
+            ? '❚❚ Pause'
+            : '▶ Play';
 }
 
 function updateOverlayStates() {
 
-    document.querySelectorAll('.overlay-btn').forEach(button => {
+    document
+        .querySelectorAll('.overlay-btn')
+        .forEach(button => {
 
-        const trackId = Number(button.dataset.track);
+            const trackId =
+                Number(button.dataset.track);
 
-        button.classList.remove('recording', 'done');
+            button.classList.remove(
+                'recording',
+                'done'
+            );
 
-        if (isRecording && currentTrack === trackId) {
+            if (
+                isRecording &&
+                currentTrack === trackId
+            ) {
 
-            button.classList.add('recording');
-            button.textContent = '';
+                button.classList.add(
+                    'recording'
+                );
 
-        } else if (recordedBlobs[trackId]) {
+                button.textContent = '';
 
-            button.classList.add('done');
-            button.textContent = '✓';
+            } else if (
+                recordedBlobs[trackId]
+            ) {
 
-        } else {
+                button.classList.add('done');
 
-            button.textContent = trackId;
-        }
-    });
+                button.textContent = '✓';
+
+            } else {
+
+                button.textContent =
+                    trackId;
+            }
+        });
 }
 
 
@@ -2146,164 +2222,378 @@ function updateOverlayStates() {
 
 function renderChecklist() {
 
-    const list = document.getElementById('track-list');
+    const list =
+        document.getElementById('track-list');
 
     list.innerHTML = '';
 
-    Object.entries(tracks).forEach(([id, track]) => {
+    Object.entries(tracks).forEach(
+        ([id, track]) => {
 
-        const trackId = Number(id);
-        const hasRecording = !!recordedBlobs[trackId];
+            const trackId = Number(id);
 
-        const card = document.createElement('div');
-        card.className = 'track-card';
+            const hasRecording =
+                !!recordedBlobs[trackId];
 
-        card.innerHTML = `
-            <span class="label">${track.title}</span>
+            const card =
+                document.createElement('div');
 
-            <span class="status ${hasRecording ? 'ready' : ''}">
-                ${
-                    hasRecording
-                        ? '✓ Ready – ' + formatTime(durations[trackId])
-                        : 'Not recorded'
+            card.className = 'track-card';
+
+            card.innerHTML = `
+                <span class="label">
+                    ${track.title}
+                </span>
+
+                <span class="status ${
+                    hasRecording ? 'ready' : ''
+                }">
+                    ${
+                        hasRecording
+                            ? '✓ Ready – ' +
+                              formatTime(
+                                  durations[trackId]
+                              )
+                            : 'Not recorded'
+                    }
+                </span>
+
+                <div class="actions">
+
+                    ${
+                        hasRecording
+                            ? `<button data-play="${trackId}">
+                                ▶ Play
+                               </button>`
+                            : ''
+                    }
+
+                    ${
+                        hasRecording
+                            ? `<button data-share="${trackId}">
+                                ↗ Share
+                               </button>`
+                            : ''
+                    }
+
+                    <button data-record="${trackId}">
+                        ${
+                            hasRecording
+                                ? 'Re-record'
+                                : 'Record'
+                        }
+                    </button>
+
+                </div>
+            `;
+
+            list.appendChild(card);
+        }
+    );
+
+    list
+        .querySelectorAll('[data-play]')
+        .forEach(button => {
+
+            button.addEventListener(
+                'click',
+                () => {
+
+                    const id =
+                        Number(
+                            button.dataset.play
+                        );
+
+                    openPanel(id);
+                    playRecording(id);
+
+                    window.setTimeout(
+                        renderChecklist,
+                        50
+                    );
                 }
-            </span>
+            );
+        });
 
-            <div class="actions">
+    list
+        .querySelectorAll('[data-share]')
+        .forEach(button => {
 
-                ${
-                    hasRecording
-                        ? `<button data-play="${trackId}">
-                            ▶ Play
-                           </button>`
-                        : ''
+            button.addEventListener(
+                'click',
+                () => {
+
+                    shareOne(
+                        Number(
+                            button.dataset.share
+                        )
+                    );
                 }
-
-                <button data-record="${trackId}">
-                    ${hasRecording ? 'Re-record' : 'Record'}
-                </button>
-
-            </div>
-        `;
-
-        list.appendChild(card);
-    });
-
-    list.querySelectorAll('[data-play]').forEach(button => {
-
-        button.addEventListener('click', () => {
-
-            const id = Number(button.dataset.play);
-
-            openPanel(id);
-            playRecording(id);
-
-            window.setTimeout(renderChecklist, 50);
+            );
         });
-    });
 
-    list.querySelectorAll('[data-record]').forEach(button => {
+    list
+        .querySelectorAll('[data-record]')
+        .forEach(button => {
 
-        button.addEventListener('click', () => {
-            openPanel(Number(button.dataset.record));
+            button.addEventListener(
+                'click',
+                () => {
+
+                    openPanel(
+                        Number(
+                            button.dataset.record
+                        )
+                    );
+                }
+            );
         });
-    });
 
-    const any = Object.keys(recordedBlobs).length > 0;
+    const any =
+        Object.keys(recordedBlobs).length > 0;
 
-    document.getElementById('btn-share').disabled = !any;
+
+    document
+        .getElementById('btn-share')
+        .disabled = !any;
+}
+
+/* =========================================================
+   SHARING
+========================================================= */
+
+function getExtension(blob) {
+
+    const type =
+        (blob.type || '').toLowerCase();
+
+    if (
+        type.includes('mpeg') ||
+        type.includes('mp3')
+    ) {
+        return 'mp3';
+    }
+
+    if (type.includes('mp4')) {
+        return 'm4a';
+    }
+
+    return 'webm';
+}
+
+function getFilename(trackId, extension) {
+
+    const name =
+        safeFilenamePart(studentName) ||
+        'Student';
+
+    const instrument =
+        safeFilenamePart(
+            getDisplayName(currentInstrument)
+        );
+
+    const trackTitle =
+        safeFilenamePart(
+            tracks[trackId].title
+        );
+
+    return (
+        `Winter_Concert_2026_` +
+        `${name}_` +
+        `${instrument}_` +
+        `${trackTitle}.` +
+        `${extension}`
+    );
 }
 
 
 /* =========================================================
-   SHARING / AIRDROP
+   SHARE ONE TRACK
 ========================================================= */
 
-async function shareRecordings() {
+async function shareOne(trackId) {
 
-    const ids = Object.keys(recordedBlobs);
+    const blob =
+        recordedBlobs[trackId];
 
-    if (!ids.length) {
-        alert('Please record something before sharing.');
-        return;
-    }
+    if (!blob) return;
 
     if (!safeFilenamePart(studentName)) {
-        requestStudentName(shareRecordings);
+
+        requestStudentName(
+            () => shareOne(trackId)
+        );
+
         return;
     }
 
     if (!navigator.share) {
 
         alert(
-            'Sharing is not supported in this browser. ' +
-            'Please use an iPad or iPhone with a browser that supports sharing.'
+            'Sharing is not supported in this browser.'
         );
 
         return;
     }
 
-    // Build each File using its own track ID and actual blob.
-    // This ensures that every recording receives its correct
-    // student, instrument, track name, and file extension.
-
-    const files = [];
-
-    for (const id of ids) {
-
-        const trackId = Number(id);
-        const blob = recordedBlobs[trackId];
-
-        const filename = getFilename(trackId, blob);
-
-        const file = new File(
-            [blob],
-            filename,
-            {
-                type: blob.type || 'application/octet-stream',
-                lastModified: Date.now()
-            }
+    const filename =
+        getFilename(
+            trackId,
+            getExtension(blob)
         );
 
-        files.push(file);
-
-        console.log('Prepared shared file:', filename);
-    }
+    const file = new File(
+        [blob],
+        filename,
+        {
+            type:
+                blob.type ||
+                'audio/mpeg'
+        }
+    );
 
     const shareData = {
-        files,
-        title: 'Winter Concert 2026 Recordings',
+
+        files: [file],
+
+        title:
+            tracks[trackId].title,
+
         text:
-            `Winter Concert 2026 recordings by ${studentName} ` +
-            `(${getDisplayName(currentInstrument)})`
+            `${tracks[trackId].title} — ` +
+            `${studentName} — ` +
+            `${getDisplayName(currentInstrument)}`
     };
 
     try {
 
-        // Check that the device supports sharing files.
-
         if (
             navigator.canShare &&
-            navigator.canShare({ files })
+            navigator.canShare(shareData)
         ) {
 
-            await navigator.share(shareData);
+            await navigator.share(
+                shareData
+            );
 
         } else {
 
             alert(
-                'This device cannot share audio files directly. ' +
-                'Please try another browser or device.'
+                'This browser cannot share ' +
+                'audio files directly.'
             );
         }
 
     } catch (error) {
 
-        // Canceling the share sheet is not an error.
-
         if (error.name !== 'AbortError') {
 
-            console.error('Share failed:', error);
+            alert(
+                'Share failed: ' +
+                (error.message || error)
+            );
+        }
+    }
+}
+
+
+/* =========================================================
+   SHARE ALL RECORDINGS
+========================================================= */
+
+async function shareRecordings() {
+
+    const ids =
+        Object.keys(recordedBlobs);
+
+    if (!ids.length) {
+
+        alert(
+            'Please record something before sharing.'
+        );
+
+        return;
+    }
+
+    if (!safeFilenamePart(studentName)) {
+
+        requestStudentName(
+            shareRecordings
+        );
+
+        return;
+    }
+
+    if (!navigator.share) {
+
+        alert(
+            'Sharing is not supported in this browser.'
+        );
+
+        return;
+    }
+
+    const files = [];
+
+    for (const id of ids) {
+
+        const trackId =
+            Number(id);
+
+        const blob =
+            recordedBlobs[trackId];
+
+        files.push(
+            new File(
+                [blob],
+                getFilename(
+                    trackId,
+                    getExtension(blob)
+                ),
+                {
+                    type:
+                        blob.type ||
+                        'audio/mpeg'
+                }
+            )
+        );
+    }
+
+    const shareData = {
+
+        files,
+
+        title:
+            'Winter Concert 2026 Recordings',
+
+        text:
+            `Winter Concert 2026 recordings ` +
+            `by ${studentName} ` +
+            `(${getDisplayName(currentInstrument)})`
+    };
+
+    try {
+
+        if (
+            navigator.canShare &&
+            navigator.canShare(shareData)
+        ) {
+
+            await navigator.share(
+                shareData
+            );
+
+        } else {
+
+            alert(
+                'This browser cannot share ' +
+                'audio files directly.'
+            );
+        }
+
+    } catch (error) {
+
+        if (error.name !== 'AbortError') {
 
             alert(
                 'Share failed: ' +
@@ -2315,7 +2605,10 @@ async function shareRecordings() {
 
 document
     .getElementById('btn-share')
-    .addEventListener('click', shareRecordings);
+    .addEventListener(
+        'click',
+        shareRecordings
+    );
 
 
 /* =========================================================
@@ -2324,9 +2617,15 @@ document
 
 function restoreInstrumentSelection() {
 
-    if (isRecording || stopProcessing) {
+    if (
+        isRecording ||
+        stopProcessing
+    ) {
 
-        alert('Please stop the current recording before leaving.');
+        alert(
+            'Please stop the current recording before leaving.'
+        );
+
         return;
     }
 
@@ -2335,17 +2634,30 @@ function restoreInstrumentSelection() {
 
     if (stream) {
 
-        stream.getTracks().forEach(track => track.stop());
+        stream
+            .getTracks()
+            .forEach(track => track.stop());
+
         stream = null;
     }
 
     resetRecordings();
 
-    document.getElementById('recorder-view').classList.remove('active');
+    document
+        .getElementById(
+            'recorder-view'
+        )
+        .classList.remove('active');
 
-    document.getElementById('instrument-selection-view').style.display = 'block';
+    document
+        .getElementById(
+            'instrument-selection-view'
+        )
+        .style.display = 'block';
 
-    document.body.classList.remove('recorder-page');
+    document.body.classList.remove(
+        'recorder-page'
+    );
 
     currentInstrument = null;
 
@@ -2353,54 +2665,100 @@ function restoreInstrumentSelection() {
 }
 
 document
-    .getElementById('back-to-instruments')
-    .addEventListener('click', event => {
+    .getElementById(
+        'back-to-instruments'
+    )
+    .addEventListener(
+        'click',
+        event => {
 
-        event.preventDefault();
-        restoreInstrumentSelection();
-    });
+            event.preventDefault();
+
+            restoreInstrumentSelection();
+        }
+    );
 
 
 /* =========================================================
    HAMBURGER MENU
 ========================================================= */
 
-const menuToggle = document.querySelector('.menu-toggle');
-const menuItems = document.querySelector('.menu-items');
+const menuToggle =
+    document.querySelector(
+        '.menu-toggle'
+    );
+
+const menuItems =
+    document.querySelector(
+        '.menu-items'
+    );
 
 function closeMenu() {
 
-    menuToggle.classList.remove('open');
-    menuItems.classList.remove('show');
+    menuToggle.classList.remove(
+        'open'
+    );
 
-    menuToggle.setAttribute('aria-expanded', 'false');
+    menuItems.classList.remove(
+        'show'
+    );
+
+    menuToggle.setAttribute(
+        'aria-expanded',
+        'false'
+    );
 }
 
-menuToggle.addEventListener('click', () => {
+menuToggle.addEventListener(
+    'click',
+    () => {
 
-    const isOpen = menuItems.classList.toggle('show');
+        const isOpen =
+            menuItems.classList.toggle(
+                'show'
+            );
 
-    menuToggle.classList.toggle('open', isOpen);
-    menuToggle.setAttribute('aria-expanded', String(isOpen));
-});
+        menuToggle.classList.toggle(
+            'open',
+            isOpen
+        );
 
-document.addEventListener('click', event => {
-
-    if (
-        !menuToggle.contains(event.target) &&
-        !menuItems.contains(event.target)
-    ) {
-        closeMenu();
+        menuToggle.setAttribute(
+            'aria-expanded',
+            String(isOpen)
+        );
     }
-});
+);
 
-document.addEventListener('keydown', event => {
+document.addEventListener(
+    'click',
+    event => {
 
-    if (event.key === 'Escape') {
-        closeMenu();
-        closePanel();
+        if (
+            !menuToggle.contains(
+                event.target
+            ) &&
+            !menuItems.contains(
+                event.target
+            )
+        ) {
+
+            closeMenu();
+        }
     }
-});
+);
+
+document.addEventListener(
+    'keydown',
+    event => {
+
+        if (event.key === 'Escape') {
+
+            closeMenu();
+            closePanel();
+        }
+    }
+);
 
 
 /* =========================================================
@@ -2408,31 +2766,43 @@ document.addEventListener('keydown', event => {
 ========================================================= */
 
 document
-    .getElementById('winter-concert-link')
-    .addEventListener('click', event => {
+    .getElementById(
+        'winter-concert-link'
+    )
+    .addEventListener(
+        'click',
+        event => {
 
-        event.preventDefault();
+            event.preventDefault();
 
-        const destination =
-            'https://biphband.github.io/winterconcert/';
+            const destination =
+                'https://biphband.github.io/winterconcert/';
 
-        window.location.replace(
-            `${destination}?refresh=${Date.now()}`
-        );
-    });
+            window.location.replace(
+                `${destination}?refresh=${Date.now()}`
+            );
+        }
+    );
 
 
 /* =========================================================
    PREVENT ACCIDENTAL NAVIGATION DURING RECORDING
 ========================================================= */
 
-window.addEventListener('beforeunload', event => {
+window.addEventListener(
+    'beforeunload',
+    event => {
 
-    if (isRecording || stopProcessing) {
-        event.preventDefault();
-        event.returnValue = '';
+        if (
+            isRecording ||
+            stopProcessing
+        ) {
+
+            event.preventDefault();
+            event.returnValue = '';
+        }
     }
-});
+);
 
 
 /* =========================================================
@@ -2440,6 +2810,8 @@ window.addEventListener('beforeunload', event => {
 ========================================================= */
 
 showInstrumentSelection();
+
+updateSignedInName();
 
 </script>
 
