@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -581,7 +582,6 @@ body.recorder-page .logocontainer {
     display: flex;
     gap: 10px;
     margin-top: 16px;
-    flex-wrap: wrap;
 }
 
 .global-actions button {
@@ -596,8 +596,9 @@ body.recorder-page .logocontainer {
     cursor: pointer;
 }
 
-#btn-download-all { background: #1a4a8a; }
-#btn-share { background: #8e44ad; }
+#btn-share {
+    background: #8e44ad;
+}
 
 .global-actions button:disabled {
     opacity: 0.45;
@@ -731,8 +732,7 @@ body.recorder-page .logocontainer {
             <div id="track-list"></div>
 
             <div class="global-actions">
-                <button id="btn-download-all" disabled>⬇ Download All</button>
-                <button id="btn-share" disabled>↗ Share</button>
+                <button id="btn-share" disabled>↗ Share / AirDrop</button>
             </div>
         </section>
 
@@ -788,10 +788,10 @@ body.recorder-page .logocontainer {
     </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
 
 <script>
+
 /* =========================================================
    INSTRUMENT SELECTION
 ========================================================= */
@@ -845,6 +845,7 @@ function getDisplayName(instrument) {
 }
 
 function showInstrumentSelection() {
+
     instrumentSelection.innerHTML = '';
 
     for (const [family, groups] of Object.entries(pdfFiles)) {
@@ -887,12 +888,6 @@ function showInstrumentSelection() {
 
 /* =========================================================
    SCORE IMAGE AND TRACK-BUTTON CONFIGURATION
-
-   Each marker is:
-   [page number, track number, vertical position percentage]
-
-   The vertical positions are based on the printed, colored
-   track headings in the supplied score images.
 ========================================================= */
 
 const instrumentParts = {
@@ -1284,17 +1279,22 @@ const tracks = {
     1: {
         title: 'Main Titles',
         color: 'track-1',
-        bpm: 105
+        bpm: 105,
+        beatsPerMeasure: 4
     },
+
     2: {
         title: 'Setting the Trap',
         color: 'track-2',
-        bpm: 180
+        bpm: 180,
+        beatsPerMeasure: 3
     },
+
     3: {
         title: 'Somewhere In My Memory',
         color: 'track-3',
-        bpm: 70
+        bpm: 70,
+        beatsPerMeasure: 4
     }
 };
 
@@ -1361,7 +1361,6 @@ function displayContent(instrument) {
                 `overlay-btn ${tracks[trackId].color} idle`;
 
             button.dataset.track = trackId;
-
             button.style.top = `${top}%`;
 
             button.textContent = trackId;
@@ -1428,6 +1427,7 @@ const nameError = document.getElementById('name-error');
 
 
 function safeFilenamePart(value) {
+
     return String(value || '')
         .trim()
         .replace(/[<>:"/\\|?*\x00-\x1F]/g, '')
@@ -1438,6 +1438,7 @@ function safeFilenamePart(value) {
 }
 
 function formatTime(seconds) {
+
     if (!isFinite(seconds) || seconds < 0) return '—';
 
     const minutes = Math.floor(seconds / 60);
@@ -1449,6 +1450,62 @@ function formatTime(seconds) {
 function updateStatus(message) {
     statusLine.innerHTML = message;
 }
+
+
+/* =========================================================
+   CORRECT SHARED FILENAMES
+========================================================= */
+
+// Determine the correct file extension from the actual blob.
+// MP3 recordings receive .mp3; fallback recordings retain
+// their actual format and receive the corresponding extension.
+
+function getExtension(blob) {
+
+    const type = (blob.type || '').toLowerCase();
+
+    if (type.includes('mpeg') || type.includes('mp3')) {
+        return 'mp3';
+    }
+
+    if (type.includes('mp4') || type.includes('m4a')) {
+        return 'm4a';
+    }
+
+    if (type.includes('ogg')) {
+        return 'ogg';
+    }
+
+    if (type.includes('wav') || type.includes('wave')) {
+        return 'wav';
+    }
+
+    if (type.includes('webm')) {
+        return 'webm';
+    }
+
+    return 'audio';
+}
+
+
+// Every shared file gets a unique, descriptive filename.
+
+function getFilename(trackId, blob) {
+
+    const name =
+        safeFilenamePart(studentName) || 'Student';
+
+    const instrument =
+        safeFilenamePart(getDisplayName(currentInstrument)) || 'Instrument';
+
+    const trackTitle =
+        safeFilenamePart(tracks[trackId].title);
+
+    const extension = getExtension(blob);
+
+    return `Winter_Concert_2026_${name}_${instrument}_${trackTitle}.${extension}`;
+}
+
 
 function resetRecordings() {
 
@@ -1490,7 +1547,6 @@ function requestStudentName(callback) {
     panelControls.style.display = 'none';
 
     nameInput.value = '';
-
     nameInput.focus();
 
     nameForm.onsubmit = event => {
@@ -1537,11 +1593,14 @@ function openPanel(trackId) {
     updatePanelButtons();
 
     if (!safeFilenamePart(studentName)) {
+
         requestStudentName(() => {
             updatePanelButtons();
             updateStatus('Ready to record.');
         });
+
     } else {
+
         updateStatus(
             recordedBlobs[trackId]
                 ? `Previous recording: ${formatTime(durations[trackId])}.`
@@ -1581,6 +1640,7 @@ function ensureAudioContext() {
     return audioContext;
 }
 
+
 /* =========================================================
    METRONOME
 ========================================================= */
@@ -1592,7 +1652,6 @@ let metronomeBeat = 0;
 
 function stopMetronome() {
 
-    // Invalidate any pending start operation.
     metronomeRunId++;
 
     if (metronomeTimer !== null) {
@@ -1610,7 +1669,6 @@ function playMetronomeClick(time, accent) {
 
     oscillator.type = 'sine';
 
-    // A slightly higher pitch on the first beat.
     oscillator.frequency.value = accent ? 1100 : 800;
 
     gain.gain.setValueAtTime(0.0001, time);
@@ -1630,6 +1688,7 @@ function startMetronome(trackId) {
 
     const runId = metronomeRunId;
     const bpm = tracks[trackId].bpm;
+    const beatsPerMeasure = tracks[trackId].beatsPerMeasure;
 
     try {
 
@@ -1637,7 +1696,6 @@ function startMetronome(trackId) {
 
         ctx.resume().then(() => {
 
-            // Do not restart if recording has already stopped.
             if (runId !== metronomeRunId || !isRecording) {
                 return;
             }
@@ -1654,12 +1712,11 @@ function startMetronome(trackId) {
                     return;
                 }
 
-                // Schedule slightly ahead to keep the tempo steady.
                 while (nextBeatTime < ctx.currentTime + 0.12) {
 
                     playMetronomeClick(
                         nextBeatTime,
-                        metronomeBeat % 4 === 0
+                        metronomeBeat % beatsPerMeasure === 0
                     );
 
                     nextBeatTime += secondsPerBeat;
@@ -1669,8 +1726,6 @@ function startMetronome(trackId) {
 
             scheduleBeats();
 
-            // Frequent scheduling avoids relying on setInterval
-            // for the actual musical timing.
             metronomeTimer = setInterval(scheduleBeats, 25);
 
         }).catch(error => {
@@ -1681,6 +1736,7 @@ function startMetronome(trackId) {
         console.warn('Metronome unavailable:', error);
     }
 }
+
 
 async function getMicrophone() {
 
@@ -1787,9 +1843,11 @@ async function startRecording() {
         let mimeType = 'audio/webm;codecs=opus';
 
         if (!MediaRecorder.isTypeSupported(mimeType)) {
+
             mimeType = 'audio/webm';
 
             if (!MediaRecorder.isTypeSupported(mimeType)) {
+
                 mimeType = 'audio/mp4';
 
                 if (!MediaRecorder.isTypeSupported(mimeType)) {
@@ -1880,7 +1938,6 @@ async function startRecording() {
 
         isRecording = true;
 
-        // Start the metronome at this track's assigned tempo.
         startMetronome(trackId);
 
         updatePanelButtons();
@@ -1909,6 +1966,7 @@ async function startRecording() {
     }
 }
 
+
 function stopRecording() {
 
     if (
@@ -1922,7 +1980,6 @@ function stopRecording() {
 
     stopProcessing = true;
 
-    // Stop the metronome immediately.
     stopMetronome();
 
     btnStart.disabled = true;
@@ -1931,7 +1988,9 @@ function stopRecording() {
     updateStatus('Stopping recording…');
 
     try {
+
         mediaRecorder.stop();
+
     } catch (error) {
 
         console.error(error);
@@ -2000,8 +2059,10 @@ function playRecording(trackId) {
             updateStatus('Playing recording…');
         })
         .catch(error => {
+
             isPlaying = false;
             updatePanelButtons();
+
             updateStatus('Playback failed: ' + error.message);
         });
 
@@ -2068,12 +2129,17 @@ function updateOverlayStates() {
         button.classList.remove('recording', 'done');
 
         if (isRecording && currentTrack === trackId) {
+
             button.classList.add('recording');
             button.textContent = '';
+
         } else if (recordedBlobs[trackId]) {
+
             button.classList.add('done');
             button.textContent = '✓';
+
         } else {
+
             button.textContent = trackId;
         }
     });
@@ -2119,14 +2185,6 @@ function renderChecklist() {
                         : ''
                 }
 
-                ${
-                    hasRecording
-                        ? `<button data-download="${trackId}">
-                            ⬇ Download
-                           </button>`
-                        : ''
-                }
-
                 <button data-record="${trackId}">
                     ${hasRecording ? 'Re-record' : 'Record'}
                 </button>
@@ -2150,13 +2208,6 @@ function renderChecklist() {
         });
     });
 
-    list.querySelectorAll('[data-download]').forEach(button => {
-
-        button.addEventListener('click', () => {
-            downloadOne(Number(button.dataset.download));
-        });
-    });
-
     list.querySelectorAll('[data-record]').forEach(button => {
 
         button.addEventListener('click', () => {
@@ -2166,147 +2217,12 @@ function renderChecklist() {
 
     const any = Object.keys(recordedBlobs).length > 0;
 
-    document.getElementById('btn-download-all').disabled = !any;
     document.getElementById('btn-share').disabled = !any;
 }
 
 
 /* =========================================================
-   DOWNLOADS
-========================================================= */
-
-function getExtension(blob) {
-
-    const type = (blob.type || '').toLowerCase();
-
-    if (type.includes('mpeg') || type.includes('mp3')) {
-        return 'mp3';
-    }
-
-    if (type.includes('mp4')) {
-        return 'm4a';
-    }
-
-    return 'webm';
-}
-
-function getFilename(trackId, extension) {
-
-    const name = safeFilenamePart(studentName) || 'Student';
-
-    const instrument = safeFilenamePart(
-        getDisplayName(currentInstrument)
-    );
-
-    const trackTitle = safeFilenamePart(
-        tracks[trackId].title
-    );
-
-    return `Winter_Concert_2026_${name}_${instrument}_${trackTitle}.${extension}`;
-}
-
-function downloadBlob(blob, filename) {
-
-    const url = URL.createObjectURL(blob);
-
-    const anchor = document.createElement('a');
-
-    anchor.href = url;
-    anchor.download = filename;
-    anchor.style.display = 'none';
-
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-
-    window.setTimeout(() => {
-        URL.revokeObjectURL(url);
-    }, 1500);
-}
-
-function downloadOne(trackId) {
-
-    const blob = recordedBlobs[trackId];
-
-    if (!blob) return;
-
-    if (!safeFilenamePart(studentName)) {
-        requestStudentName(() => downloadOne(trackId));
-        return;
-    }
-
-    downloadBlob(
-        blob,
-        getFilename(trackId, getExtension(blob))
-    );
-}
-
-async function downloadAll() {
-
-    const ids = Object.keys(recordedBlobs);
-
-    if (!ids.length) {
-        alert('Please record something first.');
-        return;
-    }
-
-    if (!safeFilenamePart(studentName)) {
-        requestStudentName(downloadAll);
-        return;
-    }
-
-    if (!window.JSZip) {
-
-        ids.forEach(id => downloadOne(Number(id)));
-        return;
-    }
-
-    try {
-
-        const zip = new JSZip();
-
-        ids.forEach(id => {
-
-            const trackId = Number(id);
-            const blob = recordedBlobs[trackId];
-
-            const filename = getFilename(
-                trackId,
-                getExtension(blob)
-            );
-
-            zip.file(filename, blob);
-        });
-
-        const content = await zip.generateAsync({
-            type: 'blob'
-        });
-
-        const name = safeFilenamePart(studentName);
-
-        downloadBlob(
-            content,
-            `Winter_Concert_2026_${name}_Recordings.zip`
-        );
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            'Download failed: ' +
-            (error.message || error)
-        );
-    }
-}
-
-document
-    .getElementById('btn-download-all')
-    .addEventListener('click', downloadAll);
-
-
-/* =========================================================
-   SHARING
+   SHARING / AIRDROP
 ========================================================= */
 
 async function shareRecordings() {
@@ -2324,12 +2240,18 @@ async function shareRecordings() {
     }
 
     if (!navigator.share) {
+
         alert(
             'Sharing is not supported in this browser. ' +
-            'Please use Download All instead.'
+            'Please use an iPad or iPhone with a browser that supports sharing.'
         );
+
         return;
     }
+
+    // Build each File using its own track ID and actual blob.
+    // This ensures that every recording receives its correct
+    // student, instrument, track name, and file extension.
 
     const files = [];
 
@@ -2338,15 +2260,20 @@ async function shareRecordings() {
         const trackId = Number(id);
         const blob = recordedBlobs[trackId];
 
-        files.push(
-            new File(
-                [blob],
-                getFilename(trackId, getExtension(blob)),
-                {
-                    type: blob.type || 'audio/mpeg'
-                }
-            )
+        const filename = getFilename(trackId, blob);
+
+        const file = new File(
+            [blob],
+            filename,
+            {
+                type: blob.type || 'application/octet-stream',
+                lastModified: Date.now()
+            }
         );
+
+        files.push(file);
+
+        console.log('Prepared shared file:', filename);
     }
 
     const shareData = {
@@ -2359,18 +2286,31 @@ async function shareRecordings() {
 
     try {
 
-        if (navigator.canShare && navigator.canShare(shareData)) {
+        // Check that the device supports sharing files.
+
+        if (
+            navigator.canShare &&
+            navigator.canShare({ files })
+        ) {
+
             await navigator.share(shareData);
+
         } else {
+
             alert(
-                'This browser cannot share audio files directly. ' +
-                'Please use Download All, then share the files.'
+                'This device cannot share audio files directly. ' +
+                'Please try another browser or device.'
             );
         }
 
     } catch (error) {
 
+        // Canceling the share sheet is not an error.
+
         if (error.name !== 'AbortError') {
+
+            console.error('Share failed:', error);
+
             alert(
                 'Share failed: ' +
                 (error.message || error)
@@ -2391,6 +2331,7 @@ document
 function restoreInstrumentSelection() {
 
     if (isRecording || stopProcessing) {
+
         alert('Please stop the current recording before leaving.');
         return;
     }
@@ -2399,6 +2340,7 @@ function restoreInstrumentSelection() {
     stopPlayback();
 
     if (stream) {
+
         stream.getTracks().forEach(track => track.stop());
         stream = null;
     }
@@ -2406,6 +2348,7 @@ function restoreInstrumentSelection() {
     resetRecordings();
 
     document.getElementById('recorder-view').classList.remove('active');
+
     document.getElementById('instrument-selection-view').style.display = 'block';
 
     document.body.classList.remove('recorder-page');
@@ -2508,3 +2451,4 @@ showInstrumentSelection();
 
 </body>
 </html>
+```
